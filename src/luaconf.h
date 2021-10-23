@@ -262,11 +262,6 @@
 #define LUA_MAXINPUT	512
 
 
-/* No readline */
-#define lua_readline(L,b,p)	\
-	((void)L, fputs(p, stdout), fflush(stdout),  /* show prompt */ \
-	fgets(b, LUA_MAXINPUT, stdin) != NULL)  /* get line */
-
 #endif
 
 /* }================================================================== */

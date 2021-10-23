@@ -5,6 +5,7 @@
 */
 
 
+#include <ncurses.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +41,7 @@ static void laction (int i) {
 
 
 static void print_usage (void) {
-  fprintf(stderr,
+  printw(
   "usage: %s [options] [script [args]].\n"
   "Available options are:\n"
   "  -e stat  execute string " LUA_QL("stat") "\n"
@@ -51,14 +52,14 @@ static void print_usage (void) {
   "  -        execute stdin and stop handling options\n"
   ,
   progname);
-  fflush(stderr);
+  refresh();
 }
 
 
 static void l_message (const char *pname, const char *msg) {
-  if (pname) fprintf(stderr, "%s: ", pname);
-  fprintf(stderr, "%s\n", msg);
-  fflush(stderr);
+  if (pname) printw("%s: ", pname);
+  printw("%s\n", msg);
+  refresh();
 }
 
 
@@ -179,10 +180,9 @@ static int pushline (lua_State *L, int firstline) {
   char *b = buffer;
   size_t l;
   const char *prmt = get_prompt(L, firstline);
-  fputs(prmt, stdout);
-  fflush(stdout);
-  if (fgets(buffer, LUA_MAXINPUT, stdin) == NULL)
-    return 0;  /* no input */
+  addstr(prmt);
+  refresh();
+  getnstr(b, LUA_MAXINPUT);
   l = strlen(b);
   if (l > 0 && b[l-1] == '\n')  /* line ends with newline? */
     b[l-1] = '\0';  /* remove it */
@@ -231,7 +231,7 @@ static void dotty (lua_State *L) {
   }
   lua_settop(L, 0);  /* clear stack */
   fputs("\n", stdout);
-  fflush(stdout);
+  refresh();
   progname = oldprogname;
 }
 
@@ -352,6 +352,7 @@ static int pmain (lua_State *L) {
   script = collectargs(argv, &has_i, &has_v, &has_e);
   if (script < 0) {  /* invalid args? */
     print_usage();
+    getch();
     s->status = 1;
     return 0;
   }
@@ -382,11 +383,15 @@ int main (int argc, char **argv) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
   }
+  initscr();
+  echo();
   s.argc = argc;
   s.argv = argv;
   status = lua_cpcall(L, &pmain, &s);
   report(L, status);
   lua_close(L);
+  getch();
+  endwin();
   return (status || s.status) ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 

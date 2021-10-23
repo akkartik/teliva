@@ -49,7 +49,6 @@ static void print_usage (void) {
   "  -i       enter interactive mode after executing " LUA_QL("script") "\n"
   "  -v       show version information\n"
   "  --       stop handling options\n"
-  "  -        execute stdin and stop handling options\n"
   ,
   progname);
   refresh();
@@ -200,7 +199,7 @@ static int loadline (lua_State *L) {
   if (!pushline(L, 1))
     return -1;  /* no input */
   for (;;) {  /* repeat until gets a complete line */
-    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
+    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=keyboard");
     if (!incomplete(L, status)) break;  /* cannot try to add lines? */
     if (!pushline(L, 0))  /* no more input? */
       return -1;
@@ -230,7 +229,6 @@ static void dotty (lua_State *L) {
     }
   }
   lua_settop(L, 0);  /* clear stack */
-  fputs("\n", stdout);
   refresh();
   progname = oldprogname;
 }
@@ -242,8 +240,6 @@ static int handle_script (lua_State *L, char **argv, int n) {
   int narg = getargs(L, argv, n);  /* collect arguments */
   lua_setglobal(L, "arg");
   fname = argv[n];
-  if (strcmp(fname, "-") == 0 && strcmp(argv[n-1], "--") != 0) 
-    fname = NULL;  /* stdin */
   status = luaL_loadfile(L, fname);
   lua_insert(L, -(narg+1));
   if (status == 0)
@@ -365,11 +361,8 @@ static int pmain (lua_State *L) {
   if (has_i)
     dotty(L);
   else if (script == 0 && !has_e && !has_v) {
-    if (lua_stdin_is_tty()) {
-      print_version();
-      dotty(L);
-    }
-    else dofile(L, NULL);  /* executes stdin as a file */
+    print_version();
+    dotty(L);
   }
   return 0;
 }

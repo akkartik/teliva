@@ -218,23 +218,6 @@
 
 #if defined(lua_c) || defined(luaall_c)
 
-/*
-@@ lua_stdin_is_tty detects whether the standard input is a 'tty' (that
-@* is, whether we're running lua interactively).
-** CHANGE it if you have a better definition for non-POSIX/non-Windows
-** systems.
-*/
-#if defined(LUA_USE_ISATTY)
-#include <unistd.h>
-#define lua_stdin_is_tty()	isatty(0)
-#elif defined(LUA_WIN)
-#include <io.h>
-#include <stdio.h>
-#define lua_stdin_is_tty()	_isatty(_fileno(stdin))
-#else
-#define lua_stdin_is_tty()	1  /* assume stdin is a tty */
-#endif
-
 
 /*
 @@ LUA_PROMPT is the default prompt used by stand-alone Lua.

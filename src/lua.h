@@ -284,8 +284,6 @@ LUA_API void lua_setallocf (lua_State *L, lua_Alloc f, void *ud);
 ** compatibility macros and functions
 */
 
-#define lua_open()	luaL_newstate()
-
 #define lua_getregistry(L)	lua_pushvalue(L, LUA_REGISTRYINDEX)
 
 #define lua_getgccount(L)	lua_gc(L, LUA_GCCOUNT, 0)

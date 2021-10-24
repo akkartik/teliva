@@ -6,7 +6,14 @@ typedef struct LG {
 
 lua_State:
   &{Value; int tt} stack, stack_last, base, top
+  GCObject* next
+  byte tt  # type == THREAD
+
+initializing a lua_State (lua_newstate)
+  allocate space (including for globals)
+  next = NULL
+  stack = NULL
 
 == todo stack
-lua_newstate
+where are stack_last/base/top initialized?
 lua_State's stack

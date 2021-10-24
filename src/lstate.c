@@ -24,10 +24,6 @@
 #include "ltm.h"
 
 
-#define fromstate(l)	(cast(lu_byte *, (l)))
-#define tostate(l)   (cast(lua_State *, cast(lu_byte *, l)))
-
-
 /*
 ** Main thread combines a thread state and the global state
 */
@@ -111,12 +107,12 @@ static void close_state (lua_State *L) {
   luaZ_freebuffer(L, &g->buff);
   freestack(L, L);
   lua_assert(g->totalbytes == sizeof(LG));
-  (*g->frealloc)(g->ud, fromstate(L), sizeof(LG), 0);
+  (*g->frealloc)(g->ud, cast(lu_byte*, L), sizeof(LG), 0);
 }
 
 
 lua_State *luaE_newthread (lua_State *L) {
-  lua_State *L1 = tostate(luaM_malloc(L, sizeof(lua_State)));
+  lua_State *L1 = cast(lua_State*, luaM_malloc(L, sizeof(lua_State)));
   luaC_link(L, obj2gco(L1), LUA_TTHREAD);
   preinit_state(L1, G(L));
   stack_init(L1, L);  /* init stack */
@@ -135,7 +131,7 @@ void luaE_freethread (lua_State *L, lua_State *L1) {
   lua_assert(L1->openupval == NULL);
   luai_userstatefree(L1);
   freestack(L, L1);
-  luaM_freemem(L, fromstate(L1), sizeof(lua_State));
+  luaM_freemem(L, cast(lu_byte*, L1), sizeof(lua_State));
 }
 
 
@@ -145,7 +141,7 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   global_State *g;
   void *l = (*f)(ud, NULL, 0, sizeof(LG));
   if (l == NULL) return NULL;
-  L = tostate(l);
+  L = cast(lua_State*, l);
   g = &((LG *)L)->g;
   L->next = NULL;
   L->tt = LUA_TTHREAD;

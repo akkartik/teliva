@@ -141,7 +141,7 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   void *l = (*f)(ud, NULL, 0, sizeof(LG));
   if (l == NULL) return NULL;
   L = cast(lua_State*, l);
-  g = &cast(LG *, L)->g;
+  g = &cast(LG *, l)->g;
   L->next = NULL;
   L->tt = LUA_TTHREAD;
   g->currentwhite = bit2mask(WHITE0BIT, FIXEDBIT);

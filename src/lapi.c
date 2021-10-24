@@ -145,7 +145,6 @@ LUA_API lua_State *lua_newthread (lua_State *L) {
   setthvalue(L, L->top, L1);
   api_incr_top(L);
   lua_unlock(L);
-  luai_userstatethread(L, L1);
   return L1;
 }
 

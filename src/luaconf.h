@@ -665,19 +665,6 @@ union luai_Cast { double l_d; long l_l; };
 
 
 /*
-@@ luai_userstate* allow user-specific actions on threads.
-** CHANGE them if you defined LUAI_EXTRASPACE and need to do something
-** extra when a thread is created/deleted/resumed/yielded.
-*/
-#define luai_userstateopen(L)		((void)L)
-#define luai_userstateclose(L)		((void)L)
-#define luai_userstatethread(L,L1)	((void)L)
-#define luai_userstatefree(L)		((void)L)
-#define luai_userstateresume(L,n)	((void)L)
-#define luai_userstateyield(L,n)	((void)L)
-
-
-/*
 @@ LUA_INTFRMLEN is the length modifier for integer conversions
 @* in 'string.format'.
 @@ LUA_INTFRM_T is the integer type correspoding to the previous length

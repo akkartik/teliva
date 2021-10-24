@@ -8,6 +8,5 @@ lua_State:
   &{Value; int tt} stack, stack_last, base, top
 
 == todo stack
-eradicate LUAI_EXTRASPACE
 lua_newstate
 lua_State's stack

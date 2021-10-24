@@ -378,6 +378,9 @@ int main (int argc, char **argv) {
   }
   initscr();
   echo();
+  lua_pushinteger(L, 42);
+  lua_setfield(L, -1, "answer");
+//?   lua_setglobal(L, "answer");
   s.argc = argc;
   s.argv = argv;
   status = lua_cpcall(L, &pmain, &s);

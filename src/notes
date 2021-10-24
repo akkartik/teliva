@@ -9,9 +9,5 @@ lua_State:
   GCObject* next
   byte tt  # type == THREAD
 
-initializing a lua_State (lua_newstate)
-  allocate space (including for globals)
-  next = NULL
-  stack = NULL
-
 Lua's stack vs globals: https://lucasklassmann.com/blog/2019-02-02-how-to-embeddeding-lua-in-c/#exposing-a-simple-variable
+More info on the stack: https://www.lua.org/pil/24.2.html

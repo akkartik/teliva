@@ -14,6 +14,4 @@ initializing a lua_State (lua_newstate)
   next = NULL
   stack = NULL
 
-== todo stack
-where are stack_last/base/top initialized?
-lua_State's stack
+Lua's stack vs globals: https://lucasklassmann.com/blog/2019-02-02-how-to-embeddeding-lua-in-c/#exposing-a-simple-variable

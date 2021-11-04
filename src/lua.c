@@ -368,6 +368,75 @@ static int pmain (lua_State *L) {
 }
 
 
+//? static const char *WINDOWMETA = "curses:window";  // metatable for all ncurses WINDOW objects
+//? // prototype for all ncurses WINDOW metatables
+//? static const luaL_Reg curses_window_fns[] = {
+//?   {"addstr", Waddstr},
+//?   {NULL, NULL}
+//? };
+
+
+typedef struct NumArray {
+  int size;
+  double values[1];  /* variable part */
+} NumArray;
+
+
+static int newarray (lua_State *L) {
+  int n = luaL_checkint(L, 1);
+  size_t nbytes = sizeof(NumArray) + (n - 1)*sizeof(double);
+  NumArray *a = (NumArray *)lua_newuserdata(L, nbytes);
+  a->size = n;
+  return 1;  /* new userdatum is already on the stack */
+}
+
+
+static int setarray (lua_State *L) {
+  NumArray *a = (NumArray *)lua_touserdata(L, 1);
+  int index = luaL_checkint(L, 2);
+  double value = luaL_checknumber(L, 3);
+
+  luaL_argcheck(L, a != NULL, 1, "`array' expected");
+
+  luaL_argcheck(L, 1 <= index && index <= a->size, 2,
+                   "index out of range");
+
+  a->values[index-1] = value;
+  return 0;
+}
+
+
+static int getarray (lua_State *L) {
+  NumArray *a = (NumArray *)lua_touserdata(L, 1);
+  int index = luaL_checkint(L, 2);
+
+  luaL_argcheck(L, a != NULL, 1, "`array' expected");
+
+  luaL_argcheck(L, 1 <= index && index <= a->size, 2,
+                   "index out of range");
+
+  lua_pushnumber(L, a->values[index-1]);
+  return 1;
+}
+
+
+static int getsize (lua_State *L) {
+  NumArray *a = (NumArray *)lua_touserdata(L, 1);
+  luaL_argcheck(L, a != NULL, 1, "`array' expected");
+  lua_pushnumber(L, a->size);
+  return 1;
+}
+
+
+static const struct luaL_Reg arraylib[] = {
+  {"new", newarray},
+  {"set", setarray},
+  {"get", getarray},
+  {"size", getsize},
+  {NULL, NULL}
+};
+
+
 int main (int argc, char **argv) {
   int status;
   struct Smain s;
@@ -376,11 +445,10 @@ int main (int argc, char **argv) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
   }
+  luaL_register(L, "array", arraylib);
+//?   luaL_register(L, "curses.window", curses_window_fns);
   initscr();
   echo();
-  lua_pushinteger(L, 42);
-  lua_setfield(L, -1, "answer");
-//?   lua_setglobal(L, "answer");
   s.argc = argc;
   s.argv = argv;
   status = lua_cpcall(L, &pmain, &s);

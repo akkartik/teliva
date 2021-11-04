@@ -11,3 +11,18 @@ lua_State:
 
 Lua's stack vs globals: https://lucasklassmann.com/blog/2019-02-02-how-to-embeddeding-lua-in-c/#exposing-a-simple-variable
 More info on the stack: https://www.lua.org/pil/24.2.html
+
+
+
+# T[k] = v
+
+## Approach 1:
+  -- initial { ... T ... }
+  push k
+  push v
+  settable index(T)
+  -- final { ... T ... }
+
+## Approach 2 (if k is a string):
+  push v
+  setfield index(T), k

@@ -378,13 +378,13 @@ static int pmain (lua_State *L) {
 
 typedef struct NumArray {
   int size;
-  double values[1];  /* variable part */
+  double values[0];  /* variable part */
 } NumArray;
 
 
 static int newarray (lua_State *L) {
   int n = luaL_checkint(L, 1);
-  size_t nbytes = sizeof(NumArray) + (n - 1)*sizeof(double);
+  size_t nbytes = sizeof(NumArray) + n*sizeof(double);
   NumArray *a = (NumArray *)lua_newuserdata(L, nbytes);
   a->size = n;
   return 1;  /* new userdatum is already on the stack */

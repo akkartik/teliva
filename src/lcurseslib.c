@@ -193,12 +193,16 @@ static const luaL_Reg curses_window_methods[] =
 
 LUALIB_API int luaopen_curses (lua_State *L) {
   luaL_newmetatable(L, "curses:window");
+
   /* metatable.__index = metatable */
   lua_pushstring(L, "__index");
   lua_pushvalue(L, -2);
   lua_settable(L, -3);
+
   luaL_register(L, NULL, curses_window_methods);
+
   luaL_register(L, "curses", curseslib);
+
   /* save main window on registry */
   curses_newwin(L, stdscr);
   lua_pushstring(L, "curses:stdscr");

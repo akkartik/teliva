@@ -466,7 +466,6 @@ int main (int argc, char **argv) {
   /* stack: metatable */
   luaL_register(L, NULL, array_methods);  /* register array_methods in metatable */
   luaL_register(L, "array", arraylib_functions);
-//?   luaL_register(L, "curses.window", curses_window_fns);
   initscr();
   echo();
   s.argc = argc;

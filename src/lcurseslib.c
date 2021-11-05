@@ -8,6 +8,12 @@
 #include "lualib.h"
 
 
+static int Prefresh (lua_State *L) {
+  refresh();
+  return 1;
+}
+
+
 static int Pstdscr (lua_State *L) {
   lua_pushstring(L, "curses:stdscr");
   lua_rawget(L, LUA_REGISTRYINDEX);
@@ -15,14 +21,8 @@ static int Pstdscr (lua_State *L) {
 }
 
 
-static int Pcols (lua_State *L) {
-  lua_pushinteger(L, COLS);
-  return 1;
-}
-
-
 static const struct luaL_Reg curseslib [] = {
-  {"cols", Pcols},
+  {"refresh", Prefresh},
   {"stdscr", Pstdscr},
   {NULL, NULL}
 };
@@ -167,6 +167,24 @@ static int Wgetmaxyx (lua_State *L) {
 }
 
 
+static int Wcols (lua_State *L) {
+  WINDOW *w = checkwin(L, 1);
+  int y, x;
+  getmaxyx(w, y, x);
+  lua_pushinteger(L, x);
+  return 1;
+}
+
+
+static int Wlines (lua_State *L) {
+  WINDOW *w = checkwin(L, 1);
+  int y, x;
+  getmaxyx(w, y, x);
+  lua_pushinteger(L, y);
+  return 1;
+}
+
+
 static int Wmvaddch (lua_State *L) {
   WINDOW *w = checkwin(L, 1);
   int y = checkinteger(L, 2, "int");
@@ -195,9 +213,11 @@ static const luaL_Reg curses_window_methods[] =
   {"attroff", Wattroff},
   {"attron", Wattron},
   {"clear", Wclear},
+  {"cols", Wcols},
   {"getch", Wgetch},
   {"getmaxyx", Wgetmaxyx},
   {"getyx", Wgetyx},
+  {"lines", Wlines},
   {"mvaddch", Wmvaddch},
   {"mvaddstr", Wmvaddstr},
   {NULL, NULL}

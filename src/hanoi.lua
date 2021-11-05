@@ -52,11 +52,11 @@ end
 
 
 local function update(screen)
-  screen:mvaddstr(curses.lines()-2, 5, "tower to remove top disk from? ")
-  local from = string.byte(curses.getch()) - 96
+  screen:mvaddstr(screen:lines()-2, 5, "tower to remove top disk from? ")
+  local from = string.byte(screen:getch()) - 96
   curses.refresh()
-  screen:mvaddstr(curses.lines()-1, 5, "tower to stack it on? ")
-  local to = string.byte(curses.getch()) - 96
+  screen:mvaddstr(screen:lines()-1, 5, "tower to stack it on? ")
+  local to = string.byte(screen:getch()) - 96
   curses.refresh()
   make_move(from, to)
 end

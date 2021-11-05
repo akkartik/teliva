@@ -30,7 +30,7 @@ static const struct luaL_Reg curseslib [] = {
 static void curses_newwin (lua_State *L, WINDOW *nw) {
   if (nw) {
     WINDOW **w = lua_newuserdata(L, sizeof(WINDOW*));
-    luaL_getmetatable(L, "meta.window");
+    luaL_getmetatable(L, "curses:window");
     lua_setmetatable(L, -2);
     *w = nw;
   }
@@ -42,7 +42,7 @@ static void curses_newwin (lua_State *L, WINDOW *nw) {
 
 
 static WINDOW **lc_getwin (lua_State *L, int offset) {
-	WINDOW **w = (WINDOW**)luaL_checkudata(L, offset, "meta.window");
+	WINDOW **w = (WINDOW**)luaL_checkudata(L, offset, "curses:window");
 	if (w == NULL)
 		luaL_argerror(L, offset, "bad curses window");
 	return w;
@@ -98,7 +98,7 @@ static const luaL_Reg curses_window_methods[] =
 
 
 LUALIB_API int luaopen_curses (lua_State *L) {
-  luaL_newmetatable(L, "meta.window");
+  luaL_newmetatable(L, "curses:window");
   luaL_register(L, NULL, curses_window_methods);
   luaL_register(L, "curses", curseslib);
   /* save main window on registry */

@@ -387,7 +387,7 @@ static int newarray (lua_State *L) {
   size_t nbytes = sizeof(NumArray) + n*sizeof(double);
   NumArray *a = (NumArray *)lua_newuserdata(L, nbytes);
 
-  luaL_getmetatable(L, "meta.array");
+  luaL_getmetatable(L, "array");
   lua_setmetatable(L, -2);
 
   a->size = n;
@@ -397,7 +397,7 @@ static int newarray (lua_State *L) {
 
 /* ensure bottom of stack is an array */
 static NumArray *checkarray (lua_State *L) {
-  void *ud = luaL_checkudata(L, 1, "meta.array");
+  void *ud = luaL_checkudata(L, 1, "array");
   luaL_argcheck(L, ud != NULL, 1, "`array' expected");
   return (NumArray *)ud;
 }
@@ -457,7 +457,7 @@ int main (int argc, char **argv) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
   }
-  luaL_newmetatable(L, "meta.array");
+  luaL_newmetatable(L, "array");
   /* stack: metatable */
   lua_pushstring(L, "__index");
   /* stack: metatable "__index" */

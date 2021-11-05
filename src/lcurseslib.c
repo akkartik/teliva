@@ -81,6 +81,18 @@ static int optint (lua_State *L, int narg, lua_Integer def) {
 }
 
 
+static int W__tostring (lua_State *L) {
+  WINDOW **w = lc_getwin(L, 1);
+  char buff[34];
+  if (*w == NULL)
+    strcpy(buff, "closed");
+  else
+    sprintf(buff, "%p", lua_touserdata(L, 1));
+  lua_pushfstring(L, "curses window (%s)", buff);
+  return 1;
+}
+
+
 static int Waddstr (lua_State *L) {
   WINDOW *w = checkwin(L, 1);
   const char *str = luaL_checkstring(L, 2);
@@ -92,6 +104,7 @@ static int Waddstr (lua_State *L) {
 
 static const luaL_Reg curses_window_methods[] =
 {
+  {"__tostring", W__tostring},
   {"addstr", Waddstr},
   {NULL, NULL}
 };

@@ -6,6 +6,13 @@
 #include "lualib.h"
 
 
+static int Pstdscr(lua_State *L) {
+  lua_pushstring(L, "curses:stdscr");
+  lua_rawget(L, LUA_REGISTRYINDEX);
+  return 1;
+}
+
+
 static int Pcols(lua_State *L) {
   lua_pushinteger(L, COLS);
   return 1;
@@ -14,6 +21,7 @@ static int Pcols(lua_State *L) {
 
 static const struct luaL_Reg curseslib [] = {
   {"cols", Pcols},
+  {"stdscr", Pstdscr},
   {NULL, NULL}
 };
 
@@ -34,7 +42,11 @@ static void curses_newwin (lua_State *L, WINDOW *nw) {
 
 LUALIB_API int luaopen_curses (lua_State *L) {
   luaL_register(L, "curses", curseslib);
+  /* save main window on registry */
   curses_newwin(L, stdscr);
+  lua_pushstring(L, "curses:stdscr");
+  lua_pushvalue(L, -2);
+  lua_rawset(L, LUA_REGISTRYINDEX);
   return 1;
 }
 

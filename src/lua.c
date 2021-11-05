@@ -386,17 +386,27 @@ static int newarray (lua_State *L) {
   int n = luaL_checkint(L, 1);
   size_t nbytes = sizeof(NumArray) + n*sizeof(double);
   NumArray *a = (NumArray *)lua_newuserdata(L, nbytes);
+
+  luaL_getmetatable(L, "meta.array");
+  lua_setmetatable(L, -2);
+
   a->size = n;
   return 1;  /* new userdatum is already on the stack */
 }
 
 
+/* ensure bottom of stack is an array */
+static NumArray *checkarray (lua_State *L) {
+  void *ud = luaL_checkudata(L, 1, "meta.array");
+  luaL_argcheck(L, ud != NULL, 1, "`array' expected");
+  return (NumArray *)ud;
+}
+
+
 static int setarray (lua_State *L) {
-  NumArray *a = (NumArray *)lua_touserdata(L, 1);
+  NumArray *a = checkarray(L);
   int index = luaL_checkint(L, 2);
   double value = luaL_checknumber(L, 3);
-
-  luaL_argcheck(L, a != NULL, 1, "`array' expected");
 
   luaL_argcheck(L, 1 <= index && index <= a->size, 2,
                    "index out of range");
@@ -407,10 +417,8 @@ static int setarray (lua_State *L) {
 
 
 static int getarray (lua_State *L) {
-  NumArray *a = (NumArray *)lua_touserdata(L, 1);
+  NumArray *a = checkarray(L);
   int index = luaL_checkint(L, 2);
-
-  luaL_argcheck(L, a != NULL, 1, "`array' expected");
 
   luaL_argcheck(L, 1 <= index && index <= a->size, 2,
                    "index out of range");
@@ -421,7 +429,7 @@ static int getarray (lua_State *L) {
 
 
 static int getsize (lua_State *L) {
-  NumArray *a = (NumArray *)lua_touserdata(L, 1);
+  NumArray *a = checkarray(L);
   luaL_argcheck(L, a != NULL, 1, "`array' expected");
   lua_pushnumber(L, a->size);
   return 1;
@@ -445,6 +453,7 @@ int main (int argc, char **argv) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
   }
+  luaL_newmetatable(L, "meta.array");
   luaL_register(L, "array", arraylib);
 //?   luaL_register(L, "curses.window", curses_window_fns);
   initscr();

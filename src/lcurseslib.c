@@ -135,6 +135,18 @@ static int Wclear (lua_State *L) {
 }
 
 
+static int Wgetch (lua_State *L) {
+  WINDOW *w = checkwin(L, 1);
+  int c = wgetch(w);
+
+  if (c == ERR)
+    return 0;
+
+  lua_pushinteger(L, c);
+  return 1;
+}
+
+
 static int Wgetyx (lua_State *L) {
   WINDOW *w = checkwin(L, 1);
   int y, x;
@@ -183,6 +195,7 @@ static const luaL_Reg curses_window_methods[] =
   {"attroff", Wattroff},
   {"attron", Wattron},
   {"clear", Wclear},
+  {"getch", Wgetch},
   {"getmaxyx", Wgetmaxyx},
   {"getyx", Wgetyx},
   {"mvaddch", Wmvaddch},

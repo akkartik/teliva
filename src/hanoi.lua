@@ -65,11 +65,10 @@ end
 local function main()
   local screen = curses.stdscr()
 
-  render(screen)
---?   while true do
---?     render(screen)
---?     update(screen)
---?   end
+  while true do
+    render(screen)
+    update(screen)
+  end
 end
 
 

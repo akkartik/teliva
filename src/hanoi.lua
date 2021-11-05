@@ -36,8 +36,7 @@ end
 
 local function render(screen)
   screen:clear()
-  local lines = curses.lines()
-  local cols = curses.cols()
+  local lines, cols = screen:getmaxyx()
   local line = math.floor(lines/2)
   local col = math.floor(cols/4)
   for i,t in ipairs(tower) do

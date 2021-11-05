@@ -109,11 +109,33 @@ static int Wclear (lua_State *L) {
 }
 
 
+static int Wgetyx (lua_State *L) {
+  WINDOW *w = checkwin(L, 1);
+  int y, x;
+  getyx(w, y, x);
+  lua_pushinteger(L, y);
+  lua_pushinteger(L, x);
+  return 2;
+}
+
+
+static int Wgetmaxyx (lua_State *L) {
+  WINDOW *w = checkwin(L, 1);
+  int y, x;
+  getmaxyx(w, y, x);
+  lua_pushinteger(L, y);
+  lua_pushinteger(L, x);
+  return 2;
+}
+
+
 static const luaL_Reg curses_window_methods[] =
 {
   {"__tostring", W__tostring},
   {"addstr", Waddstr},
   {"clear", Wclear},
+  {"getmaxyx", Wgetmaxyx},
+  {"getyx", Wgetyx},
   {NULL, NULL}
 };
 

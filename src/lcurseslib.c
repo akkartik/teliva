@@ -103,6 +103,22 @@ static int Waddstr (lua_State *L) {
 }
 
 
+static int Wattroff (lua_State *L) {
+  WINDOW *w = checkwin(L, 1);
+  int attrs = checkinteger(L, 2, "int");
+  lua_pushboolean(L, wattroff(w, attrs));
+  return 1;
+}
+
+
+static int Wattron (lua_State *L) {
+  WINDOW *w = checkwin(L, 1);
+  int attrs = checkinteger(L, 2, "int");
+  lua_pushboolean(L, wattron(w, attrs));
+  return 1;
+}
+
+
 static int Wclear (lua_State *L) {
   lua_pushboolean(L, wclear(checkwin(L, 1)));
   return 1;
@@ -133,6 +149,8 @@ static const luaL_Reg curses_window_methods[] =
 {
   {"__tostring", W__tostring},
   {"addstr", Waddstr},
+  {"attroff", Wattroff},
+  {"attron", Wattron},
   {"clear", Wclear},
   {"getmaxyx", Wgetmaxyx},
   {"getyx", Wgetyx},

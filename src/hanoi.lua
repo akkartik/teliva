@@ -17,6 +17,16 @@ local function pop(array)
   return table.remove(array)
 end
 
+local function lines(window)
+  local lines, cols = window:getmaxyx()
+  return lines
+end
+
+local function cols(window)
+  local lines, cols = window:getmaxyx()
+  return cols
+end
+
 
 local function render_tower(screen, line, col, tower_index, tower)
   screen:attron(curses.A_BOLD)
@@ -52,10 +62,10 @@ end
 
 
 local function update(screen)
-  screen:mvaddstr(screen:lines()-2, 5, "tower to remove top disk from? ")
+  screen:mvaddstr(lines(screen)-2, 5, "tower to remove top disk from? ")
   local from = screen:getch() - 96
   curses.refresh()
-  screen:mvaddstr(screen:lines()-1, 5, "tower to stack it on? ")
+  screen:mvaddstr(lines(screen)-1, 5, "tower to stack it on? ")
   local to = screen:getch() - 96
   curses.refresh()
   make_move(from, to)

@@ -167,24 +167,6 @@ static int Wgetmaxyx (lua_State *L) {
 }
 
 
-static int Wcols (lua_State *L) {
-  WINDOW *w = checkwin(L, 1);
-  int y, x;
-  getmaxyx(w, y, x);
-  lua_pushinteger(L, x);
-  return 1;
-}
-
-
-static int Wlines (lua_State *L) {
-  WINDOW *w = checkwin(L, 1);
-  int y, x;
-  getmaxyx(w, y, x);
-  lua_pushinteger(L, y);
-  return 1;
-}
-
-
 static int Wmvaddch (lua_State *L) {
   WINDOW *w = checkwin(L, 1);
   int y = checkinteger(L, 2, "int");
@@ -213,11 +195,9 @@ static const luaL_Reg curses_window_methods[] =
   {"attroff", Wattroff},
   {"attron", Wattron},
   {"clear", Wclear},
-  {"cols", Wcols},
   {"getch", Wgetch},
   {"getmaxyx", Wgetmaxyx},
   {"getyx", Wgetyx},
-  {"lines", Wlines},
   {"mvaddch", Wmvaddch},
   {"mvaddstr", Wmvaddstr},
   {NULL, NULL}

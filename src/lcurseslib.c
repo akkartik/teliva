@@ -75,6 +75,16 @@ static lua_Integer checkinteger (lua_State *L, int narg, const char *expected) {
 }
 
 
+static chtype checkch (lua_State *L, int narg) {
+  if (lua_isnumber(L, narg))
+    return cast(chtype, checkinteger(L, narg, "int"));
+  if (lua_isstring(L, narg))
+    return *lua_tostring(L, narg);
+
+  return argtypeerror(L, narg, "int or char");
+}
+
+
 static int optint (lua_State *L, int narg, lua_Integer def) {
   if (lua_isnoneornil(L, narg))
     return cast(int, def);
@@ -145,6 +155,27 @@ static int Wgetmaxyx (lua_State *L) {
 }
 
 
+static int Wmvaddch (lua_State *L) {
+  WINDOW *w = checkwin(L, 1);
+  int y = checkinteger(L, 2, "int");
+  int x = checkinteger(L, 3, "int");
+  chtype ch = checkch(L, 4);
+  mvwaddch(w, y, x, ch);
+  return 1;
+}
+
+
+static int Wmvaddstr (lua_State *L) {
+  WINDOW *w = checkwin(L, 1);
+  int y = checkinteger(L, 2, "int");
+  int x = checkinteger(L, 3, "int");
+  const char *str = luaL_checkstring(L, 4);
+  int n = optint(L, 5, -1);
+  mvwaddnstr(w, y, x, str, n);
+  return 1;
+}
+
+
 static const luaL_Reg curses_window_methods[] =
 {
   {"__tostring", W__tostring},
@@ -154,6 +185,8 @@ static const luaL_Reg curses_window_methods[] =
   {"clear", Wclear},
   {"getmaxyx", Wgetmaxyx},
   {"getyx", Wgetyx},
+  {"mvaddch", Wmvaddch},
+  {"mvaddstr", Wmvaddstr},
   {NULL, NULL}
 };
 

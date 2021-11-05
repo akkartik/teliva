@@ -436,8 +436,12 @@ static int getsize (lua_State *L) {
 }
 
 
-static const struct luaL_Reg arraylib[] = {
+static const struct luaL_Reg arraylib_functions [] = {
   {"new", newarray},
+  {NULL, NULL}
+};
+
+static const struct luaL_Reg array_methods [] = {
   {"set", setarray},
   {"get", getarray},
   {"size", getsize},
@@ -454,7 +458,14 @@ int main (int argc, char **argv) {
     return EXIT_FAILURE;
   }
   luaL_newmetatable(L, "meta.array");
-  luaL_register(L, "array", arraylib);
+  /* stack: metatable */
+  lua_pushstring(L, "__index");
+  /* stack: metatable "__index" */
+  lua_pushvalue(L, -2);  /* metatable */
+  lua_settable(L, -3);  /* metatable.__index = metatable */
+  /* stack: metatable */
+  luaL_register(L, NULL, array_methods);  /* register array_methods in metatable */
+  luaL_register(L, "array", arraylib_functions);
 //?   luaL_register(L, "curses.window", curses_window_fns);
   initscr();
   echo();

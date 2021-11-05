@@ -64,14 +64,12 @@ end
 
 
 local function main()
-  local screen = curses.initscr()
+  local screen = curses.stdscr()
 
   while true do
     render(screen)
     update(screen)
   end
-
-  curses.endwin()
 end
 
 

@@ -191,6 +191,75 @@ static const luaL_Reg curses_window_methods[] =
 };
 
 
+static void register_curses_constant(lua_State *L, const char* name, int val) {
+  lua_pushstring(L, name);
+  lua_pushinteger(L, val);
+  lua_settable(L, -3);
+}
+
+
+static void register_curses_constants (lua_State *L) {
+#define CC(s) register_curses_constant(L, #s, s)
+  /* colors */
+  CC(COLOR_BLACK);
+  CC(COLOR_RED);
+  CC(COLOR_GREEN);
+  CC(COLOR_YELLOW);
+  CC(COLOR_BLUE);
+  CC(COLOR_MAGENTA);
+  CC(COLOR_CYAN);
+  CC(COLOR_WHITE);
+
+  /* alternate character set */
+  CC(ACS_BLOCK);
+  CC(ACS_BOARD);
+
+  CC(ACS_BTEE);
+  CC(ACS_TTEE);
+  CC(ACS_LTEE);
+  CC(ACS_RTEE);
+  CC(ACS_LLCORNER);
+  CC(ACS_LRCORNER);
+  CC(ACS_URCORNER);
+  CC(ACS_ULCORNER);
+
+  CC(ACS_LARROW);
+  CC(ACS_RARROW);
+  CC(ACS_UARROW);
+  CC(ACS_DARROW);
+
+  CC(ACS_HLINE);
+  CC(ACS_VLINE);
+
+  CC(ACS_BULLET);
+  CC(ACS_CKBOARD);
+  CC(ACS_LANTERN);
+  CC(ACS_DEGREE);
+  CC(ACS_DIAMOND);
+
+  CC(ACS_PLMINUS);
+  CC(ACS_PLUS);
+  CC(ACS_S1);
+  CC(ACS_S9);
+
+  /* attributes */
+  CC(A_NORMAL);
+  CC(A_STANDOUT);
+  CC(A_UNDERLINE);
+  CC(A_REVERSE);
+  CC(A_BLINK);
+  CC(A_DIM);
+  CC(A_BOLD);
+  CC(A_PROTECT);
+  CC(A_INVIS);
+  CC(A_ALTCHARSET);
+  CC(A_CHARTEXT);
+  CC(A_ATTRIBUTES);
+  CC(A_COLOR);
+#undef CC
+}
+
+
 LUALIB_API int luaopen_curses (lua_State *L) {
   luaL_newmetatable(L, "curses:window");
 
@@ -208,6 +277,9 @@ LUALIB_API int luaopen_curses (lua_State *L) {
   lua_pushstring(L, "curses:stdscr");
   lua_pushvalue(L, -2);
   lua_rawset(L, LUA_REGISTRYINDEX);
+
+  lua_pushvalue(L, -2);
+  register_curses_constants(L);
   return 1;
 }
 

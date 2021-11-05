@@ -42,10 +42,10 @@ static void curses_newwin (lua_State *L, WINDOW *nw) {
 
 
 static WINDOW **lc_getwin (lua_State *L, int offset) {
-	WINDOW **w = (WINDOW**)luaL_checkudata(L, offset, "curses:window");
-	if (w == NULL)
-		luaL_argerror(L, offset, "bad curses window");
-	return w;
+  WINDOW **w = (WINDOW**)luaL_checkudata(L, offset, "curses:window");
+  if (w == NULL)
+    luaL_argerror(L, offset, "bad curses window");
+  return w;
 }
 
 
@@ -60,9 +60,9 @@ static WINDOW *checkwin (lua_State *L, int offset) {
 static int
 argtypeerror(lua_State *L, int narg, const char *expected)
 {
-	const char *got = luaL_typename(L, narg);
-	return luaL_argerror(L, narg,
-		lua_pushfstring(L, "%s expected, got %s", expected, got));
+  const char *got = luaL_typename(L, narg);
+  return luaL_argerror(L, narg,
+          lua_pushfstring(L, "%s expected, got %s", expected, got));
 }
 
 

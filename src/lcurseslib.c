@@ -102,10 +102,17 @@ static int Waddstr (lua_State *L) {
 }
 
 
+static int Wclear (lua_State *L) {
+  lua_pushboolean(L, wclear(checkwin(L, 1)));
+  return 1;
+}
+
+
 static const luaL_Reg curses_window_methods[] =
 {
   {"__tostring", W__tostring},
   {"addstr", Waddstr},
+  {"clear", Wclear},
   {NULL, NULL}
 };
 

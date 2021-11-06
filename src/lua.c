@@ -368,79 +368,6 @@ static int pmain (lua_State *L) {
 }
 
 
-typedef struct NumArray {
-  int size;
-  double values[0];  /* variable part */
-} NumArray;
-
-
-static int newarray (lua_State *L) {
-  int n = luaL_checkint(L, 1);
-  size_t nbytes = sizeof(NumArray) + n*sizeof(double);
-  NumArray *a = (NumArray *)lua_newuserdata(L, nbytes);
-
-  luaL_getmetatable(L, "array");
-  lua_setmetatable(L, -2);
-
-  a->size = n;
-  return 1;  /* new userdatum is already on the stack */
-}
-
-
-/* ensure bottom of stack is an array */
-static NumArray *checkarray (lua_State *L) {
-  void *ud = luaL_checkudata(L, 1, "array");
-  luaL_argcheck(L, ud != NULL, 1, "`array' expected");
-  return (NumArray *)ud;
-}
-
-
-static int setarray (lua_State *L) {
-  NumArray *a = checkarray(L);
-  int index = luaL_checkint(L, 2);
-  double value = luaL_checknumber(L, 3);
-
-  luaL_argcheck(L, 1 <= index && index <= a->size, 2,
-                   "index out of range");
-
-  a->values[index-1] = value;
-  return 0;
-}
-
-
-static int getarray (lua_State *L) {
-  NumArray *a = checkarray(L);
-  int index = luaL_checkint(L, 2);
-
-  luaL_argcheck(L, 1 <= index && index <= a->size, 2,
-                   "index out of range");
-
-  lua_pushnumber(L, a->values[index-1]);
-  return 1;
-}
-
-
-static int getsize (lua_State *L) {
-  NumArray *a = checkarray(L);
-  luaL_argcheck(L, a != NULL, 1, "`array' expected");
-  lua_pushnumber(L, a->size);
-  return 1;
-}
-
-
-static const struct luaL_Reg arraylib_functions [] = {
-  {"new", newarray},
-  {NULL, NULL}
-};
-
-static const struct luaL_Reg array_methods [] = {
-  {"set", setarray},
-  {"get", getarray},
-  {"size", getsize},
-  {NULL, NULL}
-};
-
-
 void draw_menu(void);
 
 
@@ -452,15 +379,6 @@ int main (int argc, char **argv) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
   }
-  luaL_newmetatable(L, "array");
-  /* stack: metatable */
-  lua_pushstring(L, "__index");
-  /* stack: metatable "__index" */
-  lua_pushvalue(L, -2);  /* metatable */
-  lua_settable(L, -3);  /* metatable.__index = metatable */
-  /* stack: metatable */
-  luaL_register(L, NULL, array_methods);  /* register array_methods in metatable */
-  luaL_register(L, "array", arraylib_functions);
   initscr();
   start_color();
   draw_menu();

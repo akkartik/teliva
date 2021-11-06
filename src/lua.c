@@ -86,11 +86,12 @@ void switch_to_editor(const char *message) {
 }
 
 
+const char *Previous_error = NULL;
 static int show_error_in_editor (lua_State *L, int status) {
   if (status && !lua_isnil(L, -1)) {
-    const char *msg = lua_tostring(L, -1);
-    if (msg == NULL) msg = "(error object is not a string)";
-    switch_to_editor(msg);
+    Previous_error = lua_tostring(L, -1);
+    if (Previous_error == NULL) Previous_error = "(error object is not a string)";
+    switch_to_editor(Previous_error);
   }
   return status;
 }

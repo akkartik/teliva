@@ -848,6 +848,8 @@ void abFree(struct abuf *ab) {
     free(ab->b);
 }
 
+extern char *Previous_error;
+
 /* This function writes the whole screen using VT100 escape characters
  * starting from the logical state of the editor in the global state 'E'. */
 void editorRefreshScreen(void) {
@@ -925,6 +927,10 @@ void editorRefreshScreen(void) {
     abAppend(&ab,"\x1b[0K",4);
     abAppend(&ab,"  \x1b[7m ^e \x1b[0m run ",19);
     int len =     2  +     4  +       5;
+    if (Previous_error != NULL) {
+      abAppend(&ab,"\x1b[7m ^c \x1b[0m\x1b[1m abort \x1b[0m",27);
+      len +=               4  +       7;
+    }
     abAppend(&ab,"\x1b[7m ^s \x1b[0m search ",20);
     len +=               4  +       8;
     char rstatus[80];
@@ -1163,8 +1169,10 @@ void editorProcessKeypress(int fd) {
         editorInsertNewline();
         break;
     case CTRL_C:
-        /* We ignore ctrl-c, it can't be so simple to lose the changes
-         * to the edited file. */
+        /* Mostly ignore ctrl-c. */
+        if (c == 3)  /* ctrl-c */
+          if (Previous_error != NULL)
+            exit(1);
         break;
     case CTRL_E:
         /* Save and quit. */

@@ -31,7 +31,7 @@ to a hotkey (currently `ctrl-e`) to edit its sources.
 
 <img alt='screenshot of Teliva editing the Towers of Hanoi' src='doc/hanoi-edit.png'>
 
-Save (`ctrl-s`) and quit (`ctrl-x`) to restart the app with the new sources.
+Toggle the same hotkey to restart the app with the new sources.
 
 Over time I hope to improve the experience for error messages, failing tests,
 undoing changes and so on. The emphasis will be on maximizing hackability

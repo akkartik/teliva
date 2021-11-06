@@ -1154,6 +1154,7 @@ void editorMoveCursor(int key) {
 /* Process events arriving from the standard input, which is, the user
  * is typing stuff on the terminal. */
 #define KILO_QUIT_TIMES 3
+int Quit = 0;
 void editorProcessKeypress(int fd) {
     /* When the file is modified, requires Ctrl-q to be pressed N times
      * before actually quitting. */
@@ -1176,7 +1177,7 @@ void editorProcessKeypress(int fd) {
             quit_times--;
             return;
         }
-        exit(0);
+        Quit = 1;
         break;
     case CTRL_S:        /* Ctrl-s */
         editorSave();
@@ -1263,7 +1264,7 @@ void edit(char* filename) {
     enableRawMode(STDIN_FILENO);
     editorSetStatusMessage(
         "HELP: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F = find");
-    while(1) {
+    while(!Quit) {
         editorRefreshScreen();
         editorProcessKeypress(STDIN_FILENO);
     }

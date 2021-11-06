@@ -1,6 +1,7 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "lua.h"
 #include "llimits.h"
@@ -88,15 +89,20 @@ static int Pcolor_pair (lua_State *L)
 }
 
 
-extern const char *Script_name;
+extern char **Argv;
+extern char *Script_name;
+extern void edit(char* filename);
 static int Pgetch (lua_State *L) {
   int c = wgetch(stdscr);
   if (c == ERR)
     return 0;
   if (c == 24)  /* ctrl-x */
     exit(0);
-  if (c == 5)  /* ctrl-e */
+  if (c == 5) {  /* ctrl-e */
+    /* death and rebirth */
     edit(Script_name);
+    execv(Argv[0], Argv);
+  }
   /* handle other standard menu hotkeys here */
   lua_pushinteger(L, c);
   return 1;

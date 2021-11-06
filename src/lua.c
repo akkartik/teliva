@@ -245,7 +245,7 @@ static int handle_script (lua_State *L, char **argv, int n) {
   if (status == 0)
     status = docall(L, narg, 0);
   else
-    lua_pop(L, narg);      
+    lua_pop(L, narg);
   return report(L, status);
 }
 
@@ -369,6 +369,7 @@ static int pmain (lua_State *L) {
 
 
 void draw_menu(void);
+char **Argv = NULL;
 
 
 int main (int argc, char **argv) {
@@ -385,6 +386,7 @@ int main (int argc, char **argv) {
   echo();
   s.argc = argc;
   s.argv = argv;
+  Argv = argv;
   status = lua_cpcall(L, &pmain, &s);
   report(L, status);
   lua_close(L);

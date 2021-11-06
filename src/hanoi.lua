@@ -28,29 +28,29 @@ local function cols(window)
 end
 
 
-local function render_tower(screen, line, col, tower_index, tower)
-  screen:attron(curses.A_BOLD)
-  screen:mvaddch(line+2, col, string.char(96+tower_index))
-  screen:attroff(curses.A_BOLD)
-  screen:mvaddstr(line+1, col-3, "-------")
+local function render_tower(window, line, col, tower_index, tower)
+  window:attron(curses.A_BOLD)
+  window:mvaddch(line+2, col, string.char(96+tower_index))
+  window:attroff(curses.A_BOLD)
+  window:mvaddstr(line+1, col-3, "-------")
   for i, n in ipairs(tower) do
-    screen:mvaddstr(line, col, n)
+    window:mvaddstr(line, col, n)
     line = line - 1
   end
   for i=1,5-len(tower) do
-    screen:mvaddstr(line, col, "|")
+    window:mvaddstr(line, col, "|")
     line = line - 1
   end
 end
 
 
-local function render(screen)
-  screen:clear()
-  local lines, cols = screen:getmaxyx()
+local function render(window)
+  window:clear()
+  local lines, cols = window:getmaxyx()
   local line = math.floor(lines/2)
   local col = math.floor(cols/4)
   for i,t in ipairs(tower) do
-    render_tower(screen, line, i*col, i, t)
+    render_tower(window, line, i*col, i, t)
   end
 end
 
@@ -61,23 +61,23 @@ local function make_move(from, to)
 end
 
 
-local function update(screen)
-  screen:mvaddstr(lines(screen)-2, 5, "tower to remove top disk from? ")
-  local from = screen:getch() - 96
+local function update(window)
+  window:mvaddstr(lines(window)-2, 5, "tower to remove top disk from? ")
+  local from = window:getch() - 96
   curses.refresh()
-  screen:mvaddstr(lines(screen)-1, 5, "tower to stack it on? ")
-  local to = screen:getch() - 96
+  window:mvaddstr(lines(window)-1, 5, "tower to stack it on? ")
+  local to = window:getch() - 96
   curses.refresh()
   make_move(from, to)
 end
 
 
 local function main()
-  local screen = curses.stdscr()
+  local window = curses.stdscr()
 
   while true do
-    render(screen)
-    update(screen)
+    render(window)
+    update(window)
   end
 end
 

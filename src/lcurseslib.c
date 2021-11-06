@@ -100,6 +100,7 @@ static int Pgetch (lua_State *L) {
     exit(0);
   if (c == 5) {  /* ctrl-e */
     /* death and rebirth */
+    endwin();
     edit(Script_name);
     execv(Argv[0], Argv);
   }

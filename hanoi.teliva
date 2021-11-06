@@ -1,6 +1,5 @@
 local curses = require "curses"
 
-menu = {a="abc"}
 tower = {{6, 5, 4, 3, 2}, {}, {}}
 
 local function len(array)

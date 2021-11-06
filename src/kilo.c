@@ -1157,10 +1157,6 @@ void editorMoveCursor(int key) {
 #define KILO_QUIT_TIMES 3
 int Quit = 0;
 void editorProcessKeypress(int fd) {
-    /* When the file is modified, requires Ctrl-q to be pressed N times
-     * before actually quitting. */
-    static int quit_times = KILO_QUIT_TIMES;
-
     int c = editorReadKey(fd);
     switch(c) {
     case ENTER:
@@ -1213,8 +1209,6 @@ void editorProcessKeypress(int fd) {
         editorInsertChar(c);
         break;
     }
-
-    quit_times = KILO_QUIT_TIMES; /* Reset it to the original value. */
 }
 
 int editorFileWasModified(void) {

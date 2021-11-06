@@ -52,6 +52,7 @@ local function render(window)
   for i,t in ipairs(tower) do
     render_tower(window, line, i*col, i, t)
   end
+  curses.refresh()
 end
 
 

@@ -449,6 +449,9 @@ static const struct luaL_Reg array_methods [] = {
 };
 
 
+void draw_menu(void);
+
+
 int main (int argc, char **argv) {
   int status;
   struct Smain s;
@@ -467,13 +470,13 @@ int main (int argc, char **argv) {
   luaL_register(L, NULL, array_methods);  /* register array_methods in metatable */
   luaL_register(L, "array", arraylib_functions);
   initscr();
+  draw_menu();
   echo();
   s.argc = argc;
   s.argv = argv;
   status = lua_cpcall(L, &pmain, &s);
   report(L, status);
   lua_close(L);
-  getch();
   endwin();
   return (status || s.status) ? EXIT_FAILURE : EXIT_SUCCESS;
 }

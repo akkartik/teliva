@@ -8,8 +8,21 @@
 #include "lualib.h"
 
 
+void draw_menu (void) {
+  attron(A_BOLD|A_REVERSE);
+  for (int x = 0; x < COLS; ++x)
+    mvaddch(LINES-1, x, ' ');
+  attroff(A_REVERSE);
+  mvaddstr(LINES-1, 2, " ^e ");
+  attron(A_REVERSE);
+  mvaddstr(LINES-1, 6, " edit ");
+  attroff(A_BOLD|A_REVERSE);
+}
+
+
 static int Prefresh (lua_State *L) {
   refresh();
+  draw_menu();
   return 1;
 }
 
@@ -23,6 +36,7 @@ static int Pstdscr (lua_State *L) {
 
 static int Pgetch (lua_State *L) {
   int c = wgetch(stdscr);
+  // TODO: handle menu here
   if (c == ERR)
     return 0;
   lua_pushinteger(L, c);
@@ -159,6 +173,7 @@ static int Wgetmaxyx (lua_State *L) {
   WINDOW *w = checkwin(L, 1);
   int y, x;
   getmaxyx(w, y, x);
+  --y;  // set aside space for the menu bar
   lua_pushinteger(L, y);
   lua_pushinteger(L, x);
   return 2;

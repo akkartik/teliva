@@ -122,6 +122,7 @@ enum KEY_ACTION{
         CTRL_Q = 17,
         CTRL_S = 19,
         CTRL_U = 21,
+        CTRL_X = 24,
         ESC = 27,
         BACKSPACE = 127,
         /* The following are just soft codes, not really reported by the
@@ -1169,11 +1170,11 @@ void editorProcessKeypress(int fd) {
         /* We ignore ctrl-c, it can't be so simple to lose the changes
          * to the edited file. */
         break;
-    case CTRL_Q:
+    case CTRL_X:
         /* Quit if the file was already saved. */
         if (E.dirty && quit_times) {
             editorSetStatusMessage("WARNING!!! File has unsaved changes. "
-                "Press Ctrl-Q %d more times to quit.", quit_times);
+                "Press Ctrl-X %d more times to quit.", quit_times);
             quit_times--;
             return;
         }
@@ -1263,7 +1264,7 @@ void edit(char* filename) {
     editorOpen(filename);
     enableRawMode(STDIN_FILENO);
     editorSetStatusMessage(
-        "HELP: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F = find");
+        "HELP: Ctrl-S = save | Ctrl-X = quit | Ctrl-F = find");
     while(!Quit) {
         editorRefreshScreen();
         editorProcessKeypress(STDIN_FILENO);

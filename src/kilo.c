@@ -925,10 +925,10 @@ void editorRefreshScreen(void) {
     char status[80], rstatus[80];
     int len = snprintf(status, sizeof(status), "%.20s - %d lines %s",
         E.filename, E.numrows, E.dirty ? "(modified)" : "");
-    int rlen = snprintf(rstatus, sizeof(rstatus),
-        "%d/%d",E.rowoff+E.cy+1,E.numrows);
     if (len > E.screencols) len = E.screencols;
     abAppend(&ab,status,len);
+    int rlen = snprintf(rstatus, sizeof(rstatus),
+        "%d/%d",E.rowoff+E.cy+1,E.numrows);
     while(len < E.screencols) {
         if (E.screencols - len == rlen) {
             abAppend(&ab,rstatus,rlen);

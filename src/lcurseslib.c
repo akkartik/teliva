@@ -88,13 +88,16 @@ static int Pcolor_pair (lua_State *L)
 }
 
 
+extern const char *Script_name;
 static int Pgetch (lua_State *L) {
   int c = wgetch(stdscr);
   if (c == ERR)
     return 0;
   if (c == 24)  /* ctrl-x */
     exit(0);
-  /* TODO: handle other standard menu hotkeys here */
+  if (c == 5)  /* ctrl-e */
+    edit(Script_name);
+  /* handle other standard menu hotkeys here */
   lua_pushinteger(L, c);
   return 1;
 }

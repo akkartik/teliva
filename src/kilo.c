@@ -69,11 +69,10 @@
 #define HL_HIGHLIGHT_NUMBERS (1<<1)
 
 struct editorSyntax {
-    char **filematch;
     char **keywords;
     char singleline_comment_start[2];
-    char multiline_comment_start[3];
-    char multiline_comment_end[3];
+    char *multiline_comment_start;
+    char *multiline_comment_end;
     int flags;
 };
 
@@ -161,36 +160,26 @@ void editorSetStatusMessage(const char *fmt, ...);
  *
  * There is no support to highlight patterns currently. */
 
-/* C / C++ */
-char *C_HL_extensions[] = {".c",".h",".cpp",".hpp",".cc",NULL};
-char *C_HL_keywords[] = {
-	/* C Keywords */
-	"auto","break","case","continue","default","do","else","enum",
-	"extern","for","goto","if","register","return","sizeof","static",
-	"struct","switch","typedef","union","volatile","while","NULL",
+/* Lua */
+char *Lua_HL_keywords[] = {
+  /* keywords */
+  "do", "end", "function", "return", "require", "local"
+  "if", "then", "else", "elseif",
+  "while", "for", "repeat", "until", "break",
+  "and", "or", "not", "in",
 
-	/* C++ Keywords */
-	"alignas","alignof","and","and_eq","asm","bitand","bitor","class",
-	"compl","constexpr","const_cast","deltype","delete","dynamic_cast",
-	"explicit","export","false","friend","inline","mutable","namespace",
-	"new","noexcept","not","not_eq","nullptr","operator","or","or_eq",
-	"private","protected","public","reinterpret_cast","static_assert",
-	"static_cast","template","this","thread_local","throw","true","try",
-	"typeid","typename","virtual","xor","xor_eq",
+  /* types */
+  "nil", "false", "true",
 
-	/* C types */
-        "int|","long|","double|","float|","char|","unsigned|","signed|",
-        "void|","short|","auto|","const|","bool|",NULL
+  NULL
 };
 
 /* Here we define an array of syntax highlights by extensions, keywords,
  * comments delimiters and flags. */
 struct editorSyntax HLDB[] = {
     {
-        /* C / C++ */
-        C_HL_extensions,
-        C_HL_keywords,
-        "//","/*","*/",
+        Lua_HL_keywords,
+        "--", "--[[", "--]]",
         HL_HIGHLIGHT_STRINGS | HL_HIGHLIGHT_NUMBERS
     }
 };
@@ -527,26 +516,6 @@ int editorSyntaxToColor(int hl) {
     case HL_NUMBER: return 31;      /* red */
     case HL_MATCH: return 34;      /* blu */
     default: return 37;             /* white */
-    }
-}
-
-/* Select the syntax highlight scheme depending on the filename,
- * setting it in the global state E.syntax. */
-void editorSelectSyntaxHighlight(char *filename) {
-    for (unsigned int j = 0; j < HLDB_ENTRIES; j++) {
-        struct editorSyntax *s = HLDB+j;
-        unsigned int i = 0;
-        while(s->filematch[i]) {
-            char *p;
-            int patlen = strlen(s->filematch[i]);
-            if ((p = strstr(filename,s->filematch[i])) != NULL) {
-                if (s->filematch[i][0] != '.' || p[patlen] == '\0') {
-                    E.syntax = s;
-                    return;
-                }
-            }
-            i++;
-        }
     }
 }
 
@@ -1283,20 +1252,14 @@ void initEditor(void) {
     E.row = NULL;
     E.dirty = 0;
     E.filename = NULL;
-    E.syntax = NULL;
+    E.syntax = &HLDB[0];
     updateWindowSize();
     signal(SIGWINCH, handleSigWinCh);
 }
 
-int main(int argc, char **argv) {
-    if (argc != 2) {
-        fprintf(stderr,"Usage: kilo <filename>\n");
-        exit(1);
-    }
-
+void edit(char* filename) {
     initEditor();
-    editorSelectSyntaxHighlight(argv[1]);
-    editorOpen(argv[1]);
+    editorOpen(filename);
     enableRawMode(STDIN_FILENO);
     editorSetStatusMessage(
         "HELP: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F = find");
@@ -1304,5 +1267,4 @@ int main(int argc, char **argv) {
         editorRefreshScreen();
         editorProcessKeypress(STDIN_FILENO);
     }
-    return 0;
 }

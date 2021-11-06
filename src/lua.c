@@ -234,13 +234,13 @@ static void dotty (lua_State *L) {
 }
 
 
+const char *Script_name = NULL;
 static int handle_script (lua_State *L, char **argv, int n) {
   int status;
-  const char *fname;
   int narg = getargs(L, argv, n);  /* collect arguments */
   lua_setglobal(L, "arg");
-  fname = argv[n];
-  status = luaL_loadfile(L, fname);
+  Script_name = argv[n];
+  status = luaL_loadfile(L, Script_name);
   lua_insert(L, -(narg+1));
   if (status == 0)
     status = docall(L, narg, 0);

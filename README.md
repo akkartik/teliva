@@ -39,6 +39,23 @@ rather than functionality. I plan to be extremely parsimonious in taking on
 further dependencies. It should need just a Linux (or maybe some other Unix?)
 kernel, a C compiler, 12kLoC of Lua in this repo, ncurses.
 
+## Isn't this just an IDE?
+
+There's one big difference: these apps are not intended to be runnable outside
+of the Teliva environment. Editing the sources will always be a core feature
+that's front and center in the UI.
+
+At the moment this isn't much of a restriction given how trivial the
+differences with Lua are. You also don't get much benefit in exchange for
+taking on this restriction. Let's see if that changes.
+
+A second, more subtle difference: it's primarily an environment for _running_
+apps, and only secondarily for editing them. Starting up the environment puts
+you in a running app by default. Creating an app from a clean slate is a
+low-priority use case, as is lots of specialized support for developing
+complex apps. The sweet spot for Teliva is simple apps that people will want
+to edit after using for a while.
+
 ## Why Lua?
 
 It's reputedly the fastest interpreted language per line of implementation

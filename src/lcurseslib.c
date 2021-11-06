@@ -36,19 +36,31 @@ void draw_menu_item(const char* key, const char* name) {
   attroff(A_REVERSE);
 }
 
-void draw_menu (void) {
+void draw_menu (lua_State *L) {
   attron(A_BOLD|A_REVERSE);
   for (int x = 0; x < COLS; ++x)
     mvaddch(LINES-1, x, ' ');
   menu_column = 2;
   draw_menu_item("^x", "exit");
   draw_menu_item("^e", "edit");
+
+  /* render any app-specific items */
+  lua_getglobal(L, "menu");
+  int table = lua_gettop(L);
+  if (!lua_istable(L, -1)) {
+    lua_pop(L, 1);
+    return;
+  }
+  for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1))
+    draw_menu_item(lua_tostring(L, -2), lua_tostring(L, -1));
+
+  attroff(A_BOLD);
 }
 
 
 static int Prefresh (lua_State *L) {
   refresh();
-  draw_menu();
+  draw_menu(L);
   return 1;
 }
 

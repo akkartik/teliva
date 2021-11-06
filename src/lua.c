@@ -368,7 +368,7 @@ static int pmain (lua_State *L) {
 }
 
 
-void draw_menu(void);
+void draw_menu(lua_State *);
 char **Argv = NULL;
 
 
@@ -382,7 +382,7 @@ int main (int argc, char **argv) {
   }
   initscr();
   start_color();
-  draw_menu();
+  draw_menu(L);
   echo();
   s.argc = argc;
   s.argv = argv;
@@ -390,6 +390,7 @@ int main (int argc, char **argv) {
   status = lua_cpcall(L, &pmain, &s);
   report(L, status);
   lua_close(L);
+//?   getch();  /* uncomment this to see some common errors if teliva exits cryptically with a non-zero error code. */
   endwin();
   return (status || s.status) ? EXIT_FAILURE : EXIT_SUCCESS;
 }

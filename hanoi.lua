@@ -49,7 +49,7 @@ local function render_tower(window, line, col, tower_index, tower)
     render_disk(window, line, col, n)
     line = line - 1
   end
-  for i=1,5-len(tower) do
+  for i=1,5-len(tower)+1 do
     window:attron(curses.color_pair(2))
     window:mvaddstr(line, col, "  ")
     window:attroff(curses.color_pair(2))

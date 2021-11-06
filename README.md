@@ -26,8 +26,8 @@ Here's an example app (the [Tower of Hanoi](https://en.wikipedia.org/wiki/Tower_
 
 <img alt='screenshot of Teliva running the Towers of Hanoi' src='doc/hanoi.png'>
 
-The idea is that no matter what app you run, you are always guaranteed access
-to a hotkey (currently `ctrl-e`) to edit its sources.
+No matter what app you run, you are always guaranteed access to a single
+consistent way (currently the hotkey `ctrl-e`) to edit its sources.
 
 <img alt='screenshot of Teliva editing the Towers of Hanoi' src='doc/hanoi-edit.png'>
 

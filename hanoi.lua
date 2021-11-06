@@ -1,8 +1,6 @@
 local curses = require "curses"
 
-
 tower = {{6, 5, 4, 3, 2}, {}, {}}
-
 
 local function len(array)
   local result = 0
@@ -11,7 +9,6 @@ local function len(array)
   end
   return result
 end
-
 
 local function pop(array)
   return table.remove(array)
@@ -57,7 +54,6 @@ local function render_tower(window, line, col, tower_index, tower)
   end
 end
 
-
 local function render(window)
   window:clear()
   local lines, cols = window:getmaxyx()
@@ -75,7 +71,6 @@ local function make_move(from, to)
   table.insert(tower[to], disk)
 end
 
-
 local function update(window)
   window:mvaddstr(lines(window)-2, 5, "tower to remove top disk from? ")
   local from = string.byte(curses.getch()) - 96
@@ -87,20 +82,16 @@ local function update(window)
 end
 
 
-local function main()
-  local window = curses.initscr()
-  curses.start_color()
-  for i=1,7 do
-    curses.init_pair(i, 0, i)
-  end
-
-  while true do
-    render(window)
-    update(window)
-  end
-
-  curses.endwin()
+window = curses.initscr()
+curses.start_color()
+for i=1,7 do
+  curses.init_pair(i, 0, i)
 end
 
+while true do
+  render(window)
+  update(window)
+end
 
-main()
+curses.endwin()
+

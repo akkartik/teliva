@@ -111,19 +111,19 @@ struct editorConfig {
 static struct editorConfig E;
 
 enum KEY_ACTION{
-        KEY_NULL = 0,       /* NULL */
-        CTRL_C = 3,         /* Ctrl-c */
-        CTRL_D = 4,         /* Ctrl-d */
-        CTRL_F = 6,         /* Ctrl-f */
-        CTRL_H = 8,         /* Ctrl-h */
-        TAB = 9,            /* Tab */
-        CTRL_L = 12,        /* Ctrl+l */
-        ENTER = 13,         /* Enter */
-        CTRL_Q = 17,        /* Ctrl-q */
-        CTRL_S = 19,        /* Ctrl-s */
-        CTRL_U = 21,        /* Ctrl-u */
-        ESC = 27,           /* Escape */
-        BACKSPACE =  127,   /* Backspace */
+        KEY_NULL = 0,
+        CTRL_C = 3,
+        CTRL_D = 4,
+        CTRL_F = 6,
+        CTRL_H = 8,
+        TAB = 9,
+        CTRL_L = 12,
+        ENTER = 13,
+        CTRL_Q = 17,
+        CTRL_S = 19,
+        CTRL_U = 21,
+        ESC = 27,
+        BACKSPACE = 127,
         /* The following are just soft codes, not really reported by the
          * terminal directly. */
         ARROW_LEFT = 1000,
@@ -1162,14 +1162,14 @@ void editorProcessKeypress(int fd) {
 
     int c = editorReadKey(fd);
     switch(c) {
-    case ENTER:         /* Enter */
+    case ENTER:
         editorInsertNewline();
         break;
-    case CTRL_C:        /* Ctrl-c */
+    case CTRL_C:
         /* We ignore ctrl-c, it can't be so simple to lose the changes
          * to the edited file. */
         break;
-    case CTRL_Q:        /* Ctrl-q */
+    case CTRL_Q:
         /* Quit if the file was already saved. */
         if (E.dirty && quit_times) {
             editorSetStatusMessage("WARNING!!! File has unsaved changes. "
@@ -1179,14 +1179,14 @@ void editorProcessKeypress(int fd) {
         }
         Quit = 1;
         break;
-    case CTRL_S:        /* Ctrl-s */
+    case CTRL_S:
         editorSave();
         break;
     case CTRL_F:
         editorFind(fd);
         break;
-    case BACKSPACE:     /* Backspace */
-    case CTRL_H:        /* Ctrl-h */
+    case BACKSPACE:
+    case CTRL_H:
     case DEL_KEY:
         editorDelChar();
         break;
@@ -1210,8 +1210,8 @@ void editorProcessKeypress(int fd) {
     case ARROW_RIGHT:
         editorMoveCursor(c);
         break;
-    case CTRL_L: /* ctrl+l, clear screen */
-        /* Just refresht the line as side effect. */
+    case CTRL_L:
+        /* Just refresh the line as side effect. */
         break;
     case ESC:
         /* Nothing to do for ESC in this mode. */

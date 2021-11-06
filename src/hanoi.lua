@@ -63,10 +63,10 @@ end
 
 local function update(window)
   window:mvaddstr(lines(window)-2, 5, "tower to remove top disk from? ")
-  local from = window:getch() - 96
+  local from = curses.getch() - 96
   curses.refresh()
   window:mvaddstr(lines(window)-1, 5, "tower to stack it on? ")
-  local to = window:getch() - 96
+  local to = curses.getch() - 96
   curses.refresh()
   make_move(from, to)
 end

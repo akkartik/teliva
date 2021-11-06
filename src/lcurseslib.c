@@ -21,7 +21,17 @@ static int Pstdscr (lua_State *L) {
 }
 
 
+static int Pgetch (lua_State *L) {
+  int c = wgetch(stdscr);
+  if (c == ERR)
+    return 0;
+  lua_pushinteger(L, c);
+  return 1;
+}
+
+
 static const struct luaL_Reg curseslib [] = {
+  {"getch", Pgetch},
   {"refresh", Prefresh},
   {"stdscr", Pstdscr},
   {NULL, NULL}
@@ -135,18 +145,6 @@ static int Wclear (lua_State *L) {
 }
 
 
-static int Wgetch (lua_State *L) {
-  WINDOW *w = checkwin(L, 1);
-  int c = wgetch(w);
-
-  if (c == ERR)
-    return 0;
-
-  lua_pushinteger(L, c);
-  return 1;
-}
-
-
 static int Wgetyx (lua_State *L) {
   WINDOW *w = checkwin(L, 1);
   int y, x;
@@ -195,7 +193,6 @@ static const luaL_Reg curses_window_methods[] =
   {"attroff", Wattroff},
   {"attron", Wattron},
   {"clear", Wclear},
-  {"getch", Wgetch},
   {"getmaxyx", Wgetmaxyx},
   {"getyx", Wgetyx},
   {"mvaddch", Wmvaddch},

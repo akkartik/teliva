@@ -19,19 +19,30 @@ static void cleanup(void) {
 }
 
 
+int menu_column = 0;
+void draw_string_on_menu(const char* s) {
+  mvaddstr(LINES-1, menu_column, " ");
+  ++menu_column;
+  mvaddstr(LINES-1, menu_column, s);
+  menu_column += strlen(s);
+  mvaddstr(LINES-1, menu_column, " ");
+  ++menu_column;
+}
+void draw_menu_item(const char* key, const char* name) {
+  attroff(A_REVERSE);
+  draw_string_on_menu(key);
+  attron(A_REVERSE);
+  draw_string_on_menu(name);
+  attroff(A_REVERSE);
+}
+
 void draw_menu (void) {
   attron(A_BOLD|A_REVERSE);
   for (int x = 0; x < COLS; ++x)
     mvaddch(LINES-1, x, ' ');
-  attroff(A_REVERSE);
-  mvaddstr(LINES-1, 2, " ^x ");
-  attron(A_REVERSE);
-  mvaddstr(LINES-1, 6, " exit ");
-  attroff(A_REVERSE);
-  mvaddstr(LINES-1, 12, " ^e ");
-  attron(A_REVERSE);
-  mvaddstr(LINES-1, 16, " edit ");
-  attroff(A_BOLD|A_REVERSE);
+  menu_column = 2;
+  draw_menu_item("^x", "exit");
+  draw_menu_item("^e", "edit");
 }
 
 

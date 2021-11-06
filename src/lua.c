@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define lua_c
 
@@ -68,6 +69,21 @@ static int report (lua_State *L, int status) {
     if (msg == NULL) msg = "(error object is not a string)";
     l_message(progname, msg);
     lua_pop(L, 1);
+  }
+  return status;
+}
+
+
+char *Script_name = NULL;
+char **Argv = NULL;
+extern void edit(char *filename, const char *status);
+static int show_error_in_editor (lua_State *L, int status) {
+  if (status && !lua_isnil(L, -1)) {
+    const char *msg = lua_tostring(L, -1);
+    if (msg == NULL) msg = "(error object is not a string)";
+    endwin();
+    edit(Script_name, msg);
+    execv(Argv[0], Argv);
   }
   return status;
 }
@@ -234,7 +250,6 @@ static void dotty (lua_State *L) {
 }
 
 
-const char *Script_name = NULL;
 static int handle_script (lua_State *L, char **argv, int n) {
   int status;
   int narg = getargs(L, argv, n);  /* collect arguments */
@@ -246,7 +261,7 @@ static int handle_script (lua_State *L, char **argv, int n) {
     status = docall(L, narg, 0);
   else
     lua_pop(L, narg);
-  return report(L, status);
+  return show_error_in_editor(L, status);
 }
 
 
@@ -369,7 +384,6 @@ static int pmain (lua_State *L) {
 
 
 void draw_menu(lua_State *);
-char **Argv = NULL;
 
 
 int main (int argc, char **argv) {
@@ -390,7 +404,6 @@ int main (int argc, char **argv) {
   status = lua_cpcall(L, &pmain, &s);
   report(L, status);
   lua_close(L);
-//?   getch();  /* uncomment this to see some common errors if teliva exits cryptically with a non-zero error code. */
   endwin();
   return (status || s.status) ? EXIT_FAILURE : EXIT_SUCCESS;
 }

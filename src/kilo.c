@@ -1245,10 +1245,11 @@ void initEditor(void) {
     signal(SIGWINCH, handleSigWinCh);
 }
 
-void edit(char* filename) {
+void edit(char* filename, char* message) {
     initEditor();
     editorOpen(filename);
     enableRawMode(STDIN_FILENO);
+    editorSetStatusMessage(message);
     while(!Quit) {
         editorRefreshScreen();
         editorProcessKeypress(STDIN_FILENO);

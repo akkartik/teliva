@@ -114,7 +114,7 @@ static int Pcolor_pair (lua_State *L)
 
 extern char **Argv;
 extern char *Script_name;
-extern void edit(char* filename);
+extern void edit(char *filename, const char *message);
 static int Pgetch (lua_State *L) {
   int c = wgetch(stdscr);
   if (c == ERR)
@@ -124,7 +124,7 @@ static int Pgetch (lua_State *L) {
   if (c == 5) {  /* ctrl-e */
     /* death and rebirth */
     endwin();
-    edit(Script_name);
+    edit(Script_name, "");
     execv(Argv[0], Argv);
   }
   /* handle other standard menu hotkeys here */

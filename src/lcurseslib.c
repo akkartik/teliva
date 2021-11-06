@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "lua.h"
@@ -7,15 +8,28 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
+static void cleanup(void) {
+  if (!isendwin())
+  {
+    wclear(stdscr);
+    wrefresh(stdscr);
+    endwin();
+  }
+}
+
 
 void draw_menu (void) {
   attron(A_BOLD|A_REVERSE);
   for (int x = 0; x < COLS; ++x)
     mvaddch(LINES-1, x, ' ');
   attroff(A_REVERSE);
-  mvaddstr(LINES-1, 2, " ^e ");
+  mvaddstr(LINES-1, 2, " ^x ");
   attron(A_REVERSE);
-  mvaddstr(LINES-1, 6, " edit ");
+  mvaddstr(LINES-1, 6, " exit ");
+  attroff(A_REVERSE);
+  mvaddstr(LINES-1, 12, " ^e ");
+  attron(A_REVERSE);
+  mvaddstr(LINES-1, 16, " edit ");
   attroff(A_BOLD|A_REVERSE);
 }
 
@@ -76,9 +90,11 @@ static int Pcolor_pair (lua_State *L)
 
 static int Pgetch (lua_State *L) {
   int c = wgetch(stdscr);
-  // TODO: handle menu here
   if (c == ERR)
     return 0;
+  if (c == 24)  /* ctrl-x */
+    exit(0);
+  /* TODO: handle other standard menu hotkeys here */
   lua_pushinteger(L, c);
   return 1;
 }
@@ -331,6 +347,8 @@ LUALIB_API int luaopen_curses (lua_State *L) {
 
   lua_pushvalue(L, -2);
   register_curses_constants(L);
+
+  atexit(cleanup);
   return 1;
 }
 

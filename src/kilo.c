@@ -923,12 +923,11 @@ void editorRefreshScreen(void) {
 
     /* Create a two rows status. First row: */
     abAppend(&ab,"\x1b[0K",4);
-    abAppend(&ab,"\x1b[7m",4);
-    char status[80], rstatus[80];
-    int len = snprintf(status, sizeof(status), "%.20s - %d lines %s",
-        E.filename, E.numrows, E.dirty ? "(modified)" : "");
-    if (len > E.screencols) len = E.screencols;
-    abAppend(&ab,status,len);
+    abAppend(&ab,"  \x1b[7m ^e \x1b[0m run ",19);
+    int len =     2  +     4  +       5;
+    abAppend(&ab,"\x1b[7m ^s \x1b[0m search ",20);
+    len +=               4  +       8;
+    char rstatus[80];
     int rlen = snprintf(rstatus, sizeof(rstatus),
         "%d/%d",E.rowoff+E.cy+1,E.numrows);
     while(len < E.screencols) {
@@ -1264,8 +1263,6 @@ void edit(char* filename) {
     initEditor();
     editorOpen(filename);
     enableRawMode(STDIN_FILENO);
-    editorSetStatusMessage(
-        "HELP: Ctrl-S = save | Ctrl-E = quit | Ctrl-F = find");
     while(!Quit) {
         editorRefreshScreen();
         editorProcessKeypress(STDIN_FILENO);

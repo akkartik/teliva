@@ -1171,17 +1171,9 @@ void editorProcessKeypress(int fd) {
          * to the edited file. */
         break;
     case CTRL_E:
-        /* Quit if the file was already saved. */
-        if (E.dirty && quit_times) {
-            editorSetStatusMessage("WARNING!!! File has unsaved changes. "
-                "Press Ctrl-E %d more times to quit.", quit_times);
-            quit_times--;
-            return;
-        }
-        Quit = 1;
-        break;
-    case CTRL_S:
+        /* Save and quit. */
         editorSave();
+        Quit = 1;
         break;
     case CTRL_F:
         editorFind(fd);

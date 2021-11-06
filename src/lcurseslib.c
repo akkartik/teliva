@@ -112,21 +112,15 @@ static int Pcolor_pair (lua_State *L)
 }
 
 
-extern char **Argv;
-extern char *Script_name;
-extern void edit(char *filename, const char *message);
+extern void switch_to_editor(const char *message);
 static int Pgetch (lua_State *L) {
   int c = wgetch(stdscr);
   if (c == ERR)
     return 0;
   if (c == 24)  /* ctrl-x */
     exit(0);
-  if (c == 5) {  /* ctrl-e */
-    /* death and rebirth */
-    endwin();
-    edit(Script_name, "");
-    execv(Argv[0], Argv);
-  }
+  if (c == 5)  /* ctrl-e */
+    switch_to_editor("");
   /* handle other standard menu hotkeys here */
   lua_pushinteger(L, c);
   return 1;

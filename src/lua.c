@@ -74,16 +74,23 @@ static int report (lua_State *L, int status) {
 }
 
 
+/* death and rebirth */
 char *Script_name = NULL;
 char **Argv = NULL;
 extern void edit(char *filename, const char *status);
+void switch_to_editor(const char *message) {
+  endwin();
+  edit(Script_name, message);
+  execv(Argv[0], Argv);
+  /* never returns */
+}
+
+
 static int show_error_in_editor (lua_State *L, int status) {
   if (status && !lua_isnil(L, -1)) {
     const char *msg = lua_tostring(L, -1);
     if (msg == NULL) msg = "(error object is not a string)";
-    endwin();
-    edit(Script_name, msg);
-    execv(Argv[0], Argv);
+    switch_to_editor(msg);
   }
   return status;
 }

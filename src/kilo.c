@@ -1268,4 +1268,5 @@ void edit(char* filename) {
         editorRefreshScreen();
         editorProcessKeypress(STDIN_FILENO);
     }
+    disableRawMode(STDIN_FILENO);
 }

@@ -27,6 +27,23 @@ static int Prefresh (lua_State *L) {
 }
 
 
+static int
+argtypeerror(lua_State *L, int narg, const char *expected)
+{
+  const char *got = luaL_typename(L, narg);
+  return luaL_argerror(L, narg,
+          lua_pushfstring(L, "%s expected, got %s", expected, got));
+}
+
+
+static lua_Integer checkinteger (lua_State *L, int narg, const char *expected) {
+  lua_Integer d = lua_tointeger(L, narg);
+  if (d == 0 && !lua_isnumber(L, narg))
+    argtypeerror(L, narg, expected);
+  return d;
+}
+
+
 static int Pstdscr (lua_State *L) {
   lua_pushstring(L, "curses:stdscr");
   lua_rawget(L, LUA_REGISTRYINDEX);
@@ -79,23 +96,6 @@ static WINDOW *checkwin (lua_State *L, int offset) {
   if (*w == NULL)
     luaL_argerror(L, offset, "attempt to use closed curses window");
   return *w;
-}
-
-
-static int
-argtypeerror(lua_State *L, int narg, const char *expected)
-{
-  const char *got = luaL_typename(L, narg);
-  return luaL_argerror(L, narg,
-          lua_pushfstring(L, "%s expected, got %s", expected, got));
-}
-
-
-static lua_Integer checkinteger (lua_State *L, int narg, const char *expected) {
-  lua_Integer d = lua_tointeger(L, narg);
-  if (d == 0 && !lua_isnumber(L, narg))
-    argtypeerror(L, narg, expected);
-  return d;
 }
 
 

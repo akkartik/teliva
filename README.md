@@ -64,7 +64,7 @@ code.
 ## Will it run any Lua program?
 
 Not quite. This approach doesn't make sense for batch programs, I think. I
-also don't know how to obtain a simple, shallow Graphics stack, so there's no
+also don't know how to obtain a simple, shallow graphics stack, so there's no
 support for graphics at the moment. Teliva initializes the ncurses library by
 default, so apps should assume they have access to a text-mode window for
 printing text to, and a keyboard for reading unbuffered keystrokes from.

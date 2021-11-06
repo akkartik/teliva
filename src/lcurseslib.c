@@ -51,6 +51,29 @@ static int Pstdscr (lua_State *L) {
 }
 
 
+static int Pcolor_pairs (lua_State *L) {
+  lua_pushinteger(L, COLOR_PAIRS);
+  return 1;
+}
+
+
+static int Pinit_pair (lua_State *L) {
+  int pair = checkinteger(L, 1, "int");
+  short f = checkinteger(L, 2, "int");
+  short b = checkinteger(L, 3, "int");
+  init_pair(pair, f, b);
+  return 1;
+}
+
+
+static int Pcolor_pair (lua_State *L)
+{
+  int n = checkinteger(L, 1, "int");
+  lua_pushinteger(L, COLOR_PAIR(n));
+  return 1;
+}
+
+
 static int Pgetch (lua_State *L) {
   int c = wgetch(stdscr);
   // TODO: handle menu here
@@ -62,7 +85,10 @@ static int Pgetch (lua_State *L) {
 
 
 static const struct luaL_Reg curseslib [] = {
+  {"color_pairs", Pcolor_pairs},
+  {"color_pair", Pcolor_pair},
   {"getch", Pgetch},
+  {"init_pair", Pinit_pair},
   {"refresh", Prefresh},
   {"stdscr", Pstdscr},
   {NULL, NULL}

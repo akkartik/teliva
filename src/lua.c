@@ -470,6 +470,7 @@ int main (int argc, char **argv) {
   luaL_register(L, NULL, array_methods);  /* register array_methods in metatable */
   luaL_register(L, "array", arraylib_functions);
   initscr();
+  start_color();
   draw_menu();
   echo();
   s.argc = argc;

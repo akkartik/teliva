@@ -1,7 +1,7 @@
 local curses = require "curses"
 
 
-tower = {{5, 4, 3, 2, 1}, {}, {}}
+tower = {{6, 5, 4, 3, 2}, {}, {}}
 
 
 local function len(array)
@@ -31,7 +31,9 @@ end
 local function render_disk(window, line, col, size)
   col = col-size+1
   for i=1,size do
-    window:mvaddstr(line, col, "--")
+    window:attron(curses.color_pair(1))
+    window:mvaddstr(line, col, "  ")
+    window:attroff(curses.color_pair(1))
     col = col+2
   end
 end
@@ -40,13 +42,17 @@ local function render_tower(window, line, col, tower_index, tower)
   window:attron(curses.A_BOLD)
   window:mvaddch(line+2, col, string.char(96+tower_index))
   window:attroff(curses.A_BOLD)
-  window:mvaddstr(line+1, col-3, "========")
+  window:attron(curses.color_pair(2))
+  window:mvaddstr(line+1, col-6, "              ")
+  window:attroff(curses.color_pair(2))
   for i, n in ipairs(tower) do
     render_disk(window, line, col, n)
     line = line - 1
   end
   for i=1,5-len(tower) do
-    window:mvaddstr(line, col, "||")
+    window:attron(curses.color_pair(2))
+    window:mvaddstr(line, col, "  ")
+    window:attroff(curses.color_pair(2))
     line = line - 1
   end
 end
@@ -83,6 +89,9 @@ end
 
 local function main()
   local window = curses.initscr()
+  curses.start_color()
+  curses.init_pair(1, 0, 2)
+  curses.init_pair(2, 0, 8)
 
   while true do
     render(window)

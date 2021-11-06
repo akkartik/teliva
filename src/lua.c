@@ -368,14 +368,6 @@ static int pmain (lua_State *L) {
 }
 
 
-//? static const char *WINDOWMETA = "curses:window";  // metatable for all ncurses WINDOW objects
-//? // prototype for all ncurses WINDOW metatables
-//? static const luaL_Reg curses_window_fns[] = {
-//?   {"addstr", Waddstr},
-//?   {NULL, NULL}
-//? };
-
-
 typedef struct NumArray {
   int size;
   double values[0];  /* variable part */

@@ -28,17 +28,25 @@ local function cols(window)
 end
 
 
+local function render_disk(window, line, col, size)
+  col = col-size+1
+  for i=1,size do
+    window:mvaddstr(line, col, "--")
+    col = col+2
+  end
+end
+
 local function render_tower(window, line, col, tower_index, tower)
   window:attron(curses.A_BOLD)
   window:mvaddch(line+2, col, string.char(96+tower_index))
   window:attroff(curses.A_BOLD)
-  window:mvaddstr(line+1, col-3, "-------")
+  window:mvaddstr(line+1, col-3, "========")
   for i, n in ipairs(tower) do
-    window:mvaddstr(line, col, n)
+    render_disk(window, line, col, n)
     line = line - 1
   end
   for i=1,5-len(tower) do
-    window:mvaddstr(line, col, "|")
+    window:mvaddstr(line, col, "||")
     line = line - 1
   end
 end

@@ -30,7 +30,7 @@ CORE_O=	lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \
 LIB_O=	lauxlib.o lbaselib.o lcurseslib.o ldblib.o liolib.o lmathlib.o \
 	loslib.o ltablib.o lstrlib.o loadlib.o linit.o
 
-LUA_T=	lua
+LUA_T=	teliva
 LUA_O=	lua.o
 
 LUAC_T=	luac

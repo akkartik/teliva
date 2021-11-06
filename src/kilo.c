@@ -114,6 +114,7 @@ enum KEY_ACTION{
         KEY_NULL = 0,
         CTRL_C = 3,
         CTRL_D = 4,
+        CTRL_E = 5,
         CTRL_F = 6,
         CTRL_H = 8,
         TAB = 9,
@@ -1170,11 +1171,11 @@ void editorProcessKeypress(int fd) {
         /* We ignore ctrl-c, it can't be so simple to lose the changes
          * to the edited file. */
         break;
-    case CTRL_X:
+    case CTRL_E:
         /* Quit if the file was already saved. */
         if (E.dirty && quit_times) {
             editorSetStatusMessage("WARNING!!! File has unsaved changes. "
-                "Press Ctrl-X %d more times to quit.", quit_times);
+                "Press Ctrl-E %d more times to quit.", quit_times);
             quit_times--;
             return;
         }
@@ -1264,7 +1265,7 @@ void edit(char* filename) {
     editorOpen(filename);
     enableRawMode(STDIN_FILENO);
     editorSetStatusMessage(
-        "HELP: Ctrl-S = save | Ctrl-X = quit | Ctrl-F = find");
+        "HELP: Ctrl-S = save | Ctrl-E = quit | Ctrl-F = find");
     while(!Quit) {
         editorRefreshScreen();
         editorProcessKeypress(STDIN_FILENO);

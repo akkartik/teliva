@@ -65,9 +65,7 @@ static int Prefresh (lua_State *L) {
 }
 
 
-static int
-argtypeerror(lua_State *L, int narg, const char *expected)
-{
+static int argtypeerror (lua_State *L, int narg, const char *expected) {
   const char *got = luaL_typename(L, narg);
   return luaL_argerror(L, narg,
           lua_pushfstring(L, "%s expected, got %s", expected, got));

@@ -64,22 +64,28 @@ code.
 
 ## Will it run any Lua program?
 
-Not quite. This approach doesn't make sense for batch programs, I think. I
-also don't know how to obtain a simple, shallow graphics stack, so there's no
-support for graphics at the moment. Teliva initializes the ncurses library by
-default, so apps should assume they have access to a text-mode window for
-printing text to, and a keyboard for reading unbuffered keystrokes from.
-Compare `hanoi.teliva` with `hanoi.lua` to get a sense for what changes are
-needed. My plan is to disable support for certain Lua libraries as I gain
-experience programming in this way.
+Not quite.
+
+This approach doesn't make sense for batch programs, I think.
+
+I don't know how to obtain a simple, shallow graphics stack, so there's no
+support for graphics at the moment.
+
+Teliva initializes the ncurses library by default, so apps should assume they
+have access to a text-mode window for printing text to, and a keyboard for
+reading unbuffered keystrokes from. Compare `hanoi.teliva` with `hanoi.lua` to
+get a sense for what changes are needed.
+
+My plan is to disable support for certain Lua libraries as I gain experience
+programming in this way.
 
 I want to provide sandboxed access to system resources (file system, network,
 etc.) which will likely create incompatibilities with the standard library.
 I'm disinclined to try to &lsquo;improve&rsquo; on Lua syntax, however. It's
 not my favorite, but it's good enough.
 
-It's also not tested much yet. This is my first time programming either in Lua
-or within Lua. Bug reports most appreciated.
+Teliva is not tested much at all yet. This is my first time programming either
+in Lua or within Lua. Bug reports most appreciated.
 
 ## What's with the name?
 

@@ -1,4 +1,3 @@
-os.setlocale("en_US.UTF-8")
 window = curses.stdscr()
 
 

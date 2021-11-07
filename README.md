@@ -38,7 +38,8 @@ Over time I hope to improve the experience for error messages, failing tests,
 undoing changes and so on. The emphasis will be on maximizing hackability
 rather than functionality. I plan to be extremely parsimonious in taking on
 further dependencies. It should need just a Linux (or maybe some other Unix?)
-kernel, a C compiler, 12kLoC of Lua in this repo, ncurses.
+kernel, a C compiler, 12kLoC of Lua in this repo, maybe a couple more basic C
+libraries.
 
 ## Isn't this just an IDE?
 

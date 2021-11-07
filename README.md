@@ -87,6 +87,18 @@ not my favorite, but it's good enough.
 Teliva is not tested much at all yet. This is my first time programming either
 in Lua or within Lua. Bug reports most appreciated.
 
+## Will it run any Ncurses program?
+
+Probably not. Ncurses is extremely portable. I don't test on all the
+configurations Ncurses supports. For example, I assume terminals with UTF-8
+support.
+
+## Will it run any Lua [lcurses](https://github.com/lcurses/lcurses) program?
+
+There are some exceptions. For example, lcurses has some strange
+&ldquo;smarts&rdquo; that result in `wgetch()` not behaving like `getch()`.
+Teliva doesn't reproduce such bugs.
+
 ## What's with the name?
 
 Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.

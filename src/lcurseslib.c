@@ -47,14 +47,11 @@ void draw_menu (lua_State *L) {
   /* render any app-specific items */
   lua_getglobal(L, "menu");
   int table = lua_gettop(L);
-  if (!lua_istable(L, -1)) {
-    lua_pop(L, 1);
-    attroff(A_BOLD);
-    return;
-  }
-  for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1))
-    draw_menu_item(lua_tostring(L, -2), lua_tostring(L, -1));
+  if (lua_istable(L, -1))
+    for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1))
+      draw_menu_item(lua_tostring(L, -2), lua_tostring(L, -1));
 
+  lua_pop(L, 1);
   attroff(A_BOLD);
 }
 

@@ -64,7 +64,8 @@ code.
 
 ## Will it run any Lua program?
 
-Not quite.
+Not quite. My plan is to disable support for certain Lua libraries as I gain
+experience programming in this way.
 
 This approach doesn't make sense for batch programs, I think.
 
@@ -75,9 +76,6 @@ Teliva initializes the ncurses library by default, so apps should assume they
 have access to a text-mode window for printing text to, and a keyboard for
 reading unbuffered keystrokes from. Compare `hanoi.teliva` with `hanoi.lua` to
 get a sense for what changes are needed.
-
-My plan is to disable support for certain Lua libraries as I gain experience
-programming in this way.
 
 I want to provide sandboxed access to system resources (file system, network,
 etc.) which will likely create incompatibilities with the standard library.

@@ -925,13 +925,13 @@ void editorRefreshScreen(void) {
 
     /* Create a two rows status. First row: */
     abAppend(&ab,"\x1b[0K",4);
-    abAppend(&ab,"  \x1b[7m ^e \x1b[0m run ",19);
-    int len =     2  +     4  +       5;
+    abAppend(&ab,"\x1b[7m  \x1b[0m ^e \x1b[7m run ",23);
+    int len =            2  +     4  +       5;
     if (Previous_error != NULL) {
-      abAppend(&ab,"\x1b[7m ^c \x1b[0m\x1b[1m abort \x1b[0m",27);
-      len +=               4  +       7;
+      abAppend(&ab,"\x1b[0m ^c \x1b[7m\x1b[0m\x1b[1m abort ",27);
+      len +=               4  +                     7;
     }
-    abAppend(&ab,"\x1b[7m ^s \x1b[0m search ",20);
+    abAppend(&ab,"\x1b[0m ^s \x1b[7m search ",20);
     len +=               4  +       8;
     char rstatus[80];
     int rlen = snprintf(rstatus, sizeof(rstatus),

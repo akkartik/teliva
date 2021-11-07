@@ -29,14 +29,14 @@ void draw_string_on_menu(const char* s) {
   ++menu_column;
 }
 void draw_menu_item(const char* key, const char* name) {
-  attron(A_REVERSE);
-  draw_string_on_menu(key);
   attroff(A_REVERSE);
+  draw_string_on_menu(key);
+  attron(A_REVERSE);
   draw_string_on_menu(name);
 }
 
 void draw_menu (lua_State *L) {
-  attron(A_BOLD);
+  attron(A_BOLD|A_REVERSE);
   for (int x = 0; x < COLS; ++x)
     mvaddch(LINES-1, x, ' ');
   menu_column = 2;
@@ -51,7 +51,7 @@ void draw_menu (lua_State *L) {
       draw_menu_item(lua_tostring(L, -2), lua_tostring(L, -1));
 
   lua_pop(L, 1);
-  attroff(A_BOLD);
+  attroff(A_BOLD|A_REVERSE);
 }
 
 

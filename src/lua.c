@@ -5,6 +5,7 @@
 */
 
 
+#include <locale.h>
 #include <ncurses.h>
 #include <signal.h>
 #include <stdio.h>
@@ -402,6 +403,7 @@ int main (int argc, char **argv) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
   }
+  setlocale(LC_ALL, "");
   initscr();
   start_color();
   draw_menu(L);

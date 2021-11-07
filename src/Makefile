@@ -97,7 +97,7 @@ generic:
 	$(MAKE) all MYCFLAGS=
 
 linux:
-	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-Wl,-E -ldl -lncurses"
+	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-Wl,-E -ldl -lncursesw"
 
 macosx:
 	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX

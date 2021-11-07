@@ -84,6 +84,7 @@ end
 
 window = curses.initscr()
 curses.start_color()
+curses.use_default_colors()
 for i=1,7 do
   curses.init_pair(i, 0, i)
 end

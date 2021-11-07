@@ -74,6 +74,12 @@ argtypeerror(lua_State *L, int narg, const char *expected)
 }
 
 
+static void checktype (lua_State *L, int narg, int t, const char *expected) {
+  if (lua_type(L, narg) != t)
+    argtypeerror(L, narg, expected);
+}
+
+
 static lua_Integer checkinteger (lua_State *L, int narg, const char *expected) {
   lua_Integer d = lua_tointeger(L, narg);
   if (d == 0 && !lua_isnumber(L, narg))
@@ -270,6 +276,15 @@ static int Wmvaddstr (lua_State *L) {
 }
 
 
+static int Wnodelay (lua_State *L) {
+  WINDOW *w = checkwin(L, 1);
+  checktype(L, 2, LUA_TBOOLEAN, "boolean or nil");
+  int bf = (int)lua_toboolean(L, 2);
+  lua_pushboolean(L, nodelay(w, bf));
+  return 1;
+}
+
+
 static const luaL_Reg curses_window_methods[] =
 {
   {"__tostring", W__tostring},
@@ -281,6 +296,7 @@ static const luaL_Reg curses_window_methods[] =
   {"getyx", Wgetyx},
   {"mvaddch", Wmvaddch},
   {"mvaddstr", Wmvaddstr},
+  {"nodelay", Wnodelay},
   {NULL, NULL}
 };
 

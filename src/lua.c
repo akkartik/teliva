@@ -406,6 +406,7 @@ int main (int argc, char **argv) {
   setlocale(LC_ALL, "");
   initscr();
   start_color();
+  use_default_colors();
   draw_menu(L);
   echo();
   s.argc = argc;

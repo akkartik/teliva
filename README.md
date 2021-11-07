@@ -89,7 +89,7 @@ behave unexpectedly under Teliva.
 
 ## Will it run any ncurses program?
 
-Hopefully. Ncurses is extremely portable; I don't test on all the
+Hopefully. ncurses is extremely portable; I don't test on all the
 configurations ncurses supports. In particular, I assume terminals with colors
 and UTF-8 support.
 
@@ -112,7 +112,7 @@ This repository is an unholy union of:
   ([Documentation](https://www.lua.org/pil/contents.html))
 * The [ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
   building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
-* The [Lcurses](https://github.com/lcurses/lcurses) library providing Lua
+* The [lcurses](https://github.com/lcurses/lcurses) library providing Lua
   bindings for ncurses. ([Documentation](http://lcurses.github.io/lcurses))
 * The [Kilo](https://github.com/antirez/kilo) text editor. ([With a fantastic
   walk-through.](https://viewsourcecode.org/snaptoken/kilo))

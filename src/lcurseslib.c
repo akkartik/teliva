@@ -37,7 +37,7 @@ void draw_menu_item(const char* key, const char* name) {
 }
 
 void draw_menu (lua_State *L) {
-  attron(A_BOLD|A_REVERSE);
+  attron(A_BOLD);
   for (int x = 0; x < COLS; ++x)
     mvaddch(LINES-1, x, ' ');
   menu_column = 2;

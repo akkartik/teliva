@@ -66,37 +66,40 @@ code.
 ## Will it run any Lua program?
 
 Not quite. My plan is to disable support for certain Lua libraries as I gain
-experience programming in this way.
+experience programming in this way:
 
-This approach doesn't make sense for batch programs, I think.
+- This approach doesn't make sense for batch programs, I think.
 
-I don't know how to obtain a simple, shallow graphics stack, so there's no
-support for graphics at the moment.
+- I don't know how to obtain a simple, shallow graphics stack, so there's no
+  support for graphics at the moment.
 
-Teliva initializes the ncurses library by default, so apps should assume they
-have access to a text-mode window for printing text to, and a keyboard for
-reading unbuffered keystrokes from. Compare `hanoi.teliva` with `hanoi.lua` to
-get a sense for what changes are needed.
+- Teliva initializes the ncurses library by default, so apps should assume
+  they have access to a text-mode window for printing text to, and a keyboard
+  for reading unbuffered keystrokes from. Compare `hanoi.teliva` with
+  `hanoi.lua` to get a sense for what changes are needed.
 
-I want to provide sandboxed access to system resources (file system, network,
-etc.) which will likely create incompatibilities with the standard library.
-I'm disinclined to try to &lsquo;improve&rsquo; on Lua syntax, however. It's
-not my favorite, but it's good enough.
+- I want to provide sandboxed access to system resources (file system,
+  network, etc.) which will likely create incompatibilities with the standard
+  library. I'm disinclined to try to &lsquo;improve&rsquo; on Lua syntax,
+  however. It's not my favorite, but it's good enough.
 
 Teliva is not tested much at all yet. This is my first time programming either
-in Lua or within Lua. Bug reports most appreciated.
+in Lua or within Lua. So bug reports are most appreciated if Lua programs
+behave unexpectedly under Teliva.
 
-## Will it run any Ncurses program?
+## Will it run any ncurses program?
 
-Probably not. Ncurses is extremely portable. I don't test on all the
-configurations Ncurses supports. For example, I assume terminals with UTF-8
-support.
+Hopefully. Ncurses is extremely portable; I don't test on all the
+configurations ncurses supports. In particular, I assume terminals with colors
+and UTF-8 support.
 
 ## Will it run any Lua [lcurses](https://github.com/lcurses/lcurses) program?
 
-There are some exceptions. For example, lcurses has some strange
-&ldquo;smarts&rdquo; that result in `wgetch()` not behaving like `getch()`.
-Teliva doesn't reproduce such bugs.
+There will likely be some exceptions that I'll record here as I encounter them:
+
+- lcurses has some strange &ldquo;smarts&rdquo; that result in
+  `window:getch()` not behaving like the global `curses.getch()`. Teliva is
+  consistent with the underlying ncurses.
 
 ## What's with the name?
 
@@ -107,10 +110,10 @@ Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
 This repository is an unholy union of:
 * The [Lua](https://www.lua.org) 5.1 programming language.
   ([Documentation](https://www.lua.org/pil/contents.html))
-* The [Ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
+* The [ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
   building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
 * The [Lcurses](https://github.com/lcurses/lcurses) library providing Lua
-  bindings for Ncurses. ([Documentation](http://lcurses.github.io/lcurses))
+  bindings for ncurses. ([Documentation](http://lcurses.github.io/lcurses))
 * The [Kilo](https://github.com/antirez/kilo) text editor. ([With a fantastic
   walk-through.](https://viewsourcecode.org/snaptoken/kilo))
 

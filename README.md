@@ -36,10 +36,18 @@ Toggle the same hotkey to restart the app with the new sources.
 
 Over time I hope to improve the experience for error messages, failing tests,
 undoing changes and so on. The emphasis will be on maximizing hackability
-rather than functionality. I plan to be extremely parsimonious in taking on
-further dependencies. It should need just a Linux (or maybe some other Unix?)
-kernel, a C compiler, 12kLoC of Lua in this repo, maybe a couple more basic C
-libraries.
+rather than functionality. In addition to Lua 1.5, this repository currently
+packages:
+
+* The [ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
+  building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
+* A port of the [lcurses](https://github.com/lcurses/lcurses) library
+  providing Lua bindings for ncurses. ([Documentation](http://lcurses.github.io/lcurses))
+* The [Kilo](https://github.com/antirez/kilo) text editor. ([With a fantastic
+  walk-through.](https://viewsourcecode.org/snaptoken/kilo))
+
+Send all praise to them, brickbats to [me](http://akkartik.name/contact). I
+plan to be extremely parsimonious in taking on further dependencies.
 
 ## Isn't this just an IDE?
 
@@ -107,20 +115,6 @@ There will likely be some exceptions that I'll record here as I encounter them:
 ## What's with the name?
 
 Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
-
-## Credits
-
-This repository is an unholy union of:
-* The [Lua](https://www.lua.org) 5.1 programming language.
-  ([Documentation](https://www.lua.org/pil/contents.html))
-* The [ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
-  building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
-* The [lcurses](https://github.com/lcurses/lcurses) library providing Lua
-  bindings for ncurses. ([Documentation](http://lcurses.github.io/lcurses))
-* The [Kilo](https://github.com/antirez/kilo) text editor. ([With a fantastic
-  walk-through.](https://viewsourcecode.org/snaptoken/kilo))
-
-Send all praise to them, brickbats to [me](http://akkartik.name/contact).
 
 # README for Lua 5.1
 

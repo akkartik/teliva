@@ -65,8 +65,11 @@ code.
 
 ## Will it run any Lua program?
 
-Not quite. My plan is to disable support for certain Lua libraries as I gain
-experience programming in this way:
+Not quite. My priority is providing a good experience for newcomers to
+comprehend and modify the programs they use. If it's not clear how to provide
+that experience for some kinds of Lua programs, I'd rather disable support for
+them in Teliva and let people use regular Lua (or other languages and
+environments!) for them.
 
 - This approach doesn't make sense for batch programs, I think.
 

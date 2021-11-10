@@ -187,6 +187,38 @@ function step()
 end
 
 
+function file_exists(filename)
+  local f = io.open(filename, "r")
+  if f ~= nil then
+    io.close(f)
+    return true
+  else
+    return false
+  end
+end
+
+
+function load_file(window, filename)
+  io.input(filename)
+  local line_index = lines
+  for line in io.lines() do
+    if line:sub(1,1) ~= '!' then  -- comment; plaintext files can't have whitespace before comments
+      local col_index = cols
+      for c in line:gmatch(".") do
+        if c == '\r' then break end  -- DOS line ending
+        if c == '.' then
+          grid[line_index][col_index] = 0
+        else
+          grid[line_index][col_index] = 1
+        end
+        col_index = col_index+1
+      end
+      line_index = line_index+1
+    end
+  end
+end
+
+
 if (#arg == 0) then
   -- by default, start from a deterministically random state
   for i=1,lines*4 do
@@ -228,6 +260,21 @@ elseif arg[1] == "block" then
   grid[5][5] = 1
   grid[6][4] = 1
   grid[6][5] = 1
+elseif arg[1] == "loaf" then
+  -- https://www.conwaylife.com/wiki/Loaf
+  grid[5][4] = 1
+  grid[5][5] = 1
+  grid[6][4] = 1
+  grid[6][5] = 1
+elseif file_exists(arg[1]) then
+  -- Load a file in the standard "plaintext" format: https://www.conwaylife.com/wiki/Plaintext
+  --
+  -- Each pattern page at https://www.conwaylife.com/wiki provides its
+  -- plaintext representation in a block called "Pattern Files" on the right.
+  --
+  -- For example, check out the list of Important Patterns at
+  -- https://www.conwaylife.com/wiki/Category:Patterns_with_Catagolue_frequency_class_0
+  load_file(window, arg[1])
 end
 
 while true do

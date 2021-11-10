@@ -219,6 +219,11 @@ function load_file(window, filename)
 end
 
 
+function update(window)
+  curses.getch()  -- just check for menu keys
+end
+
+
 if (#arg == 0) then
   -- by default, start from a deterministically random state
   for i=1,lines*4 do
@@ -279,7 +284,7 @@ end
 
 while true do
   render(window)
-  curses.getch()  -- just check for menu keys
+  update(window)
 --?   sleep(0.1)
   step()
 end

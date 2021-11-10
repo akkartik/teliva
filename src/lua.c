@@ -405,6 +405,7 @@ int main (int argc, char **argv) {
   }
   setlocale(LC_ALL, "");
   initscr();
+  keypad(stdscr, 1);
   start_color();
   use_default_colors();
   draw_menu(L);

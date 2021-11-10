@@ -219,8 +219,42 @@ function load_file(window, filename)
 end
 
 
+menu = {arrow="pan"}
 function update(window)
-  curses.getch()  -- just check for menu keys
+  c = curses.getch()
+  if c == curses.KEY_LEFT then
+    for i=1,lines*4 do
+      for j=2,cols*2 do
+        grid[i][j-1] = grid[i][j]
+      end
+      grid[i][cols*2] = 0
+    end
+  elseif c == curses.KEY_DOWN then
+    for i=lines*4-1,1,-1 do
+      for j=1,cols*2 do
+        grid[i+1][j] = grid[i][j]
+      end
+    end
+    for j=1,cols*2 do
+      grid[1][j] = 0
+    end
+  elseif c == curses.KEY_UP then
+    for i=2,lines*4 do
+      for j=1,cols*2 do
+        grid[i][j-1] = grid[i][j+1]
+      end
+    end
+    for j=1,cols*2 do
+      grid[lines*4][j] = 0
+    end
+  elseif c == curses.KEY_RIGHT then
+    for i=1,lines*4 do
+      for j=cols*2-1,1,-1 do
+        grid[i][j+1] = grid[i][j]
+      end
+      grid[i][1] = 0
+    end
+  end
 end
 
 

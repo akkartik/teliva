@@ -1,9 +1,3 @@
-window = curses.stdscr()
-
-
--- animation-based app
-window:nodelay(true)
-
 function sleep(a)
     local sec = tonumber(os.clock() + a);
     while (os.clock() < sec) do
@@ -11,17 +5,7 @@ function sleep(a)
 end
 
 
--- grid data structure
-lines, cols = window:getmaxyx()
-
-grid = {}
-for i=1,lines*4 do
-  grid[i] = {}
-  for j=1,cols*2 do
-    grid[i][j] = 0
-  end
-end
-
+-- render using Unicode braille characters, 4x2 tiles of the grid per character
 
 -- grab a 4x2 chunk of grid
 function grid_char(line, col)
@@ -41,20 +25,6 @@ function print_grid_char(window, x)
   end
   return result
 end
-
--- testing for grid_char
---? grid = {
---?         {1, 2, 3, 4},
---?         {5, 6, 7, 8},
---?         {9, 10, 11, 12},
---?         {13, 14, 15, 16},
---?       }
---? for l, row in ipairs(grid_char(1, 1)) do
---?   print(l, row)
---?   for c, val in ipairs(row) do
---?     print(l, c, val)
---?   end
---? end
 
 
 -- look up the braille pattern corresponding to a 4x2 chunk of grid
@@ -80,34 +50,25 @@ glyph = {
   0x28b8, 0x28b9, 0x28ba, 0x28bb, 0x28bc, 0x28bd, 0x28be, 0x28bf,   0x28f8, 0x28f9, 0x28fa, 0x28fb, 0x28fc, 0x28fd, 0x28fe, 0x28ff,
 }
 
--- https://stackoverflow.com/questions/7983574/how-to-write-a-unicode-symbol-in-lua
-do
-  local bytemarkers = { {0x7FF,192}, {0xFFFF,224}, {0x1FFFFF,240} }
-  function utf8(decimal)
-    if decimal<128 then return string.char(decimal) end
-    local charbytes = {}
-    for bytes,vals in ipairs(bytemarkers) do
-      if decimal<=vals[1] then
-        for b=bytes+1,2,-1 do
-          local mod = decimal%64
-          decimal = (decimal-mod)/64
-          charbytes[b] = string.char(128+mod)
-        end
-        charbytes[1] = string.char(vals[2]+decimal)
-        break
-      end
-    end
-    return table.concat(charbytes)
-  end
-end
 
--- testing for glyphs
---? for _, val in ipairs(glyph) do
---?   window:mvaddstr(10, 10, utf8(val))
---?   window:mvaddstr(10, 20, " ")
---?   curses.getch()  -- just check for menu keys
---?   sleep(0.1)
---? end
+-- https://stackoverflow.com/questions/7983574/how-to-write-a-unicode-symbol-in-lua
+function utf8(decimal)
+  local bytemarkers = { {0x7FF,192}, {0xFFFF,224}, {0x1FFFFF,240} }
+  if decimal<128 then return string.char(decimal) end
+  local charbytes = {}
+  for bytes,vals in ipairs(bytemarkers) do
+    if decimal<=vals[1] then
+      for b=bytes+1,2,-1 do
+        local mod = decimal%64
+        decimal = (decimal-mod)/64
+        charbytes[b] = string.char(128+mod)
+      end
+      charbytes[1] = string.char(vals[2]+decimal)
+      break
+    end
+  end
+  return table.concat(charbytes)
+end
 
 
 -- convert a chunk of grid into a number
@@ -128,25 +89,6 @@ function render(window)
   curses.refresh()
 end
 
--- test single iteration of render
---? grid[1][1] = 1
---? grid[2][1] = 1
---? print_grid_char(window, grid_char(1, 1))
---? window:mvaddstr(10, 10, grid_char_to_glyph_index(grid_char(1, 1)))
---? window:mvaddstr(10, 20, string.format("%x", glyph[grid_char_to_glyph_index(grid_char(1, 1))]))
---? window:mvaddstr(10, 30, utf8(glyph[grid_char_to_glyph_index(grid_char(1, 1))]))
---? curses.getch()
-
--- test render
---? grid[10][11] = 1
---? grid[10][12] = 1
---? grid[10][13] = 1
---? 
---? while true do
---?   render(window)
---?   curses.getch()  -- just check for menu keys
---?   sleep(0.1)
---? end
 
 -- step
 function state(line, col)
@@ -156,17 +98,13 @@ function state(line, col)
   return grid[line][col]
 end
 
+
 function num_live_neighbors(line, col)
   return state(line-1, col-1) + state(line-1, col) + state(line-1, col+1) +
          state(line,   col-1) +                      state(line,   col+1) +
          state(line+1, col-1) + state(line+1, col) + state(line+1, col+1)
 end
 
---? grid[10][11] = 1
---? grid[10][12] = 1
---? grid[10][13] = 1
---? window:mvaddstr(10, 10, num_live_neighbors(10, 12))
---? curses.getch()
 
 function step()
   local new_grid = {}
@@ -219,6 +157,7 @@ function load_file(window, filename)
 end
 
 
+-- process input
 menu = {arrow="pan"}
 function update(window)
   c = curses.getch()
@@ -258,70 +197,89 @@ function update(window)
 end
 
 
-if (#arg == 0) then
-  -- by default, start from a deterministically random state
-  for i=1,lines*4 do
-    for j=1,cols*2 do
-      grid[i][j] = math.random(0, 1)
-    end
-  end
-elseif arg[1] == "random" then
-  -- start from a non-deterministically random start state
-  math.randomseed(os.time())
-  for i=1,lines*4 do
-    for j=1,cols*2 do
-      grid[i][j] = math.random(0, 1)
-    end
-  end
--- Shortcuts for some common patterns
-elseif arg[1] == "pentomino" then
-  -- https://www.conwaylife.com/wiki/Pentomino
-  grid[83][172] = 1
-  grid[83][173] = 1
-  grid[84][173] = 1
-  grid[84][174] = 1
-  grid[85][173] = 1
-elseif arg[1] == "glider" then
-  -- https://www.conwaylife.com/wiki/Glider
-  grid[5][4] = 1
-  grid[6][5] = 1
-  grid[7][3] = 1
-  grid[7][4] = 1
-  grid[7][5] = 1
-elseif arg[1] == "blinker" then
-  -- https://www.conwaylife.com/wiki/Blinker
-  grid[7][3] = 1
-  grid[7][4] = 1
-  grid[7][5] = 1
-elseif arg[1] == "block" then
-  -- https://www.conwaylife.com/wiki/Block
-  grid[5][4] = 1
-  grid[5][5] = 1
-  grid[6][4] = 1
-  grid[6][5] = 1
-elseif arg[1] == "loaf" then
-  -- https://www.conwaylife.com/wiki/Loaf
-  grid[5][4] = 1
-  grid[5][5] = 1
-  grid[6][6] = 1
-  grid[7][6] = 1
-  grid[8][5] = 1
-  grid[7][4] = 1
-  grid[6][3] = 1
-elseif file_exists(arg[1]) then
-  -- Load a file in the standard "plaintext" format: https://www.conwaylife.com/wiki/Plaintext
-  --
-  -- Each pattern page at https://www.conwaylife.com/wiki provides its
-  -- plaintext representation in a block called "Pattern Files" on the right.
-  --
-  -- For example, check out the list of Important Patterns at
-  -- https://www.conwaylife.com/wiki/Category:Patterns_with_Catagolue_frequency_class_0
-  load_file(window, arg[1])
-end
+function main()
+  window = curses.stdscr()
 
-while true do
-  render(window)
-  update(window)
---?   sleep(0.1)
-  step()
+  -- animation-based app
+  window:nodelay(true)
+
+  -- main data structure
+  lines, cols = window:getmaxyx()
+  grid = {}
+  for i=1,lines*4 do
+    grid[i] = {}
+    for j=1,cols*2 do
+      grid[i][j] = 0
+    end
+  end
+
+  -- initialize grid based on commandline args
+  if (#arg == 0) then
+    -- by default, start from a deterministically random state
+    for i=1,lines*4 do
+      for j=1,cols*2 do
+        grid[i][j] = math.random(0, 1)
+      end
+    end
+  elseif arg[1] == "random" then
+    -- start from a non-deterministically random start state
+    math.randomseed(os.time())
+    for i=1,lines*4 do
+      for j=1,cols*2 do
+        grid[i][j] = math.random(0, 1)
+      end
+    end
+  -- shortcuts for some common patterns
+  elseif arg[1] == "pentomino" then
+    -- https://www.conwaylife.com/wiki/Pentomino
+    grid[83][172] = 1
+    grid[83][173] = 1
+    grid[84][173] = 1
+    grid[84][174] = 1
+    grid[85][173] = 1
+  elseif arg[1] == "glider" then
+    -- https://www.conwaylife.com/wiki/Glider
+    grid[5][4] = 1
+    grid[6][5] = 1
+    grid[7][3] = 1
+    grid[7][4] = 1
+    grid[7][5] = 1
+  elseif arg[1] == "blinker" then
+    -- https://www.conwaylife.com/wiki/Blinker
+    grid[7][3] = 1
+    grid[7][4] = 1
+    grid[7][5] = 1
+  elseif arg[1] == "block" then
+    -- https://www.conwaylife.com/wiki/Block
+    grid[5][4] = 1
+    grid[5][5] = 1
+    grid[6][4] = 1
+    grid[6][5] = 1
+  elseif arg[1] == "loaf" then
+    -- https://www.conwaylife.com/wiki/Loaf
+    grid[5][4] = 1
+    grid[5][5] = 1
+    grid[6][6] = 1
+    grid[7][6] = 1
+    grid[8][5] = 1
+    grid[7][4] = 1
+    grid[6][3] = 1
+  elseif file_exists(arg[1]) then
+    -- Load a file in the standard "plaintext" format: https://www.conwaylife.com/wiki/Plaintext
+    --
+    -- Each pattern page at https://www.conwaylife.com/wiki provides its
+    -- plaintext representation in a block called "Pattern Files" on the right.
+    --
+    -- For example, check out the list of Important Patterns at
+    -- https://www.conwaylife.com/wiki/Category:Patterns_with_Catagolue_frequency_class_0
+    load_file(window, arg[1])
+  end
+
+  -- main loop
+  while true do
+    render(window)
+    update(window)
+    step()
+  end
 end
+main()

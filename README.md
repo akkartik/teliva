@@ -12,8 +12,8 @@
 ## What's this, then?
 
 An extremely naïve, [brutalist](https://en.wikipedia.org/wiki/Brutalist_architecture)
-attempt at packaging up simple Lua (5.1) apps with all the stuff needed to
-edit and build them.
+attempt at packaging up simple [Lua](http://www.lua.org) ([5.1](https://www.lua.org/manual/5.1))
+apps with all the stuff needed to edit and build them.
 
 ```
 git clone https://github.com/akkartik/teliva
@@ -115,62 +115,3 @@ There will likely be some exceptions that I'll record here as I encounter them:
 ## What's with the name?
 
 Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
-
-# README for Lua 5.1
-
-* What is Lua?
-  ------------
-  Lua is a powerful, light-weight programming language designed for extending
-  applications. Lua is also frequently used as a general-purpose, stand-alone
-  language. Lua is free software.
-
-  For complete information, visit Lua's web site at http://www.lua.org/ .
-  For an executive summary, see http://www.lua.org/about.html .
-
-  Lua has been used in many different projects around the world.
-  For a short list, see http://www.lua.org/uses.html .
-
-* Availability
-  ------------
-  Lua is freely available for both academic and commercial purposes.
-  See COPYRIGHT and http://www.lua.org/license.html for details.
-  Lua can be downloaded at http://www.lua.org/download.html .
-
-* Installation
-  ------------
-  Lua is implemented in pure ANSI C, and compiles unmodified in all known
-  platforms that have an ANSI C compiler. In most Unix-like platforms, simply
-  do "make" with a suitable target. See INSTALL for detailed instructions.
-
-* Origin
-  ------
-  Lua is developed at Lua.org, a laboratory of the Department of Computer
-  Science of PUC-Rio (the Pontifical Catholic University of Rio de Janeiro
-  in Brazil).
-  For more information about the authors, see http://www.lua.org/authors.html .
-
-# README for Kilo
-
-Kilo is a small text editor in less than 1K lines of code (counted with cloc).
-
-A screencast is available here: https://asciinema.org/a/90r2i9bq8po03nazhqtsifksb
-
-Usage: kilo `<filename>`
-
-Keys:
-
-    CTRL-S: Save
-    CTRL-Q: Quit
-    CTRL-F: Find string in file (ESC to exit search, arrows to navigate)
-
-Kilo does not depend on any library (not even curses). It uses fairly standard
-VT100 (and similar terminals) escape sequences. The project is in alpha
-stage and was written in just a few hours taking code from my other two
-projects, load81 and linenoise.
-
-People are encouraged to use it as a starting point to write other editors
-or command line interfaces that are more advanced than the usual REPL
-style CLI.
-
-Kilo was written by Salvatore Sanfilippo aka antirez and is released
-under the BSD 2 clause license.

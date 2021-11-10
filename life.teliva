@@ -241,7 +241,7 @@ function update(window)
   elseif c == curses.KEY_UP then
     for i=2,lines*4 do
       for j=1,cols*2 do
-        grid[i][j-1] = grid[i][j+1]
+        grid[i-1][j] = grid[i][j]
       end
     end
     for j=1,cols*2 do

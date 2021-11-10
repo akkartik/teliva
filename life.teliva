@@ -303,8 +303,11 @@ elseif arg[1] == "loaf" then
   -- https://www.conwaylife.com/wiki/Loaf
   grid[5][4] = 1
   grid[5][5] = 1
-  grid[6][4] = 1
-  grid[6][5] = 1
+  grid[6][6] = 1
+  grid[7][6] = 1
+  grid[8][5] = 1
+  grid[7][4] = 1
+  grid[6][3] = 1
 elseif file_exists(arg[1]) then
   -- Load a file in the standard "plaintext" format: https://www.conwaylife.com/wiki/Plaintext
   --

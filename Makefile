@@ -55,9 +55,6 @@ all:	$(PLAT)
 $(PLATS) clean:
 	cd src && $(MAKE) $@
 
-test:	dummy
-	src/lua test/hello.lua
-
 install: dummy
 	cd src && $(MKDIR) $(INSTALL_BIN) $(INSTALL_INC) $(INSTALL_LIB) $(INSTALL_MAN) $(INSTALL_LMOD) $(INSTALL_CMOD)
 	cd src && $(INSTALL_EXEC) $(TO_BIN) $(INSTALL_BIN)

@@ -186,11 +186,49 @@ function step()
   grid = new_grid
 end
 
-grid[83][172] = 1
-grid[83][173] = 1
-grid[84][173] = 1
-grid[84][174] = 1
-grid[85][173] = 1
+
+if (#arg == 0) then
+  -- by default, start from a deterministically random state
+  for i=1,lines*4 do
+    for j=1,cols*2 do
+      grid[i][j] = math.random(0, 1)
+    end
+  end
+elseif arg[1] == "random" then
+  -- start from a non-deterministically random start state
+  math.randomseed(os.time())
+  for i=1,lines*4 do
+    for j=1,cols*2 do
+      grid[i][j] = math.random(0, 1)
+    end
+  end
+-- Shortcuts for some common patterns
+elseif arg[1] == "pentomino" then
+  -- https://www.conwaylife.com/wiki/Pentomino
+  grid[83][172] = 1
+  grid[83][173] = 1
+  grid[84][173] = 1
+  grid[84][174] = 1
+  grid[85][173] = 1
+elseif arg[1] == "glider" then
+  -- https://www.conwaylife.com/wiki/Glider
+  grid[5][4] = 1
+  grid[6][5] = 1
+  grid[7][3] = 1
+  grid[7][4] = 1
+  grid[7][5] = 1
+elseif arg[1] == "blinker" then
+  -- https://www.conwaylife.com/wiki/Blinker
+  grid[7][3] = 1
+  grid[7][4] = 1
+  grid[7][5] = 1
+elseif arg[1] == "block" then
+  -- https://www.conwaylife.com/wiki/Block
+  grid[5][4] = 1
+  grid[5][5] = 1
+  grid[6][4] = 1
+  grid[6][5] = 1
+end
 
 while true do
   render(window)

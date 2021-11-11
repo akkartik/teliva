@@ -75,29 +75,6 @@ static int report (lua_State *L, int status) {
 }
 
 
-/* death and rebirth */
-char *Script_name = NULL;
-char **Argv = NULL;
-extern void edit(char *filename, const char *status);
-void switch_to_editor(const char *message) {
-  endwin();
-  edit(Script_name, message);
-  execv(Argv[0], Argv);
-  /* never returns */
-}
-
-
-const char *Previous_error = NULL;
-static int show_error_in_editor (lua_State *L, int status) {
-  if (status && !lua_isnil(L, -1)) {
-    Previous_error = lua_tostring(L, -1);
-    if (Previous_error == NULL) Previous_error = "(error object is not a string)";
-    switch_to_editor(Previous_error);
-  }
-  return status;
-}
-
-
 static int traceback (lua_State *L) {
   if (!lua_isstring(L, 1))  /* 'message' not a string? */
     return 1;  /* keep it intact */
@@ -326,6 +303,29 @@ static int handle_image (lua_State *L, char **argv, int n) {
 //?   stackDump(L);
 //?   exit(1);
   return 0;
+}
+
+
+/* death and rebirth */
+char *Script_name = NULL;
+char **Argv = NULL;
+extern void edit(char *filename, const char *status);
+void switch_to_editor(const char *message) {
+  endwin();
+  edit(Script_name, message);
+  execv(Argv[0], Argv);
+  /* never returns */
+}
+
+
+const char *Previous_error = NULL;
+static int show_error_in_editor (lua_State *L, int status) {
+  if (status && !lua_isnil(L, -1)) {
+    Previous_error = lua_tostring(L, -1);
+    if (Previous_error == NULL) Previous_error = "(error object is not a string)";
+    switch_to_editor(Previous_error);
+  }
+  return status;
 }
 
 

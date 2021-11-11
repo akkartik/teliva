@@ -1,8 +1,8 @@
-local curses = require "curses"
+window = curses.stdscr()
 
 n = 0
 
-local function render(window)
+function render(window)
   window:clear()
   window:attron(curses.A_BOLD)
   window:attron(curses.color_pair(6))
@@ -14,19 +14,21 @@ local function render(window)
 end
 
 menu = {Enter="increment"}
-local function update(window)
+function update(window)
   local key = curses.getch()
   if key == 10 then
     n = n+1
   end
 end
 
-local window = curses.stdscr()
-for i=1,7 do
-  curses.init_pair(i, 0, i)
-end
+function main()
+  for i=1,7 do
+    curses.init_pair(i, 0, i)
+  end
 
-while true do
-  render(window)
-  update(window)
+  while true do
+    render(window)
+    update(window)
+  end
 end
+main()

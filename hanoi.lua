@@ -1,8 +1,10 @@
-local curses = require "curses"
+curses = require "curses"
+
+window = curses.initscr()
 
 tower = {{6, 5, 4, 3, 2}, {}, {}}
 
-local function len(array)
+function len(array)
   local result = 0
   for k in pairs(array) do
     result = result+1
@@ -10,22 +12,22 @@ local function len(array)
   return result
 end
 
-local function pop(array)
+function pop(array)
   return table.remove(array)
 end
 
-local function lines(window)
+function lines(window)
   local lines, cols = window:getmaxyx()
   return lines
 end
 
-local function cols(window)
+function cols(window)
   local lines, cols = window:getmaxyx()
   return cols
 end
 
 
-local function render_disk(window, line, col, size)
+function render_disk(window, line, col, size)
   col = col-size+1
   for i=1,size do
     window:attron(curses.color_pair(size))
@@ -35,7 +37,7 @@ local function render_disk(window, line, col, size)
   end
 end
 
-local function render_tower(window, line, col, tower_index, tower)
+function render_tower(window, line, col, tower_index, tower)
   window:attron(curses.A_BOLD)
   window:mvaddch(line+2, col, string.char(96+tower_index))
   window:attroff(curses.A_BOLD)
@@ -54,7 +56,7 @@ local function render_tower(window, line, col, tower_index, tower)
   end
 end
 
-local function render(window)
+function render(window)
   window:clear()
   local lines, cols = window:getmaxyx()
   local line = math.floor(lines/2)
@@ -66,12 +68,12 @@ local function render(window)
 end
 
 
-local function make_move(from, to)
+function make_move(from, to)
   local disk = pop(tower[from])
   table.insert(tower[to], disk)
 end
 
-local function update(window)
+function update(window)
   window:mvaddstr(lines(window)-2, 5, "tower to remove top disk from? ")
   local from = string.byte(curses.getch()) - 96
   window:mvaddstr(lines(window)-1, 5, "tower to stack it on? ")
@@ -80,17 +82,18 @@ local function update(window)
 end
 
 
-window = curses.initscr()
-curses.start_color()
-curses.use_default_colors()
-for i=1,7 do
-  curses.init_pair(i, 0, i)
+function main()
+  curses.start_color()
+  curses.use_default_colors()
+  for i=1,7 do
+    curses.init_pair(i, 0, i)
+  end
+
+  while true do
+    render(window)
+    update(window)
+  end
+
+  curses.endwin()
 end
-
-while true do
-  render(window)
-  update(window)
-end
-
-curses.endwin()
-
+main()

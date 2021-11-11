@@ -1,5 +1,4 @@
 window = curses.stdscr()
-
 -- animation-based app
 window:nodelay(true)
 

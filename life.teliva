@@ -180,8 +180,8 @@ end
 -- process input
 
 menu = {arrow="pan"}
-function update(window)
-  c = curses.getch()
+
+function update(window, c)
   if c == curses.KEY_LEFT then
     for i=1,lines*4 do
       for j=2,cols*2 do
@@ -284,7 +284,8 @@ function main()
   -- main loop
   while true do
     render(window)
-    update(window)
+    c = curses.getch()
+    update(window, c)
     step()
   end
 end

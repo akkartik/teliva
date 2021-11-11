@@ -113,7 +113,7 @@ static int Pcolor_pair (lua_State *L)
 }
 
 
-extern void switch_to_editor(const char *message);
+extern void switch_to_editor(lua_State *L, const char *message);
 static int Pgetch (lua_State *L) {
   int c = wgetch(stdscr);
   if (c == ERR)
@@ -121,7 +121,7 @@ static int Pgetch (lua_State *L) {
   if (c == 24)  /* ctrl-x */
     exit(0);
   if (c == 5)  /* ctrl-e */
-    switch_to_editor("");
+    switch_to_editor(L, "");
   /* handle other standard menu hotkeys here */
   lua_pushinteger(L, c);
   return 1;

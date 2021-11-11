@@ -140,7 +140,7 @@ static int dofile (lua_State *L, const char *name) {
 }
 
 
-static int dostring (lua_State *L, const char *s, const char *name) {
+int dostring (lua_State *L, const char *s, const char *name) {
   int status = luaL_loadbuffer(L, s, strlen(s), name) || docall(L, 0, 1);
   return report(L, status);
 }
@@ -244,7 +244,7 @@ static int has_extension (const char *filename, const char *extension) {
 }
 
 
-static void stackDump (lua_State *L) {
+void stackDump (lua_State *L) {
   int i;
   int top = lua_gettop(L);
   for (i = 1; i <= top; i++) {  /* repeat for each level */
@@ -274,12 +274,14 @@ static void stackDump (lua_State *L) {
 }
 
 
+char *Image_name = NULL;
 static int handle_image (lua_State *L, char **argv, int n) {
   int status;
   int narg = getargs(L, argv, n);  /* collect arguments */
   lua_setglobal(L, "arg");
   /* parse and load file contents (teliva_program table) */
-  status = luaL_loadfile(L, argv[n]);
+  Image_name = argv[n];
+  status = luaL_loadfile(L, Image_name);
   lua_insert(L, -(narg+1));
   if (status != 0) {
     return status;
@@ -306,13 +308,24 @@ static int handle_image (lua_State *L, char **argv, int n) {
 }
 
 
+/* Push the string corresponding to the definition for 'name' on the stack. */
+void teliva_get_definition(lua_State *L, const char *name) {
+  lua_getglobal(L, "teliva_program");
+  lua_getfield(L, -1, name);
+}
+
+
 /* death and rebirth */
 char *Script_name = NULL;
 char **Argv = NULL;
 extern void edit(char *filename, const char *status);
-void switch_to_editor(const char *message) {
+extern void editString(lua_State *L, char *name);
+void switch_to_editor(lua_State *L, const char *message) {
   endwin();
-  edit(Script_name, message);
+  if (Script_name)
+    edit(Script_name, message);
+  else
+    editString(L, "main");
   execv(Argv[0], Argv);
   /* never returns */
 }
@@ -323,7 +336,7 @@ static int show_error_in_editor (lua_State *L, int status) {
   if (status && !lua_isnil(L, -1)) {
     Previous_error = lua_tostring(L, -1);
     if (Previous_error == NULL) Previous_error = "(error object is not a string)";
-    switch_to_editor(Previous_error);
+    switch_to_editor(L, Previous_error);
   }
   return status;
 }

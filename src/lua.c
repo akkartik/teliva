@@ -5,6 +5,7 @@
 */
 
 
+#include <fcntl.h>
 #include <locale.h>
 #include <ncurses.h>
 #include <signal.h>
@@ -328,6 +329,49 @@ void switch_to_editor(lua_State *L, const char *message) {
     editString(L, "main");
   execv(Argv[0], Argv);
   /* never returns */
+}
+
+void editString(lua_State *L, char *name) {
+    /* write given definition out to tmp file */
+//?     stackDump(L);
+    teliva_get_definition(L, name);
+//?     stackDump(L);
+    const char *contents = lua_tostring(L, -1);
+    int outfd = open("teliva_editbuffer", O_WRONLY|O_CREAT|O_TRUNC, 0644);
+    write(outfd, contents, strlen(contents));
+    close(outfd);
+
+    /* edit tmp file */
+    edit("teliva_editbuffer", "");
+
+    /* read contents of tmp file */
+    char new_contents[8192] = {0};
+    int infd = open("teliva_editbuffer", O_RDONLY);
+    read(infd, new_contents, 8190);  /* TODO: handle overly large file */
+    close(infd);
+
+    /* save contents back into image */
+    lua_pop(L, 1);
+    lua_pushstring(L, new_contents);
+    lua_setfield(L, -2, name);
+
+    /* save teliva_program to disk */
+    int table = lua_gettop(L);
+    FILE* fp = fopen(Image_name, "w");
+    fprintf(fp, "teliva_program = {\n");
+    for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
+      const char* key = lua_tostring(L, -2);
+      const char* value = lua_tostring(L, -1);
+      fprintf(fp, "  %s = [[", key);
+      fprintf(fp, "%s", value);
+      fprintf(fp, "]],\n");
+    }
+    fprintf(fp, "}\n");
+    fclose(fp);
+
+    /* reload binding */
+    dostring(L, new_contents, name);
+    /* TODO: handle error */
 }
 
 

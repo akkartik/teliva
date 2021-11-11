@@ -4,13 +4,6 @@ window = curses.stdscr()
 window:nodelay(true)
 
 
-function sleep(a)
-    local sec = tonumber(os.clock() + a);
-    while (os.clock() < sec) do
-    end
-end
-
-
 lines, cols = window:getmaxyx()
 
 -- main data structure
@@ -143,6 +136,15 @@ function step()
 end
 
 
+-- miscellaneous helpers
+
+function sleep(a)
+    local sec = tonumber(os.clock() + a);
+    while (os.clock() < sec) do
+    end
+end
+
+
 function file_exists(filename)
   local f = io.open(filename, "r")
   if f ~= nil then
@@ -176,6 +178,7 @@ end
 
 
 -- process input
+
 menu = {arrow="pan"}
 function update(window)
   c = curses.getch()

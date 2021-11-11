@@ -138,6 +138,7 @@ static void print_version (void) {
 }
 
 
+/* pushes commandline args to the stack, then an array of all commandline args */
 static int getargs (lua_State *L, char **argv, int n) {
   int narg;
   int i;
@@ -259,7 +260,78 @@ static void dotty (lua_State *L) {
 }
 
 
+static int has_extension (const char *filename, const char *extension) {
+  const char *filename_final_dot = strrchr(filename, '.');
+  if (filename_final_dot == NULL) return 0;
+  return strcmp(filename_final_dot+1, extension) == 0;
+}
+
+
+static void stackDump (lua_State *L) {
+  int i;
+  int top = lua_gettop(L);
+  for (i = 1; i <= top; i++) {  /* repeat for each level */
+    int t = lua_type(L, i);
+    switch (t) {
+
+      case LUA_TSTRING:  /* strings */
+        printf("`%s'", lua_tostring(L, i));
+        break;
+
+      case LUA_TBOOLEAN:  /* booleans */
+        printf(lua_toboolean(L, i) ? "true" : "false");
+        break;
+
+      case LUA_TNUMBER:  /* numbers */
+        printf("%g", lua_tonumber(L, i));
+        break;
+
+      default:  /* other values */
+        printf("%s", lua_typename(L, t));
+        break;
+
+    }
+    printf("  ");  /* put a separator */
+  }
+  printf("\n");  /* end the listing */
+}
+
+
+static int handle_image (lua_State *L, char **argv, int n) {
+  int status;
+  int narg = getargs(L, argv, n);  /* collect arguments */
+  lua_setglobal(L, "arg");
+  /* parse and load file contents (teliva_program table) */
+  status = luaL_loadfile(L, argv[n]);
+  lua_insert(L, -(narg+1));
+  if (status != 0) {
+    return status;
+  }
+  status = docall(L, narg, 0);
+  lua_getglobal(L, "teliva_program");
+  int table = lua_gettop(L);
+//?   endwin();
+  /* parse and load each binding in teliva_program */
+  for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
+    const char* key = lua_tostring(L, -2);
+    const char* value = lua_tostring(L, -1);
+//?     printf("===\nkey: %s\n", key);
+//?     printf("value: %s\n", value);
+    dostring(L, value, key);
+//?     stackDump(L);
+  }
+  /* call main() */
+  lua_getglobal(L, "main");
+  docall(L, 0, 1);
+//?   stackDump(L);
+//?   exit(1);
+  return 0;
+}
+
+
 static int handle_script (lua_State *L, char **argv, int n) {
+  if (has_extension(argv[n], "tlv"))
+    return handle_image(L, argv, n);
   int status;
   int narg = getargs(L, argv, n);  /* collect arguments */
   lua_setglobal(L, "arg");

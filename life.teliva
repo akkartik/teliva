@@ -1,7 +1,25 @@
+window = curses.stdscr()
+
+-- animation-based app
+window:nodelay(true)
+
+
 function sleep(a)
     local sec = tonumber(os.clock() + a);
     while (os.clock() < sec) do
     end
+end
+
+
+lines, cols = window:getmaxyx()
+
+-- main data structure
+grid = {}
+for i=1,lines*4 do
+  grid[i] = {}
+  for j=1,cols*2 do
+    grid[i][j] = 0
+  end
 end
 
 
@@ -198,21 +216,6 @@ end
 
 
 function main()
-  window = curses.stdscr()
-
-  -- animation-based app
-  window:nodelay(true)
-
-  -- main data structure
-  lines, cols = window:getmaxyx()
-  grid = {}
-  for i=1,lines*4 do
-    grid[i] = {}
-    for j=1,cols*2 do
-      grid[i][j] = 0
-    end
-  end
-
   -- initialize grid based on commandline args
   if (#arg == 0) then
     -- by default, start from a deterministically random state

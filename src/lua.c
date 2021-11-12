@@ -316,32 +316,31 @@ void teliva_get_definition(lua_State *L, const char *name) {
 }
 
 
-extern void edit(char *filename, const char *status);
-void editString(lua_State *L, char *name) {
-    /* write given definition out to tmp file */
-//?     stackDump(L);
+void write_definition_to_file(lua_State *L, char *name, char *outfilename) {
     teliva_get_definition(L, name);
-//?     stackDump(L);
     const char *contents = lua_tostring(L, -1);
     lua_pop(L, 1);
-    int outfd = open("teliva_editbuffer", O_WRONLY|O_CREAT|O_TRUNC, 0644);
+    int outfd = open(outfilename, O_WRONLY|O_CREAT|O_TRUNC, 0644);
     write(outfd, contents, strlen(contents));
     close(outfd);
+}
 
-    /* edit tmp file */
-    edit("teliva_editbuffer", "");
 
-    /* read contents of tmp file */
-    char new_contents[8192] = {0};
-    int infd = open("teliva_editbuffer", O_RDONLY);
-    read(infd, new_contents, 8190);  /* TODO: handle overly large file */
+void read_contents(lua_State *L, char *filename, char *out) {
+    int infd = open(filename, O_RDONLY);
+    read(infd, out, 8190);  /* TODO: handle overly large file */
     close(infd);
+}
 
-    /* save contents back into image */
-    lua_pushstring(L, new_contents);
+
+/* table to update is at top of stack */
+void update_definition(lua_State *L, char *name, char *out) {
+    lua_pushstring(L, out);
     lua_setfield(L, -2, name);
+}
 
-    /* save teliva_program to disk */
+
+void save_image(lua_State *L) {
     int table = lua_gettop(L);
     FILE* fp = fopen(Image_name, "w");
     fprintf(fp, "teliva_program = {\n");
@@ -354,22 +353,28 @@ void editString(lua_State *L, char *name) {
     }
     fprintf(fp, "}\n");
     fclose(fp);
-
-    /* reload binding */
-    dostring(L, new_contents, name);
-    /* TODO: handle error */
 }
 
 
 /* death and rebirth */
 char *Script_name = NULL;
 char **Argv = NULL;
+extern void edit(char *filename, const char *status);
 void switch_to_editor(lua_State *L, const char *message) {
   endwin();
   if (Script_name)
     edit(Script_name, message);
-  else
-    editString(L, "main");
+  else {
+    write_definition_to_file(L, "main", "teliva_editbuffer");
+    edit("teliva_editbuffer", "");
+    char new_contents[8192] = {0};
+    read_contents(L, "teliva_editbuffer", new_contents);
+    update_definition(L, "main", new_contents);
+    save_image(L);
+    /* reload binding */
+    dostring(L, new_contents, "main");
+    /* TODO: handle error */
+  }
   execv(Argv[0], Argv);
   /* never returns */
 }

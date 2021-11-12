@@ -314,6 +314,7 @@ void write_definition_to_file (lua_State *L, char *name, char *outfilename) {
     lua_getfield(L, -1, name);
     const char *contents = lua_tostring(L, -1);
     lua_pop(L, 1);
+    if (contents == NULL) return;
     int outfd = open(outfilename, O_WRONLY|O_CREAT|O_TRUNC, 0644);
     write(outfd, contents, strlen(contents));
     close(outfd);

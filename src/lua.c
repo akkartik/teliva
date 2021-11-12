@@ -353,20 +353,22 @@ void save_image(lua_State *L) {
 /* death and rebirth */
 char *Script_name = NULL;
 char **Argv = NULL;
+char *Current_definition = NULL;
 extern void edit(lua_State *L, char *filename, const char *status);
 void switch_to_editor(lua_State *L, const char *message) {
   endwin();
   if (Script_name)
     edit(L, Script_name, message);
   else {
-    write_definition_to_file(L, "main", "teliva_editbuffer");
+    Current_definition = "main";
+    write_definition_to_file(L, Current_definition, "teliva_editbuffer");
     edit(L, "teliva_editbuffer", "");
     char new_contents[8192] = {0};
     read_contents(L, "teliva_editbuffer", new_contents);
-    update_definition(L, "main", new_contents);
+    update_definition(L, Current_definition, new_contents);
     save_image(L);
     /* reload binding */
-    dostring(L, new_contents, "main");
+    dostring(L, new_contents, Current_definition);
     /* TODO: handle error */
   }
   execv(Argv[0], Argv);

@@ -118,6 +118,7 @@ enum KEY_ACTION{
         CTRL_D = 4,
         CTRL_E = 5,
         CTRL_F = 6,
+        CTRL_G = 7,
         CTRL_H = 8,
         TAB = 9,
         CTRL_L = 12,
@@ -603,6 +604,11 @@ void editorDelRow(int at) {
     E.dirty++;
 }
 
+void editorClear(void) {
+    for (int j = E.numrows-1; j >= 0; j--)
+      editorDelRow(j);
+}
+
 /* Turn the editor rows into a single heap-allocated string.
  * Returns the pointer to the heap-allocated string and populate the
  * integer pointed by 'buflen' with the size of the string, escluding
@@ -927,12 +933,15 @@ void editorRefreshScreen(void) {
 
     /* Create a two rows status. First row: */
     abAppend(&ab,"\x1b[0K",4);
-    abAppend(&ab,"\x1b[7m  \x1b[0m ^e \x1b[7m run ",23);
+    abAppend(&ab,"\x1b[7m  ",6);
+    abAppend(&ab,"\x1b[0m ^e \x1b[7m run ",17);
     int len =            2  +     4  +       5;
     if (Previous_error != NULL) {
       abAppend(&ab,"\x1b[0m ^c \x1b[7m\x1b[0m\x1b[1m abort ",27);
       len +=               4  +                     7;
     }
+    abAppend(&ab,"\x1b[0m ^g \x1b[7m go ",16);
+    len +=               4  +       4;
     abAppend(&ab,"\x1b[0m ^s \x1b[7m search ",20);
     len +=               4  +       8;
     char rstatus[80];
@@ -1160,6 +1169,50 @@ void editorMoveCursor(int key) {
     }
 }
 
+extern char* Current_definition;
+int definition_exists(lua_State *L, char *name);
+void write_definition_to_file(lua_State *L, char *name, char *outfilename);
+void read_contents(lua_State *L, char *filename, char *out);
+void update_definition(lua_State *L, char *name, char *out);
+void save_image(lua_State *L);
+int dostring(lua_State *L, const char *s, const char *name);
+void editorGo(lua_State* L, int fd) {
+    char query[KILO_QUERY_LEN+1] = {0};
+    int qlen = 0;
+
+    editorSave();
+    char new_contents[8192] = {0};
+    read_contents(L, "teliva_editbuffer", new_contents);
+    update_definition(L, Current_definition, new_contents);
+    save_image(L);
+    /* reload binding if possible */
+    dostring(L, new_contents, Current_definition);
+
+    while(1) {
+        editorSetStatusMessage("Jump to: %s", query);
+        editorRefreshScreen();
+
+        int c = editorReadKey(fd);
+        if (c == DEL_KEY || c == CTRL_H || c == BACKSPACE) {
+            if (qlen != 0) query[--qlen] = '\0';
+        } else if (c == ESC || c == ENTER) {
+            editorSetStatusMessage("");
+            if (c == ENTER  &&  definition_exists(L, query)) {
+              Current_definition = query;
+              write_definition_to_file(L, Current_definition, "teliva_editbuffer");
+              editorClear();
+              editorOpen("teliva_editbuffer");
+            }
+            return;
+        } else if (isprint(c)) {
+            if (qlen < KILO_QUERY_LEN) {
+                query[qlen++] = c;
+                query[qlen] = '\0';
+            }
+        }
+    }
+}
+
 /* Process events arriving from the standard input, which is, the user
  * is typing stuff on the terminal. */
 #define KILO_QUIT_TIMES 3
@@ -1180,6 +1233,10 @@ void editorProcessKeypress(lua_State* L, int fd) {
         /* Save and quit. */
         editorSave();
         Quit = 1;
+        break;
+    case CTRL_G:
+        /* Go to a different definition. */
+        editorGo(L, fd);
         break;
     case CTRL_F:
         editorFind(fd);

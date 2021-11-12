@@ -309,6 +309,15 @@ static int handle_image (lua_State *L, char **argv, int n) {
 }
 
 
+int definition_exists (lua_State *L, char *name) {
+    lua_getglobal(L, "teliva_program");
+    lua_getfield(L, -1, name);
+    const char *contents = lua_tostring(L, -1);
+    lua_pop(L, 1);
+    return contents != NULL;
+}
+
+
 void write_definition_to_file (lua_State *L, char *name, char *outfilename) {
     lua_getglobal(L, "teliva_program");
     lua_getfield(L, -1, name);
@@ -368,9 +377,8 @@ void switch_to_editor (lua_State *L, const char *message) {
     read_contents(L, "teliva_editbuffer", new_contents);
     update_definition(L, Current_definition, new_contents);
     save_image(L);
-    /* reload binding */
+    /* reload binding if possible */
     dostring(L, new_contents, Current_definition);
-    /* TODO: handle error */
   }
   execv(Argv[0], Argv);
   /* never returns */

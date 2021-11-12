@@ -316,21 +316,7 @@ void teliva_get_definition(lua_State *L, const char *name) {
 }
 
 
-/* death and rebirth */
-char *Script_name = NULL;
-char **Argv = NULL;
 extern void edit(char *filename, const char *status);
-extern void editString(lua_State *L, char *name);
-void switch_to_editor(lua_State *L, const char *message) {
-  endwin();
-  if (Script_name)
-    edit(Script_name, message);
-  else
-    editString(L, "main");
-  execv(Argv[0], Argv);
-  /* never returns */
-}
-
 void editString(lua_State *L, char *name) {
     /* write given definition out to tmp file */
 //?     stackDump(L);
@@ -372,6 +358,20 @@ void editString(lua_State *L, char *name) {
     /* reload binding */
     dostring(L, new_contents, name);
     /* TODO: handle error */
+}
+
+
+/* death and rebirth */
+char *Script_name = NULL;
+char **Argv = NULL;
+void switch_to_editor(lua_State *L, const char *message) {
+  endwin();
+  if (Script_name)
+    edit(Script_name, message);
+  else
+    editString(L, "main");
+  execv(Argv[0], Argv);
+  /* never returns */
 }
 
 

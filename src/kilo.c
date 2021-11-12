@@ -1164,7 +1164,7 @@ void editorMoveCursor(int key) {
  * is typing stuff on the terminal. */
 #define KILO_QUIT_TIMES 3
 int Quit = 0;
-void editorProcessKeypress(int fd) {
+void editorProcessKeypress(lua_State* L, int fd) {
     int c = editorReadKey(fd);
     switch(c) {
     case ENTER:
@@ -1255,14 +1255,14 @@ void initEditor(void) {
     signal(SIGWINCH, handleSigWinCh);
 }
 
-void edit(char* filename, char* message) {
+void edit(lua_State* L, char* filename, char* message) {
     initEditor();
     editorOpen(filename);
     enableRawMode(STDIN_FILENO);
     editorSetStatusMessage(message);
     while(!Quit) {
         editorRefreshScreen();
-        editorProcessKeypress(STDIN_FILENO);
+        editorProcessKeypress(L, STDIN_FILENO);
     }
     disableRawMode(STDIN_FILENO);
 }

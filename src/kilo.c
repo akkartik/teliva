@@ -1197,7 +1197,7 @@ void editorGo(lua_State* L, int fd) {
             if (qlen != 0) query[--qlen] = '\0';
         } else if (c == ESC || c == ENTER) {
             editorSetStatusMessage("");
-            if (c == ENTER  &&  definition_exists(L, query)) {
+            if (c == ENTER) {
               Current_definition = query;
               write_definition_to_file(L, Current_definition, "teliva_editbuffer");
               editorClear();

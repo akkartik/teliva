@@ -323,9 +323,9 @@ void write_definition_to_file (lua_State *L, char *name, char *outfilename) {
     lua_getfield(L, -1, name);
     const char *contents = lua_tostring(L, -1);
     lua_pop(L, 1);
-    if (contents == NULL) return;
     int outfd = open(outfilename, O_WRONLY|O_CREAT|O_TRUNC, 0644);
-    write(outfd, contents, strlen(contents));
+    if (contents != NULL)
+      write(outfd, contents, strlen(contents));
     close(outfd);
 }
 
@@ -372,7 +372,7 @@ void switch_to_editor (lua_State *L, const char *message) {
   else {
     Current_definition = "main";
     write_definition_to_file(L, Current_definition, "teliva_editbuffer");
-    edit(L, "teliva_editbuffer", "");
+    edit(L, "teliva_editbuffer", /*status message*/ "");
     char new_contents[8192] = {0};
     read_contents(L, "teliva_editbuffer", new_contents);
     update_definition(L, Current_definition, new_contents);

@@ -337,6 +337,7 @@ void editString(lua_State *L, char *name) {
     teliva_get_definition(L, name);
 //?     stackDump(L);
     const char *contents = lua_tostring(L, -1);
+    lua_pop(L, 1);
     int outfd = open("teliva_editbuffer", O_WRONLY|O_CREAT|O_TRUNC, 0644);
     write(outfd, contents, strlen(contents));
     close(outfd);
@@ -351,7 +352,6 @@ void editString(lua_State *L, char *name) {
     close(infd);
 
     /* save contents back into image */
-    lua_pop(L, 1);
     lua_pushstring(L, new_contents);
     lua_setfield(L, -2, name);
 

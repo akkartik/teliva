@@ -309,7 +309,7 @@ static int handle_image (lua_State *L, char **argv, int n) {
 }
 
 
-void write_definition_to_file(lua_State *L, char *name, char *outfilename) {
+void write_definition_to_file (lua_State *L, char *name, char *outfilename) {
     lua_getglobal(L, "teliva_program");
     lua_getfield(L, -1, name);
     const char *contents = lua_tostring(L, -1);
@@ -320,7 +320,7 @@ void write_definition_to_file(lua_State *L, char *name, char *outfilename) {
 }
 
 
-void read_contents(lua_State *L, char *filename, char *out) {
+void read_contents (lua_State *L, char *filename, char *out) {
     int infd = open(filename, O_RDONLY);
     read(infd, out, 8190);  /* TODO: handle overly large file */
     close(infd);
@@ -328,13 +328,13 @@ void read_contents(lua_State *L, char *filename, char *out) {
 
 
 /* table to update is at top of stack */
-void update_definition(lua_State *L, char *name, char *out) {
+void update_definition (lua_State *L, char *name, char *out) {
     lua_pushstring(L, out);
     lua_setfield(L, -2, name);
 }
 
 
-void save_image(lua_State *L) {
+void save_image (lua_State *L) {
     int table = lua_gettop(L);
     FILE* fp = fopen(Image_name, "w");
     fprintf(fp, "teliva_program = {\n");
@@ -355,7 +355,7 @@ char *Script_name = NULL;
 char **Argv = NULL;
 char *Current_definition = NULL;
 extern void edit(lua_State *L, char *filename, const char *status);
-void switch_to_editor(lua_State *L, const char *message) {
+void switch_to_editor (lua_State *L, const char *message) {
   endwin();
   if (Script_name)
     edit(L, Script_name, message);

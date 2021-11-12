@@ -1,5 +1,18 @@
 curses = require "curses"
 
+count = {}
+function foo(event, line)
+  local s = debug.getinfo(2)
+--?   print(s.name)
+  if s.name ~= nil then
+    if count[s.name] == nil then
+      count[s.name] = 0
+    end
+    count[s.name] = count[s.name]+1
+  end
+end
+debug.sethook(foo, "c")
+
 window = curses.initscr()
 
 tower = {{6, 5, 4, 3, 2}, {}, {}}
@@ -53,6 +66,14 @@ function render_tower(window, line, col, tower_index, tower)
     window:mvaddstr(line, col, "  ")
     window:attroff(curses.color_pair(7))
     line = line - 1
+  end
+
+  window:mvaddstr(30, 0, "profile: ")
+  for k,v in pairs(count) do
+    window:addstr(k)
+    window:addstr(": ")
+    window:addstr(v)
+    window:addstr("; ")
   end
 end
 

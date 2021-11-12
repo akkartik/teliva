@@ -942,8 +942,8 @@ void editorRefreshScreen(void) {
     }
     abAppend(&ab,"\x1b[0m ^g \x1b[7m go ",16);
     len +=               4  +       4;
-    abAppend(&ab,"\x1b[0m ^s \x1b[7m search ",20);
-    len +=               4  +       8;
+    abAppend(&ab,"\x1b[0m ^f \x1b[7m find ",18);
+    len +=               4  +       6;
     char rstatus[80];
     int rlen = snprintf(rstatus, sizeof(rstatus),
         "%d/%d",E.rowoff+E.cy+1,E.numrows);

@@ -309,15 +309,9 @@ static int handle_image (lua_State *L, char **argv, int n) {
 }
 
 
-/* Push the string corresponding to the definition for 'name' on the stack. */
-void teliva_get_definition(lua_State *L, const char *name) {
-  lua_getglobal(L, "teliva_program");
-  lua_getfield(L, -1, name);
-}
-
-
 void write_definition_to_file(lua_State *L, char *name, char *outfilename) {
-    teliva_get_definition(L, name);
+    lua_getglobal(L, "teliva_program");
+    lua_getfield(L, -1, name);
     const char *contents = lua_tostring(L, -1);
     lua_pop(L, 1);
     int outfd = open(outfilename, O_WRONLY|O_CREAT|O_TRUNC, 0644);

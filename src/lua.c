@@ -366,8 +366,14 @@ static void save_image (lua_State *L) {
 char *Script_name = NULL;
 char **Argv = NULL;
 extern void edit(lua_State *L, char *filename, const char *message);
+extern void editorClear(void);
+extern int editorOpen(char *filename);
 void editBuffer(lua_State* L, const char* message) {
   edit(L, "teliva_editbuffer", message);
+}
+void editorRefreshBuffer(void) {
+  editorClear();
+  editorOpen("teliva_editbuffer");
 }
 
 

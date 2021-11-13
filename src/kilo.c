@@ -604,7 +604,7 @@ static void editorDelRow(int at) {
     E.dirty++;
 }
 
-static void editorClear(void) {
+void editorClear(void) {
     for (int j = E.numrows-1; j >= 0; j--)
       editorDelRow(j);
 }
@@ -773,7 +773,7 @@ static void editorDelChar() {
 
 /* Load the specified program in the editor memory and returns 0 on success
  * or 1 on error. */
-static int editorOpen(char *filename) {
+int editorOpen(char *filename) {
     FILE *fp;
 
     E.dirty = 0;
@@ -1171,6 +1171,7 @@ static void editorMoveCursor(int key) {
 
 extern void save_to_current_definition_and_editor_buffer(lua_State *L, char *name);
 extern void load_editor_buffer_to_current_definition_in_image(lua_State *L);
+extern void editorRefreshBuffer(void);
 static void editorGo(lua_State* L, int fd) {
     char query[KILO_QUERY_LEN+1] = {0};
     int qlen = 0;
@@ -1189,8 +1190,7 @@ static void editorGo(lua_State* L, int fd) {
             editorSetStatusMessage("");
             if (c == ENTER) {
               save_to_current_definition_and_editor_buffer(L, query);
-              editorClear();
-              editorOpen("teliva_editbuffer");
+              editorRefreshBuffer();
             }
             return;
         } else if (isprint(c)) {

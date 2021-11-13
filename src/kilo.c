@@ -806,7 +806,7 @@ static int editorOpen(char *filename) {
 }
 
 /* Save the current file on disk. Return 0 on success, 1 on error. */
-static int editorSave(void) {
+static int editorSaveToDisk(void) {
     int len;
     char *buf = editorRowsToString(&len);
     int fd = open(E.filename,O_RDWR|O_CREAT,0644);
@@ -1176,7 +1176,7 @@ static void editorGo(lua_State* L, int fd) {
     char query[KILO_QUERY_LEN+1] = {0};
     int qlen = 0;
 
-    editorSave();
+    editorSaveToDisk();
     load_editor_buffer_to_current_definition_in_image(L);
 
     while(1) {
@@ -1222,7 +1222,7 @@ static void editorProcessKeypress(lua_State* L, int fd) {
         break;
     case CTRL_E:
         /* Save and quit. */
-        editorSave();
+        editorSaveToDisk();
         Quit = 1;
         break;
     case CTRL_G:

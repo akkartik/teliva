@@ -314,7 +314,7 @@ static int checkArgMode (const Proto *pt, int r, enum OpArgMask mode) {
 }
 
 
-static Instruction symbexec (const Proto *pt, int lastpc, int reg) {
+Instruction symbexec (const Proto *pt, int lastpc, int reg) {
   int pc;
   int last;  /* stores position of last instruction that changed `reg' */
   last = pt->sizecode-1;  /* points to final return (a `neutral' instruction) */

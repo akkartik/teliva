@@ -141,7 +141,7 @@ static int dofile (lua_State *L, const char *name) {
 }
 
 
-int dostring (lua_State *L, const char *s, const char *name) {
+static int dostring (lua_State *L, const char *s, const char *name) {
   int status = luaL_loadbuffer(L, s, strlen(s), name) || docall(L, 0, 1);
   return report(L, status);
 }
@@ -309,7 +309,7 @@ static int handle_image (lua_State *L, char **argv, int n) {
 }
 
 
-int definition_exists (lua_State *L, char *name) {
+static int definition_exists (lua_State *L, char *name) {
     lua_getglobal(L, "teliva_program");
     lua_getfield(L, -1, name);
     const char *contents = lua_tostring(L, -1);
@@ -330,7 +330,7 @@ void write_definition_to_file (lua_State *L, char *name, char *outfilename) {
 }
 
 
-void read_contents (lua_State *L, char *filename, char *out) {
+static void read_contents (lua_State *L, char *filename, char *out) {
     int infd = open(filename, O_RDONLY);
     read(infd, out, 8190);  /* TODO: handle overly large file */
     close(infd);
@@ -338,13 +338,13 @@ void read_contents (lua_State *L, char *filename, char *out) {
 
 
 /* table to update is at top of stack */
-void update_definition (lua_State *L, char *name, char *out) {
+static void update_definition (lua_State *L, char *name, char *out) {
     lua_pushstring(L, out);
     lua_setfield(L, -2, name);
 }
 
 
-void save_image (lua_State *L) {
+static void save_image (lua_State *L) {
     int table = lua_gettop(L);
     FILE* fp = fopen(Image_name, "w");
     fprintf(fp, "teliva_program = {\n");
@@ -365,6 +365,18 @@ char *Script_name = NULL;
 char **Argv = NULL;
 char *Current_definition = NULL;
 extern void edit(lua_State *L, char *filename, const char *status);
+
+
+void load_editor_buffer_to_current_definition_in_image(lua_State *L) {
+  char new_contents[8192] = {0};
+  read_contents(L, "teliva_editbuffer", new_contents);
+  update_definition(L, Current_definition, new_contents);
+  save_image(L);
+  /* reload binding if possible */
+  dostring(L, new_contents, Current_definition);
+}
+
+
 void switch_to_editor (lua_State *L, const char *message) {
   endwin();
   if (Script_name)
@@ -373,12 +385,7 @@ void switch_to_editor (lua_State *L, const char *message) {
     Current_definition = "main";
     write_definition_to_file(L, Current_definition, "teliva_editbuffer");
     edit(L, "teliva_editbuffer", /*status message*/ "");
-    char new_contents[8192] = {0};
-    read_contents(L, "teliva_editbuffer", new_contents);
-    update_definition(L, Current_definition, new_contents);
-    save_image(L);
-    /* reload binding if possible */
-    dostring(L, new_contents, Current_definition);
+    load_editor_buffer_to_current_definition_in_image(L);
   }
   execv(Argv[0], Argv);
   /* never returns */

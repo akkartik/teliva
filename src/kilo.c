@@ -1170,23 +1170,14 @@ static void editorMoveCursor(int key) {
 }
 
 extern char* Current_definition;
-extern int definition_exists(lua_State *L, char *name);
 extern void write_definition_to_file(lua_State *L, char *name, char *outfilename);
-extern void read_contents(lua_State *L, char *filename, char *out);
-extern void update_definition(lua_State *L, char *name, char *out);
-extern void save_image(lua_State *L);
-extern int dostring(lua_State *L, const char *s, const char *name);
+extern void load_editor_buffer_to_current_definition_in_image(lua_State *L);
 static void editorGo(lua_State* L, int fd) {
     char query[KILO_QUERY_LEN+1] = {0};
     int qlen = 0;
 
     editorSave();
-    char new_contents[8192] = {0};
-    read_contents(L, "teliva_editbuffer", new_contents);
-    update_definition(L, Current_definition, new_contents);
-    save_image(L);
-    /* reload binding if possible */
-    dostring(L, new_contents, Current_definition);
+    load_editor_buffer_to_current_definition_in_image(L);
 
     while(1) {
         editorSetStatusMessage("Jump to: %s", query);

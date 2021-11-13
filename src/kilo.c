@@ -1169,8 +1169,7 @@ static void editorMoveCursor(int key) {
     }
 }
 
-extern char* Current_definition;
-extern void write_definition_to_file(lua_State *L, char *name, char *outfilename);
+extern void save_to_current_definition_and_editor_buffer(lua_State *L, char *name);
 extern void load_editor_buffer_to_current_definition_in_image(lua_State *L);
 static void editorGo(lua_State* L, int fd) {
     char query[KILO_QUERY_LEN+1] = {0};
@@ -1189,8 +1188,7 @@ static void editorGo(lua_State* L, int fd) {
         } else if (c == ESC || c == ENTER) {
             editorSetStatusMessage("");
             if (c == ENTER) {
-              Current_definition = query;
-              write_definition_to_file(L, Current_definition, "teliva_editbuffer");
+              save_to_current_definition_and_editor_buffer(L, query);
               editorClear();
               editorOpen("teliva_editbuffer");
             }

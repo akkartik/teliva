@@ -318,12 +318,14 @@ static int definition_exists (lua_State *L, char *name) {
 }
 
 
-void write_definition_to_file (lua_State *L, char *name, char *outfilename) {
+char *Current_definition = NULL;
+void save_to_current_definition_and_editor_buffer (lua_State *L, char *definition) {
+    Current_definition = definition;
     lua_getglobal(L, "teliva_program");
-    lua_getfield(L, -1, name);
+    lua_getfield(L, -1, Current_definition);
     const char *contents = lua_tostring(L, -1);
     lua_pop(L, 1);
-    int outfd = open(outfilename, O_WRONLY|O_CREAT|O_TRUNC, 0644);
+    int outfd = open("teliva_editbuffer", O_WRONLY|O_CREAT|O_TRUNC, 0644);
     if (contents != NULL)
       write(outfd, contents, strlen(contents));
     close(outfd);
@@ -363,7 +365,6 @@ static void save_image (lua_State *L) {
 /* death and rebirth */
 char *Script_name = NULL;
 char **Argv = NULL;
-char *Current_definition = NULL;
 extern void edit(lua_State *L, char *filename, const char *status);
 
 
@@ -382,8 +383,7 @@ void switch_to_editor (lua_State *L, const char *message) {
   if (Script_name)
     edit(L, Script_name, message);
   else {
-    Current_definition = "main";
-    write_definition_to_file(L, Current_definition, "teliva_editbuffer");
+    save_to_current_definition_and_editor_buffer(L, "main");
     edit(L, "teliva_editbuffer", /*status message*/ "");
     load_editor_buffer_to_current_definition_in_image(L);
   }

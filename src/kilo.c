@@ -1297,7 +1297,7 @@ static void initEditor(void) {
     signal(SIGWINCH, handleSigWinCh);
 }
 
-void edit(lua_State* L, char* filename, char* message) {
+void edit(lua_State* L, char* filename, const char* message) {
     initEditor();
     editorOpen(filename);
     enableRawMode(STDIN_FILENO);

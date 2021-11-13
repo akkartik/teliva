@@ -387,15 +387,19 @@ void load_editor_buffer_to_current_definition_in_image(lua_State *L) {
 }
 
 
+void editImage (lua_State *L) {
+  save_to_current_definition_and_editor_buffer(L, "main");
+  editBuffer(L, /*status message*/ "");
+  load_editor_buffer_to_current_definition_in_image(L);
+}
+
+
 void switch_to_editor (lua_State *L, const char *message) {
   endwin();
   if (Script_name)
     edit(L, Script_name, message);
-  else {
-    save_to_current_definition_and_editor_buffer(L, "main");
-    editBuffer(L, /*status message*/ "");
-    load_editor_buffer_to_current_definition_in_image(L);
-  }
+  else
+    editImage(L);
   execv(Argv[0], Argv);
   /* never returns */
 }

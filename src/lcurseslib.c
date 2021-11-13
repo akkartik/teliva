@@ -20,7 +20,7 @@ static void cleanup(void) {
 
 
 int menu_column = 0;
-void draw_string_on_menu(const char* s) {
+static void draw_string_on_menu(const char* s) {
   mvaddstr(LINES-1, menu_column, " ");
   ++menu_column;
   mvaddstr(LINES-1, menu_column, s);
@@ -28,7 +28,7 @@ void draw_string_on_menu(const char* s) {
   mvaddstr(LINES-1, menu_column, " ");
   ++menu_column;
 }
-void draw_menu_item(const char* key, const char* name) {
+static void draw_menu_item(const char* key, const char* name) {
   attroff(A_REVERSE);
   draw_string_on_menu(key);
   attron(A_REVERSE);

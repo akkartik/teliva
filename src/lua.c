@@ -365,7 +365,10 @@ static void save_image (lua_State *L) {
 /* death and rebirth */
 char *Script_name = NULL;
 char **Argv = NULL;
-extern void edit(lua_State *L, char *filename, const char *status);
+extern void edit(lua_State *L, char *filename, const char *message);
+void editBuffer(lua_State* L, const char* message) {
+  edit(L, "teliva_editbuffer", message);
+}
 
 
 void load_editor_buffer_to_current_definition_in_image(lua_State *L) {
@@ -384,7 +387,7 @@ void switch_to_editor (lua_State *L, const char *message) {
     edit(L, Script_name, message);
   else {
     save_to_current_definition_and_editor_buffer(L, "main");
-    edit(L, "teliva_editbuffer", /*status message*/ "");
+    editBuffer(L, /*status message*/ "");
     load_editor_buffer_to_current_definition_in_image(L);
   }
   execv(Argv[0], Argv);

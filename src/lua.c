@@ -370,16 +370,6 @@ void switch_to_editor (lua_State *L, const char *message) {
   if (Script_name)
     edit(L, Script_name, message);
   else {
-    luaL_newmetatable(L, "__teliva_call_graph_depth");
-    int cgt = lua_gettop(L);
-    printf("cgt: %d\n", cgt);
-    for (lua_pushnil(L); lua_next(L, cgt) != 0;) {
-      const char* function_name = lua_tostring(L, -2);
-      int depth = lua_tointeger(L, -1);
-      printf("%s: %d\n", function_name, depth);
-      lua_pop(L, 1);  // pop value, leave key on stack for next iteration
-    }
-    exit(4);
     Current_definition = "main";
     write_definition_to_file(L, Current_definition, "teliva_editbuffer");
     edit(L, "teliva_editbuffer", /*status message*/ "");

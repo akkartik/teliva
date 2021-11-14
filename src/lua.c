@@ -5,6 +5,7 @@
 */
 
 
+#include <assert.h>
 #include <fcntl.h>
 #include <locale.h>
 #include <ncurses.h>
@@ -305,7 +306,7 @@ static int handle_image (lua_State *L, char **argv, int n) {
 
 const char *Current_definition = NULL;
 void save_to_current_definition_and_editor_buffer (lua_State *L, const char *definition) {
-    Current_definition = definition;
+    Current_definition = strdup(definition);
     lua_getglobal(L, "teliva_program");
     lua_getfield(L, -1, Current_definition);
     const char *contents = lua_tostring(L, -1);
@@ -327,6 +328,7 @@ static void read_contents (lua_State *L, char *filename, char *out) {
 /* table to update is at top of stack */
 static void update_definition (lua_State *L, const char *name, char *out) {
     lua_pushstring(L, out);
+    assert(strlen(name) > 0);
     lua_setfield(L, -2, name);
 }
 

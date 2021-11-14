@@ -61,9 +61,15 @@ static void print_usage (void) {
 
 
 static void l_message (const char *pname, const char *msg) {
-  if (pname) printw("%s: ", pname);
-  printw("%s\n", msg);
+  if (!stdscr || isendwin()) {
+    printf("%s: %s\n", pname, msg);
+    exit(1);
+  }
+  if (pname) mvprintw(LINES-2, 0, "%s: ", pname);
+  printw(msg);
+  mvprintw(LINES-1, 0, "sorry, you'll need to edit the image directly. press any key to exit.");
   refresh();
+  getch();
 }
 
 

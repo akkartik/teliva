@@ -9,7 +9,7 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-static void cleanup (void) {
+void cleanup_curses (void) {
   if (!isendwin()) {
     wclear(stdscr);
     wrefresh(stdscr);
@@ -477,7 +477,7 @@ LUALIB_API int luaopen_curses (lua_State *L) {
   lua_pushvalue(L, -2);
   register_curses_constants(L);
 
-  atexit(cleanup);
+  atexit(cleanup_curses);
   return 1;
 }
 

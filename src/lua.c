@@ -566,6 +566,7 @@ static int pmain (lua_State *L) {
 
 
 extern void draw_menu (lua_State *);
+extern void cleanup_curses (void);
 
 
 int main (int argc, char **argv) {
@@ -589,7 +590,7 @@ int main (int argc, char **argv) {
   status = lua_cpcall(L, &pmain, &s);
   report(L, status);
   lua_close(L);
-  endwin();
+  cleanup_curses();
   return (status || s.status) ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 

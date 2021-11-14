@@ -929,6 +929,31 @@ static void editorMoveCursor(int key) {
     }
 }
 
+int identifier_char(char c) {
+  /* keep sync'd with llex */
+  return isalnum(c) || c == '_';
+}
+
+void word_at_cursor(char* out, int capacity) {
+  erow* row = &E.row[E.rowoff + E.cy];
+  int cidx = E.coloff + E.cx;
+  int len = 0;
+  memset(out, 0, capacity);
+  /* scan back */
+  while (cidx > 0) {
+    --cidx;
+    if (!identifier_char(row->chars[cidx]))
+      break;
+  }
+  /* now scan forward */
+  for (len = 0; cidx+len < row->size; ++len) {
+    if (!identifier_char(row->chars[cidx+len]))
+      break;
+  }
+  if (len < capacity)
+    strncpy(out, &row->chars[cidx], len);
+}
+
 extern void save_to_current_definition_and_editor_buffer(lua_State *L, char *name);
 extern void load_editor_buffer_to_current_definition_in_image(lua_State *L);
 extern void editorRefreshBuffer(void);
@@ -939,6 +964,9 @@ static void editorGo(lua_State* L) {
 
     editorSaveToDisk();
     load_editor_buffer_to_current_definition_in_image(L);
+
+    word_at_cursor(query, CURRENT_DEFINITION_LEN);
+    qlen = strlen(query);
 
     while(1) {
         editorSetStatusMessage("Jump to: %s", query);

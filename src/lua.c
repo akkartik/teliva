@@ -550,6 +550,7 @@ void switch_to_editor (lua_State *L, const char *message) {
     init_pair(i, i, -1);
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, -1, i);
+  nodelay(stdscr, 0);
   if (browse_image(L))
     cleanup_curses();
   execv(Argv[0], Argv);

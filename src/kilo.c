@@ -685,16 +685,17 @@ static void editorFindMenu(void) {
     menu_column = 2;
     draw_menu_item("Esc", "cancel");
     draw_menu_item("Enter", "submit");
-    // draw_menu_item("↑", "previous");
+    draw_menu_item("^u", "clear");
+    // draw_menu_item("←/↑", "previous");
     attroff(A_REVERSE);
-    mvaddstr(LINES-1, menu_column, " ↑ ");
-    menu_column += 3;  // strlen isn't sufficient
+    mvaddstr(LINES-1, menu_column, " ←/↑ ");
+    menu_column += 5;  // strlen isn't sufficient
     attron(A_REVERSE);
     draw_string_on_menu("previous");
-    // draw_menu_item("↓", "next");
+    // draw_menu_item("↓/→", "next");
     attroff(A_REVERSE);
-    mvaddstr(LINES-1, menu_column, " ↓ ");
-    menu_column += 3;  // strlen isn't sufficient
+    mvaddstr(LINES-1, menu_column, " ↓/→ ");
+    menu_column += 5;  // strlen isn't sufficient
     attron(A_REVERSE);
     draw_string_on_menu("next");
     attrset(A_NORMAL);
@@ -709,6 +710,7 @@ static void editorGoMenu(void) {
     menu_column = 2;
     draw_menu_item("Esc", "cancel");
     draw_menu_item("Enter", "submit");
+    draw_menu_item("^u", "clear");
     attrset(A_NORMAL);
 }
 
@@ -837,6 +839,9 @@ static void editorFind() {
             FIND_RESTORE_HL;
             editorSetStatusMessage("");
             return;
+        } else if (c == CTRL_U) {
+            qlen = 0;
+            query[qlen] = '\0';
         } else if (c == KEY_RIGHT || c == KEY_DOWN) {
             find_next = 1;
         } else if (c == KEY_LEFT || c == KEY_UP) {
@@ -1027,8 +1032,8 @@ static void editorGo(lua_State* L) {
             }
             return;
         } else if (c == CTRL_U) {
-          query[0] = '\0';
           qlen = 0;
+          query[qlen] = '\0';
         } else if (isprint(c)) {
             if (qlen < CURRENT_DEFINITION_LEN) {
                 query[qlen++] = c;

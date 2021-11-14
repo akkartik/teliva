@@ -390,6 +390,7 @@ static void browser_menu (void) {
   menu_column = 2;
   draw_menu_item("Esc", "go back");
   draw_menu_item("Enter", "submit");
+  draw_menu_item("^u", "clear");
   attrset(A_NORMAL);
 }
 
@@ -495,6 +496,8 @@ int browse_image (lua_State *L) {
   int qlen = 0;
   while (1) {
     browser_menu();
+    for (int x = 0; x < COLS; ++x)
+      mvaddch(LINES-2, x, ' ');
     mvprintw(LINES-2, 0, "Edit: %s", query);
     int c = getch();
     if (c == KEY_BACKSPACE) {
@@ -505,8 +508,8 @@ int browse_image (lua_State *L) {
       edit_image(L, query);
       return 1;
     } else if (c == CTRL_U) {
-      query[0] = '\0';
       qlen = 0;
+      query[qlen] = '\0';
     } else if (isprint(c)) {
       if (qlen < CURRENT_DEFINITION_LEN) {
           query[qlen++] = c;

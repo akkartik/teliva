@@ -963,7 +963,6 @@ static void editorGo(lua_State* L) {
 
 /* Process events arriving from the standard input, which is, the user
  * is typing stuff on the terminal. */
-#define KILO_QUIT_TIMES 3
 int Quit = 0;
 static void editorProcessKeypress(lua_State* L) {
     int c = getch();

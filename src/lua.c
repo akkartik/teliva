@@ -414,6 +414,7 @@ void switch_to_editor (lua_State *L, const char *message) {
     edit(L, Script_name, message);
   else
     browseImage(L);
+  cleanup_curses();
   execv(Argv[0], Argv);
   /* never returns */
 }

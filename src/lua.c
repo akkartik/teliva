@@ -240,7 +240,7 @@ static void dotty (lua_State *L) {
 }
 
 
-void stackDump (lua_State *L) {
+void stack_dump (lua_State *L) {
   int i;
   int top = lua_gettop(L);
   for (i = 1; i <= top; i++) {  /* repeat for each level */
@@ -351,13 +351,13 @@ static void save_image (lua_State *L) {
 
 /* death and rebirth */
 char **Argv = NULL;
-extern void edit(lua_State *L, char *filename, const char *message);
-extern void editorClear(void);
-extern int editorOpen(char *filename);
-void editBuffer(lua_State* L, const char* message) {
+extern void edit (lua_State *L, char *filename, const char *message);
+extern void editorClear (void);
+extern int editorOpen (char *filename);
+void edit_buffer (lua_State *L, const char *message) {
   edit(L, "teliva_editbuffer", message);
 }
-void editorRefreshBuffer(void) {
+void editor_refresh_buffer (void) {
   editorClear();
   editorOpen("teliva_editbuffer");
 }
@@ -373,15 +373,15 @@ void load_editor_buffer_to_current_definition_in_image(lua_State *L) {
 }
 
 
-void editImage (lua_State *L, const char *definition) {
+void edit_image (lua_State *L, const char *definition) {
   save_to_current_definition_and_editor_buffer(L, definition);
-  editBuffer(L, /*status message*/ "");
+  edit_buffer(L, /*status message*/ "");
   load_editor_buffer_to_current_definition_in_image(L);
 }
 
 
 extern void draw_menu_item (const char* key, const char* name);
-static void browserMenu (void) {
+static void browser_menu (void) {
   attrset(A_REVERSE);
   for (int x = 0; x < COLS; ++x)
     mvaddch(LINES-1, x, ' ');
@@ -396,7 +396,7 @@ static void browserMenu (void) {
 
 #define BG(i) (COLOR_PAIR((i)+8))
 #define FG(i) (COLOR_PAIR(i))
-void browseDefinition (const char *definition_name) {
+void browse_definition (const char *definition_name) {
   attron(BG(7));
   addstr(definition_name);
   attrset(A_NORMAL);
@@ -404,7 +404,7 @@ void browseDefinition (const char *definition_name) {
 }
 
 /* return true if submitted */
-int browseImage (lua_State *L) {
+int browse_image (lua_State *L) {
   clear();
   luaL_newmetatable(L, "__teliva_call_graph_depth");
   int cgt = lua_gettop(L);
@@ -429,7 +429,7 @@ int browseImage (lua_State *L) {
         && !is_userdata  // including curses window objects
                          // (unlikely to have an interesting definition)
     ) {
-      browseDefinition(definition_name);
+      browse_definition(definition_name);
     }
     lua_pop(L, 1);  // value
     // leave key on stack for next iteration
@@ -444,7 +444,7 @@ int browseImage (lua_State *L) {
     if (strcmp(definition_name, "menu") == 0
         || is_userdata  // including curses window objects
     ) {
-      browseDefinition(definition_name);
+      browse_definition(definition_name);
     }
     lua_pop(L, 1);  // value
     // leave key on stack for next iteration
@@ -461,7 +461,7 @@ int browseImage (lua_State *L) {
       lua_getfield(L, cgt, definition_name);
       int depth = lua_tointeger(L, -1);
       if (depth == level)
-        browseDefinition(definition_name);
+        browse_definition(definition_name);
       lua_pop(L, 1);  // depth of value
       lua_pop(L, 1);  // value
       // leave key on stack for next iteration
@@ -478,7 +478,7 @@ int browseImage (lua_State *L) {
     lua_pop(L, 1);
     lua_getfield(L, cgt, definition_name);
     if (is_function && lua_isnoneornil(L, -1))
-      browseDefinition(definition_name);
+      browse_definition(definition_name);
     lua_pop(L, 1);  // depth of value
     lua_pop(L, 1);  // value
     // leave key on stack for next iteration
@@ -494,7 +494,7 @@ int browseImage (lua_State *L) {
   char query[CURRENT_DEFINITION_LEN+1] = {0};
   int qlen = 0;
   while (1) {
-    browserMenu();
+    browser_menu();
     mvprintw(LINES-2, 0, "Edit: %s", query);
     int c = getch();
     if (c == KEY_BACKSPACE) {
@@ -502,7 +502,7 @@ int browseImage (lua_State *L) {
     } else if (c == ESC) {
       return 0;
     } else if (c == ENTER) {
-      editImage(L, query);
+      edit_image(L, query);
       return 1;
     } else if (c == CTRL_U) {
       query[0] = '\0';
@@ -525,7 +525,7 @@ void switch_to_editor (lua_State *L, const char *message) {
     init_pair(i, i, -1);
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, -1, i);
-  if (browseImage(L)) {
+  if (browse_image(L)) {
     cleanup_curses();
   }
   execv(Argv[0], Argv);

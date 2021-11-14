@@ -399,10 +399,7 @@ void browseImage (lua_State *L) {
     ++y;
     lua_pop(L, 1);  // pop value, leave key on stack for next iteration
   }
-  int maxy, maxx;
-  getmaxyx(stdscr, maxy, maxx);
-  (void)maxx;  // unused
-  mvaddstr(maxy-1, 0, "edit what? ");
+  mvaddstr(LINES-1, 0, "edit what? ");
   char definition[64] = {0};
   getnstr(definition, 60);
   editImage(L, definition);

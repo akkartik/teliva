@@ -309,15 +309,6 @@ static int handle_image (lua_State *L, char **argv, int n) {
 }
 
 
-static int definition_exists (lua_State *L, char *name) {
-    lua_getglobal(L, "teliva_program");
-    lua_getfield(L, -1, name);
-    const char *contents = lua_tostring(L, -1);
-    lua_pop(L, 1);
-    return contents != NULL;
-}
-
-
 char *Current_definition = NULL;
 void save_to_current_definition_and_editor_buffer (lua_State *L, char *definition) {
     Current_definition = definition;

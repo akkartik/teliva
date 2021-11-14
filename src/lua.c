@@ -309,8 +309,8 @@ static int handle_image (lua_State *L, char **argv, int n) {
 }
 
 
-char *Current_definition = NULL;
-void save_to_current_definition_and_editor_buffer (lua_State *L, char *definition) {
+const char *Current_definition = NULL;
+void save_to_current_definition_and_editor_buffer (lua_State *L, const char *definition) {
     Current_definition = definition;
     lua_getglobal(L, "teliva_program");
     lua_getfield(L, -1, Current_definition);
@@ -331,7 +331,7 @@ static void read_contents (lua_State *L, char *filename, char *out) {
 
 
 /* table to update is at top of stack */
-static void update_definition (lua_State *L, char *name, char *out) {
+static void update_definition (lua_State *L, const char *name, char *out) {
     lua_pushstring(L, out);
     lua_setfield(L, -2, name);
 }

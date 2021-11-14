@@ -389,7 +389,8 @@ void editImage (lua_State *L, const char *definition) {
 
 #define BG(i) (COLOR_PAIR((i)+8))
 #define FG(i) (COLOR_PAIR(i))
-void browseImage (lua_State *L) {
+/* return true if submitted */
+int browseImage (lua_State *L) {
   clear();
   luaL_newmetatable(L, "__teliva_call_graph_depth");
   int cgt = lua_gettop(L);
@@ -444,12 +445,14 @@ void browseImage (lua_State *L) {
   }
   lua_settop(L, 0);
   attron(A_REVERSE);
-  mvaddstr(LINES-1, 0, " edit what? ");
+  mvaddstr(LINES-1, 0, " edit what? (hit just Enter to go back) ");
   attroff(A_REVERSE);
   addch(' ');
   char definition[64] = {0};
   getnstr(definition, 60);
-  editImage(L, definition);
+  if (*definition != '\0')
+    editImage(L, definition);
+  return *definition != '\0';
 }
 
 
@@ -462,9 +465,9 @@ void switch_to_editor (lua_State *L, const char *message) {
     init_pair(i+8, -1, i);
   if (Script_name)
     edit(L, Script_name, message);
-  else
-    browseImage(L);
-  cleanup_curses();
+  else if (browseImage(L)) {
+    cleanup_curses();
+  }
   execv(Argv[0], Argv);
   /* never returns */
 }

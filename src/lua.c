@@ -240,13 +240,6 @@ static void dotty (lua_State *L) {
 }
 
 
-static int has_extension (const char *filename, const char *extension) {
-  const char *filename_final_dot = strrchr(filename, '.');
-  if (filename_final_dot == NULL) return 0;
-  return strcmp(filename_final_dot+1, extension) == 0;
-}
-
-
 void stackDump (lua_State *L) {
   int i;
   int top = lua_gettop(L);
@@ -357,7 +350,6 @@ static void save_image (lua_State *L) {
 
 
 /* death and rebirth */
-char *Script_name = NULL;
 char **Argv = NULL;
 extern void edit(lua_State *L, char *filename, const char *message);
 extern void editorClear(void);
@@ -533,9 +525,7 @@ void switch_to_editor (lua_State *L, const char *message) {
     init_pair(i, i, -1);
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, -1, i);
-  if (Script_name)
-    edit(L, Script_name, message);
-  else if (browseImage(L)) {
+  if (browseImage(L)) {
     cleanup_curses();
   }
   execv(Argv[0], Argv);
@@ -551,23 +541,6 @@ static int show_error_in_editor (lua_State *L, int status) {
     switch_to_editor(L, Previous_error);
   }
   return status;
-}
-
-
-static int handle_script (lua_State *L, char **argv, int n) {
-  if (has_extension(argv[n], "tlv"))
-    return handle_image(L, argv, n);
-  int status;
-  int narg = getargs(L, argv, n);  /* collect arguments */
-  lua_setglobal(L, "arg");
-  Script_name = argv[n];
-  status = luaL_loadfile(L, Script_name);
-  lua_insert(L, -(narg+1));
-  if (status == 0)
-    status = docall(L, narg, 0);
-  else
-    lua_pop(L, narg);
-  return show_error_in_editor(L, status);
 }
 
 
@@ -657,7 +630,7 @@ struct Smain {
 static int pmain (lua_State *L) {
   struct Smain *s = (struct Smain *)lua_touserdata(L, 1);
   char **argv = s->argv;
-  int script;
+  int image;
   int has_i = 0, has_v = 0, has_e = 0;
   globalL = L;
   if (argv[0] && argv[0][0]) progname = argv[0];
@@ -666,22 +639,22 @@ static int pmain (lua_State *L) {
   lua_gc(L, LUA_GCRESTART, 0);
   s->status = handle_luainit(L);
   if (s->status != 0) return 0;
-  script = collectargs(argv, &has_i, &has_v, &has_e);
-  if (script < 0) {  /* invalid args? */
+  image = collectargs(argv, &has_i, &has_v, &has_e);
+  if (image < 0) {  /* invalid args? */
     print_usage();
     getch();
     s->status = 1;
     return 0;
   }
   if (has_v) print_version();
-  s->status = runargs(L, argv, (script > 0) ? script : s->argc);
+  s->status = runargs(L, argv, (image > 0) ? image : s->argc);
   if (s->status != 0) return 0;
-  if (script)
-    s->status = handle_script(L, argv, script);
+  if (image)
+    s->status = handle_image(L, argv, image);
   if (s->status != 0) return 0;
   if (has_i)
     dotty(L);
-  else if (script == 0 && !has_e && !has_v) {
+  else if (image == 0 && !has_e && !has_v) {
     print_version();
     dotty(L);
   }

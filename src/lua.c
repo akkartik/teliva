@@ -389,6 +389,13 @@ void editImage (lua_State *L, const char *definition) {
 
 #define BG(i) (COLOR_PAIR((i)+8))
 #define FG(i) (COLOR_PAIR(i))
+void browseDefinition (const char *definition_name) {
+  attron(BG(7));
+  addstr(definition_name);
+  attrset(A_NORMAL);
+  addstr("  ");
+}
+
 /* return true if submitted */
 int browseImage (lua_State *L) {
   clear();
@@ -400,27 +407,42 @@ int browseImage (lua_State *L) {
   // segment definitions by depth
   lua_getglobal(L, "teliva_program");
   int t = lua_gettop(L);
+
   int y = 2;
   mvaddstr(y, 0, "data:           ");
+  // first: data (non-functions) that's not the Teliva menu or curses variables
   for (lua_pushnil(L); lua_next(L, t) != 0;) {
-    const char* definition_name = lua_tostring(L, -2);
-    if (strcmp(definition_name, "window") != 0
-        && strcmp(definition_name, "menu") != 0) {
-      lua_getfield(L, cgt, definition_name);
-      if (lua_isnoneornil(L, -1)) {
-        attron(BG(7));
-        addstr(definition_name);
-        attrset(A_NORMAL);
-        addstr("  ");
-      }
-      lua_pop(L, 1);  // lookup result (depth of value)
+    const char *definition_name = lua_tostring(L, -2);
+    lua_getglobal(L, definition_name);
+    int is_userdata = lua_isuserdata(L, -1);
+    int is_function = lua_isfunction(L, -1);
+    lua_pop(L, 1);
+    if (strcmp(definition_name, "menu") != 0  // required by all Teliva programs
+        && !is_function  // functions are not data
+        && !is_userdata  // including curses window objects
+                         // (unlikely to have an interesting definition)
+    ) {
+      browseDefinition(definition_name);
     }
     lua_pop(L, 1);  // value
     // leave key on stack for next iteration
   }
-  // window and menu at the end
-  attron(BG(7));  addstr("menu");  attrset(A_NORMAL);  addstr("  ");
-  attron(BG(7));  addstr("window");  attrset(A_NORMAL);  addstr("  ");
+
+  // second: menu and other userdata
+  for (lua_pushnil(L); lua_next(L, t) != 0;) {
+    const char* definition_name = lua_tostring(L, -2);
+    lua_getglobal(L, definition_name);
+    int is_userdata = lua_isuserdata(L, -1);
+    lua_pop(L, 1);
+    if (strcmp(definition_name, "menu") == 0
+        || is_userdata  // including curses window objects
+    ) {
+      browseDefinition(definition_name);
+    }
+    lua_pop(L, 1);  // value
+    // leave key on stack for next iteration
+  }
+
   // functions by level
   y += 2;
   mvprintw(y, 0, "functions: ");
@@ -431,18 +453,30 @@ int browseImage (lua_State *L) {
       const char* definition_name = lua_tostring(L, -2);
       lua_getfield(L, cgt, definition_name);
       int depth = lua_tointeger(L, -1);
-      if (depth == level) {
-        attron(BG(7));
-        addstr(definition_name);
-        attrset(A_NORMAL);
-        addstr("  ");
-      }
+      if (depth == level)
+        browseDefinition(definition_name);
       lua_pop(L, 1);  // depth of value
       lua_pop(L, 1);  // value
       // leave key on stack for next iteration
     }
     y += 2;
   }
+
+  // unused functions
+  mvaddstr(y, 0, "                ");
+  for (lua_pushnil(L); lua_next(L, t) != 0;) {
+    const char* definition_name = lua_tostring(L, -2);
+    lua_getglobal(L, definition_name);
+    int is_function = lua_isfunction(L, -1);
+    lua_pop(L, 1);
+    lua_getfield(L, cgt, definition_name);
+    if (is_function && lua_isnoneornil(L, -1))
+      browseDefinition(definition_name);
+    lua_pop(L, 1);  // depth of value
+    lua_pop(L, 1);  // value
+    // leave key on stack for next iteration
+  }
+
   lua_settop(L, 0);
   attron(A_REVERSE);
   mvaddstr(LINES-1, 0, " edit what? (hit just Enter to go back) ");

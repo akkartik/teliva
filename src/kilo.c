@@ -655,8 +655,10 @@ extern void draw_menu_item(const char* key, const char* name);
 static void editorRefreshScreen(void) {
     int y;
     erow *r;
+    int current_color = -1;
     curs_set(0);
     clear();
+    attrset(A_NORMAL);
     for (y = 0; y < LINES-1; y++) {
         int filerow = E.rowoff+y;
 
@@ -667,7 +669,6 @@ static void editorRefreshScreen(void) {
         r = &E.row[filerow];
 
         int len = r->rsize - E.coloff;
-        int current_color = -1;
         mvaddstr(y, 0, "");
         if (len > 0) {
             if (len > COLS) len = COLS;

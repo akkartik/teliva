@@ -399,6 +399,7 @@ void browseImage (lua_State *L) {
     ++y;
     lua_pop(L, 1);  // pop value, leave key on stack for next iteration
   }
+  lua_settop(L, 0);
   mvaddstr(LINES-1, 0, "edit what? ");
   char definition[64] = {0};
   getnstr(definition, 60);

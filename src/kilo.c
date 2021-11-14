@@ -38,7 +38,8 @@
 #define _POSIX_C_SOURCE 200809L
 #endif
 
-#include <termios.h>
+#include <assert.h>
+#include <ncurses.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -47,12 +48,9 @@
 #include <ctype.h>
 #include <time.h>
 #include <sys/types.h>
-#include <sys/ioctl.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <stdarg.h>
 #include <fcntl.h>
-#include <signal.h>
 
 #include "lua.h"
 
@@ -98,10 +96,7 @@ struct editorConfig {
     int cx,cy;  /* Cursor x and y position in characters */
     int rowoff;     /* Offset of row displayed. */
     int coloff;     /* Offset of column displayed. */
-    int screenrows; /* Number of rows that we can show */
-    int screencols; /* Number of cols that we can show */
     int numrows;    /* Number of rows */
-    int rawmode;    /* Is terminal raw mode enabled? */
     erow *row;      /* Rows */
     int dirty;      /* File modified but not saved. */
     char *filename; /* Currently open filename */
@@ -121,25 +116,13 @@ enum KEY_ACTION{
         CTRL_G = 7,
         CTRL_H = 8,
         TAB = 9,
+        ENTER = 10,
         CTRL_L = 12,
-        ENTER = 13,
         CTRL_Q = 17,
         CTRL_S = 19,
         CTRL_U = 21,
         CTRL_X = 24,
         ESC = 27,
-        BACKSPACE = 127,
-        /* The following are just soft codes, not really reported by the
-         * terminal directly. */
-        ARROW_LEFT = 1000,
-        ARROW_RIGHT,
-        ARROW_UP,
-        ARROW_DOWN,
-        DEL_KEY,
-        HOME_KEY,
-        END_KEY,
-        PAGE_UP,
-        PAGE_DOWN
 };
 
 static void editorSetStatusMessage(const char *fmt, ...);
@@ -190,170 +173,6 @@ struct editorSyntax HLDB[] = {
 };
 
 #define HLDB_ENTRIES (sizeof(HLDB)/sizeof(HLDB[0]))
-
-/* ======================= Low level terminal handling ====================== */
-
-static struct termios orig_termios; /* In order to restore at exit.*/
-
-static void disableRawMode(int fd) {
-    /* Don't even check the return value as it's too late. */
-    if (E.rawmode) {
-        tcsetattr(fd,TCSAFLUSH,&orig_termios);
-        E.rawmode = 0;
-    }
-}
-
-/* Called at exit to avoid remaining in raw mode. */
-static void editorAtExit(void) {
-    disableRawMode(STDIN_FILENO);
-}
-
-/* Raw mode: 1960 magic shit. */
-static int enableRawMode(int fd) {
-    struct termios raw;
-
-    if (E.rawmode) return 0; /* Already enabled. */
-    if (!isatty(STDIN_FILENO)) goto fatal;
-    atexit(editorAtExit);
-    if (tcgetattr(fd,&orig_termios) == -1) goto fatal;
-
-    raw = orig_termios;  /* modify the original mode */
-    /* input modes: no break, no CR to NL, no parity check, no strip char,
-     * no start/stop output control. */
-    raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-    /* output modes - disable post processing */
-    raw.c_oflag &= ~(OPOST);
-    /* control modes - set 8 bit chars */
-    raw.c_cflag |= (CS8);
-    /* local modes - choing off, canonical off, no extended functions,
-     * no signal chars (^Z,^C) */
-    raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-    /* control chars - set return condition: min number of bytes and timer. */
-    raw.c_cc[VMIN] = 0; /* Return each byte, or zero for timeout. */
-    raw.c_cc[VTIME] = 1; /* 100 ms timeout (unit is tens of second). */
-
-    /* put terminal in raw mode after flushing */
-    if (tcsetattr(fd,TCSAFLUSH,&raw) < 0) goto fatal;
-    E.rawmode = 1;
-    return 0;
-
-fatal:
-    errno = ENOTTY;
-    return -1;
-}
-
-/* Read a key from the terminal put in raw mode, trying to handle
- * escape sequences. */
-static int editorReadKey(int fd) {
-    int nread;
-    char c, seq[3];
-    while ((nread = read(fd,&c,1)) == 0);
-    if (nread == -1) exit(1);
-
-    while(1) {
-        switch(c) {
-        case ESC:    /* escape sequence */
-            /* If this is just an ESC, we'll timeout here. */
-            if (read(fd,seq,1) == 0) return ESC;
-            if (read(fd,seq+1,1) == 0) return ESC;
-
-            /* ESC [ sequences. */
-            if (seq[0] == '[') {
-                if (seq[1] >= '0' && seq[1] <= '9') {
-                    /* Extended escape, read additional byte. */
-                    if (read(fd,seq+2,1) == 0) return ESC;
-                    if (seq[2] == '~') {
-                        switch(seq[1]) {
-                        case '3': return DEL_KEY;
-                        case '5': return PAGE_UP;
-                        case '6': return PAGE_DOWN;
-                        }
-                    }
-                } else {
-                    switch(seq[1]) {
-                    case 'A': return ARROW_UP;
-                    case 'B': return ARROW_DOWN;
-                    case 'C': return ARROW_RIGHT;
-                    case 'D': return ARROW_LEFT;
-                    case 'H': return HOME_KEY;
-                    case 'F': return END_KEY;
-                    }
-                }
-            }
-
-            /* ESC O sequences. */
-            else if (seq[0] == 'O') {
-                switch(seq[1]) {
-                case 'H': return HOME_KEY;
-                case 'F': return END_KEY;
-                }
-            }
-            break;
-        default:
-            return c;
-        }
-    }
-}
-
-/* Use the ESC [6n escape sequence to query the horizontal cursor position
- * and return it. On error -1 is returned, on success the position of the
- * cursor is stored at *rows and *cols and 0 is returned. */
-static int getCursorPosition(int ifd, int ofd, int *rows, int *cols) {
-    char buf[32];
-    unsigned int i = 0;
-
-    /* Report cursor location */
-    if (write(ofd, "\x1b[6n", 4) != 4) return -1;
-
-    /* Read the response: ESC [ rows ; cols R */
-    while (i < sizeof(buf)-1) {
-        if (read(ifd,buf+i,1) != 1) break;
-        if (buf[i] == 'R') break;
-        i++;
-    }
-    buf[i] = '\0';
-
-    /* Parse it. */
-    if (buf[0] != ESC || buf[1] != '[') return -1;
-    if (sscanf(buf+2,"%d;%d",rows,cols) != 2) return -1;
-    return 0;
-}
-
-/* Try to get the number of columns in the current terminal. If the ioctl()
- * call fails the function will try to query the terminal itself.
- * Returns 0 on success, -1 on error. */
-static int getWindowSize(int ifd, int ofd, int *rows, int *cols) {
-    struct winsize ws;
-
-    if (ioctl(1, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0) {
-        /* ioctl() failed. Try to query the terminal itself. */
-        int orig_row, orig_col, retval;
-
-        /* Get the initial position so we can restore it later. */
-        retval = getCursorPosition(ifd,ofd,&orig_row,&orig_col);
-        if (retval == -1) goto failed;
-
-        /* Go to right/bottom margin and get position. */
-        if (write(ofd,"\x1b[999C\x1b[999B",12) != 12) goto failed;
-        retval = getCursorPosition(ifd,ofd,rows,cols);
-        if (retval == -1) goto failed;
-
-        /* Restore position. */
-        char seq[32];
-        snprintf(seq,32,"\x1b[%d;%dH",orig_row,orig_col);
-        if (write(ofd,seq,strlen(seq)) == -1) {
-            /* Can't recover... */
-        }
-        return 0;
-    } else {
-        *cols = ws.ws_col;
-        *rows = ws.ws_row;
-        return 0;
-    }
-
-failed:
-    return -1;
-}
 
 /* ====================== Syntax highlight color scheme  ==================== */
 
@@ -514,13 +333,13 @@ static void editorUpdateSyntax(erow *row) {
 static int editorSyntaxToColor(int hl) {
     switch(hl) {
     case HL_COMMENT:
-    case HL_MLCOMMENT: return 36;     /* cyan */
-    case HL_KEYWORD1: return 33;    /* yellow */
-    case HL_KEYWORD2: return 32;    /* green */
-    case HL_STRING: return 35;      /* magenta */
-    case HL_NUMBER: return 31;      /* red */
-    case HL_MATCH: return 34;      /* blu */
-    default: return 37;             /* white */
+    case HL_MLCOMMENT: return 6;  /* cyan */
+    case HL_KEYWORD1: return 3;   /* yellow */
+    case HL_KEYWORD2: return 2;   /* green */
+    case HL_STRING: return 5;     /* magenta */
+    case HL_NUMBER: return 1;     /* red */
+    case HL_MATCH: return 4;      /* blue */
+    default: return 7;            /* white */
     }
 }
 
@@ -692,7 +511,7 @@ static void editorInsertChar(int c) {
     }
     row = &E.row[filerow];
     editorRowInsertChar(row,filecol,c);
-    if (E.cx == E.screencols-1)
+    if (E.cx == COLS-1)
         E.coloff++;
     else
         E.cx++;
@@ -727,7 +546,7 @@ static void editorInsertNewline(void) {
         editorUpdateRow(row);
     }
 fixcursor:
-    if (E.cy == E.screenrows-1) {
+    if (E.cy == LINES-1-1) {
         E.rowoff++;
     } else {
         E.cy++;
@@ -755,8 +574,8 @@ static void editorDelChar() {
         else
             E.cy--;
         E.cx = filecol;
-        if (E.cx >= E.screencols) {
-            int shift = (E.screencols-E.cx)+1;
+        if (E.cx >= COLS) {
+            int shift = (COLS-E.cx)+1;
             E.cx -= shift;
             E.coloff += shift;
         }
@@ -832,60 +651,20 @@ writeerr:
 
 /* ============================= Terminal update ============================ */
 
-/* We define a very simple "append buffer" structure, that is an heap
- * allocated string where we can append to. This is useful in order to
- * write all the escape sequences in a buffer and flush them to the standard
- * output in a single call, to avoid flickering effects. */
-struct abuf {
-    char *b;
-    int len;
-};
-
-#define ABUF_INIT {NULL,0}
-
-static void abAppend(struct abuf *ab, const char *s, int len) {
-    char *new = realloc(ab->b,ab->len+len);
-
-    if (new == NULL) return;
-    memcpy(new+ab->len,s,len);
-    ab->b = new;
-    ab->len += len;
-}
-
-static void abFree(struct abuf *ab) {
-    free(ab->b);
-}
-
 extern char *Previous_error;
+extern void draw_menu_item(const char* key, const char* name);
 
 /* This function writes the whole screen using VT100 escape characters
  * starting from the logical state of the editor in the global state 'E'. */
 static void editorRefreshScreen(void) {
     int y;
     erow *r;
-    char buf[32];
-    struct abuf ab = ABUF_INIT;
-
-    abAppend(&ab,"\x1b[?25l",6); /* Hide cursor. */
-    abAppend(&ab,"\x1b[H",3); /* Go home. */
-    for (y = 0; y < E.screenrows; y++) {
+    curs_set(0);
+    clear();
+    for (y = 0; y < LINES-1; y++) {
         int filerow = E.rowoff+y;
 
         if (filerow >= E.numrows) {
-            if (E.numrows == 0 && y == E.screenrows/3) {
-                char welcome[80];
-                int welcomelen = snprintf(welcome,sizeof(welcome),
-                    "Kilo editor -- verison %s\x1b[0K\r\n", KILO_VERSION);
-                int padding = (E.screencols-welcomelen)/2;
-                if (padding) {
-                    abAppend(&ab,"~",1);
-                    padding--;
-                }
-                while(padding--) abAppend(&ab," ",1);
-                abAppend(&ab,welcome,welcomelen);
-            } else {
-                abAppend(&ab,"~\x1b[0K\r\n",7);
-            }
             continue;
         }
 
@@ -893,82 +672,64 @@ static void editorRefreshScreen(void) {
 
         int len = r->rsize - E.coloff;
         int current_color = -1;
+        mvaddstr(y, 0, "");
         if (len > 0) {
-            if (len > E.screencols) len = E.screencols;
+            if (len > COLS) len = COLS;
             char *c = r->render+E.coloff;
             unsigned char *hl = r->hl+E.coloff;
             int j;
             for (j = 0; j < len; j++) {
                 if (hl[j] == HL_NONPRINT) {
                     char sym;
-                    abAppend(&ab,"\x1b[7m",4);
+                    attron(A_REVERSE);
                     if (c[j] <= 26)
                         sym = '@'+c[j];
                     else
                         sym = '?';
-                    abAppend(&ab,&sym,1);
-                    abAppend(&ab,"\x1b[0m",4);
+                    addch(sym);
+                    attroff(A_REVERSE);
                 } else if (hl[j] == HL_NORMAL) {
                     if (current_color != -1) {
-                        abAppend(&ab,"\x1b[39m",5);
+                        attrset(A_NORMAL);
                         current_color = -1;
                     }
-                    abAppend(&ab,c+j,1);
+                    addch(c[j]);
                 } else {
                     int color = editorSyntaxToColor(hl[j]);
                     if (color != current_color) {
-                        char buf[16];
-                        int clen = snprintf(buf,sizeof(buf),"\x1b[%dm",color);
+                        attrset(COLOR_PAIR(color));
                         current_color = color;
-                        abAppend(&ab,buf,clen);
                     }
-                    abAppend(&ab,c+j,1);
+                    addch(c[j]);
                 }
             }
         }
-        abAppend(&ab,"\x1b[39m",5);
-        abAppend(&ab,"\x1b[0K",4);
-        abAppend(&ab,"\r\n",2);
     }
 
-    /* Create a two rows status. First row: */
-    abAppend(&ab,"\x1b[0K",4);
-    abAppend(&ab,"\x1b[7m  ",6);
-    abAppend(&ab,"\x1b[0m ^e \x1b[7m run ",17);
-    int len =            2  +     4  +       5;
+    /* menu bar */
+    attrset(A_REVERSE);
+    for (int x = 0; x < COLS; ++x)
+      mvaddch(LINES-1, x, ' ');
+    attrset(A_NORMAL);
+    extern int menu_column;
+    menu_column = 2;
+    draw_menu_item("^e", "run");
     if (Previous_error != NULL) {
-      abAppend(&ab,"\x1b[0m ^c \x1b[7m\x1b[0m\x1b[1m abort ",27);
-      len +=               4  +                     7;
+      attron(A_BOLD);
+      draw_menu_item("^c", "abort");
+      attroff(A_BOLD);
     }
-    abAppend(&ab,"\x1b[0m ^g \x1b[7m go ",16);
-    len +=               4  +       4;
-    abAppend(&ab,"\x1b[0m ^f \x1b[7m find ",18);
-    len +=               4  +       6;
-    char rstatus[80];
-    int rlen = snprintf(rstatus, sizeof(rstatus),
-        "%d/%d",E.rowoff+E.cy+1,E.numrows);
-    while(len < E.screencols) {
-        if (E.screencols - len == rlen) {
-            abAppend(&ab,rstatus,rlen);
-            break;
-        } else {
-            abAppend(&ab," ",1);
-            len++;
-        }
-    }
-    abAppend(&ab,"\x1b[0m\r\n",6);
+    draw_menu_item("^g", "go");
+    draw_menu_item("^f", "find");
 
-    /* Second row depends on E.statusmsg and the status message update time. */
-    abAppend(&ab,"\x1b[0K",4);
-    int msglen = strlen(E.statusmsg);
-    if (msglen && time(NULL)-E.statusmsg_time < 5)
-        abAppend(&ab,E.statusmsg,msglen <= E.screencols ? msglen : E.screencols);
+    addstr("    ");
+    addstr(E.statusmsg);
 
     /* Put cursor at its current position. Note that the horizontal position
      * at which the cursor is displayed may be different compared to 'E.cx'
      * because of TABs. */
     int j;
-    int cx = 1;
+    int cx = 0;
     int filerow = E.rowoff+E.cy;
     erow *row = (filerow >= E.numrows) ? NULL : &E.row[filerow];
     if (row) {
@@ -977,11 +738,8 @@ static void editorRefreshScreen(void) {
             cx++;
         }
     }
-    snprintf(buf,sizeof(buf),"\x1b[%d;%dH",E.cy+1,cx);
-    abAppend(&ab,buf,strlen(buf));
-    abAppend(&ab,"\x1b[?25h",6); /* Show cursor. */
-    write(STDOUT_FILENO,ab.b,ab.len);
-    abFree(&ab);
+    mvaddstr(E.cy, cx, "");
+    curs_set(1);
 }
 
 /* Set an editor status message for the second line of the status, at the
@@ -998,7 +756,7 @@ static void editorSetStatusMessage(const char *fmt, ...) {
 
 #define KILO_QUERY_LEN 256
 
-static void editorFind(int fd) {
+static void editorFind() {
     char query[KILO_QUERY_LEN+1] = {0};
     int qlen = 0;
     int last_match = -1; /* Last line where a match was found. -1 for none. */
@@ -1020,14 +778,14 @@ static void editorFind(int fd) {
 
     while(1) {
         editorSetStatusMessage(
-            "Search: %s (Use ESC/Arrows/Enter)", query);
+            "Search: %s (Use ^c/Arrows/Enter)", query);
         editorRefreshScreen();
 
-        int c = editorReadKey(fd);
-        if (c == DEL_KEY || c == CTRL_H || c == BACKSPACE) {
+        int c = getch();
+        if (c == KEY_BACKSPACE) {
             if (qlen != 0) query[--qlen] = '\0';
             last_match = -1;
-        } else if (c == ESC || c == ENTER) {
+        } else if (c == CTRL_C || c == ENTER) {
             if (c == ESC) {
                 E.cx = saved_cx; E.cy = saved_cy;
                 E.coloff = saved_coloff; E.rowoff = saved_rowoff;
@@ -1035,9 +793,9 @@ static void editorFind(int fd) {
             FIND_RESTORE_HL;
             editorSetStatusMessage("");
             return;
-        } else if (c == ARROW_RIGHT || c == ARROW_DOWN) {
+        } else if (c == KEY_RIGHT || c == KEY_DOWN) {
             find_next = 1;
-        } else if (c == ARROW_LEFT || c == ARROW_UP) {
+        } else if (c == KEY_LEFT || c == KEY_UP) {
             find_next = -1;
         } else if (isprint(c)) {
             if (qlen < KILO_QUERY_LEN) {
@@ -1083,8 +841,8 @@ static void editorFind(int fd) {
                 E.rowoff = current;
                 E.coloff = 0;
                 /* Scroll horizontally as needed. */
-                if (E.cx > E.screencols) {
-                    int diff = E.cx - E.screencols;
+                if (E.cx > COLS) {
+                    int diff = E.cx - COLS;
                     E.cx -= diff;
                     E.coloff += diff;
                 }
@@ -1103,7 +861,7 @@ static void editorMoveCursor(int key) {
     erow *row = (filerow >= E.numrows) ? NULL : &E.row[filerow];
 
     switch(key) {
-    case ARROW_LEFT:
+    case KEY_LEFT:
         if (E.cx == 0) {
             if (E.coloff) {
                 E.coloff--;
@@ -1111,9 +869,9 @@ static void editorMoveCursor(int key) {
                 if (filerow > 0) {
                     E.cy--;
                     E.cx = E.row[filerow-1].size;
-                    if (E.cx > E.screencols-1) {
-                        E.coloff = E.cx-E.screencols+1;
-                        E.cx = E.screencols-1;
+                    if (E.cx > COLS-1) {
+                        E.coloff = E.cx-COLS+1;
+                        E.cx = COLS-1;
                     }
                 }
             }
@@ -1121,9 +879,9 @@ static void editorMoveCursor(int key) {
             E.cx -= 1;
         }
         break;
-    case ARROW_RIGHT:
+    case KEY_RIGHT:
         if (row && filecol < row->size) {
-            if (E.cx == E.screencols-1) {
+            if (E.cx == COLS-1) {
                 E.coloff++;
             } else {
                 E.cx += 1;
@@ -1131,23 +889,23 @@ static void editorMoveCursor(int key) {
         } else if (row && filecol == row->size) {
             E.cx = 0;
             E.coloff = 0;
-            if (E.cy == E.screenrows-1) {
+            if (E.cy == LINES-1-1) {
                 E.rowoff++;
             } else {
                 E.cy += 1;
             }
         }
         break;
-    case ARROW_UP:
+    case KEY_UP:
         if (E.cy == 0) {
             if (E.rowoff) E.rowoff--;
         } else {
             E.cy -= 1;
         }
         break;
-    case ARROW_DOWN:
+    case KEY_DOWN:
         if (filerow < E.numrows) {
-            if (E.cy == E.screenrows-1) {
+            if (E.cy == LINES-1-1) {
                 E.rowoff++;
             } else {
                 E.cy += 1;
@@ -1173,7 +931,7 @@ extern void save_to_current_definition_and_editor_buffer(lua_State *L, char *nam
 extern void load_editor_buffer_to_current_definition_in_image(lua_State *L);
 extern void editorRefreshBuffer(void);
 #define CURRENT_DEFINITION_LEN 256
-static void editorGo(lua_State* L, int fd) {
+static void editorGo(lua_State* L) {
     char query[CURRENT_DEFINITION_LEN+1] = {0};
     int qlen = 0;
 
@@ -1184,10 +942,10 @@ static void editorGo(lua_State* L, int fd) {
         editorSetStatusMessage("Jump to: %s", query);
         editorRefreshScreen();
 
-        int c = editorReadKey(fd);
-        if (c == DEL_KEY || c == CTRL_H || c == BACKSPACE) {
+        int c = getch();
+        if (c == KEY_BACKSPACE) {
             if (qlen != 0) query[--qlen] = '\0';
-        } else if (c == ESC || c == ENTER) {
+        } else if (c == CTRL_C || c == ENTER) {
             editorSetStatusMessage("");
             if (c == ENTER) {
               save_to_current_definition_and_editor_buffer(L, query);
@@ -1207,17 +965,15 @@ static void editorGo(lua_State* L, int fd) {
  * is typing stuff on the terminal. */
 #define KILO_QUIT_TIMES 3
 int Quit = 0;
-static void editorProcessKeypress(lua_State* L, int fd) {
-    int c = editorReadKey(fd);
+static void editorProcessKeypress(lua_State* L) {
+    int c = getch();
     switch(c) {
     case ENTER:
         editorInsertNewline();
         break;
     case CTRL_C:
-        /* Mostly ignore ctrl-c. */
-        if (c == 3)  /* ctrl-c */
-          if (Previous_error != NULL)
-            exit(1);
+        if (Previous_error != NULL)
+          exit(1);
         break;
     case CTRL_E:
         /* Save and quit. */
@@ -1226,34 +982,31 @@ static void editorProcessKeypress(lua_State* L, int fd) {
         break;
     case CTRL_G:
         /* Go to a different definition. */
-        editorGo(L, fd);
+        editorGo(L);
         break;
     case CTRL_F:
-        editorFind(fd);
+        editorFind();
         break;
-    case BACKSPACE:
-    case CTRL_H:
-    case DEL_KEY:
+    case KEY_BACKSPACE:
         editorDelChar();
         break;
-    case PAGE_UP:
-    case PAGE_DOWN:
-        if (c == PAGE_UP && E.cy != 0)
+    case KEY_NPAGE:
+    case KEY_PPAGE:
+        if (c == KEY_PPAGE && E.cy != 0)
             E.cy = 0;
-        else if (c == PAGE_DOWN && E.cy != E.screenrows-1)
-            E.cy = E.screenrows-1;
+        else if (c == KEY_NPAGE && E.cy != LINES-1-1)
+            E.cy = LINES-1-1;
         {
-        int times = E.screenrows;
-        while(times--)
-            editorMoveCursor(c == PAGE_UP ? ARROW_UP:
-                                            ARROW_DOWN);
+          int times = LINES-1;
+          while(times--)
+            editorMoveCursor(c == KEY_PPAGE ? KEY_UP : KEY_DOWN);
         }
         break;
 
-    case ARROW_UP:
-    case ARROW_DOWN:
-    case ARROW_LEFT:
-    case ARROW_RIGHT:
+    case KEY_UP:
+    case KEY_DOWN:
+    case KEY_LEFT:
+    case KEY_RIGHT:
         editorMoveCursor(c);
         break;
     case CTRL_L:
@@ -1268,22 +1021,6 @@ static void editorProcessKeypress(lua_State* L, int fd) {
     }
 }
 
-static void updateWindowSize(void) {
-    if (getWindowSize(STDIN_FILENO,STDOUT_FILENO,
-                      &E.screenrows,&E.screencols) == -1) {
-        perror("Unable to query the screen for size (columns / rows)");
-        exit(1);
-    }
-    E.screenrows -= 2; /* Get room for status bar. */
-}
-
-static void handleSigWinCh(int unused __attribute__((unused))) {
-    updateWindowSize();
-    if (E.cy > E.screenrows) E.cy = E.screenrows - 1;
-    if (E.cx > E.screencols) E.cx = E.screencols - 1;
-    editorRefreshScreen();
-}
-
 static void initEditor(void) {
     E.cx = 0;
     E.cy = 0;
@@ -1294,18 +1031,17 @@ static void initEditor(void) {
     E.dirty = 0;
     E.filename = NULL;
     E.syntax = &HLDB[0];
-    updateWindowSize();
-    signal(SIGWINCH, handleSigWinCh);
 }
 
 void edit(lua_State* L, char* filename, const char* message) {
     initEditor();
+    /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */
+    for (int i = 0; i < 7; ++i)
+      init_pair(i, i, -1);
     editorOpen(filename);
-    enableRawMode(STDIN_FILENO);
     editorSetStatusMessage(message);
     while(!Quit) {
         editorRefreshScreen();
-        editorProcessKeypress(L, STDIN_FILENO);
+        editorProcessKeypress(L);
     }
-    disableRawMode(STDIN_FILENO);
 }

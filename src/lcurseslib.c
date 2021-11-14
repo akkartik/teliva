@@ -28,7 +28,7 @@ static void draw_string_on_menu(const char* s) {
   mvaddstr(LINES-1, menu_column, " ");
   ++menu_column;
 }
-static void draw_menu_item(const char* key, const char* name) {
+void draw_menu_item(const char* key, const char* name) {
   attroff(A_REVERSE);
   draw_string_on_menu(key);
   attron(A_REVERSE);

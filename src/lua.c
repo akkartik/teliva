@@ -410,7 +410,6 @@ void browseImage (lua_State *L) {
 
 
 void switch_to_editor (lua_State *L, const char *message) {
-  endwin();
   if (Script_name)
     edit(L, Script_name, message);
   else

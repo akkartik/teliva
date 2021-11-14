@@ -304,9 +304,10 @@ static int handle_image (lua_State *L, char **argv, int n) {
 }
 
 
-const char *Current_definition = NULL;
+#define CURRENT_DEFINITION_LEN 256
+char Current_definition[CURRENT_DEFINITION_LEN+1] = {0};
 void save_to_current_definition_and_editor_buffer (lua_State *L, const char *definition) {
-    Current_definition = strdup(definition);
+    strncpy(Current_definition, definition, CURRENT_DEFINITION_LEN);
     lua_getglobal(L, "teliva_program");
     lua_getfield(L, -1, Current_definition);
     const char *contents = lua_tostring(L, -1);

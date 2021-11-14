@@ -1172,8 +1172,9 @@ static void editorMoveCursor(int key) {
 extern void save_to_current_definition_and_editor_buffer(lua_State *L, char *name);
 extern void load_editor_buffer_to_current_definition_in_image(lua_State *L);
 extern void editorRefreshBuffer(void);
+#define CURRENT_DEFINITION_LEN 256
 static void editorGo(lua_State* L, int fd) {
-    char query[KILO_QUERY_LEN+1] = {0};
+    char query[CURRENT_DEFINITION_LEN+1] = {0};
     int qlen = 0;
 
     editorSaveToDisk();
@@ -1194,7 +1195,7 @@ static void editorGo(lua_State* L, int fd) {
             }
             return;
         } else if (isprint(c)) {
-            if (qlen < KILO_QUERY_LEN) {
+            if (qlen < CURRENT_DEFINITION_LEN) {
                 query[qlen++] = c;
                 query[qlen] = '\0';
             }

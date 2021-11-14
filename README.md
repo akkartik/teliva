@@ -30,34 +30,11 @@ No matter what app you run, you are always guaranteed access to a single
 obvious, consistent way (currently the hotkey `ctrl-e`) to edit its sources.
 And to run the updates after editing.
 
-<img alt='screenshot of Teliva editing the Towers of Hanoi' src='doc/hanoi-edit.png'>
-
-Toggle the same hotkey to restart the app with the new sources.
-
-Over time I hope to improve the experience for error messages, failing tests,
-undoing changes and so on. The emphasis will be on maximizing hackability
-rather than functionality. In addition to Lua 1.5, this repository currently
-packages:
-
-* The [ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
-  building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
-* A port of the [lcurses](https://github.com/lcurses/lcurses) library
-  providing Lua bindings for ncurses. ([Documentation](http://lcurses.github.io/lcurses))
-* The [Kilo](https://github.com/antirez/kilo) text editor. ([With a fantastic
-  walk-through.](https://viewsourcecode.org/snaptoken/kilo))
-
-Send all praise to them, brickbats to [me](http://akkartik.name/contact). I
-plan to be extremely parsimonious in taking on further dependencies.
-
 ## Isn't this just an IDE?
 
 There's one big difference: these apps are not intended to be runnable outside
 of the Teliva environment. Editing the sources will always be a core feature
 that's front and center in the UI.
-
-At the moment this isn't much of a restriction given how trivial the
-differences with Lua are. You also don't get much benefit in exchange for
-taking on this restriction. Let's see if that changes.
 
 A second, more subtle difference: it's primarily an environment for _running_
 apps, and only secondarily for editing them. Starting up the environment puts
@@ -115,3 +92,16 @@ There will likely be some exceptions that I'll record here as I encounter them:
 ## What's with the name?
 
 Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
+
+## Coda
+
+In addition to Lua 1.5, Teliva is inspired by:
+
+* The [ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
+  building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
+* An interface to ncurses like the [lcurses](https://github.com/lcurses/lcurses)
+  library. ([Documentation](http://lcurses.github.io/lcurses))
+* The [Kilo](https://github.com/antirez/kilo) text editor. (Read more about it
+  in this [fantastic walk-through](https://viewsourcecode.org/snaptoken/kilo).)
+
+Send all praise to them, brickbats to [me](http://akkartik.name/contact).

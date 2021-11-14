@@ -174,19 +174,23 @@ static int is_separator(int c) {
     return c == '\0' || isspace(c) || strchr(",.()+-/*=~%[];",c) != NULL;
 }
 
+static int starts_with(const char* s, const char* prefix) {
+    return strncmp(prefix, s, strlen(prefix)) == 0;
+}
+
 /* Return true if the specified row last char is part of a multi line comment
  * that starts at this row or at one before, and does not end at the end
  * of the row but spawns to the next row. */
-static int editorRowHasOpenComment(erow *row) {
+static int editorRowHasOpenComment(erow *row, char *mce) {
     if (row->hl && row->rsize && row->hl[row->rsize-1] == HL_MLCOMMENT &&
-        (row->rsize < 2 || (row->render[row->rsize-2] != '*' ||
-                            row->render[row->rsize-1] != '/'))) return 1;
+        (row->rsize < strlen(mce) || strcmp(&row->render[row->rsize-strlen(mce)], mce) != 0)) return 1;
     return 0;
 }
 
 /* Set every byte of row->hl (that corresponds to every character in the line)
  * to the right syntax highlight type (HL_* defines). */
 static void editorUpdateSyntax(erow *row) {
+//?     mvprintw(row->idx, 0, "i:%d|", row->idx);
     row->hl = realloc(row->hl,row->rsize);
     memset(row->hl,HL_NORMAL,row->rsize);
 
@@ -212,23 +216,19 @@ static void editorUpdateSyntax(erow *row) {
 
     /* If the previous line has an open comment, this line starts
      * with an open comment state. */
-    if (row->idx > 0 && editorRowHasOpenComment(&E.row[row->idx-1]))
+    if (row->idx > 0 && editorRowHasOpenComment(&E.row[row->idx-1], mce)) {
+//?         addstr("continue multiline comment|");
         in_comment = 1;
+    }
 
     while(*p) {
-        /* Handle single-line comments. */
-        if (prev_sep && *p == scs[0] && *(p+1) == scs[1]) {
-            /* From here to end is a comment */
-            memset(row->hl+i,HL_COMMENT,row->size-i);
-            return;
-        }
-
         /* Handle multi line comments. */
         if (in_comment) {
             row->hl[i] = HL_MLCOMMENT;
-            if (*p == mce[0] && *(p+1) == mce[1]) {
-                row->hl[i+1] = HL_MLCOMMENT;
-                p += 2; i += 2;
+            if (starts_with(p, mce)) {
+//?                 addstr("mce|");
+                memset(&row->hl[i],HL_MLCOMMENT, strlen(mce));
+                p += strlen(mce); i += strlen(mce);
                 in_comment = 0;
                 prev_sep = 1;
                 continue;
@@ -237,13 +237,20 @@ static void editorUpdateSyntax(erow *row) {
                 p++; i++;
                 continue;
             }
-        } else if (*p == mcs[0] && *(p+1) == mcs[1]) {
-            row->hl[i] = HL_MLCOMMENT;
-            row->hl[i+1] = HL_MLCOMMENT;
-            p += 2; i += 2;
+        } else if (starts_with(p, mcs)) {
+//?             addstr("mcs|");
+            memset(&row->hl[i],HL_MLCOMMENT, strlen(mcs));
+            p += strlen(mcs); i += strlen(mcs);
             in_comment = 1;
             prev_sep = 0;
             continue;
+        }
+
+        /* Handle single-line comments. */
+        if (prev_sep && *p == scs[0] && *(p+1) == scs[1]) {
+            /* From here to end is a comment */
+            memset(row->hl+i,HL_COMMENT,row->size-i);
+            return;
         }
 
         /* Handle "" and '' */
@@ -278,7 +285,7 @@ static void editorUpdateSyntax(erow *row) {
 
         /* Handle numbers */
         if ((isdigit(*p) && (prev_sep || row->hl[i-1] == HL_NUMBER)) ||
-            (*p == '.' && i >0 && row->hl[i-1] == HL_NUMBER)) {
+            (*p == '.' && i > 0 && row->hl[i-1] == HL_NUMBER)) {
             row->hl[i] = HL_NUMBER;
             p++; i++;
             prev_sep = 0;
@@ -314,10 +321,10 @@ static void editorUpdateSyntax(erow *row) {
         p++; i++;
     }
 
-    /* Propagate syntax change to the next row if the open commen
+    /* Propagate syntax change to the next row if the open comment
      * state changed. This may recursively affect all the following rows
      * in the file. */
-    int oc = editorRowHasOpenComment(row);
+    int oc = editorRowHasOpenComment(row, mce);
     if (row->hl_oc != oc && row->idx+1 < E.numrows)
         editorUpdateSyntax(&E.row[row->idx+1]);
     row->hl_oc = oc;

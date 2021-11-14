@@ -1123,3 +1123,14 @@ void edit(lua_State* L, char* filename, const char* message) {
         editorProcessKeypress(L);
     }
 }
+
+void resumeEdit(lua_State* L, char* filename, const char* message) {
+    Quit = 0;
+    clearEditor();
+    editorOpen(filename);
+    editorSetStatusMessage(message);
+    while(!Quit) {
+        editorRefreshScreen(editorMenu);
+        editorProcessKeypress(L);
+    }
+}

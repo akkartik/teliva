@@ -360,29 +360,44 @@ char **Argv = NULL;
 extern void edit (lua_State *L, char *filename, const char *message);
 extern void clearEditor (void);
 extern int editorOpen (char *filename);
-void edit_buffer (lua_State *L, const char *message) {
+inline void edit_buffer (lua_State *L, const char *message) {
   edit(L, "teliva_editbuffer", message);
 }
 void editor_refresh_buffer (void) {
   clearEditor();
   editorOpen("teliva_editbuffer");
 }
+extern void resumeEdit (lua_State *L, char *filename, const char *message);
+inline void editor_resume (lua_State *L, const char *message) {
+  resumeEdit(L, "teliva_editbuffer", message);
+}
 
 
-void load_editor_buffer_to_current_definition_in_image(lua_State *L) {
+int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
   char new_contents[8192] = {0};
   read_contents(L, "teliva_editbuffer", new_contents);
   update_definition(L, Current_definition, new_contents);
   save_image(L);
-  /* reload binding if possible */
-  dostring(L, new_contents, Current_definition);
+  /* reload binding */
+  return luaL_loadbuffer(L, new_contents, strlen(new_contents), Current_definition)
+          || docall(L, 0, 1);
 }
 
 
 void edit_image (lua_State *L, const char *definition) {
   save_to_current_definition_and_editor_buffer(L, definition);
   edit_buffer(L, /*status message*/ "");
-  load_editor_buffer_to_current_definition_in_image(L);
+  // error handling
+  while (1) {
+    int status;
+    status = load_editor_buffer_to_current_definition_in_image(L);
+    if (status == 0 || lua_isnil(L, -1))
+      break;
+    const char *msg = lua_tostring(L, -1);
+    if (msg == NULL) msg = "(error object is not a string)";
+    editor_resume(L, msg);
+    lua_pop(L, 1);
+  }
 }
 
 

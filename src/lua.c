@@ -290,21 +290,15 @@ static int handle_image (lua_State *L, char **argv, int n) {
   status = docall(L, narg, 0);
   lua_getglobal(L, "teliva_program");
   int table = lua_gettop(L);
-//?   endwin();
   /* parse and load each binding in teliva_program */
   for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
     const char* key = lua_tostring(L, -2);
     const char* value = lua_tostring(L, -1);
-//?     printf("===\nkey: %s\n", key);
-//?     printf("value: %s\n", value);
     dostring(L, value, key);
-//?     stackDump(L);
   }
   /* call main() */
   lua_getglobal(L, "main");
   docall(L, 0, 1);
-//?   stackDump(L);
-//?   exit(1);
   return 0;
 }
 

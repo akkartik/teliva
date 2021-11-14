@@ -200,6 +200,10 @@ function update(window, c)
 end]==],
   main = [==[
 function main()
+  for i=1,7 do
+    curses.init_pair(i, i, -1)
+  end
+
   -- initialize grid based on commandline args
   if (#arg == 0) then
     -- by default, start from a deterministically random state

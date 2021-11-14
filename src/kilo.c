@@ -1,6 +1,4 @@
-/* Kilo -- A very simple editor in less than 1-kilo lines of code (as counted
- *         by "cloc"). Does not depend on libcurses, directly emits VT100
- *         escapes on the terminal.
+/* Based on https://github.com/antirez/kilo
  *
  * -----------------------------------------------------------------------
  *
@@ -218,7 +216,7 @@ static void editorUpdateSyntax(erow *row) {
         in_comment = 1;
 
     while(*p) {
-        /* Handle // comments. */
+        /* Handle single-line comments. */
         if (prev_sep && *p == scs[0] && *(p+1) == scs[1]) {
             /* From here to end is a comment */
             memset(row->hl+i,HL_COMMENT,row->size-i);
@@ -650,8 +648,6 @@ writeerr:
 extern char *Previous_error;
 extern void draw_menu_item(const char* key, const char* name);
 
-/* This function writes the whole screen using VT100 escape characters
- * starting from the logical state of the editor in the global state 'E'. */
 static void editorRefreshScreen(void) {
     int y;
     erow *r;

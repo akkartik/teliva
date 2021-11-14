@@ -409,6 +409,7 @@ void browseImage (lua_State *L) {
 }
 
 
+extern void cleanup_curses (void);
 void switch_to_editor (lua_State *L, const char *message) {
   if (Script_name)
     edit(L, Script_name, message);
@@ -567,7 +568,6 @@ static int pmain (lua_State *L) {
 
 
 extern void draw_menu (lua_State *);
-extern void cleanup_curses (void);
 
 
 int main (int argc, char **argv) {

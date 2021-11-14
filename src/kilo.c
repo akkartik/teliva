@@ -424,7 +424,7 @@ static void editorDelRow(int at) {
     E.dirty++;
 }
 
-void editorClear(void) {
+void clearEditor(void) {
     E.cx = E.cy = 0;
     E.rowoff = E.coloff = 0;
     for (int j = E.numrows-1; j >= 0; j--)

@@ -367,9 +367,9 @@ void editor_refresh_buffer (void) {
   clearEditor();
   editorOpen("teliva_editbuffer");
 }
-extern void resumeEdit (lua_State *L, char *filename, const char *message);
-inline void editor_resume (lua_State *L, const char *message) {
-  resumeEdit(L, "teliva_editbuffer", message);
+extern void resumeEdit (lua_State *L, char *filename);
+inline void editor_resume (lua_State *L) {
+  resumeEdit(L, "teliva_editbuffer");
 }
 
 
@@ -384,6 +384,7 @@ int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
 }
 
 
+const char *Previous_error = NULL;
 void edit_image (lua_State *L, const char *definition) {
   save_to_current_definition_and_editor_buffer(L, definition);
   edit_buffer(L, /*status message*/ "");
@@ -393,9 +394,9 @@ void edit_image (lua_State *L, const char *definition) {
     status = load_editor_buffer_to_current_definition_in_image(L);
     if (status == 0 || lua_isnil(L, -1))
       break;
-    const char *msg = lua_tostring(L, -1);
-    if (msg == NULL) msg = "(error object is not a string)";
-    editor_resume(L, msg);
+    Previous_error = lua_tostring(L, -1);
+    if (Previous_error == NULL) Previous_error = "(error object is not a string)";
+    editor_resume(L);
     lua_pop(L, 1);
   }
 }
@@ -553,17 +554,6 @@ void switch_to_editor (lua_State *L, const char *message) {
     cleanup_curses();
   execv(Argv[0], Argv);
   /* never returns */
-}
-
-
-const char *Previous_error = NULL;
-static int show_error_in_editor (lua_State *L, int status) {
-  if (status && !lua_isnil(L, -1)) {
-    Previous_error = lua_tostring(L, -1);
-    if (Previous_error == NULL) Previous_error = "(error object is not a string)";
-    switch_to_editor(L, Previous_error);
-  }
-  return status;
 }
 
 

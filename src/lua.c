@@ -316,6 +316,7 @@ void save_to_current_definition_and_editor_buffer (lua_State *L, const char *def
     if (contents != NULL)
       write(outfd, contents, strlen(contents));
     close(outfd);
+    lua_settop(L, 0);
 }
 
 
@@ -328,13 +329,16 @@ static void read_contents (lua_State *L, char *filename, char *out) {
 
 /* table to update is at top of stack */
 static void update_definition (lua_State *L, const char *name, char *out) {
+    lua_getglobal(L, "teliva_program");
     lua_pushstring(L, out);
     assert(strlen(name) > 0);
     lua_setfield(L, -2, name);
+    lua_settop(L, 0);
 }
 
 
 static void save_image (lua_State *L) {
+    lua_getglobal(L, "teliva_program");
     int table = lua_gettop(L);
     FILE* fp = fopen(Image_name, "w");
     fprintf(fp, "teliva_program = {\n");
@@ -347,6 +351,7 @@ static void save_image (lua_State *L) {
     }
     fprintf(fp, "}\n");
     fclose(fp);
+    lua_settop(L, 0);
 }
 
 

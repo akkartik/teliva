@@ -780,15 +780,15 @@ static void editorFind() {
 
     while(1) {
         editorSetStatusMessage(
-            "Search: %s (Use ^c/Arrows/Enter)", query);
+            "Search: %s (Use ^g/Arrows/Enter)", query);
         editorRefreshScreen();
 
         int c = getch();
         if (c == KEY_BACKSPACE) {
             if (qlen != 0) query[--qlen] = '\0';
             last_match = -1;
-        } else if (c == CTRL_C || c == ENTER) {
-            if (c == ESC) {
+        } else if (c == CTRL_G || c == ENTER) {
+            if (c == CTRL_G) {
                 E.cx = saved_cx; E.cy = saved_cy;
                 E.coloff = saved_coloff; E.rowoff = saved_rowoff;
             }
@@ -969,13 +969,13 @@ static void editorGo(lua_State* L) {
     qlen = strlen(query);
 
     while(1) {
-        editorSetStatusMessage("Jump to: %s", query);
+        editorSetStatusMessage("Jump to (^g to cancel): %s", query);
         editorRefreshScreen();
 
         int c = getch();
         if (c == KEY_BACKSPACE) {
             if (qlen != 0) query[--qlen] = '\0';
-        } else if (c == CTRL_C || c == ENTER) {
+        } else if (c == CTRL_G || c == ENTER) {
             editorSetStatusMessage("");
             if (c == ENTER) {
               save_to_current_definition_and_editor_buffer(L, query);

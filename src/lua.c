@@ -443,7 +443,10 @@ void browseImage (lua_State *L) {
     y += 2;
   }
   lua_settop(L, 0);
-  mvaddstr(LINES-1, 0, "edit what? ");
+  attron(A_REVERSE);
+  mvaddstr(LINES-1, 0, " edit what? ");
+  attroff(A_REVERSE);
+  addch(' ');
   char definition[64] = {0};
   getnstr(definition, 60);
   editImage(L, definition);

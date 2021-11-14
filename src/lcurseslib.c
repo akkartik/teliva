@@ -19,7 +19,7 @@ void cleanup_curses (void) {
 
 
 int menu_column = 0;
-static void draw_string_on_menu (const char* s) {
+void draw_string_on_menu (const char* s) {
   mvaddstr(LINES-1, menu_column, " ");
   ++menu_column;
   mvaddstr(LINES-1, menu_column, s);

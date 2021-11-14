@@ -657,7 +657,59 @@ writeerr:
 extern char *Previous_error;
 extern void draw_menu_item(const char* key, const char* name);
 
-static void editorRefreshScreen(void) {
+static void editorMenu(void) {
+    attrset(A_REVERSE);
+    for (int x = 0; x < COLS; ++x)
+      mvaddch(LINES-1, x, ' ');
+    attrset(A_NORMAL);
+    extern int menu_column;
+    menu_column = 2;
+    draw_menu_item("^e", "run");
+    if (Previous_error != NULL) {
+      attron(A_BOLD);
+      draw_menu_item("^c", "abort");
+      attroff(A_BOLD);
+    }
+    draw_menu_item("^g", "go");
+    draw_menu_item("^f", "find");
+}
+
+extern void draw_string_on_menu (const char* s);
+static void editorFindMenu(void) {
+    attrset(A_REVERSE);
+    for (int x = 0; x < COLS; ++x)
+      mvaddch(LINES-1, x, ' ');
+    attrset(A_NORMAL);
+    extern int menu_column;
+    menu_column = 2;
+    draw_menu_item("Esc", "cancel");
+    draw_menu_item("Enter", "submit");
+    // draw_menu_item("↑", "previous");
+    attroff(A_REVERSE);
+    mvaddstr(LINES-1, menu_column, " ↑ ");
+    menu_column += 3;  // strlen isn't sufficient
+    attron(A_REVERSE);
+    draw_string_on_menu("previous");
+    // draw_menu_item("↓", "next");
+    attroff(A_REVERSE);
+    mvaddstr(LINES-1, menu_column, " ↓ ");
+    menu_column += 5;  // strlen isn't sufficient
+    attron(A_REVERSE);
+    draw_string_on_menu("next");
+}
+
+static void editorGoMenu(void) {
+    attrset(A_REVERSE);
+    for (int x = 0; x < COLS; ++x)
+      mvaddch(LINES-1, x, ' ');
+    attrset(A_NORMAL);
+    extern int menu_column;
+    menu_column = 2;
+    draw_menu_item("Esc", "cancel");
+    draw_menu_item("Enter", "submit");
+}
+
+static void editorRefreshScreen(void (*menu_func)(void)) {
     int y;
     erow *r;
     int current_color = -1;
@@ -708,21 +760,7 @@ static void editorRefreshScreen(void) {
         }
     }
 
-    /* menu bar */
-    attrset(A_REVERSE);
-    for (int x = 0; x < COLS; ++x)
-      mvaddch(LINES-1, x, ' ');
-    attrset(A_NORMAL);
-    extern int menu_column;
-    menu_column = 2;
-    draw_menu_item("^e", "run");
-    if (Previous_error != NULL) {
-      attron(A_BOLD);
-      draw_menu_item("^c", "abort");
-      attroff(A_BOLD);
-    }
-    draw_menu_item("^g", "go");
-    draw_menu_item("^f", "find");
+    (*menu_func)();
 
     addstr("    ");
     addstr(E.statusmsg);
@@ -779,9 +817,8 @@ static void editorFind() {
     int saved_coloff = E.coloff, saved_rowoff = E.rowoff;
 
     while(1) {
-        editorSetStatusMessage(
-            "Search: %s (Use Esc/Arrows/Enter)", query);
-        editorRefreshScreen();
+        editorSetStatusMessage("Search: %s", query);
+        editorRefreshScreen(editorFindMenu);
 
         int c = getch();
         if (c == KEY_BACKSPACE) {
@@ -971,8 +1008,8 @@ static void editorGo(lua_State* L) {
     qlen = strlen(query);
 
     while(1) {
-        editorSetStatusMessage("Jump to (Esc to cancel): %s", query);
-        editorRefreshScreen();
+        editorSetStatusMessage("Jump to: %s", query);
+        editorRefreshScreen(editorGoMenu);
 
         int c = getch();
         if (c == KEY_BACKSPACE) {
@@ -1072,7 +1109,7 @@ void edit(lua_State* L, char* filename, const char* message) {
     editorOpen(filename);
     editorSetStatusMessage(message);
     while(!Quit) {
-        editorRefreshScreen();
+        editorRefreshScreen(editorMenu);
         editorProcessKeypress(L);
     }
 }

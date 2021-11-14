@@ -19,7 +19,7 @@ apps with all the stuff needed to edit and build them.
 git clone https://github.com/akkartik/teliva
 cd teliva
 make linux
-src/teliva hanoi.teliva
+src/teliva hanoi.tlv
 ```
 
 Here's an example app (the [Tower of Hanoi](https://en.wikipedia.org/wiki/Tower_of_Hanoi)):
@@ -62,8 +62,7 @@ them in Teliva and let people use regular Lua. Or other platforms!
 
 - Teliva initializes the ncurses library by default, so apps should assume
   they have access to a text-mode window for printing text to, and a keyboard
-  for reading unbuffered keystrokes from. Compare `hanoi.teliva` with
-  `hanoi.lua` to get a sense for what changes are needed.
+  for reading unbuffered keystrokes from.
 
 - I want to provide sandboxed access to system resources (file system,
   network, etc.) which will likely create incompatibilities with the standard

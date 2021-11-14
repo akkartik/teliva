@@ -65,15 +65,11 @@
 #define HL_NUMBER 7
 #define HL_MATCH 8      /* Search match. */
 
-#define HL_HIGHLIGHT_STRINGS (1<<0)
-#define HL_HIGHLIGHT_NUMBERS (1<<1)
-
 struct editorSyntax {
     char **keywords;
     char singleline_comment_start[2];
     char *multiline_comment_start;
     char *multiline_comment_end;
-    int flags;
 };
 
 /* This structure represents a single line of the file we are editing. */
@@ -140,8 +136,7 @@ static void editorSetStatusMessage(const char *fmt, ...);
  * a different color, so that you can have two different sets of keywords.
  *
  * Finally add a stanza in the HLDB global variable with two two arrays
- * of strings, and a set of flags in order to enable highlighting of
- * comments and numbers.
+ * of strings.
  *
  * The characters for single and multi line comments must be exactly two
  * and must be provided as well (see the C language example).
@@ -163,12 +158,13 @@ char *Lua_HL_keywords[] = {
 };
 
 /* Here we define an array of syntax highlights by extensions, keywords,
- * comments delimiters and flags. */
+ * comments delimiters. */
 struct editorSyntax HLDB[] = {
     {
         Lua_HL_keywords,
-        "--", "--[[", "--]]",
-        HL_HIGHLIGHT_STRINGS | HL_HIGHLIGHT_NUMBERS
+        "--",  // line comment
+        "--[[",  // multiline comment start
+        "--]]"  // multline comment stop
     }
 };
 

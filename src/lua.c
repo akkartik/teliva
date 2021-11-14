@@ -378,10 +378,32 @@ void load_editor_buffer_to_current_definition_in_image(lua_State *L) {
 }
 
 
-void editImage (lua_State *L) {
-  save_to_current_definition_and_editor_buffer(L, "main");
+void editImage (lua_State *L, const char *definition) {
+  save_to_current_definition_and_editor_buffer(L, definition);
   editBuffer(L, /*status message*/ "");
   load_editor_buffer_to_current_definition_in_image(L);
+}
+
+
+void browseImage (lua_State *L) {
+  clear();
+  luaL_newmetatable(L, "__teliva_call_graph_depth");
+  int cgt = lua_gettop(L);
+  int y = 2;
+  for (lua_pushnil(L); lua_next(L, cgt) != 0;) {
+    const char* function_name = lua_tostring(L, -2);
+    int depth = lua_tointeger(L, -1);
+    mvprintw(y, 0, "%s: %d", function_name, depth);
+    ++y;
+    lua_pop(L, 1);  // pop value, leave key on stack for next iteration
+  }
+  int maxy, maxx;
+  getmaxyx(stdscr, maxy, maxx);
+  (void)maxx;  // unused
+  mvaddstr(maxy-1, 0, "edit what? ");
+  char definition[64] = {0};
+  getnstr(definition, 60);
+  editImage(L, definition);
 }
 
 
@@ -390,7 +412,7 @@ void switch_to_editor (lua_State *L, const char *message) {
   if (Script_name)
     edit(L, Script_name, message);
   else
-    editImage(L);
+    browseImage(L);
   execv(Argv[0], Argv);
   /* never returns */
 }

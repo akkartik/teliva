@@ -387,17 +387,60 @@ void editImage (lua_State *L, const char *definition) {
 }
 
 
+#define BG(i) (COLOR_PAIR((i)+8))
+#define FG(i) (COLOR_PAIR(i))
 void browseImage (lua_State *L) {
   clear();
   luaL_newmetatable(L, "__teliva_call_graph_depth");
   int cgt = lua_gettop(L);
+  // special-case: we don't instrument the call to main, but it's always 1
+  lua_pushinteger(L, 1);
+  lua_setfield(L, cgt, "main");
+  // segment definitions by depth
+  lua_getglobal(L, "teliva_program");
+  int t = lua_gettop(L);
   int y = 2;
-  for (lua_pushnil(L); lua_next(L, cgt) != 0;) {
-    const char* function_name = lua_tostring(L, -2);
-    int depth = lua_tointeger(L, -1);
-    mvprintw(y, 0, "%s: %d", function_name, depth);
-    ++y;
-    lua_pop(L, 1);  // pop value, leave key on stack for next iteration
+  mvaddstr(y, 0, "data:           ");
+  for (lua_pushnil(L); lua_next(L, t) != 0;) {
+    const char* definition_name = lua_tostring(L, -2);
+    if (strcmp(definition_name, "window") != 0
+        && strcmp(definition_name, "menu") != 0) {
+      lua_getfield(L, cgt, definition_name);
+      if (lua_isnoneornil(L, -1)) {
+        attron(BG(7));
+        addstr(definition_name);
+        attrset(A_NORMAL);
+        addstr("  ");
+      }
+      lua_pop(L, 1);  // lookup result (depth of value)
+    }
+    lua_pop(L, 1);  // value
+    // leave key on stack for next iteration
+  }
+  // window and menu at the end
+  attron(BG(7));  addstr("menu");  attrset(A_NORMAL);  addstr("  ");
+  attron(BG(7));  addstr("window");  attrset(A_NORMAL);  addstr("  ");
+  // functions by level
+  y += 2;
+  mvprintw(y, 0, "functions: ");
+  y++;
+  for (int level = 1; level < 5; ++level) {
+    mvaddstr(y, 0, "                ");
+    for (lua_pushnil(L); lua_next(L, t) != 0;) {
+      const char* definition_name = lua_tostring(L, -2);
+      lua_getfield(L, cgt, definition_name);
+      int depth = lua_tointeger(L, -1);
+      if (depth == level) {
+        attron(BG(7));
+        addstr(definition_name);
+        attrset(A_NORMAL);
+        addstr("  ");
+      }
+      lua_pop(L, 1);  // depth of value
+      lua_pop(L, 1);  // value
+      // leave key on stack for next iteration
+    }
+    y += 2;
   }
   lua_settop(L, 0);
   mvaddstr(LINES-1, 0, "edit what? ");
@@ -409,6 +452,11 @@ void browseImage (lua_State *L) {
 
 extern void cleanup_curses (void);
 void switch_to_editor (lua_State *L, const char *message) {
+  /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */
+  for (int i = 0; i < 8; ++i)
+    init_pair(i, i, -1);
+  for (int i = 0; i < 8; ++i)
+    init_pair(i+8, -1, i);
   if (Script_name)
     edit(L, Script_name, message);
   else

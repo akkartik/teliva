@@ -1035,9 +1035,6 @@ static void initEditor(void) {
 
 void edit(lua_State* L, char* filename, const char* message) {
     initEditor();
-    /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */
-    for (int i = 0; i < 7; ++i)
-      init_pair(i, i, -1);
     editorOpen(filename);
     editorSetStatusMessage(message);
     while(!Quit) {

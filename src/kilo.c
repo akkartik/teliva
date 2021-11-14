@@ -939,11 +939,13 @@ void word_at_cursor(char* out, int capacity) {
   int cidx = E.coloff + E.cx;
   int len = 0;
   memset(out, 0, capacity);
-  /* scan back */
+  /* scan back to first identifier char */
   while (cidx > 0) {
     --cidx;
-    if (!identifier_char(row->chars[cidx]))
+    if (!identifier_char(row->chars[cidx])) {
+      ++cidx;
       break;
+    }
   }
   /* now scan forward */
   for (len = 0; cidx+len < row->size; ++len) {

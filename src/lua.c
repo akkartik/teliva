@@ -6,6 +6,7 @@
 
 
 #include <assert.h>
+#include <ctype.h>
 #include <fcntl.h>
 #include <locale.h>
 #include <ncurses.h>
@@ -387,6 +388,20 @@ void editImage (lua_State *L, const char *definition) {
 }
 
 
+extern void draw_menu_item (const char* key, const char* name);
+static void browserMenu (void) {
+  attrset(A_REVERSE);
+  for (int x = 0; x < COLS; ++x)
+    mvaddch(LINES-1, x, ' ');
+  attrset(A_NORMAL);
+  extern int menu_column;
+  menu_column = 2;
+  draw_menu_item("Esc", "go back");
+  draw_menu_item("Enter", "submit");
+  attrset(A_NORMAL);
+}
+
+
 #define BG(i) (COLOR_PAIR((i)+8))
 #define FG(i) (COLOR_PAIR(i))
 void browseDefinition (const char *definition_name) {
@@ -478,15 +493,36 @@ int browseImage (lua_State *L) {
   }
 
   lua_settop(L, 0);
-  attron(A_REVERSE);
-  mvaddstr(LINES-1, 0, " edit what? (hit just Enter to go back) ");
-  attroff(A_REVERSE);
-  addch(' ');
-  char definition[64] = {0};
-  getnstr(definition, 60);
-  if (*definition != '\0')
-    editImage(L, definition);
-  return *definition != '\0';
+
+  enum {
+    ENTER = 10,
+    CTRL_U = 21,
+    ESC = 27,
+  };
+  char query[CURRENT_DEFINITION_LEN+1] = {0};
+  int qlen = 0;
+  while (1) {
+    browserMenu();
+    mvprintw(LINES-2, 0, "Edit: %s", query);
+    int c = getch();
+    if (c == KEY_BACKSPACE) {
+      if (qlen != 0) query[--qlen] = '\0';
+    } else if (c == ESC) {
+      return 0;
+    } else if (c == ENTER) {
+      editImage(L, query);
+      return 1;
+    } else if (c == CTRL_U) {
+      query[0] = '\0';
+      qlen = 0;
+    } else if (isprint(c)) {
+      if (qlen < CURRENT_DEFINITION_LEN) {
+          query[qlen++] = c;
+          query[qlen] = '\0';
+      }
+    }
+  }
+  /* never gets here */
 }
 
 

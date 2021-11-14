@@ -101,7 +101,7 @@ struct editorConfig {
 
 static struct editorConfig E;
 
-enum KEY_ACTION{
+enum KEY_ACTION {
         KEY_NULL = 0,
         CTRL_C = 3,
         CTRL_D = 4,

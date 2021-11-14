@@ -565,7 +565,7 @@ static int pmain (lua_State *L) {
 }
 
 
-void draw_menu(lua_State *);
+extern void draw_menu (lua_State *);
 
 
 int main (int argc, char **argv) {

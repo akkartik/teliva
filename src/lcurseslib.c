@@ -9,9 +9,8 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
-static void cleanup(void) {
-  if (!isendwin())
-  {
+static void cleanup (void) {
+  if (!isendwin()) {
     wclear(stdscr);
     wrefresh(stdscr);
     endwin();
@@ -20,7 +19,7 @@ static void cleanup(void) {
 
 
 int menu_column = 0;
-static void draw_string_on_menu(const char* s) {
+static void draw_string_on_menu (const char* s) {
   mvaddstr(LINES-1, menu_column, " ");
   ++menu_column;
   mvaddstr(LINES-1, menu_column, s);
@@ -28,7 +27,7 @@ static void draw_string_on_menu(const char* s) {
   mvaddstr(LINES-1, menu_column, " ");
   ++menu_column;
 }
-void draw_menu_item(const char* key, const char* name) {
+void draw_menu_item (const char* key, const char* name) {
   attroff(A_REVERSE);
   draw_string_on_menu(key);
   attron(A_REVERSE);
@@ -113,7 +112,7 @@ static int Pcolor_pair (lua_State *L)
 }
 
 
-extern void switch_to_editor(lua_State *L, const char *message);
+extern void switch_to_editor (lua_State *L, const char *message);
 static int Pgetch (lua_State *L) {
   int c = wgetch(stdscr);
   if (c == ERR)
@@ -296,7 +295,7 @@ static const luaL_Reg curses_window_methods[] =
 };
 
 
-static void register_curses_constant(lua_State *L, const char* name, int val) {
+static void register_curses_constant (lua_State *L, const char* name, int val) {
   lua_pushstring(L, name);
   lua_pushinteger(L, val);
   lua_settable(L, -3);

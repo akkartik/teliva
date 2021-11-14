@@ -672,6 +672,7 @@ static void editorMenu(void) {
     }
     draw_menu_item("^g", "go");
     draw_menu_item("^f", "find");
+    attrset(A_NORMAL);
 }
 
 extern void draw_string_on_menu (const char* s);
@@ -693,9 +694,10 @@ static void editorFindMenu(void) {
     // draw_menu_item("↓", "next");
     attroff(A_REVERSE);
     mvaddstr(LINES-1, menu_column, " ↓ ");
-    menu_column += 5;  // strlen isn't sufficient
+    menu_column += 3;  // strlen isn't sufficient
     attron(A_REVERSE);
     draw_string_on_menu("next");
+    attrset(A_NORMAL);
 }
 
 static void editorGoMenu(void) {
@@ -707,6 +709,7 @@ static void editorGoMenu(void) {
     menu_column = 2;
     draw_menu_item("Esc", "cancel");
     draw_menu_item("Enter", "submit");
+    attrset(A_NORMAL);
 }
 
 static void editorRefreshScreen(void (*menu_func)(void)) {
@@ -762,8 +765,10 @@ static void editorRefreshScreen(void (*menu_func)(void)) {
 
     (*menu_func)();
 
+    attrset(A_REVERSE);
     addstr("    ");
     addstr(E.statusmsg);
+    attrset(A_NORMAL);
 
     /* Put cursor at its current position. Note that the horizontal position
      * at which the cursor is displayed may be different compared to 'E.cx'
@@ -817,8 +822,8 @@ static void editorFind() {
     int saved_coloff = E.coloff, saved_rowoff = E.rowoff;
 
     while(1) {
-        editorSetStatusMessage("Search: %s", query);
         editorRefreshScreen(editorFindMenu);
+        mvprintw(LINES-2, 0, "Find: %s", query);
 
         int c = getch();
         if (c == KEY_BACKSPACE) {
@@ -1008,8 +1013,8 @@ static void editorGo(lua_State* L) {
     qlen = strlen(query);
 
     while(1) {
-        editorSetStatusMessage("Jump to: %s", query);
         editorRefreshScreen(editorGoMenu);
+        mvprintw(LINES-2, 0, "Go to: %s", query);
 
         int c = getch();
         if (c == KEY_BACKSPACE) {

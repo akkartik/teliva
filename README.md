@@ -14,7 +14,7 @@
 An extremely naïve, [brutalist](https://en.wikipedia.org/wiki/Brutalist_architecture)
 attempt at packaging up simple [Lua](http://www.lua.org) ([5.1](https://www.lua.org/manual/5.1))
 apps with almost all the stuff needed to edit and build them. You will need
-Linux, a C compiler and the ncurses library.
+some Unix-like platform[1] with a C compiler and the ncurses library.
 
 Here's how you run one of the example apps (the [Tower of Hanoi](https://en.wikipedia.org/wiki/Tower_of_Hanoi)):
 
@@ -30,6 +30,9 @@ src/teliva hanoi.tlv
 No matter what app you run, you are always guaranteed access to a single
 obvious, consistent way (currently the hotkey `ctrl-e`) to edit its sources.
 And to run the updates after editing.
+
+[1] Tested so far on Linux and Mac OSX; should also work on BSD, WSL on
+Windows, etc.
 
 ## Isn't this just an IDE?
 

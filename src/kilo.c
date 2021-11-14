@@ -954,6 +954,9 @@ static void editorGo(lua_State* L) {
               editorRefreshBuffer();
             }
             return;
+        } else if (c == CTRL_U) {
+          query[0] = '\0';
+          qlen = 0;
         } else if (isprint(c)) {
             if (qlen < CURRENT_DEFINITION_LEN) {
                 query[qlen++] = c;

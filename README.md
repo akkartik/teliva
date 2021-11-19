@@ -80,12 +80,14 @@ behave unexpectedly under Teliva.
 ## Will it run any ncurses program?
 
 Hopefully. ncurses is extremely portable; I don't test on all the
-configurations ncurses supports. In particular, I assume terminals with colors
+configurations ncurses runs on. In particular, I assume terminals with colors
 and UTF-8 support.
 
 ## Will it run any Lua [lcurses](https://github.com/lcurses/lcurses) program?
 
-There will likely be some exceptions that I'll record here as I encounter them:
+It only includes a few bindings from lcurses at the moment, but I plan to port
+everything over. There will likely be some discrepancies that I'll record here
+as I encounter them:
 
 - lcurses has some strange &ldquo;smarts&rdquo; that result in
   `window:getch()` not behaving like the global `curses.getch()`. Teliva is
@@ -97,12 +99,12 @@ Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
 
 ## Coda
 
-In addition to Lua 1.5, Teliva is inspired by:
+In addition to Lua 1.5, Teliva forks or depends on:
 
 * The [ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
   building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
-* An interface to ncurses like the [lcurses](https://github.com/lcurses/lcurses)
-  library. ([Documentation](http://lcurses.github.io/lcurses))
+* The [lcurses](https://github.com/lcurses/lcurses) binding for ncurses.
+  ([Documentation](http://lcurses.github.io/lcurses))
 * The [Kilo](https://github.com/antirez/kilo) text editor. (Read more about it
   in this [fantastic walk-through](https://viewsourcecode.org/snaptoken/kilo).)
 

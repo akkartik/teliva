@@ -360,7 +360,7 @@ char **Argv = NULL;
 extern void edit (lua_State *L, char *filename, const char *message);
 extern void clearEditor (void);
 extern int editorOpen (char *filename);
-inline void edit_buffer (lua_State *L, const char *message) {
+void edit_buffer (lua_State *L, const char *message) {
   edit(L, "teliva_editbuffer", message);
 }
 void editor_refresh_buffer (void) {
@@ -368,7 +368,7 @@ void editor_refresh_buffer (void) {
   editorOpen("teliva_editbuffer");
 }
 extern void resumeEdit (lua_State *L, char *filename);
-inline void editor_resume (lua_State *L) {
+void editor_resume (lua_State *L) {
   resumeEdit(L, "teliva_editbuffer");
 }
 

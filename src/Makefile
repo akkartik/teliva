@@ -28,7 +28,7 @@ CORE_O=	lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \
 	lundump.o lvm.o lzio.o \
 	kilo.o
 LIB_O=	lauxlib.o lbaselib.o lcurseslib.o ldblib.o liolib.o lmathlib.o \
-	loslib.o ltablib.o lstrlib.o loadlib.o linit.o
+	loslib.o ltablib.o lstrlib.o loadlib.o linit.o lcurses/curses.o
 
 LUA_T=	teliva
 LUA_O=	lua.o
@@ -179,5 +179,9 @@ lzio.o: lzio.c lua.h luaconf.h llimits.h lmem.h lstate.h lobject.h ltm.h \
   lzio.h
 print.o: print.c ldebug.h lstate.h lua.h luaconf.h lobject.h llimits.h \
   ltm.h lzio.h lmem.h lopcodes.h lundump.h
+
+lcurses/curses.o: lcurses/curses.c lcurses/window.c lcurses/chstr.c \
+  lcurses/_helpers.c lcurses/compat-5.2.c lcurses/compat-5.2.h \
+  lcurses/strlcpy.c
 
 # (end of Makefile)

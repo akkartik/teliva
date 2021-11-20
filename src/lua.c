@@ -295,11 +295,13 @@ static int handle_image (lua_State *L, char **argv, int n) {
   for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
     const char* key = lua_tostring(L, -2);
     const char* value = lua_tostring(L, -1);
-    dostring(L, value, key);
+    status = dostring(L, value, key);
+    if (status != 0) return report(L, status);
   }
   /* call main() */
   lua_getglobal(L, "main");
-  docall(L, 0, 1);
+  status = docall(L, 0, 1);
+  if (status != 0) return report(L, status);
   return 0;
 }
 

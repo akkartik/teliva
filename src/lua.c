@@ -640,6 +640,21 @@ static int handle_luainit (lua_State *L) {
 }
 
 
+/* roughly equivalent to:
+ *  globalname = require(filename) */
+static int dorequire (lua_State *L, const char *filename, const char *globalname) {
+  int status = luaL_loadfile(L, filename) || docall(L, /*nargs*/0, /*don't clean up stack*/0);
+  if (status != 0) return report(L, status);
+  if (lua_isnil(L, -1)) {
+    endwin();
+    printf("%s didn't return a module\n", filename);
+    exit(1);
+  }
+  lua_setglobal(L, globalname);
+  return 0;
+}
+
+
 struct Smain {
   int argc;
   char **argv;
@@ -657,14 +672,8 @@ static int pmain (lua_State *L) {
   if (argv[0] && argv[0][0]) progname = argv[0];
   lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
   luaL_openlibs(L);  /* open libraries */
-  status = luaL_loadfile(L, "src/lcurses/curses.lua") || docall(L, /*nargs*/0, /*don't clean up stack*/0);
-  if (status != 0) return report(L, status);
-  if (lua_isnil(L, -1)) {
-    endwin();
-    printf("lcurses/curses.lua didn't return a module\n");
-    exit(1);
-  }
-  lua_setglobal(L, "curses");
+  status = dorequire(L, "src/lcurses/curses.lua", "curses");
+  if (status != 0) return 0;
   lua_gc(L, LUA_GCRESTART, 0);
   s->status = handle_luainit(L);
   if (s->status != 0) return 0;

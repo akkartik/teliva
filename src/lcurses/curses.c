@@ -1514,7 +1514,7 @@ after @{curses.initscr} has returned successfully.
 */
 
 LUALIB_API int
-luaopen_curses_c(lua_State *L)
+luaopen_curses(lua_State *L)
 {
 	luaopen_curses_window(L);
 	luaopen_curses_chstr(L);

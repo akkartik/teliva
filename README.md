@@ -85,13 +85,8 @@ and UTF-8 support.
 
 ## Will it run any Lua [lcurses](https://github.com/lcurses/lcurses) program?
 
-It only includes a few bindings from lcurses at the moment, but I plan to port
-everything over. There will likely be some discrepancies that I'll record here
-as I encounter them:
-
-- lcurses has some strange &ldquo;smarts&rdquo; that result in
-  `window:getch()` not behaving like the global `curses.getch()`. Teliva is
-  consistent with the underlying ncurses.
+Some functions in lcurses have [additional smarts](https://github.com/lcurses/lcurses/blob/master/lib/curses.lua).
+Teliva is consistent with the underlying ncurses.
 
 ## What's with the name?
 

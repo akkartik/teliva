@@ -657,7 +657,7 @@ static int pmain (lua_State *L) {
   if (argv[0] && argv[0][0]) progname = argv[0];
   lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
   luaL_openlibs(L);  /* open libraries */
-  status = luaL_loadfile(L, "lcurses/curses.lua") || docall(L, /*nargs*/0, /*don't clean up stack*/0);
+  status = luaL_loadfile(L, "src/lcurses/curses.lua") || docall(L, /*nargs*/0, /*don't clean up stack*/0);
   if (status != 0) return report(L, status);
   if (lua_isnil(L, -1)) {
     endwin();

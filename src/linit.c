@@ -24,6 +24,7 @@ static const luaL_Reg lualibs[] = {
   {LUA_MATHLIBNAME, luaopen_math},
   {LUA_CURSESLIBNAME, luaopen_curses},
   {LUA_SOCKETCORELIBNAME, luaopen_socket_core},
+  {LUA_MIMECORELIBNAME, luaopen_mime_core},
   {LUA_DBLIBNAME, luaopen_debug},
   {NULL, NULL}
 };

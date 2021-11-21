@@ -7,14 +7,6 @@
 -----------------------------------------------------------------------------
 -- Declare module and import dependencies
 -------------------------------------------------------------------------------
-local socket = require("socket")
-local url = require("socket.url")
-local ltn12 = require("ltn12")
-local mime = require("mime")
-local string = require("string")
-local headers = require("socket.headers")
-local base = _G
-local table = require("table")
 socket.http = {}
 local _M = socket.http
 
@@ -79,7 +71,7 @@ end
 -- Extra sources and sinks
 -----------------------------------------------------------------------------
 socket.sourcet["http-chunked"] = function(sock, headers)
-    return base.setmetatable({
+    return setmetatable({
         getfd = function() return sock:getfd() end,
         dirty = function() return sock:dirty() end
     }, {
@@ -87,7 +79,7 @@ socket.sourcet["http-chunked"] = function(sock, headers)
             -- get chunk size, skip extention
             local line, err = sock:receive()
             if err then return nil, err end
-            local size = base.tonumber(string.gsub(line, ";.*", ""), 16)
+            local size = tonumber(string.gsub(line, ";.*", ""), 16)
             if not size then return nil, "invalid chunk size" end
             -- was it the last chunk?
             if size > 0 then
@@ -105,7 +97,7 @@ socket.sourcet["http-chunked"] = function(sock, headers)
 end
 
 socket.sinkt["http-chunked"] = function(sock)
-    return base.setmetatable({
+    return setmetatable({
         getfd = function() return sock:getfd() end,
         dirty = function() return sock:dirty() end
     }, {
@@ -125,7 +117,7 @@ local metat = { __index = {} }
 function _M.open(host, port, create)
     -- create socket with user connect function, or with default
     local c = socket.try(create())
-    local h = base.setmetatable({ c = c }, metat)
+    local h = setmetatable({ c = c }, metat)
     -- create finalized try
     h.try = socket.newtry(function() h:close() end)
     -- set timeout before connecting
@@ -143,7 +135,7 @@ end
 function metat.__index:sendheaders(tosend)
     local canonic = headers.canonic
     local h = "\r\n"
-    for f, v in base.pairs(tosend) do
+    for f, v in pairs(tosend) do
         h = (canonic[f] or f) .. ": " .. v .. "\r\n" .. h
     end
     self.try(self.c:send(h))
@@ -172,7 +164,7 @@ function metat.__index:receivestatusline()
     -- otherwise proceed reading a status line
     status = self.try(self.c:receive("*l", status))
     local code = socket.skip(2, string.find(status, "HTTP/%d*%.%d* (%d%d%d)"))
-    return self.try(base.tonumber(code), status)
+    return self.try(tonumber(code), status)
 end
 
 function metat.__index:receiveheaders()
@@ -182,11 +174,11 @@ end
 function metat.__index:receivebody(headers, sink, step)
     sink = sink or ltn12.sink.null()
     step = step or ltn12.pump.step
-    local length = base.tonumber(headers["content-length"])
+    local length = tonumber(headers["content-length"])
     local t = headers["transfer-encoding"] -- shortcut
     local mode = "default" -- connection close
     if t and t ~= "identity" then mode = "http-chunked"
-    elseif base.tonumber(headers["content-length"]) then mode = "by-length" end
+    elseif tonumber(headers["content-length"]) then mode = "by-length" end
     return self.try(ltn12.pump.all(socket.source(mode, self.c, length),
         sink, step))
 end
@@ -256,7 +248,7 @@ local function adjustheaders(reqt)
         end
     end
     -- override with user headers
-    for i,v in base.pairs(reqt.headers or lower) do
+    for i,v in pairs(reqt.headers or lower) do
         lower[string.lower(i)] = v
     end
     return lower
@@ -272,7 +264,7 @@ local function adjustrequest(reqt)
     -- parse url if provided
     local nreqt = reqt.url and url.parse(reqt.url, default) or {}
     -- explicit components override url
-    for i,v in base.pairs(reqt) do nreqt[i] = v end
+    for i,v in pairs(reqt) do nreqt[i] = v end
     -- default to scheme particulars
     local schemedefs, host, port, method
         = SCHEMES[nreqt.scheme], nreqt.host, nreqt.port, nreqt.method
@@ -280,7 +272,7 @@ local function adjustrequest(reqt)
     if not (port and port ~= '') then nreqt.port = schemedefs.port end
     if not (method and method ~= '') then nreqt.method = 'GET' end
     if not (host and host ~= "") then
-        socket.try(nil, "invalid host '" .. base.tostring(nreqt.host) .. "'")
+        socket.try(nil, "invalid host '" .. tostring(nreqt.host) .. "'")
     end
     -- compute uri if user hasn't overriden
     nreqt.uri = reqt.uri or adjusturi(nreqt)
@@ -412,7 +404,7 @@ local function srequest(u, b)
 end
 
 _M.request = socket.protect(function(reqt, body)
-    if base.type(reqt) == "string" then return srequest(reqt, body)
+    if type(reqt) == "string" then return srequest(reqt, body)
     else return trequest(reqt) end
 end)
 

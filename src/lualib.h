@@ -39,6 +39,9 @@ LUALIB_API int (luaopen_curses) (lua_State *L);
 #define LUA_SOCKETCORELIBNAME	"socket"
 LUALIB_API int (luaopen_socket_core) (lua_State *L);
 
+#define LUA_MIMECORELIBNAME	"mime"
+LUALIB_API int (luaopen_mime_core) (lua_State *L);
+
 #define LUA_DBLIBNAME	"debug"
 LUALIB_API int (luaopen_debug) (lua_State *L);
 

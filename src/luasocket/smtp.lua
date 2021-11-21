@@ -7,16 +7,7 @@
 -----------------------------------------------------------------------------
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
-local base = _G
-local coroutine = require("coroutine")
-local string = require("string")
-local math = require("math")
-local os = require("os")
-local socket = require("socket")
 local tp = require("socket.tp")
-local ltn12 = require("ltn12")
-local headers = require("socket.headers")
-local mime = require("mime")
 
 socket.smtp = {}
 local _M = socket.smtp
@@ -103,8 +94,8 @@ end
 -- send message or throw an exception
 function metat.__index:send(mailt)
     self:mail(mailt.from)
-    if base.type(mailt.rcpt) == "table" then
-        for i,v in base.ipairs(mailt.rcpt) do
+    if type(mailt.rcpt) == "table" then
+        for i,v in ipairs(mailt.rcpt) do
             self:rcpt(v)
         end
     else
@@ -116,7 +107,7 @@ end
 function _M.open(server, port, create)
     local tp = socket.try(tp.connect(server or _M.SERVER, port or _M.PORT,
         _M.TIMEOUT, create))
-    local s = base.setmetatable({tp = tp}, metat)
+    local s = setmetatable({tp = tp}, metat)
     -- make sure tp is closed if we get an exception
     s.try = socket.newtry(function()
         s:close()
@@ -127,7 +118,7 @@ end
 -- convert headers to lowercase
 local function lower_headers(headers)
     local lower = {}
-    for i,v in base.pairs(headers or lower) do
+    for i,v in pairs(headers or lower) do
         lower[string.lower(i)] = v
     end
     return lower
@@ -151,7 +142,7 @@ local send_message
 local function send_headers(tosend)
     local canonic = headers.canonic
     local h = "\r\n"
-    for f,v in base.pairs(tosend) do
+    for f,v in pairs(tosend) do
         h = (canonic[f] or f) .. ': ' .. v .. "\r\n" .. h
     end
     coroutine.yield(h)
@@ -172,7 +163,7 @@ local function send_multipart(mesgt)
         coroutine.yield("\r\n")
     end
     -- send each part separated by a boundary
-    for i, m in base.ipairs(mesgt.body) do
+    for i, m in ipairs(mesgt.body) do
         coroutine.yield("\r\n--" .. bd .. "\r\n")
         send_message(m)
     end
@@ -214,8 +205,8 @@ end
 
 -- message source
 function send_message(mesgt)
-    if base.type(mesgt.body) == "table" then send_multipart(mesgt)
-    elseif base.type(mesgt.body) == "function" then send_source(mesgt)
+    if type(mesgt.body) == "table" then send_multipart(mesgt)
+    elseif type(mesgt.body) == "function" then send_source(mesgt)
     else send_string(mesgt) end
 end
 

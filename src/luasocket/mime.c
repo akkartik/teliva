@@ -171,6 +171,8 @@ LUASOCKET_API int luaopen_mime_core(lua_State *L)
 {
     lua_newtable(L);
     luaL_setfuncs(L, func, 0);
+    lua_pushvalue(L, -1);
+    lua_setglobal(L, "mime");
     /* make version string available to scripts */
     lua_pushstring(L, "_VERSION");
     lua_pushstring(L, MIME_VERSION);

@@ -7,14 +7,7 @@
 -----------------------------------------------------------------------------
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
-local base = _G
-local table = require("table")
-local string = require("string")
-local math = require("math")
-local socket = require("socket")
-local url = require("socket.url")
 local tp = require("socket.tp")
-local ltn12 = require("ltn12")
 socket.ftp = {}
 local _M = socket.ftp
 -----------------------------------------------------------------------------
@@ -36,7 +29,7 @@ local metat = { __index = {} }
 
 function _M.open(server, port, create)
     local tp = socket.try(tp.connect(server, port or PORT, _M.TIMEOUT, create))
-    local f = base.setmetatable({ tp = tp }, metat)
+    local f = setmetatable({ tp = tp }, metat)
     -- make sure everything gets closed in an exception
     f.try = socket.newtry(function() f:close() end)
     return f
@@ -226,7 +219,7 @@ end
 local function override(t)
     if t.url then
         local u = url.parse(t.url)
-        for i,v in base.pairs(t) do
+        for i,v in pairs(t) do
             u[i] = v
         end
         return u
@@ -274,7 +267,7 @@ local function sput(u, body)
 end
 
 _M.put = socket.protect(function(putt, body)
-    if base.type(putt) == "string" then return sput(putt, body)
+    if type(putt) == "string" then return sput(putt, body)
     else return tput(putt) end
 end)
 
@@ -322,7 +315,7 @@ _M.command = socket.protect(function(cmdt)
 end)
 
 _M.get = socket.protect(function(gett)
-    if base.type(gett) == "string" then return sget(gett)
+    if type(gett) == "string" then return sget(gett)
     else return tget(gett) end
 end)
 

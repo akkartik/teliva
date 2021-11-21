@@ -7,11 +7,6 @@
 -----------------------------------------------------------------------------
 -- Declare module and import dependencies
 -----------------------------------------------------------------------------
-local base = _G
-local string = require("string")
-local socket = require("socket")
-local ltn12 = require("ltn12")
-
 socket.tp = {}
 local _M = socket.tp
 
@@ -57,19 +52,19 @@ end
 function metat.__index:check(ok)
     local code, reply = get_reply(self.c)
     if not code then return nil, reply end
-    if base.type(ok) ~= "function" then
-        if base.type(ok) == "table" then
-            for i, v in base.ipairs(ok) do
+    if type(ok) ~= "function" then
+        if type(ok) == "table" then
+            for i, v in ipairs(ok) do
                 if string.find(code, v) then
-                    return base.tonumber(code), reply
+                    return tonumber(code), reply
                 end
             end
             return nil, reply
         else
-            if string.find(code, ok) then return base.tonumber(code), reply
+            if string.find(code, ok) then return tonumber(code), reply
             else return nil, reply end
         end
-    else return ok(base.tonumber(code), reply) end
+    else return ok(tonumber(code), reply) end
 end
 
 function metat.__index:command(cmd, arg)
@@ -128,7 +123,7 @@ function _M.connect(host, port, timeout, create)
         c:close()
         return nil, e
     end
-    return base.setmetatable({c = c}, metat)
+    return setmetatable({c = c}, metat)
 end
 
 return _M

@@ -7,11 +7,6 @@
 -----------------------------------------------------------------------------
 -- Declare module
 -----------------------------------------------------------------------------
-local string = require("string")
-local base = _G
-local table = require("table")
-local socket = require("socket")
-
 socket.url = {}
 local _M = socket.url
 
@@ -43,7 +38,7 @@ end
 -----------------------------------------------------------------------------
 local function make_set(t)
     local s = {}
-    for i,v in base.ipairs(t) do
+    for i,v in ipairs(t) do
         s[t[i]] = 1
     end
     return s
@@ -72,7 +67,7 @@ end
 -----------------------------------------------------------------------------
 function _M.unescape(s)
     return (string.gsub(s, "%%(%x%x)", function(hex)
-        return string.char(base.tonumber(hex, 16))
+        return string.char(tonumber(hex, 16))
     end))
 end
 
@@ -143,7 +138,7 @@ end
 function _M.parse(url, default)
     -- initialize default parameters
     local parsed = {}
-    for i,v in base.pairs(default or parsed) do parsed[i] = v end
+    for i,v in pairs(default or parsed) do parsed[i] = v end
     -- empty url is parsed to nil
     if not url or url == "" then return nil, "invalid url" end
     -- remove whitespace
@@ -211,7 +206,7 @@ function _M.build(parsed)
         if string.find(authority, ":") then -- IPv6?
             authority = "[" .. authority .. "]"
         end
-        if parsed.port then authority = authority .. ":" .. base.tostring(parsed.port) end
+        if parsed.port then authority = authority .. ":" .. tostring(parsed.port) end
         local userinfo = parsed.userinfo
         if parsed.user then
             userinfo = parsed.user
@@ -238,7 +233,7 @@ end
 -----------------------------------------------------------------------------
 function _M.absolute(base_url, relative_url)
     local base_parsed
-    if base.type(base_url) == "table" then
+    if type(base_url) == "table" then
         base_parsed = base_url
         base_url = _M.build(base_parsed)
     else

@@ -3,7 +3,6 @@
 -- LuaSocket toolkit.
 -- Author: Diego Nehab
 -----------------------------------------------------------------------------
-local socket = require("socket")
 socket.headers = {}
 local _M = socket.headers
 

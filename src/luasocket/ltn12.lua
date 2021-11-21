@@ -7,23 +7,13 @@
 -----------------------------------------------------------------------------
 -- Declare module
 -----------------------------------------------------------------------------
-local string = require("string")
-local table = require("table")
-local unpack = unpack or table.unpack
-local base = _G
 local _M = {}
-if module then -- heuristic for exporting a global package table
-    ltn12 = _M
-end
 local filter,source,sink,pump = {},{},{},{}
 
 _M.filter = filter
 _M.source = source
 _M.sink = sink
 _M.pump = pump
-
-local unpack = unpack or table.unpack
-local select = base.select
 
 -- 2048 seems to be better in windows...
 _M.BLOCKSIZE = 2048
@@ -34,7 +24,7 @@ _M._VERSION = "LTN12 1.0.3"
 -----------------------------------------------------------------------------
 -- returns a high level filter that cycles a low-level filter
 function filter.cycle(low, ctx, extra)
-    base.assert(low)
+    assert(low)
     return function(chunk)
         local ret
         ret, ctx = low(ctx, chunk, extra)
@@ -46,7 +36,7 @@ end
 -- (thanks to Wim Couwenberg)
 function filter.chain(...)
     local arg = {...}
-    local n = base.select('#',...)
+    local n = select('#',...)
     local top, index = 1, 1
     local retry = ""
     return function(chunk)
@@ -68,7 +58,7 @@ function filter.chain(...)
                 elseif chunk then
                     if index == n then return chunk
                     else index = index + 1 end
-                else base.error("filter returned inappropriate nil") end
+                else error("filter returned inappropriate nil") end
             end
         end
     end
@@ -106,7 +96,7 @@ end
 
 -- turns a fancy source into a simple source
 function source.simplify(src)
-    base.assert(src)
+    assert(src)
     return function()
         local chunk, err_or_new = src()
         src = err_or_new or src
@@ -130,7 +120,7 @@ end
 
 -- creates table source
 function source.table(t)
-    base.assert('table' == type(t))
+    assert('table' == type(t))
     local i = 0
     return function()
         i = i + 1
@@ -140,7 +130,7 @@ end
 
 -- creates rewindable source
 function source.rewind(src)
-    base.assert(src)
+    assert(src)
     local t = {}
     return function(chunk)
         if not chunk then
@@ -156,13 +146,13 @@ end
 -- chains a source with one or several filter(s)
 function source.chain(src, f, ...)
     if ... then f=filter.chain(f, ...) end
-    base.assert(src and f)
+    assert(src and f)
     local last_in, last_out = "", ""
     local state = "feeding"
     local err
     return function()
         if not last_out then
-            base.error('source is empty!', 2)
+            error('source is empty!', 2)
         end
         while true do
             if state == "feeding" then
@@ -171,7 +161,7 @@ function source.chain(src, f, ...)
                 last_out = f(last_in)
                 if not last_out then
                     if last_in then
-                        base.error('filter returned inappropriate nil')
+                        error('filter returned inappropriate nil')
                     else
                         return nil
                     end
@@ -186,11 +176,11 @@ function source.chain(src, f, ...)
                     if last_in == "" then
                         state = "feeding"
                     else
-                        base.error('filter returned ""')
+                        error('filter returned ""')
                     end
                 elseif not last_out then
                     if last_in then
-                        base.error('filter returned inappropriate nil')
+                        error('filter returned inappropriate nil')
                     else
                         return nil
                     end
@@ -233,7 +223,7 @@ end
 
 -- turns a fancy sink into a simple sink
 function sink.simplify(snk)
-    base.assert(snk)
+    assert(snk)
     return function(chunk, err)
         local ret, err_or_new = snk(chunk, err)
         if not ret then return nil, err_or_new end
@@ -277,7 +267,7 @@ function sink.chain(f, snk, ...)
         snk = table.remove(args, #args)
         f = filter.chain(unpack(args))
     end
-    base.assert(f and snk)
+    assert(f and snk)
     return function(chunk, err)
         if chunk ~= "" then
             local filtered = f(chunk)
@@ -305,7 +295,7 @@ end
 
 -- pumps all data from a source to a sink, using a step function
 function pump.all(src, snk, step)
-    base.assert(src and snk)
+    assert(src and snk)
     step = step or pump.step
     while true do
         local ret, err = step(src, snk)

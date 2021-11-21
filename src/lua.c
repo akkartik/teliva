@@ -674,6 +674,8 @@ static int pmain (lua_State *L) {
   luaL_openlibs(L);  /* open libraries */
   status = dorequire(L, "src/lcurses/curses.lua", "curses");
   if (status != 0) return 0;
+  status = dorequire(L, "src/luasocket/socket.lua", "socket");
+  if (status != 0) return 0;
   lua_gc(L, LUA_GCRESTART, 0);
   s->status = handle_luainit(L);
   if (s->status != 0) return 0;

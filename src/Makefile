@@ -29,7 +29,7 @@ CORE_O=	lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \
 	kilo.o
 LIB_O=	lauxlib.o lbaselib.o menu.o ldblib.o liolib.o lmathlib.o \
 	loslib.o ltablib.o lstrlib.o loadlib.o linit.o \
-	lcurses/curses.o luasocket/socket.a
+	lcurses/curses.o
 
 LUA_T=	teliva
 LUA_O=	lua.o
@@ -50,11 +50,11 @@ o:	$(ALL_O)
 a:	$(ALL_A)
 
 $(LUA_A): $(CORE_O) $(LIB_O)
-	$(AR) $@ $(CORE_O) $(LIB_O)	# DLL needs all object files
+	$(AR) $@ $(CORE_O) $(LIB_O)
 	$(RANLIB) $@
 
-$(LUA_T): $(LUA_O) $(LUA_A)
-	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) $(LIBS)
+$(LUA_T): $(LUA_O) $(LUA_A) luasocket/socket.a
+	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) luasocket/socket.a $(LIBS)
 
 $(LUAC_T): $(LUAC_O) $(LUA_A)
 	$(CC) -o $@ $(MYLDFLAGS) $(LUAC_O) $(LUA_A) $(LIBS)
@@ -122,7 +122,7 @@ solaris:
 	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-ldl"
 
 # list targets that do not create files (but not all makes understand .PHONY)
-.PHONY: all $(PLATS) default o a clean depend echo none
+.PHONY: all $(PLATS) default o a clean depend echo none luasocket/socket.a
 
 # DO NOT DELETE
 

@@ -3,13 +3,6 @@
 -- Author: Diego Nehab
 -----------------------------------------------------------------------------
 
------------------------------------------------------------------------------
--- Declare module and import dependencies
------------------------------------------------------------------------------
-local base = _G
-local string = require("string")
-local math = require("math")
-
 local _M = socket
 
 -----------------------------------------------------------------------------
@@ -29,7 +22,7 @@ function _M.bind(host, port, backlog)
     if not addrinfo then return nil, err end
     local sock, res
     err = "no info on address"
-    for i, alt in base.ipairs(addrinfo) do
+    for i, alt in ipairs(addrinfo) do
         if alt.family == "inet" then
             sock, err = socket.tcp4()
         else
@@ -56,11 +49,11 @@ _M.try = _M.newtry()
 
 function _M.choose(table)
     return function(name, opt1, opt2)
-        if base.type(name) ~= "string" then
+        if type(name) ~= "string" then
             name, opt1, opt2 = "default", name, opt1
         end
         local f = table[name or "nil"]
-        if not f then base.error("unknown key (".. base.tostring(name) ..")", 3)
+        if not f then error("unknown key (".. tostring(name) ..")", 3)
         else return f(opt1, opt2) end
     end
 end
@@ -76,7 +69,7 @@ _M.sinkt = sinkt
 _M.BLOCKSIZE = 2048
 
 sinkt["close-when-done"] = function(sock)
-    return base.setmetatable({
+    return setmetatable({
         getfd = function() return sock:getfd() end,
         dirty = function() return sock:dirty() end
     }, {
@@ -90,7 +83,7 @@ sinkt["close-when-done"] = function(sock)
 end
 
 sinkt["keep-open"] = function(sock)
-    return base.setmetatable({
+    return setmetatable({
         getfd = function() return sock:getfd() end,
         dirty = function() return sock:dirty() end
     }, {
@@ -106,7 +99,7 @@ sinkt["default"] = sinkt["keep-open"]
 _M.sink = _M.choose(sinkt)
 
 sourcet["by-length"] = function(sock, length)
-    return base.setmetatable({
+    return setmetatable({
         getfd = function() return sock:getfd() end,
         dirty = function() return sock:dirty() end
     }, {
@@ -123,7 +116,7 @@ end
 
 sourcet["until-closed"] = function(sock)
     local done
-    return base.setmetatable({
+    return setmetatable({
         getfd = function() return sock:getfd() end,
         dirty = function() return sock:dirty() end
     }, {

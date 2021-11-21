@@ -111,19 +111,12 @@ Pnew_chstr(lua_State *L)
 #define CCR(n, v)				\
 	lua_pushstring(L, n);			\
 	lua_pushinteger(L, v);			\
-	lua_settable(L, lua_upvalueindex(1))
+	lua_settable(L, -3);
 
 #define CC(s)	   CCR(#s, s)
 #define CF(i)	   CCR(LCURSES_STR(LCURSES_SPLICE(KEY_F, i)), KEY_F(i))
 
 /*
-** these values may be fixed only after initialization, so this is
-** called from Pinitscr, after the curses driver is initialized
-**
-** curses table is kept at upvalue position 1, in case the global
-** name is changed by the user or even in the registration phase by
-** the developer
-**
 ** some of these values are not constant so need to register
 ** them directly instead of using a table
 */
@@ -217,8 +210,8 @@ register_curses_constants(lua_State *L)
 ** proper cleanup)
 */
 
-static void
-cleanup(void)
+void
+cleanup_curses(void)
 {
 	if (!isendwin())
 	{
@@ -229,31 +222,12 @@ cleanup(void)
 }
 
 
-/***
-Initialise screen.
-@function initscr
-@treturn window main screen
-@see initscr(3x)
-*/
+extern void stack_dump(lua_State *L);
 static int
-Pinitscr(lua_State *L)
+init_stdscr(lua_State *L)
 {
-	WINDOW *w;
-
-	/* initialize curses */
-	w = initscr();
-
-	/* no longer used, so clean it up */
-	lua_pushstring(L, RIPOFF_TABLE);
-	lua_pushnil(L);
-	lua_settable(L, LUA_REGISTRYINDEX);
-
-	/* failed to initialize */
-	if (w == NULL)
-		return 0;
-
 	/* return stdscr - main window */
-	lc_newwin(L, w);
+	lc_newwin(L, stdscr);
 
 	/* save main window on registry */
 	lua_pushstring(L, STDSCR_REGISTRY);
@@ -261,10 +235,11 @@ Pinitscr(lua_State *L)
 	lua_rawset(L, LUA_REGISTRYINDEX);
 
 	/* setup curses constants - curses.xxx numbers */
+	lua_pushvalue(L, -2);
 	register_curses_constants(L);
 
 	/* install cleanup handler to help in debugging and screen trashing */
-	atexit(cleanup);
+	atexit(cleanup_curses);
 
 	return 1;
 }
@@ -1546,10 +1521,7 @@ luaopen_curses_c(lua_State *L)
 
 	luaL_register(L, "curses", curseslib);
 
-	lua_pushstring(L, "initscr");
-	lua_pushvalue(L, -2);
-	lua_pushcclosure(L, Pinitscr, 1);
-	lua_settable(L, -3);
+	init_stdscr(L);
 
 	return 1;
 }

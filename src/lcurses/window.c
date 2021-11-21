@@ -36,8 +36,6 @@
 @classmod curses.window
 */
 
-//? #include <config.h>
-
 #include "_helpers.c"
 
 #include "chstr.c"
@@ -311,10 +309,13 @@ Refresh the window terminal display from the virtual screen.
 @see curses.doupdate
 @see noutrefresh
 */
+extern void draw_menu (lua_State *L);
 static int
 Wrefresh(lua_State *L)
 {
-	return pushokresult(wrefresh(checkwin(L, 1)));
+	int result = wrefresh(checkwin(L, 1));
+	draw_menu(L);
+	return pushokresult(result);
 }
 
 
@@ -548,6 +549,7 @@ Wgetmaxyx(lua_State *L)
 	WINDOW *w = checkwin(L, 1);
 	int y, x;
 	getmaxyx(w, y, x);
+	--y;  // set aside space for the menu bar
 	lua_pushinteger(L, y);
 	lua_pushinteger(L, x);
 	return 2;
@@ -1302,6 +1304,7 @@ Read a character from the window input.
 @see curses.echo
 @see keypad
 */
+extern void switch_to_editor (lua_State *L, const char *message);
 static int
 Wgetch(lua_State *L)
 {
@@ -1310,6 +1313,11 @@ Wgetch(lua_State *L)
 
 	if (c == ERR)
 		return 0;
+	if (c == 24)  /* ctrl-x */
+		exit(0);
+	if (c == 5)  /* ctrl-e */
+		switch_to_editor(L, "");
+	/* handle other standard menu hotkeys here */
 
 	return pushintresult(c);
 }

@@ -249,30 +249,34 @@ static void dotty (lua_State *L) {
 void stack_dump (lua_State *L) {
   int i;
   int top = lua_gettop(L);
+  int y = 1;
   for (i = 1; i <= top; i++) {  /* repeat for each level */
     int t = lua_type(L, i);
     switch (t) {
 
       case LUA_TSTRING:  /* strings */
-        printf("`%s'", lua_tostring(L, i));
+        mvprintw(y, 30, "`%s'", lua_tostring(L, i));
         break;
 
       case LUA_TBOOLEAN:  /* booleans */
-        printf(lua_toboolean(L, i) ? "true" : "false");
+        mvprintw(y, 30, lua_toboolean(L, i) ? "true" : "false");
         break;
 
       case LUA_TNUMBER:  /* numbers */
-        printf("%g", lua_tonumber(L, i));
+        mvprintw(y, 30, "%g", lua_tonumber(L, i));
         break;
 
       default:  /* other values */
-        printf("%s", lua_typename(L, t));
+        mvprintw(y, 30, "%s", lua_typename(L, t));
         break;
 
     }
-    printf("  ");  /* put a separator */
+    y++;
+    mvprintw(y, 30, "  ");  /* put a separator */
+    y++;
   }
-  printf("\n");  /* end the listing */
+  mvprintw(y, 30, "\n");  /* end the listing */
+  y++;
 }
 
 
@@ -646,13 +650,21 @@ struct Smain {
 static int pmain (lua_State *L) {
   struct Smain *s = (struct Smain *)lua_touserdata(L, 1);
   char **argv = s->argv;
+  int status;
   int image;
   int has_i = 0, has_v = 0, has_e = 0;
   globalL = L;
   if (argv[0] && argv[0][0]) progname = argv[0];
   lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
   luaL_openlibs(L);  /* open libraries */
-  dofile(L, "lcurses/curses.lua");
+  status = luaL_loadfile(L, "lcurses/curses.lua") || docall(L, /*nargs*/0, /*don't clean up stack*/0);
+  if (status != 0) return report(L, status);
+  if (lua_isnil(L, -1)) {
+    endwin();
+    printf("lcurses/curses.lua didn't return a module\n");
+    exit(1);
+  }
+  lua_setglobal(L, "curses");
   lua_gc(L, LUA_GCRESTART, 0);
   s->status = handle_luainit(L);
   if (s->status != 0) return 0;

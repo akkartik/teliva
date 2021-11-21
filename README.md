@@ -104,5 +104,7 @@ In addition to Lua 1.5, Teliva forks or depends on:
   in this [fantastic walk-through](https://viewsourcecode.org/snaptoken/kilo).)
 * The [luasocket](https://w3.impa.br/~diego/software/luasocket) library of
   networking primitives.
+* The [json.lua](https://github.com/rxi/json.lua) library for
+  serializing/deserializing to JSON.
 
 Send all praise to them, brickbats to [me](http://akkartik.name/contact).

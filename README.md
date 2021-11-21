@@ -14,7 +14,7 @@
 An extremely naïve, [brutalist](https://en.wikipedia.org/wiki/Brutalist_architecture)
 attempt at packaging up simple [Lua](http://www.lua.org) ([5.1](https://www.lua.org/manual/5.1))
 apps with almost all the stuff needed to edit and build them. You will need
-some Unix-like platform[1] with a C compiler and the ncurses library.
+some Unix-like platform[1] with a C compiler and the ncurses and openssl libraries.
 
 Here's how you run one of the example apps (the [Tower of Hanoi](https://en.wikipedia.org/wiki/Tower_of_Hanoi)):
 

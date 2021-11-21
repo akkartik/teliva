@@ -12,7 +12,7 @@ CFLAGS= -g -O2 -Wall $(MYCFLAGS)
 AR= ar rc
 RANLIB= ranlib
 RM= rm -f
-LIBS= -lm $(MYLIBS)
+LIBS= -lm -lssl -lcrypto $(MYLIBS)
 
 MYCFLAGS=
 MYLDFLAGS=
@@ -53,8 +53,8 @@ $(LUA_A): $(CORE_O) $(LIB_O)
 	$(AR) $@ $(CORE_O) $(LIB_O)
 	$(RANLIB) $@
 
-$(LUA_T): $(LUA_O) $(LUA_A) luasocket/socket.a luasocket/mime.a
-	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) luasocket/socket.a luasocket/mime.a $(LIBS)
+$(LUA_T): $(LUA_O) $(LUA_A) luasocket/socket.a luasocket/mime.a luasec/ssl.a
+	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) luasocket/socket.a luasocket/mime.a luasec/ssl.a $(LIBS)
 
 $(LUAC_T): $(LUAC_O) $(LUA_A)
 	$(CC) -o $@ $(MYLDFLAGS) $(LUAC_O) $(LUA_A) $(LIBS)
@@ -62,8 +62,12 @@ $(LUAC_T): $(LUAC_O) $(LUA_A)
 luasocket/socket.a luasocket/mime.a:
 	make -C luasocket linux
 
+luasec/ssl.a:
+	make -C luasec linux
+
 clean:
 	make -C luasocket clean
+	make -C luasec clean
 	$(RM) $(ALL_T) $(ALL_O)
 
 depend:
@@ -122,7 +126,7 @@ solaris:
 	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-ldl"
 
 # list targets that do not create files (but not all makes understand .PHONY)
-.PHONY: all $(PLATS) default o a clean depend echo none luasocket/socket.a luasocket/mime.a
+.PHONY: all $(PLATS) default o a clean depend echo none luasocket/socket.a luasocket/mime.a luasec/ssl.a
 
 # DO NOT DELETE
 

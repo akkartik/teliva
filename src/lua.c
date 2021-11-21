@@ -686,6 +686,10 @@ static int pmain (lua_State *L) {
   if (status != 0) return 0;
   status = dorequire(L, "src/luasocket/http.lua", "http");
   if (status != 0) return 0;
+  status = dorequire(L, "src/luasec/ssl.lua", "ssl");
+  if (status != 0) return 0;
+  status = dorequire(L, "src/luasec/https.lua", "https");
+  if (status != 0) return 0;
   status = dorequire(L, "src/json.lua", "json");
   if (status != 0) return 0;
   lua_gc(L, LUA_GCRESTART, 0);

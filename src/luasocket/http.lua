@@ -27,11 +27,7 @@ local SCHEMES = {
     , https = {
         port = 443
         , create = function(t)
-          local https = assert(
-            require("ssl.https"), 'LuaSocket: LuaSec not found')
-          local tcp = assert(
-            https.tcp, 'LuaSocket: Function tcp() not available from LuaSec')
-          return tcp(t) end }}
+            return https.tcp(t) end }}
 
 -- default scheme and port for document retrieval
 local SCHEME = 'http'

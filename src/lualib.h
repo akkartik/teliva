@@ -42,6 +42,18 @@ LUALIB_API int (luaopen_socket_core) (lua_State *L);
 #define LUA_MIMECORELIBNAME	"mime"
 LUALIB_API int (luaopen_mime_core) (lua_State *L);
 
+#define LUA_SSLLIBNAME	"ssl"
+LUALIB_API int (luaopen_ssl_core) (lua_State *L);
+
+#define LUA_SSLCONTEXTLIBNAME	"context"
+LUALIB_API int (luaopen_ssl_context) (lua_State *L);
+
+#define LUA_SSLX509LIBNAME	"x509"
+LUALIB_API int (luaopen_ssl_x509) (lua_State *L);
+
+#define LUA_SSLCONFIGLIBNAME	"config"
+LUALIB_API int (luaopen_ssl_config) (lua_State *L);
+
 #define LUA_DBLIBNAME	"debug"
 LUALIB_API int (luaopen_debug) (lua_State *L);
 

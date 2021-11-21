@@ -28,7 +28,8 @@ CORE_O=	lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \
 	lundump.o lvm.o lzio.o \
 	kilo.o
 LIB_O=	lauxlib.o lbaselib.o lcurseslib.o ldblib.o liolib.o lmathlib.o \
-	loslib.o ltablib.o lstrlib.o loadlib.o linit.o lcurses/curses.o
+	loslib.o ltablib.o lstrlib.o loadlib.o linit.o \
+	lcurses/curses.o luasocket/socket.a
 
 LUA_T=	teliva
 LUA_O=	lua.o
@@ -58,7 +59,11 @@ $(LUA_T): $(LUA_O) $(LUA_A)
 $(LUAC_T): $(LUAC_O) $(LUA_A)
 	$(CC) -o $@ $(MYLDFLAGS) $(LUAC_O) $(LUA_A) $(LIBS)
 
+luasocket/socket.a:
+	make -C luasocket linux
+
 clean:
+	make -C luasocket clean
 	$(RM) $(ALL_T) $(ALL_O)
 
 depend:

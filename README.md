@@ -59,7 +59,8 @@ comprehend and modify the programs they use. If it's not clear how to provide
 that experience for some kinds of Lua programs, I'd rather disable support for
 them in Teliva and let people use regular Lua. Or other platforms!
 
-- This approach doesn't make sense for batch programs, I think.
+- This approach doesn't make sense for batch programs, I think. I also don't
+  yet have a good story for building server programs in this way.
 
 - I don't know how to obtain a simple, shallow graphics stack, so there's no
   support for graphics at the moment.

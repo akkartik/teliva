@@ -100,6 +100,8 @@ In addition to Lua 1.5, Teliva forks or depends on:
   building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
 * The [lcurses](https://github.com/lcurses/lcurses) binding for ncurses.
   ([Documentation](http://lcurses.github.io/lcurses))
+* The [luasocket](https://w3.impa.br/~diego/software/luasocket) library of
+  networking primitives.
 * The [Kilo](https://github.com/antirez/kilo) text editor. (Read more about it
   in this [fantastic walk-through](https://viewsourcecode.org/snaptoken/kilo).)
 

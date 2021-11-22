@@ -22,14 +22,14 @@ piece_glyph = {
 }]==],
   top_player = [==[
 function top_player(current_game)
-  if current_game.players[1].color ~= current_game.orientation then
+  if current_game.players[1].color == "black" then
     return current_game.players[1]
   end
   return current_game.players[2]
 end]==],
   bottom_player = [==[
 function bottom_player(current_game)
-  if current_game.players[1].color == current_game.orientation then
+  if current_game.players[1].color == "white" then
     return current_game.players[1]
   end
   return current_game.players[2]
@@ -41,44 +41,56 @@ function render_player(y, x, player)
   curses.addstr(tostring(player.rating))
 end]==],
   render_square = [==[
-function render_square(current_game, rank, file)
+function render_square(current_game, rank, file, highlighted_squares)
+  -- decide whether to highlight
+  local hl = 0
+  if (rank == highlighted_squares.from.rank and file == highlighted_squares.from.file)
+      or (rank == highlighted_squares.to.rank and file == highlighted_squares.to.file) then
+    hl = 4
+  end
   if (rank+file)%2 == 0 then
     -- light square
-    curses.attrset(curses.color_pair(1))
+    curses.attrset(curses.color_pair(1+hl))
   else
     -- dark square
-    curses.attrset(curses.color_pair(3))
+    curses.attrset(curses.color_pair(3+hl))
   end
-  curses.mvaddstr(rank*3,   file*5, "     ")
-  curses.mvaddstr(rank*3+1, file*5, "     ")
-  curses.mvaddstr(rank*3+2, file*5, "     ")
+  curses.mvaddstr((8 - rank + 1)*3,   file*5, "     ")
+  curses.mvaddstr((8 - rank + 1)*3+1, file*5, "     ")
+  curses.mvaddstr((8 - rank + 1)*3+2, file*5, "     ")
   curses.attrset(curses.A_NORMAL)
 end]==],
   render_fen_rank = [==[
-function render_fen_rank(rank, fen_rank)
+function render_fen_rank(rank, fen_rank, highlighted_squares)
   local file = 1
   for x in fen_rank:gmatch(".") do
     if x:match("%d") then
       file = file + tonumber(x)
     else
+      -- decide whether to highlight
+      local hl = 0
+      if (rank == highlighted_squares.from.rank and file == highlighted_squares.from.file)
+          or (rank == highlighted_squares.to.rank and file == highlighted_squares.to.file) then
+        hl = 4
+      end
       if (rank+file)%2 == 0 then
         if x < 'Z' then
           -- white piece on light square
-          curses.attrset(curses.color_pair(1))
+          curses.attrset(curses.color_pair(1+hl))
         else
           -- black piece on light square
-          curses.attrset(curses.color_pair(2))
+          curses.attrset(curses.color_pair(2+hl))
         end
       else
         if x < 'Z' then
           -- white piece on dark square
-          curses.attrset(curses.color_pair(3))
+          curses.attrset(curses.color_pair(3+hl))
         else
           -- black piece on dark square
-          curses.attrset(curses.color_pair(4))
+          curses.attrset(curses.color_pair(4+hl))
         end
       end
-      curses.mvaddstr(rank*3+1, file*5+2, utf8(piece_glyph[x]))
+      curses.mvaddstr((8 - rank + 1)*3+1, file*5+2, utf8(piece_glyph[x]))
       curses.attrset(curses.A_NORMAL)
       file = file + 1
     end
@@ -86,31 +98,42 @@ function render_fen_rank(rank, fen_rank)
 end]==],
   render_board = [==[
 function render_board(current_game)
+--?   curses.mvaddstr(1, 50, dump(current_game.fen))
+--?   curses.mvaddstr(6, 50, dump(current_game.previously_moved_squares))
   render_player(2, 5, top_player(current_game))
-  local top_rank, bottom_rank, step
-  if current_game.orientation == "white" then
-    top_rank, bottom_rank, step = 1, 8, 1
-  else
-    top_rank, bottom_rank, step = 8, 1, -1
-  end
-  for rank=top_rank,bottom_rank,step do
+  for rank=8,1,-1 do
     for file=1,8 do
-      render_square(current_game, rank, file)
+      render_square(current_game, rank, file, current_game.previously_moved_squares)
     end
-    render_fen_rank(rank, current_game.fen_rank[rank])
+    render_fen_rank(rank, current_game.fen_rank[8-rank+1], current_game.previously_moved_squares)
   end
   render_player(27, 5, bottom_player(current_game))
+end]==],
+  parse_lm = [==[
+function parse_lm(move)
+--?   curses.mvaddstr(4, 50, move)
+  local file1 = string.byte(move:sub(1, 1)) - 96  -- 'a'-1
+  local rank1 = string.byte(move:sub(2, 2)) - 48  -- '0'
+  local file2 = string.byte(move:sub(3, 3)) - 96  -- 'a'-1
+  local rank2 = string.byte(move:sub(4, 4)) - 48  -- '0'
+--?   curses.mvaddstr(5, 50, dump({{rank1, file1}, {rank2, file2}}))
+  return {from={rank=rank1, file=file1}, to={rank=rank2, file=file2}}
 end]==],
   render = [==[
 function render(chunk)
   local o = json.decode(chunk)
   if o.t == "featured" then
     current_game = o.d
+--?     current_game.lm = "__"
+    current_game.previously_moved_squares = {from={rank=0, file=0}, to={rank=0, file=0}}  -- no highlight
   else
     current_game.fen = o.d.fen
     current_game.wc = o.d.wc
     current_game.bc = o.d.bc
-    -- todo: o.d.lm to highlight the last move?
+--?     current_game.lm = o.d.lm
+    current_game.previously_moved_squares = parse_lm(o.d.lm)
+--?     window:nodelay(false)
+--?     curses.mvaddstr(3, 50, "paused")
   end
   current_game.fen_rank = split(current_game.fen, "%w+")
   render_board(current_game)
@@ -126,6 +149,14 @@ function main()
   curses.init_pair(3, -1, 3)
   -- black piece on dark square
   curses.init_pair(4, 0, 3)
+  -- white piece on last-moved light square
+  curses.init_pair(5, -1, 10)
+  -- black piece on last-moved light square
+  curses.init_pair(6, 0, 10)
+  -- white piece on last-moved dark square
+  curses.init_pair(7, -1, 2)
+  -- black piece on last-moved dark square
+  curses.init_pair(8, 0, 2)
   local request = {
     url = "https://lichess.org/api/tv/feed",
     sink = function(chunk, err)

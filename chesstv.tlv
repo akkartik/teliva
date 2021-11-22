@@ -48,7 +48,7 @@ function render_square(current_game, rank, file, highlighted_squares)
       or (rank == highlighted_squares.to.rank and file == highlighted_squares.to.file) then
     hl = 4
   end
-  if (rank+file)%2 == 0 then
+  if (rank+file)%2 == 1 then
     -- light square
     curses.attrset(curses.color_pair(1+hl))
   else
@@ -73,7 +73,7 @@ function render_fen_rank(rank, fen_rank, highlighted_squares)
           or (rank == highlighted_squares.to.rank and file == highlighted_squares.to.file) then
         hl = 4
       end
-      if (rank+file)%2 == 0 then
+      if (rank+file)%2 == 1 then
         if x < 'Z' then
           -- white piece on light square
           curses.attrset(curses.color_pair(1+hl))

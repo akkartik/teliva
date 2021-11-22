@@ -114,6 +114,23 @@ a say in its future direction.
 
 Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
 
+## Other apps to try out
+
+* Conway's Game of Life, as an example of an animated local app.
+  ```
+  src/teliva life.tlv
+  ```
+
+  [video](https://merveilles.town/@akkartik/107277755421024772)
+
+* A viewer for [LiChess TV](https://lichess.org/tv), as an example of
+  animation and accessing a remote API over a network.
+  ```
+  src/teliva chesstv.tlv
+  ```
+
+  [video](https://merveilles.town/@akkartik/107319684018301051)
+
 ## Feedback
 
 [Here.](http://akkartik.name/contact)

@@ -133,4 +133,4 @@ Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
 
 ## Feedback
 
-[Here.](http://akkartik.name/contact)
+[Most appreciated.](http://akkartik.name/contact)

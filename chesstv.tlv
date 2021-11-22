@@ -96,11 +96,18 @@ function render_fen_rank(rank, fen_rank, highlighted_squares)
     end
   end
 end]==],
+  render_time = [==[
+function render_time(y, x, seconds)
+  if seconds == nil then return end
+  curses.mvaddstr(y, x, tostring(math.floor(seconds/60)))
+  curses.addstr(string.format(":%02d", seconds%60))
+end]==],
   render_board = [==[
 function render_board(current_game)
 --?   curses.mvaddstr(1, 50, dump(current_game.fen))
 --?   curses.mvaddstr(6, 50, dump(current_game.previously_moved_squares))
   render_player(2, 5, top_player(current_game))
+  render_time(2, 35, current_game.bc)
   for rank=8,1,-1 do
     for file=1,8 do
       render_square(current_game, rank, file, current_game.previously_moved_squares)
@@ -108,6 +115,7 @@ function render_board(current_game)
     render_fen_rank(rank, current_game.fen_rank[8-rank+1], current_game.previously_moved_squares)
   end
   render_player(27, 5, bottom_player(current_game))
+  render_time(27, 35, current_game.wc)
 end]==],
   parse_lm = [==[
 function parse_lm(move)

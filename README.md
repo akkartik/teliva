@@ -29,7 +29,7 @@ src/teliva hanoi.tlv
 
 No matter what app you run, you are always guaranteed access to a single
 obvious, consistent way (currently the hotkey `ctrl-e`) to edit its sources.
-And to run the updates after editing.
+And to run the updates after editing. ([video](https://archive.org/details/akkartik-2021-11-14))
 
 [1] Tested so far on Linux and Mac OSX; should also work on BSD, WSL on
 Windows, etc.

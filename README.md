@@ -102,13 +102,13 @@ The modules mentioned above are always available, just like standard Lua 5.1
 libraries. They're available in their entirety with one exception:
 
 * Some functions in lcurses have [additional smarts](https://github.com/lcurses/lcurses/blob/master/lib/curses.lua).
-  Teliva is consistent with the underlying ncurses.
+  Teliva is [consistent with the underlying ncurses](https://github.com/akkartik/teliva/blob/main/src/lcurses/curses.lua).
 
 While most things in these modules are currently available, I expect to delete
 capabilities throughout this stack as I discover features that don't fit well
-with the Teliva experience. If you use Teliva, please [introduce yourself](http://akkartik.name/contact)
-to me so that I am aware of your use cases. Anybody who is interested is
-welcome to join me in discussing its future direction.
+with the Teliva experience. If you find Teliva of use, please [introduce yourself](http://akkartik.name/contact)
+to me so that I am aware of your use cases. Anybody who is interested can gain
+a say in its future direction.
 
 ## What's with the name?
 

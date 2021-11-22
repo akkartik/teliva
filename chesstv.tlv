@@ -42,8 +42,12 @@ function render_player(y, x, player)
 end]==],
   render_square = [==[
 function render_square(current_game, rank, file)
-  if (rank+file)%2 == 1 then
-    curses.attrset(curses.A_REVERSE)
+  if (rank+file)%2 == 0 then
+    -- light square
+    curses.attrset(curses.color_pair(1))
+  else
+    -- dark square
+    curses.attrset(curses.color_pair(3))
   end
   curses.mvaddstr(rank*3,   file*5, "     ")
   curses.mvaddstr(rank*3+1, file*5, "     ")
@@ -56,9 +60,23 @@ function render_fen_rank(rank, fen_rank)
   for x in fen_rank:gmatch(".") do
     if x:match("%d") then
       file = file + tonumber(x)
-    else  -- if x ~= nil then
-      if (rank+file)%2 == 1 then
-        curses.attrset(curses.A_REVERSE)
+    else
+      if (rank+file)%2 == 0 then
+        if x < 'Z' then
+          -- white piece on light square
+          curses.attrset(curses.color_pair(1))
+        else
+          -- black piece on light square
+          curses.attrset(curses.color_pair(2))
+        end
+      else
+        if x < 'Z' then
+          -- white piece on dark square
+          curses.attrset(curses.color_pair(3))
+        else
+          -- black piece on dark square
+          curses.attrset(curses.color_pair(4))
+        end
       end
       curses.mvaddstr(rank*3+1, file*5+2, utf8(piece_glyph[x]))
       curses.attrset(curses.A_NORMAL)
@@ -69,7 +87,13 @@ end]==],
   render_board = [==[
 function render_board(current_game)
   render_player(2, 5, top_player(current_game))
-  for rank=1,8 do
+  local top_rank, bottom_rank, step
+  if current_game.orientation == "white" then
+    top_rank, bottom_rank, step = 1, 8, 1
+  else
+    top_rank, bottom_rank, step = 8, 1, -1
+  end
+  for rank=top_rank,bottom_rank,step do
     for file=1,8 do
       render_square(current_game, rank, file)
     end
@@ -94,6 +118,14 @@ function render(chunk)
 end]==],
   main = [==[
 function main()
+  -- white piece on light square (assume light background)
+  curses.init_pair(1, -1, -1)
+  -- black piece on light square
+  curses.init_pair(2, 0, -1)
+  -- white piece on dark square
+  curses.init_pair(3, -1, 3)
+  -- black piece on dark square
+  curses.init_pair(4, 0, 3)
   local request = {
     url = "https://lichess.org/api/tv/feed",
     sink = function(chunk, err)

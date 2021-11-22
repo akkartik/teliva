@@ -1,9 +1,28 @@
 teliva_program = {
+  window = [==[
+window = curses.stdscr()
+-- animation-based app
+window:nodelay(true)
+lines, cols = window:getmaxyx()]==],
+  render = [==[
+function render(chunk)
+  curses.mvaddstr(5, 5, chunk)
+  curses.refresh()
+end]==],
   main = [==[
 function main()
-  local body = http.request("https://example.com")
-  curses.mvaddstr(5, 5, body)
-  curses.refresh()
+  local request = {
+    url = "https://lichess.org/api/tv/feed",
+    sink = function(chunk, err)
+             if chunk then
+               curses.clear()
+               render(chunk)
+               curses.getch()
+             end
+             return 1
+           end,
+  }
+  http.request(request)
   curses.getch()
 end]==],
   dump = [==[

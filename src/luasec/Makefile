@@ -1,4 +1,4 @@
-CMOD=ssl.so
+CMOD=ssl.a
 LMOD=ssl.lua
 
 OBJS= \
@@ -40,8 +40,8 @@ install: $(CMOD) $(LMOD)
 	$(INSTALL) -m644 https.lua $(DESTDIR)$(LUAPATH)/ssl
 
 linux: $(OBJS)
-	$(AR) ssl.a $(OBJS)
-	$(RANLIB) ssl.a
+	$(AR) $(CMOD) $(OBJS)
+	$(RANLIB) $(CMOD)
 
 bsd:
 	@$(MAKE) $(CMOD) MYCFLAGS="$(BSD_CFLAGS)" MYLDFLAGS="$(BSD_LDFLAGS)" EXTRA="$(EXTRA)"

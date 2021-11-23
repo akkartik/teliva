@@ -154,10 +154,10 @@ function init_colors()
   -- colors
   local light_piece = 1
   local dark_piece = 0
-  local light_square = -1
-  local dark_square = 3
-  local light_last_moved_square = 10
-  local dark_last_moved_square = 2
+  local light_square = 252
+  local dark_square = 242
+  local light_last_moved_square = 229
+  local dark_last_moved_square = 226
   -- initialize colors
   curses.init_pair(1, light_piece, light_square)
   curses.init_pair(2, dark_piece, light_square)

@@ -174,7 +174,7 @@ SO_linux=so
 O_linux=o
 CC_linux=gcc
 DEF_linux=-DLUASOCKET_$(DEBUG)
-CFLAGS_linux=-g -O2 -Wall -Wpedantic -Wshadow -Wextra -Wimplicit $(LUAINC:%=-I%) $(DEF)
+CFLAGS_linux=-g -O2 -Wall -Wpedantic -Wshadow -Wextra $(LUAINC:%=-I%) $(DEF)
 LDFLAGS_linux= -o
 LD_linux=ld
 SOCKET_linux=usocket.o

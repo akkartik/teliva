@@ -14,16 +14,16 @@ WARN=-Wall -pedantic
 BSD_CFLAGS=-O2 -fPIC $(WARN) $(INCDIR) $(DEFS)
 BSD_LDFLAGS=-O -fPIC -shared $(LIBDIR)
 
-LNX_CFLAGS=-O2 $(WARN) $(INCDIR) $(DEFS)
-LNX_LDFLAGS=-O
+linux_CFLAGS=-g -O2 $(WARN) $(INCDIR) $(DEFS)
 
-MAC_ENV=env MACOSX_DEPLOYMENT_TARGET='$(MACVER)'
-MAC_CFLAGS=-O2 -fno-common $(WARN) $(INCDIR) $(DEFS)
-MAC_LDFLAGS=-bundle -undefined dynamic_lookup $(LIBDIR)
+macosx_ENV=env MACOSX_DEPLOYMENT_TARGET='$(MACVER)'
+macosx_CFLAGS=-O2 -fno-common $(WARN) $(INCDIR) $(DEFS)
+macosx_LDFLAGS=-bundle -undefined dynamic_lookup $(LIBDIR)
 
 INSTALL  = install
 CC      ?= gcc
 CCLD      ?= $(MYENV) $(CC)
+CFLAGS = $(linux_CFLAGS)
 CFLAGS  += $(MYCFLAGS)
 LDFLAGS += $(MYLDFLAGS)
 AR= ar rc
@@ -47,7 +47,7 @@ bsd:
 	@$(MAKE) $(CMOD) MYCFLAGS="$(BSD_CFLAGS)" MYLDFLAGS="$(BSD_LDFLAGS)" EXTRA="$(EXTRA)"
 
 macosx:
-	@$(MAKE) $(CMOD) MYCFLAGS="$(MAC_CFLAGS)" MYLDFLAGS="$(MAC_LDFLAGS)" MYENV="$(MAC_ENV)" EXTRA="$(EXTRA)"
+	@$(MAKE) $(CMOD) MYCFLAGS="$(macosx_CFLAGS)" MYLDFLAGS="$(macosx_LDFLAGS)" MYENV="$(macosx_ENV)" EXTRA="$(EXTRA)"
 
 clean:
 	rm -f $(OBJS) $(CMOD)

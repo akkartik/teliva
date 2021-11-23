@@ -49,7 +49,7 @@ LDIR_macosx?=share/lua/$(LUAV)
 # /usr/local/include/lua$(LUAV)
 # where lua headers are found for linux builds
 LUAINC_linux_base?=/usr/include
-LUAINC_linux?=$(LUAINC_linux_base)/lua/$(LUAV) $(LUAINC_linux_base)/lua$(LUAV)
+LUAINC_linux?=..
 LUAPREFIX_linux?=/usr/local
 CDIR_linux?=lib/lua/$(LUAV)
 LDIR_linux?=share/lua/$(LUAV)
@@ -174,8 +174,7 @@ SO_linux=so
 O_linux=o
 CC_linux=gcc
 DEF_linux=-DLUASOCKET_$(DEBUG)
-CFLAGS_linux=$(LUAINC:%=-I%) $(DEF) -Wall -Wshadow -Wextra \
-	-Wimplicit -O2 -g
+CFLAGS_linux=-g -O2 -Wall -Wpedantic -Wshadow -Wextra -Wimplicit $(LUAINC:%=-I%) $(DEF)
 LDFLAGS_linux= -o
 LD_linux=ld
 SOCKET_linux=usocket.o
@@ -286,8 +285,8 @@ CC=$(CC_$(PLAT))
 DEF=$(DEF_$(PLAT))
 AR= ar rc
 RANLIB= ranlib
-CFLAGS=$(MYCFLAGS) $(CFLAGS_$(PLAT))
-LDFLAGS=$(MYLDFLAGS) $(LDFLAGS_$(PLAT))
+CFLAGS=$(CFLAGS_$(PLAT)) $(MYCFLAGS)
+LDFLAGS=$(LDFLAGS_$(PLAT)) $(MYLDFLAGS)
 LD=$(LD_$(PLAT))
 LUAINC= $(LUAINC_$(PLAT))
 LUALIB= $(LUALIB_$(PLAT))

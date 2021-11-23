@@ -160,9 +160,9 @@ char *Lua_HL_keywords[] = {
 struct editorSyntax HLDB[] = {
     {
         Lua_HL_keywords,
-        "--",  // line comment
-        "--[[",  // multiline comment start
-        "--]]"  // multline comment stop
+        "--",  /* line comment */
+        "--[[",  /* multiline comment start */
+        "--]]"  /* multline comment stop */
     }
 };
 
@@ -190,7 +190,6 @@ static int editorRowHasOpenComment(erow *row, char *mce) {
 /* Set every byte of row->hl (that corresponds to every character in the line)
  * to the right syntax highlight type (HL_* defines). */
 static void editorUpdateSyntax(erow *row) {
-//?     mvprintw(row->idx, 0, "i:%d|", row->idx);
     row->hl = realloc(row->hl,row->rsize);
     memset(row->hl,HL_NORMAL,row->rsize);
 
@@ -216,17 +215,14 @@ static void editorUpdateSyntax(erow *row) {
 
     /* If the previous line has an open comment, this line starts
      * with an open comment state. */
-    if (row->idx > 0 && editorRowHasOpenComment(&E.row[row->idx-1], mce)) {
-//?         addstr("continue multiline comment|");
+    if (row->idx > 0 && editorRowHasOpenComment(&E.row[row->idx-1], mce))
         in_comment = 1;
-    }
 
     while(*p) {
         /* Handle multi line comments. */
         if (in_comment) {
             row->hl[i] = HL_MLCOMMENT;
             if (starts_with(p, mce)) {
-//?                 addstr("mce|");
                 memset(&row->hl[i],HL_MLCOMMENT, strlen(mce));
                 p += strlen(mce); i += strlen(mce);
                 in_comment = 0;
@@ -238,7 +234,6 @@ static void editorUpdateSyntax(erow *row) {
                 continue;
             }
         } else if (starts_with(p, mcs)) {
-//?             addstr("mcs|");
             memset(&row->hl[i],HL_MLCOMMENT, strlen(mcs));
             p += strlen(mcs); i += strlen(mcs);
             in_comment = 1;
@@ -686,16 +681,16 @@ static void editorFindMenu(void) {
     draw_menu_item("Esc", "cancel");
     draw_menu_item("Enter", "submit");
     draw_menu_item("^u", "clear");
-    // draw_menu_item("←/↑", "previous");
+    /* draw_menu_item("←/↑", "previous"); */
     attroff(A_REVERSE);
     mvaddstr(LINES-1, menu_column, " ←/↑ ");
-    menu_column += 5;  // strlen isn't sufficient
+    menu_column += 5;  /* strlen isn't sufficient */
     attron(A_REVERSE);
     draw_string_on_menu("previous");
-    // draw_menu_item("↓/→", "next");
+    /* draw_menu_item("↓/→", "next"); */
     attroff(A_REVERSE);
     mvaddstr(LINES-1, menu_column, " ↓/→ ");
-    menu_column += 5;  // strlen isn't sufficient
+    menu_column += 5;  /* strlen isn't sufficient */
     attron(A_REVERSE);
     draw_string_on_menu("next");
     attrset(A_NORMAL);

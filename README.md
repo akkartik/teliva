@@ -69,10 +69,10 @@ them in Teliva and let people use regular Lua. Or other platforms!
   they have access to a (color, UTF-8) text-mode window for printing text to,
   and a keyboard for reading unbuffered keystrokes from.
 
-- Teliva doesn't use files, so the `require` keyword no longer makes sense.
-  You get some libraries preloaded (see below). Beyond those, apps should
-  include all Lua code they want to use. There's no affordance for adding
-  native (non-Lua) libraries.
+- Teliva doesn't use files for source code, so the `require` keyword no longer
+  makes sense. You get some libraries preloaded (see below). Beyond those,
+  apps should include all Lua code they want to use. There's no affordance for
+  adding native (non-Lua) libraries.
 
 - I want to provide sandboxed access to system resources (file system,
   network, etc.) which will likely create incompatibilities with the standard

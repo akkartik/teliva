@@ -1304,7 +1304,7 @@ Read a character from the window input.
 @see curses.echo
 @see keypad
 */
-extern void switch_to_editor (lua_State *L, const char *message);
+extern void switch_to_editor (lua_State *L);
 static int
 Wgetch(lua_State *L)
 {
@@ -1316,7 +1316,7 @@ Wgetch(lua_State *L)
 	if (c == 24)  /* ctrl-x */
 		exit(0);
 	if (c == 5)  /* ctrl-e */
-		switch_to_editor(L, "");
+		switch_to_editor(L);
 	/* handle other standard menu hotkeys here */
 
 	return pushintresult(c);

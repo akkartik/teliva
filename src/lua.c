@@ -326,7 +326,7 @@ void save_to_current_definition_and_editor_buffer (lua_State *L, const char *def
 }
 
 
-static void read_contents (lua_State *L, char *filename, char *out) {
+static void read_contents (char *filename, char *out) {
     int infd = open(filename, O_RDONLY);
     read(infd, out, 8190);  /* TODO: handle overly large file */
     close(infd);
@@ -373,15 +373,12 @@ void editor_refresh_buffer (void) {
   clearEditor();
   editorOpen("teliva_editbuffer");
 }
-extern void resumeEdit (lua_State *L, char *filename);
-void editor_resume (lua_State *L) {
-  resumeEdit(L, "teliva_editbuffer");
-}
+extern void resumeEdit (lua_State *L);
 
 
 int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
   char new_contents[8192] = {0};
-  read_contents(L, "teliva_editbuffer", new_contents);
+  read_contents("teliva_editbuffer", new_contents);
   update_definition(L, Current_definition, new_contents);
   save_image(L);
   /* reload binding */
@@ -402,7 +399,7 @@ void edit_image (lua_State *L, const char *definition) {
       break;
     Previous_error = lua_tostring(L, -1);
     if (Previous_error == NULL) Previous_error = "(error object is not a string)";
-    editor_resume(L);
+    resumeEdit(L);
     lua_pop(L, 1);
   }
 }
@@ -550,7 +547,7 @@ int browse_image (lua_State *L) {
 
 
 extern void cleanup_curses (void);
-void switch_to_editor (lua_State *L, const char *message) {
+void switch_to_editor (lua_State *L) {
   /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */
   for (int i = 0; i < 8; ++i)
     init_pair(i, i, -1);
@@ -581,13 +578,13 @@ static int collectargs (char **argv, int *pi, int *pv, int *pe) {
         return i;
       case 'i':
         notail(argv[i]);
-        *pi = 1;  /* go through */
+        *pi = 1;  /* fall through */
       case 'v':
         notail(argv[i]);
         *pv = 1;
         break;
       case 'e':
-        *pe = 1;  /* go through */
+        *pe = 1;  /* fall through */
       case 'l':
         if (argv[i][2] == '\0') {
           i++;

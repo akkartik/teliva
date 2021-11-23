@@ -1,7 +1,7 @@
 /*--------------------------------------------------------------------------
  * LuaSec 1.0.2
  *
- * Copyright (C) 2014-2021 Kim Alvefur, Paul Aurich, Tobias Markmann, 
+ * Copyright (C) 2014-2021 Kim Alvefur, Paul Aurich, Tobias Markmann,
  *                         Matthew Wild.
  * Copyright (C) 2006-2021 Bruno Silvestre.
  *
@@ -120,7 +120,7 @@ static const SSL_METHOD* str2method(const char *method, int *vmin, int *vmax)
  */
 static int set_verify_flag(const char *str, int *flag)
 {
-  if (!strcmp(str, "none")) { 
+  if (!strcmp(str, "none")) {
     *flag |= SSL_VERIFY_NONE;
     return 1;
   }
@@ -132,7 +132,7 @@ static int set_verify_flag(const char *str, int *flag)
     *flag |= SSL_VERIFY_CLIENT_ONCE;
     return 1;
   }
-  if (!strcmp(str, "fail_if_no_peer_cert")) { 
+  if (!strcmp(str, "fail_if_no_peer_cert")) {
     *flag |= SSL_VERIFY_FAIL_IF_NO_PEER_CERT;
     return 1;
   }
@@ -153,7 +153,7 @@ static int passwd_cb(char *buf, int size, int flag, void *udata)
        lua_pop(L, 1);  /* Remove the result from the stack */
        return 0;
     }
-    /* fallback */
+    /* fall through */
   case LUA_TSTRING:
     strncpy(buf, lua_tostring(L, -1), size);
     lua_pop(L, 1);  /* Remove the result from the stack */
@@ -398,8 +398,8 @@ static int load_key(lua_State *L)
   case LUA_TFUNCTION:
     SSL_CTX_set_default_passwd_cb(ctx, passwd_cb);
     SSL_CTX_set_default_passwd_cb_userdata(ctx, L);
-    /* fallback */
-  case LUA_TNIL: 
+    /* fall through */
+  case LUA_TNIL:
     if (SSL_CTX_use_PrivateKey_file(ctx, filename, SSL_FILETYPE_PEM) == 1)
       lua_pushboolean(L, 1);
     else {
@@ -543,7 +543,7 @@ static int set_mode(lua_State *L)
   lua_pushboolean(L, 0);
   lua_pushfstring(L, "invalid mode (%s)", str);
   return 1;
-}   
+}
 
 /**
  * Configure DH parameters.
@@ -677,7 +677,7 @@ static int alpn_cb(SSL *s, const unsigned char **out, unsigned char *outlen,
   if (ret != OPENSSL_NPN_NEGOTIATED) {
     lua_pop(L, 2);
     return SSL_TLSEXT_ERR_NOACK;
-  } 
+  }
 
   // Copy the result because lua_pop() can collect the pointer
   ctx->alpn = malloc(*outlen);

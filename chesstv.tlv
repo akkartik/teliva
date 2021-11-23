@@ -7,12 +7,14 @@ lines, cols = window:getmaxyx()]==],
   current_game = [==[current_game = {}]==],
   piece_glyph = [==[
 piece_glyph = {
-  K = 0x2654,
-  Q = 0x2655,
-  R = 0x2656,
-  B = 0x2657,
-  N = 0x2658,
-  P = 0x2659,
+  -- for legibility, white pieces also use unicode glyphs for black pieces
+  -- we rely on colors to distinguish them
+  K = 0x265a,
+  Q = 0x265b,
+  R = 0x265c,
+  B = 0x265d,
+  N = 0x265e,
+  P = 0x265f,
   k = 0x265a,
   q = 0x265b,
   r = 0x265c,
@@ -150,11 +152,11 @@ end]==],
   main = [==[
 function main()
   -- white piece on light square (assume light background)
-  curses.init_pair(1, -1, -1)
+  curses.init_pair(1, 1, -1)
   -- black piece on light square
   curses.init_pair(2, 0, -1)
   -- white piece on dark square
-  curses.init_pair(3, -1, 3)
+  curses.init_pair(3, 1, 3)
   -- black piece on dark square
   curses.init_pair(4, 0, 3)
   -- white piece on last-moved light square

@@ -29,9 +29,9 @@ LDFLAGS += $(MYLDFLAGS)
 AR= ar rc
 RANLIB= ranlib
 
-.PHONY: all clean install none linux bsd macosx luasocket
+.PHONY: all clean install none linux bsd macosx
 
-all: luasocket
+all:
 
 install: $(CMOD) $(LMOD)
 	$(INSTALL) -d $(DESTDIR)$(LUAPATH)/ssl $(DESTDIR)$(LUACPATH)
@@ -49,14 +49,7 @@ bsd:
 macosx:
 	@$(MAKE) $(CMOD) MYCFLAGS="$(MAC_CFLAGS)" MYLDFLAGS="$(MAC_LDFLAGS)" MYENV="$(MAC_ENV)" EXTRA="$(EXTRA)"
 
-luasocket:
-	@cd luasocket && $(MAKE)
-
-$(CMOD): $(EXTRA) $(OBJS)
-	$(CCLD) $(LDFLAGS) -o $@ $(OBJS) luasocket/libluasocket.a -lssl -lcrypto
-
 clean:
-	cd luasocket && $(MAKE) clean
 	rm -f $(OBJS) $(CMOD)
 
 options.o: options.h options.c

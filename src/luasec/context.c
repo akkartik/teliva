@@ -43,7 +43,7 @@ static p_context checkctx(lua_State *L, int idx)
 
 static p_context testctx(lua_State *L, int idx)
 {
-  return (p_context)luaL_testudata(L, idx, "SSL:Context");
+  return (p_context)luasocket_testudata(L, idx, "SSL:Context");
 }
 
 /**
@@ -886,25 +886,6 @@ int lsec_getmode(lua_State *L, int idx)
   p_context ctx = checkctx(L, idx);
   return ctx->mode;
 }
-
-/*-- Compat - Lua 5.1 --*/
-#if (LUA_VERSION_NUM == 501)
-
-void *lsec_testudata (lua_State *L, int ud, const char *tname) {
-  void *p = lua_touserdata(L, ud);
-  if (p != NULL) {  /* value is a userdata? */
-    if (lua_getmetatable(L, ud)) {  /* does it have a metatable? */
-      luaL_getmetatable(L, tname);  /* get correct metatable */
-      if (!lua_rawequal(L, -1, -2))  /* not the same? */
-        p = NULL;  /* value is a userdata with wrong metatable */
-      lua_pop(L, 2);  /* remove both metatables */
-      return p;
-    }
-  }
-  return NULL;  /* value is not a userdata with a metatable */
-}
-
-#endif
 
 /*------------------------------ Initialization ------------------------------*/
 

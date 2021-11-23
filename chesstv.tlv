@@ -151,22 +151,22 @@ function render(chunk)
 end]==],
   init_colors = [==[
 function init_colors()
-  -- white piece on light square (assume light background)
-  curses.init_pair(1, 1, -1)
-  -- black piece on light square
-  curses.init_pair(2, 0, -1)
-  -- white piece on dark square
-  curses.init_pair(3, 1, 3)
-  -- black piece on dark square
-  curses.init_pair(4, 0, 3)
-  -- white piece on last-moved light square
-  curses.init_pair(5, 1, 10)
-  -- black piece on last-moved light square
-  curses.init_pair(6, 0, 10)
-  -- white piece on last-moved dark square
-  curses.init_pair(7, 1, 2)
-  -- black piece on last-moved dark square
-  curses.init_pair(8, 0, 2)
+  -- colors
+  local light_piece = 1
+  local dark_piece = 0
+  local light_square = -1
+  local dark_square = 3
+  local light_last_moved_square = 10
+  local dark_last_moved_square = 2
+  -- initialize colors
+  curses.init_pair(1, light_piece, light_square)
+  curses.init_pair(2, dark_piece, light_square)
+  curses.init_pair(3, light_piece, dark_square)
+  curses.init_pair(4, dark_piece, dark_square)
+  curses.init_pair(5, light_piece, light_last_moved_square)
+  curses.init_pair(6, dark_piece, light_last_moved_square)
+  curses.init_pair(7, light_piece, dark_last_moved_square)
+  curses.init_pair(8, dark_piece, dark_last_moved_square)
 end]==],
   main = [==[
 function main()

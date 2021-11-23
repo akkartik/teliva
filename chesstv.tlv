@@ -149,8 +149,8 @@ function render(chunk)
   render_board(current_game)
   curses.refresh()
 end]==],
-  main = [==[
-function main()
+  init_colors = [==[
+function init_colors()
   -- white piece on light square (assume light background)
   curses.init_pair(1, 1, -1)
   -- black piece on light square
@@ -167,6 +167,10 @@ function main()
   curses.init_pair(7, 1, 2)
   -- black piece on last-moved dark square
   curses.init_pair(8, 0, 2)
+end]==],
+  main = [==[
+function main()
+  init_colors()
   local request = {
     url = "https://lichess.org/api/tv/feed",
     sink = function(chunk, err)

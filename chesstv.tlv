@@ -160,11 +160,11 @@ function main()
   -- black piece on dark square
   curses.init_pair(4, 0, 3)
   -- white piece on last-moved light square
-  curses.init_pair(5, -1, 10)
+  curses.init_pair(5, 1, 10)
   -- black piece on last-moved light square
   curses.init_pair(6, 0, 10)
   -- white piece on last-moved dark square
-  curses.init_pair(7, -1, 2)
+  curses.init_pair(7, 1, 2)
   -- black piece on last-moved dark square
   curses.init_pair(8, 0, 2)
   local request = {

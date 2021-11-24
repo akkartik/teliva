@@ -11,20 +11,19 @@ OBJS= \
 
 WARN=-Wall -Wpedantic -Wshadow
 
-BSD_CFLAGS=-O2 -fPIC $(WARN) $(INCDIR) $(DEFS)
-BSD_LDFLAGS=-O -fPIC -shared $(LIBDIR)
+BSD_CFLAGS=-O2 -fPIC $(WARN) $(DEFS)
+BSD_LDFLAGS=-O -fPIC -shared
 
-linux_CFLAGS=-g -O2 $(WARN) $(INCDIR) $(DEFS)
+linux_CFLAGS=-g -O2 $(WARN) $(DEFS)
 
 macosx_ENV=env MACOSX_DEPLOYMENT_TARGET='$(MACVER)'
-macosx_CFLAGS=-O2 -fno-common $(WARN) $(INCDIR) $(DEFS)
-macosx_LDFLAGS=-bundle -undefined dynamic_lookup $(LIBDIR)
+macosx_CFLAGS=-O2 -fno-common $(WARN) $(DEFS)
+macosx_LDFLAGS=-bundle -undefined dynamic_lookup
 
 INSTALL  = install
 CC      ?= gcc
 CCLD      ?= $(MYENV) $(CC)
-CFLAGS = $(linux_CFLAGS)
-CFLAGS  += $(MYCFLAGS)
+CFLAGS  = $(MYCFLAGS)
 LDFLAGS += $(MYLDFLAGS)
 AR= ar rc
 RANLIB= ranlib
@@ -39,15 +38,18 @@ install: $(CMOD) $(LMOD)
 	$(INSTALL) -m644 $(LMOD) $(DESTDIR)$(LUAPATH)
 	$(INSTALL) -m644 https.lua $(DESTDIR)$(LUAPATH)/ssl
 
-linux: $(OBJS)
-	$(AR) $(CMOD) $(OBJS)
-	$(RANLIB) $(CMOD)
+linux:
+	@$(MAKE) $(CMOD) MYCFLAGS="$(linux_CFLAGS)" MYLDFLAGS="$(linux_LDFLAGS)" EXTRA="$(EXTRA)"
 
 bsd:
 	@$(MAKE) $(CMOD) MYCFLAGS="$(BSD_CFLAGS)" MYLDFLAGS="$(BSD_LDFLAGS)" EXTRA="$(EXTRA)"
 
 macosx:
 	@$(MAKE) $(CMOD) MYCFLAGS="$(macosx_CFLAGS)" MYLDFLAGS="$(macosx_LDFLAGS)" MYENV="$(macosx_ENV)" EXTRA="$(EXTRA)"
+
+$(CMOD): $(OBJS)
+	$(AR) $(CMOD) $(OBJS)
+	$(RANLIB) $(CMOD)
 
 clean:
 	rm -f $(OBJS) $(CMOD)

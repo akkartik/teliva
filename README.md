@@ -71,16 +71,15 @@ them in Teliva and let people use regular Lua. Or other platforms!
 
 - Teliva doesn't use files for source code, so the `require` keyword no longer
   makes sense. You get some libraries preloaded (see below). Beyond those,
-  apps should include all Lua code they want to use. There's no affordance for
-  adding native (non-Lua) libraries.
+  apps should include all Lua code they want to use.
 
 - I want to provide sandboxed access to system resources (file system,
   network, etc.) which will likely create incompatibilities with the standard
   library. I'm disinclined to try to &lsquo;improve&rsquo; on Lua syntax,
   however. It's not my favorite, but it's good enough.
 
-- To create a well-behaved sandbox, Teliva includes a small set of native
-  libraries and doesn't support adding more native libraries.
+- To create a well-behaved sandbox, Teliva doesn't support adding libraries
+  with C bindings beyond the few it starts up with.
 
 Teliva is not tested much at all yet. This is my first time programming either
 in Lua or within Lua. So bug reports are most appreciated if Lua programs

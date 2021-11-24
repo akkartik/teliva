@@ -326,8 +326,8 @@ void save_to_current_definition_and_editor_buffer (lua_State *L, const char *def
 }
 
 
-static void read_contents (char *filename, char *out) {
-  FILE *in = fopen(filename, "r");
+static void read_editor_buffer (char *out) {
+  FILE *in = fopen("teliva_editbuffer", "r");
   fread(out, 8190, 1, in);  /* TODO: handle overly large file */
   fclose(in);
 }
@@ -378,7 +378,7 @@ extern void resumeEdit (lua_State *L);
 
 int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
   char new_contents[8192] = {0};
-  read_contents("teliva_editbuffer", new_contents);
+  read_editor_buffer(new_contents);
   update_definition(L, Current_definition, new_contents);
   save_image(L);
   /* reload binding */

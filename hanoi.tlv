@@ -1,4 +1,5 @@
 teliva_program = {
+  {
     render = [==[
 function render(window)
   window:clear()
@@ -10,16 +11,25 @@ function render(window)
   end
   curses.refresh()
 end]==],
+  },
+  {
     lines = [==[
 function lines(window)
   local lines, cols = window:getmaxyx()
   return lines
 end]==],
+  },
+  {
     pop = [==[
 function pop(array)
   return table.remove(array)
 end]==],
-    window = [==[window = curses.stdscr()]==],
+  },
+  {
+    window = [==[
+window = curses.stdscr()]==],
+  },
+  {
     render_tower = [==[
 function render_tower(window, line, col, tower_index, tower)
   window:attron(curses.A_BOLD)
@@ -39,7 +49,12 @@ function render_tower(window, line, col, tower_index, tower)
     line = line - 1
   end
 end]==],
-    tower = [==[tower = {{6, 5, 4, 3, 2}, {}, {}}]==],
+  },
+  {
+    tower = [==[
+tower = {{6, 5, 4, 3, 2}, {}, {}}]==],
+  },
+  {
     render_disk = [==[
 function render_disk(window, line, col, size)
   col = col-size+1
@@ -50,6 +65,8 @@ function render_disk(window, line, col, size)
     col = col+2
   end
 end]==],
+  },
+  {
     main = [==[
 function main()
   for i=1,7 do
@@ -62,6 +79,8 @@ function main()
   end
 end
 ]==],
+  },
+  {
     len = [==[
 function len(array)
   local result = 0
@@ -70,6 +89,8 @@ function len(array)
   end
   return result
 end]==],
+  },
+  {
     update = [==[
 function update(window)
   window:mvaddstr(lines(window)-2, 5, "tower to remove top disk from? ")
@@ -78,14 +99,19 @@ function update(window)
   local to = curses.getch() - 96
   make_move(from, to)
 end]==],
+  },
+  {
     make_move = [==[
 function make_move(from, to)
   local disk = pop(tower[from])
   table.insert(tower[to], disk)
 end]==],
+  },
+  {
     cols = [==[
 function cols(window)
   local lines, cols = window:getmaxyx()
   return cols
 end]==],
+  },
 }

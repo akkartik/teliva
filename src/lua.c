@@ -280,27 +280,64 @@ void stack_dump (lua_State *L) {
 }
 
 
+static int binding_exists (lua_State *L, const char *name) {
+  int result = 0;
+  lua_getglobal(L, name);
+  result = !lua_isnil(L, -1);
+  lua_pop(L, 1);
+  return result;
+}
+
+
+static const char *look_up_definition (lua_State *L, const char *name) {
+  lua_getglobal(L, "teliva_program");
+  int history_array = lua_gettop(L);
+  /* iterate over mutations in teliva_program history in reverse order */
+  int history_array_size = luaL_getn(L, history_array);
+  for (int i = history_array_size; i > 0; --i) {
+    lua_rawgeti(L, history_array, i);
+    int table = lua_gettop(L);
+    /* iterate over bindings */
+    /* really we expect only one */
+    for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
+      const char* key = lua_tostring(L, -2);
+      if (strcmp(key, name) == 0)
+        return lua_tostring(L, -1);
+    }
+  }
+  lua_pop(L, 1);
+  return NULL;
+}
+
+
 char *Image_name = NULL;
 static int handle_image (lua_State *L, char **argv, int n) {
   int status;
   int narg = getargs(L, argv, n);  /* collect arguments */
   lua_setglobal(L, "arg");
-  /* parse and load file contents (teliva_program table) */
+  /* parse and load file contents (teliva_program array) */
   Image_name = argv[n];
   status = luaL_loadfile(L, Image_name);
   lua_insert(L, -(narg+1));
-  if (status != 0) {
-    return status;
-  }
+  if (status != 0) return status;
   status = docall(L, narg, 0);
   lua_getglobal(L, "teliva_program");
-  int table = lua_gettop(L);
-  /* parse and load each binding in teliva_program */
-  for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
-    const char* key = lua_tostring(L, -2);
-    const char* value = lua_tostring(L, -1);
-    status = dostring(L, value, key);
-    if (status != 0) return report(L, status);
+  int history_array = lua_gettop(L);
+  /* iterate over mutations in teliva_program history in reverse order */
+  int history_array_size = luaL_getn(L, history_array);
+  for (int i = history_array_size; i > 0; --i) {
+    lua_rawgeti(L, history_array, i);
+    int table = lua_gettop(L);
+    /* iterate over bindings */
+    /* really we expect only one */
+    for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
+      const char* key = lua_tostring(L, -2);
+      if (binding_exists(L, key))
+        continue;  // most recent binding trumps older ones
+      const char* value = lua_tostring(L, -1);
+      status = dostring(L, value, key);
+      if (status != 0) return report(L, status);
+    }
   }
   /* call main() */
   lua_getglobal(L, "main");
@@ -314,10 +351,7 @@ static int handle_image (lua_State *L, char **argv, int n) {
 char Current_definition[CURRENT_DEFINITION_LEN+1] = {0};
 void save_to_current_definition_and_editor_buffer (lua_State *L, const char *definition) {
   strncpy(Current_definition, definition, CURRENT_DEFINITION_LEN);
-  lua_getglobal(L, "teliva_program");
-  lua_getfield(L, -1, Current_definition);
-  const char *contents = lua_tostring(L, -1);
-  lua_pop(L, 1);
+  const char *contents = look_up_definition(L, Current_definition);
   FILE *out = fopen("teliva_editbuffer", "w");
   if (contents != NULL)
     fprintf(out, "%s", contents);
@@ -333,27 +367,42 @@ static void read_editor_buffer (char *out) {
 }
 
 
-/* table to update is at top of stack */
-static void update_definition (lua_State *L, const char *name, char *out) {
+static void update_definition (lua_State *L, const char *name, char *new_contents) {
+  assert(lua_gettop(L) == 0);
   lua_getglobal(L, "teliva_program");
-  lua_pushstring(L, out);
+  int history_array = 1;
+  /* create a new table containing a single binding */
+  lua_createtable(L, /*number of fields per mutation*/2, 0);
+  lua_pushstring(L, new_contents);
   assert(strlen(name) > 0);
   lua_setfield(L, -2, name);
+  /* append the new table to the history of mutations */
+  int history_array_size = luaL_getn(L, history_array);
+  ++history_array_size;
+  lua_rawseti(L, history_array, history_array_size);
   lua_settop(L, 0);
 }
 
 
 static void save_image (lua_State *L) {
   lua_getglobal(L, "teliva_program");
-  int table = lua_gettop(L);
-  FILE *out = fopen(Image_name, "w");
+  int history_array = lua_gettop(L);
+  int history_array_size = luaL_getn(L, history_array);
+  FILE* out = fopen(Image_name, "w");
   fprintf(out, "teliva_program = {\n");
-  for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
-    const char *key = lua_tostring(L, -2);
-    const char *value = lua_tostring(L, -1);
-    fprintf(out, "  %s = [==[", key);
-    fprintf(out, "%s", value);
-    fprintf(out, "]==],\n");
+  for (int i = 1;  i <= history_array_size; ++i) {
+    lua_rawgeti(L, history_array, i);
+    int table = lua_gettop(L);
+    fprintf(out, "  {\n");
+    for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
+      const char* key = lua_tostring(L, -2);
+      const char* value = lua_tostring(L, -1);
+      fprintf(out, "    %s = [==[\n", key);
+      fprintf(out, "%s", value);
+      fprintf(out, "]==],\n");
+    }
+    fprintf(out, "  },\n");
+    lua_pop(L, 1);
   }
   fprintf(out, "}\n");
   fclose(out);
@@ -434,46 +483,55 @@ int browse_image (lua_State *L) {
   clear();
   luaL_newmetatable(L, "__teliva_call_graph_depth");
   int cgt = lua_gettop(L);
-  // special-case: we don't instrument the call to main, but it's always 1
+  // special-case: we don't instrument the call to main, but it's always at depth 1
   lua_pushinteger(L, 1);
   lua_setfield(L, cgt, "main");
   // segment definitions by depth
   lua_getglobal(L, "teliva_program");
-  int t = lua_gettop(L);
+  int history_array = lua_gettop(L);
+  int history_array_size = luaL_getn(L, history_array);
 
   int y = 2;
   mvaddstr(y, 0, "data:           ");
   // first: data (non-functions) that's not the Teliva menu or curses variables
-  for (lua_pushnil(L); lua_next(L, t) != 0;) {
-    const char *definition_name = lua_tostring(L, -2);
-    lua_getglobal(L, definition_name);
-    int is_userdata = lua_isuserdata(L, -1);
-    int is_function = lua_isfunction(L, -1);
-    lua_pop(L, 1);
-    if (strcmp(definition_name, "menu") != 0  // required by all Teliva programs
-        && !is_function  // functions are not data
-        && !is_userdata  // including curses window objects
-                         // (unlikely to have an interesting definition)
-    ) {
-      browse_definition(definition_name);
+  for (int i = history_array_size; i > 0; --i) {
+    lua_rawgeti(L, history_array, i);
+    int t = lua_gettop(L);
+    for (lua_pushnil(L); lua_next(L, t) != 0;) {
+      const char *definition_name = lua_tostring(L, -2);
+      lua_getglobal(L, definition_name);
+      int is_userdata = lua_isuserdata(L, -1);
+      int is_function = lua_isfunction(L, -1);
+      lua_pop(L, 1);
+      if (strcmp(definition_name, "menu") != 0  // required by all Teliva programs
+          && !is_function  // functions are not data
+          && !is_userdata  // including curses window objects
+                           // (unlikely to have an interesting definition)
+      ) {
+        browse_definition(definition_name);
+      }
+      lua_pop(L, 1);  // value
+      // leave key on stack for next iteration
     }
-    lua_pop(L, 1);  // value
-    // leave key on stack for next iteration
   }
 
   // second: menu and other userdata
-  for (lua_pushnil(L); lua_next(L, t) != 0;) {
-    const char* definition_name = lua_tostring(L, -2);
-    lua_getglobal(L, definition_name);
-    int is_userdata = lua_isuserdata(L, -1);
-    lua_pop(L, 1);
-    if (strcmp(definition_name, "menu") == 0
-        || is_userdata  // including curses window objects
-    ) {
-      browse_definition(definition_name);
+  for (int i = history_array_size; i > 0; --i) {
+    lua_rawgeti(L, history_array, i);
+    int t = lua_gettop(L);
+    for (lua_pushnil(L); lua_next(L, t) != 0;) {
+      const char* definition_name = lua_tostring(L, -2);
+      lua_getglobal(L, definition_name);
+      int is_userdata = lua_isuserdata(L, -1);
+      lua_pop(L, 1);
+      if (strcmp(definition_name, "menu") == 0
+          || is_userdata  // including curses window objects
+      ) {
+        browse_definition(definition_name);
+      }
+      lua_pop(L, 1);  // value
+      // leave key on stack for next iteration
     }
-    lua_pop(L, 1);  // value
-    // leave key on stack for next iteration
   }
 
   // functions by level
@@ -482,32 +540,40 @@ int browse_image (lua_State *L) {
   y++;
   for (int level = 1; level < 5; ++level) {
     mvaddstr(y, 0, "                ");
-    for (lua_pushnil(L); lua_next(L, t) != 0;) {
-      const char* definition_name = lua_tostring(L, -2);
-      lua_getfield(L, cgt, definition_name);
-      int depth = lua_tointeger(L, -1);
-      if (depth == level)
-        browse_definition(definition_name);
-      lua_pop(L, 1);  // depth of value
-      lua_pop(L, 1);  // value
-      // leave key on stack for next iteration
+    for (int i = history_array_size; i > 0; --i) {
+      lua_rawgeti(L, history_array, i);
+      int t = lua_gettop(L);
+      for (lua_pushnil(L); lua_next(L, t) != 0;) {
+        const char* definition_name = lua_tostring(L, -2);
+        lua_getfield(L, cgt, definition_name);
+        int depth = lua_tointeger(L, -1);
+        if (depth == level)
+          browse_definition(definition_name);
+        lua_pop(L, 1);  // depth of value
+        lua_pop(L, 1);  // value
+        // leave key on stack for next iteration
+      }
     }
     y += 2;
   }
 
   // unused functions
   mvaddstr(y, 0, "                ");
-  for (lua_pushnil(L); lua_next(L, t) != 0;) {
-    const char* definition_name = lua_tostring(L, -2);
-    lua_getglobal(L, definition_name);
-    int is_function = lua_isfunction(L, -1);
-    lua_pop(L, 1);
-    lua_getfield(L, cgt, definition_name);
-    if (is_function && lua_isnoneornil(L, -1))
-      browse_definition(definition_name);
-    lua_pop(L, 1);  // depth of value
-    lua_pop(L, 1);  // value
-    // leave key on stack for next iteration
+  for (int i = history_array_size; i > 0; --i) {
+    lua_rawgeti(L, history_array, i);
+    int t = lua_gettop(L);
+    for (lua_pushnil(L); lua_next(L, t) != 0;) {
+      const char* definition_name = lua_tostring(L, -2);
+      lua_getglobal(L, definition_name);
+      int is_function = lua_isfunction(L, -1);
+      lua_pop(L, 1);
+      lua_getfield(L, cgt, definition_name);
+      if (is_function && lua_isnoneornil(L, -1))
+        browse_definition(definition_name);
+      lua_pop(L, 1);  // depth of value
+      lua_pop(L, 1);  // value
+      // leave key on stack for next iteration
+    }
   }
 
   lua_settop(L, 0);

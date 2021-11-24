@@ -1,9 +1,5 @@
 teliva_program = {
-    window = [==[
-window = curses.stdscr()
--- animation-based app
-window:nodelay(true)
-lines, cols = window:getmaxyx()]==],
+  {
     grid = [==[
 -- main data structure
 grid = {}
@@ -14,6 +10,15 @@ for i=1,lines*4 do
   end
 end
 ]==],
+  },
+  {
+    window = [==[
+window = curses.stdscr()
+-- animation-based app
+window:nodelay(true)
+lines, cols = window:getmaxyx()]==],
+  },
+  {
     grid_char = [==[
 -- grab a 4x2 chunk of grid
 function grid_char(line, col)
@@ -23,6 +28,8 @@ function grid_char(line, col)
   end
   return result
 end]==],
+  },
+  {
     print_grid_char = [==[
 function print_grid_char(window, x)
   result = {}
@@ -33,6 +40,8 @@ function print_grid_char(window, x)
   end
   return result
 end]==],
+  },
+  {
     glyph = [==[
 -- look up the braille pattern corresponding to a 4x2 chunk of grid
 -- https://en.wikipedia.org/wiki/Braille_Patterns
@@ -56,6 +65,8 @@ glyph = {
   0x28b0, 0x28b1, 0x28b2, 0x28b3, 0x28b4, 0x28b5, 0x28b6, 0x28b7,   0x28f0, 0x28f1, 0x28f2, 0x28f3, 0x28f4, 0x28f5, 0x28f6, 0x28f7,
   0x28b8, 0x28b9, 0x28ba, 0x28bb, 0x28bc, 0x28bd, 0x28be, 0x28bf,   0x28f8, 0x28f9, 0x28fa, 0x28fb, 0x28fc, 0x28fd, 0x28fe, 0x28ff,
 }]==],
+  },
+  {
     utf8 = [==[
 -- https://stackoverflow.com/questions/7983574/how-to-write-a-unicode-symbol-in-lua
 function utf8(decimal)
@@ -75,6 +86,8 @@ function utf8(decimal)
   end
   return table.concat(charbytes)
 end]==],
+  },
+  {
     grid_char_to_glyph_index = [==[
 -- convert a chunk of grid into a number
 function grid_char_to_glyph_index(g)
@@ -82,6 +95,8 @@ function grid_char_to_glyph_index(g)
          g[1][2]*16 + g[2][2]*32 + g[3][2]*64 + g[4][2]*128 +
          1  -- 1-indexing
 end]==],
+  },
+  {
     render = [==[
 function render(window)
   window:clear()
@@ -93,6 +108,8 @@ function render(window)
   curses.refresh()
 end
 ]==],
+  },
+  {
     state = [==[
 function state(line, col)
   if line < 1 or line > table.getn(grid) or col < 1 or col > table.getn(grid[1]) then
@@ -100,12 +117,16 @@ function state(line, col)
   end
   return grid[line][col]
 end]==],
+  },
+  {
     num_live_neighbors = [==[
 function num_live_neighbors(line, col)
   return state(line-1, col-1) + state(line-1, col) + state(line-1, col+1) +
          state(line,   col-1) +                      state(line,   col+1) +
          state(line+1, col-1) + state(line+1, col) + state(line+1, col+1)
 end]==],
+  },
+  {
     step = [==[
 function step()
   local new_grid = {}
@@ -124,12 +145,16 @@ function step()
   end
   grid = new_grid
 end]==],
+  },
+  {
     sleep = [==[
 function sleep(a)
     local sec = tonumber(os.clock() + a);
     while (os.clock() < sec) do
     end
 end]==],
+  },
+  {
     file_exists = [==[
 function file_exists(filename)
   local f = io.open(filename, "r")
@@ -140,6 +165,8 @@ function file_exists(filename)
     return false
   end
 end]==],
+  },
+  {
     load_file = [==[
 function load_file(window, filename)
   io.input(filename)
@@ -160,6 +187,8 @@ function load_file(window, filename)
     end
   end
 end]==],
+  },
+  {
     update = [==[
 menu = {arrow="pan"}
 
@@ -198,6 +227,8 @@ function update(window, c)
     end
   end
 end]==],
+  },
+  {
     main = [==[
 function main()
   for i=1,7 do
@@ -274,4 +305,5 @@ function main()
     step()
   end
 end]==],
+  },
 }

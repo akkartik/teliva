@@ -455,7 +455,7 @@ void edit_image (lua_State *L, const char *definition) {
 
 
 extern void draw_menu_item (const char* key, const char* name);
-static void browser_menu (void) {
+static void big_picture_menu (void) {
   attrset(A_REVERSE);
   for (int x = 0; x < COLS; ++x)
     mvaddch(LINES-1, x, ' ');
@@ -471,7 +471,7 @@ static void browser_menu (void) {
 
 #define BG(i) (COLOR_PAIR((i)+8))
 #define FG(i) (COLOR_PAIR(i))
-void browse_definition (const char *definition_name) {
+void draw_definition_name (const char *definition_name) {
   attron(BG(7));
   addstr(definition_name);
   attrset(A_NORMAL);
@@ -479,7 +479,7 @@ void browse_definition (const char *definition_name) {
 }
 
 /* return true if submitted */
-int browse_image (lua_State *L) {
+int big_picture (lua_State *L) {
   clear();
   luaL_newmetatable(L, "__teliva_call_graph_depth");
   int cgt = lua_gettop(L);
@@ -508,7 +508,7 @@ int browse_image (lua_State *L) {
           && !is_userdata  // including curses window objects
                            // (unlikely to have an interesting definition)
       ) {
-        browse_definition(definition_name);
+        draw_definition_name(definition_name);
       }
       lua_pop(L, 1);  // value
       // leave key on stack for next iteration
@@ -527,7 +527,7 @@ int browse_image (lua_State *L) {
       if (strcmp(definition_name, "menu") == 0
           || is_userdata  // including curses window objects
       ) {
-        browse_definition(definition_name);
+        draw_definition_name(definition_name);
       }
       lua_pop(L, 1);  // value
       // leave key on stack for next iteration
@@ -548,7 +548,7 @@ int browse_image (lua_State *L) {
         lua_getfield(L, cgt, definition_name);
         int depth = lua_tointeger(L, -1);
         if (depth == level)
-          browse_definition(definition_name);
+          draw_definition_name(definition_name);
         lua_pop(L, 1);  // depth of value
         lua_pop(L, 1);  // value
         // leave key on stack for next iteration
@@ -569,7 +569,7 @@ int browse_image (lua_State *L) {
       lua_pop(L, 1);
       lua_getfield(L, cgt, definition_name);
       if (is_function && lua_isnoneornil(L, -1))
-        browse_definition(definition_name);
+        draw_definition_name(definition_name);
       lua_pop(L, 1);  // depth of value
       lua_pop(L, 1);  // value
       // leave key on stack for next iteration
@@ -586,7 +586,7 @@ int browse_image (lua_State *L) {
   char query[CURRENT_DEFINITION_LEN+1] = {0};
   int qlen = 0;
   while (1) {
-    browser_menu();
+    big_picture_menu();
     for (int x = 0; x < COLS; ++x)
       mvaddch(LINES-2, x, ' ');
     mvprintw(LINES-2, 0, "Edit: %s", query);
@@ -620,7 +620,7 @@ void switch_to_editor (lua_State *L) {
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, -1, i);
   nodelay(stdscr, 0);
-  if (browse_image(L))
+  if (big_picture(L))
     cleanup_curses();
   execv(Argv[0], Argv);
   /* never returns */

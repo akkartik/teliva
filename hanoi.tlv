@@ -1,5 +1,5 @@
 teliva_program = {
-  render = [==[
+    render = [==[
 function render(window)
   window:clear()
   local lines, cols = window:getmaxyx()
@@ -10,17 +10,17 @@ function render(window)
   end
   curses.refresh()
 end]==],
-  lines = [==[
+    lines = [==[
 function lines(window)
   local lines, cols = window:getmaxyx()
   return lines
 end]==],
-  pop = [==[
+    pop = [==[
 function pop(array)
   return table.remove(array)
 end]==],
-  window = [==[window = curses.stdscr()]==],
-  render_tower = [==[
+    window = [==[window = curses.stdscr()]==],
+    render_tower = [==[
 function render_tower(window, line, col, tower_index, tower)
   window:attron(curses.A_BOLD)
   window:mvaddch(line+2, col, string.char(96+tower_index))
@@ -39,8 +39,8 @@ function render_tower(window, line, col, tower_index, tower)
     line = line - 1
   end
 end]==],
-  tower = [==[tower = {{6, 5, 4, 3, 2}, {}, {}}]==],
-  render_disk = [==[
+    tower = [==[tower = {{6, 5, 4, 3, 2}, {}, {}}]==],
+    render_disk = [==[
 function render_disk(window, line, col, size)
   col = col-size+1
   for i=1,size do
@@ -50,7 +50,7 @@ function render_disk(window, line, col, size)
     col = col+2
   end
 end]==],
-  main = [==[
+    main = [==[
 function main()
   for i=1,7 do
     curses.init_pair(i, 0, i)
@@ -62,7 +62,7 @@ function main()
   end
 end
 ]==],
-  len = [==[
+    len = [==[
 function len(array)
   local result = 0
   for k in pairs(array) do
@@ -70,7 +70,7 @@ function len(array)
   end
   return result
 end]==],
-  update = [==[
+    update = [==[
 function update(window)
   window:mvaddstr(lines(window)-2, 5, "tower to remove top disk from? ")
   local from = curses.getch() - 96
@@ -78,12 +78,12 @@ function update(window)
   local to = curses.getch() - 96
   make_move(from, to)
 end]==],
-  make_move = [==[
+    make_move = [==[
 function make_move(from, to)
   local disk = pop(tower[from])
   table.insert(tower[to], disk)
 end]==],
-  cols = [==[
+    cols = [==[
 function cols(window)
   local lines, cols = window:getmaxyx()
   return cols

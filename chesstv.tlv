@@ -1,11 +1,11 @@
 teliva_program = {
-  window = [==[
+    window = [==[
 window = curses.stdscr()
 -- animation-based app
 window:nodelay(true)
 lines, cols = window:getmaxyx()]==],
-  current_game = [==[current_game = {}]==],
-  piece_glyph = [==[
+    current_game = [==[current_game = {}]==],
+    piece_glyph = [==[
 piece_glyph = {
   -- for legibility, white pieces also use unicode glyphs for black pieces
   -- we rely on colors to distinguish them
@@ -22,27 +22,27 @@ piece_glyph = {
   n = 0x265e,
   p = 0x265f,
 }]==],
-  top_player = [==[
+    top_player = [==[
 function top_player(current_game)
   if current_game.players[1].color == "black" then
     return current_game.players[1]
   end
   return current_game.players[2]
 end]==],
-  bottom_player = [==[
+    bottom_player = [==[
 function bottom_player(current_game)
   if current_game.players[1].color == "white" then
     return current_game.players[1]
   end
   return current_game.players[2]
 end]==],
-  render_player = [==[
+    render_player = [==[
 function render_player(y, x, player)
   curses.mvaddstr(y, x, player.user.name)
   curses.addstr(" · ")
   curses.addstr(tostring(player.rating))
 end]==],
-  render_square = [==[
+    render_square = [==[
 function render_square(current_game, rank, file, highlighted_squares)
   -- decide whether to highlight
   local hl = 0
@@ -62,7 +62,7 @@ function render_square(current_game, rank, file, highlighted_squares)
   curses.mvaddstr((8 - rank + 1)*3+2, file*5, "     ")
   curses.attrset(curses.A_NORMAL)
 end]==],
-  render_fen_rank = [==[
+    render_fen_rank = [==[
 function render_fen_rank(rank, fen_rank, highlighted_squares)
   local file = 1
   for x in fen_rank:gmatch(".") do
@@ -98,13 +98,13 @@ function render_fen_rank(rank, fen_rank, highlighted_squares)
     end
   end
 end]==],
-  render_time = [==[
+    render_time = [==[
 function render_time(y, x, seconds)
   if seconds == nil then return end
   curses.mvaddstr(y, x, tostring(math.floor(seconds/60)))
   curses.addstr(string.format(":%02d", seconds%60))
 end]==],
-  render_board = [==[
+    render_board = [==[
 function render_board(current_game)
 --?   curses.mvaddstr(1, 50, dump(current_game.fen))
 --?   curses.mvaddstr(6, 50, dump(current_game.previously_moved_squares))
@@ -119,7 +119,7 @@ function render_board(current_game)
   render_player(27, 5, bottom_player(current_game))
   render_time(27, 35, current_game.wc)
 end]==],
-  parse_lm = [==[
+    parse_lm = [==[
 function parse_lm(move)
 --?   curses.mvaddstr(4, 50, move)
   local file1 = string.byte(move:sub(1, 1)) - 96  -- 'a'-1
@@ -129,7 +129,7 @@ function parse_lm(move)
 --?   curses.mvaddstr(5, 50, dump({{rank1, file1}, {rank2, file2}}))
   return {from={rank=rank1, file=file1}, to={rank=rank2, file=file2}}
 end]==],
-  render = [==[
+    render = [==[
 function render(chunk)
   local o = json.decode(chunk)
   if o.t == "featured" then
@@ -149,7 +149,7 @@ function render(chunk)
   render_board(current_game)
   curses.refresh()
 end]==],
-  init_colors = [==[
+    init_colors = [==[
 function init_colors()
   -- colors
   local light_piece = 1
@@ -168,7 +168,7 @@ function init_colors()
   curses.init_pair(7, light_piece, dark_last_moved_square)
   curses.init_pair(8, dark_piece, dark_last_moved_square)
 end]==],
-  main = [==[
+    main = [==[
 function main()
   init_colors()
   local request = {
@@ -184,7 +184,7 @@ function main()
   }
   http.request(request)
 end]==],
-  utf8 = [==[
+    utf8 = [==[
 -- https://stackoverflow.com/questions/7983574/how-to-write-a-unicode-symbol-in-lua
 function utf8(decimal)
   local bytemarkers = { {0x7FF,192}, {0xFFFF,224}, {0x1FFFFF,240} }
@@ -203,7 +203,7 @@ function utf8(decimal)
   end
   return table.concat(charbytes)
 end]==],
-  split = [==[
+    split = [==[
 function split(s, pat)
   result = {}
   for x in s:gmatch(pat) do
@@ -211,7 +211,7 @@ function split(s, pat)
   end
   return result
 end]==],
-  dump = [==[
+    dump = [==[
 -- https://stackoverflow.com/questions/9168058/how-to-dump-a-table-to-console
 function dump(o)
   if type(o) == 'table' then

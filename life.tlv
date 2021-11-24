@@ -1,10 +1,10 @@
 teliva_program = {
-  window = [==[
+    window = [==[
 window = curses.stdscr()
 -- animation-based app
 window:nodelay(true)
 lines, cols = window:getmaxyx()]==],
-  grid = [==[
+    grid = [==[
 -- main data structure
 grid = {}
 for i=1,lines*4 do
@@ -14,7 +14,7 @@ for i=1,lines*4 do
   end
 end
 ]==],
-  grid_char = [==[
+    grid_char = [==[
 -- grab a 4x2 chunk of grid
 function grid_char(line, col)
   result = {}
@@ -23,7 +23,7 @@ function grid_char(line, col)
   end
   return result
 end]==],
-  print_grid_char = [==[
+    print_grid_char = [==[
 function print_grid_char(window, x)
   result = {}
   for l, row in ipairs(x) do
@@ -33,7 +33,7 @@ function print_grid_char(window, x)
   end
   return result
 end]==],
-  glyph = [==[
+    glyph = [==[
 -- look up the braille pattern corresponding to a 4x2 chunk of grid
 -- https://en.wikipedia.org/wiki/Braille_Patterns
 -- not obviously programmatic because Unicode added 4x2 after 3x2
@@ -56,7 +56,7 @@ glyph = {
   0x28b0, 0x28b1, 0x28b2, 0x28b3, 0x28b4, 0x28b5, 0x28b6, 0x28b7,   0x28f0, 0x28f1, 0x28f2, 0x28f3, 0x28f4, 0x28f5, 0x28f6, 0x28f7,
   0x28b8, 0x28b9, 0x28ba, 0x28bb, 0x28bc, 0x28bd, 0x28be, 0x28bf,   0x28f8, 0x28f9, 0x28fa, 0x28fb, 0x28fc, 0x28fd, 0x28fe, 0x28ff,
 }]==],
-  utf8 = [==[
+    utf8 = [==[
 -- https://stackoverflow.com/questions/7983574/how-to-write-a-unicode-symbol-in-lua
 function utf8(decimal)
   local bytemarkers = { {0x7FF,192}, {0xFFFF,224}, {0x1FFFFF,240} }
@@ -75,14 +75,14 @@ function utf8(decimal)
   end
   return table.concat(charbytes)
 end]==],
-  grid_char_to_glyph_index = [==[
+    grid_char_to_glyph_index = [==[
 -- convert a chunk of grid into a number
 function grid_char_to_glyph_index(g)
   return g[1][1]    + g[2][1]*2  + g[3][1]*4  + g[4][1]*8 +
          g[1][2]*16 + g[2][2]*32 + g[3][2]*64 + g[4][2]*128 +
          1  -- 1-indexing
 end]==],
-  render = [==[
+    render = [==[
 function render(window)
   window:clear()
   for line=1,lines do
@@ -93,20 +93,20 @@ function render(window)
   curses.refresh()
 end
 ]==],
-  state = [==[
+    state = [==[
 function state(line, col)
   if line < 1 or line > table.getn(grid) or col < 1 or col > table.getn(grid[1]) then
     return 0
   end
   return grid[line][col]
 end]==],
-  num_live_neighbors = [==[
+    num_live_neighbors = [==[
 function num_live_neighbors(line, col)
   return state(line-1, col-1) + state(line-1, col) + state(line-1, col+1) +
          state(line,   col-1) +                      state(line,   col+1) +
          state(line+1, col-1) + state(line+1, col) + state(line+1, col+1)
 end]==],
-  step = [==[
+    step = [==[
 function step()
   local new_grid = {}
   for line=1,table.getn(grid) do
@@ -124,13 +124,13 @@ function step()
   end
   grid = new_grid
 end]==],
-  sleep = [==[
+    sleep = [==[
 function sleep(a)
     local sec = tonumber(os.clock() + a);
     while (os.clock() < sec) do
     end
 end]==],
-  file_exists = [==[
+    file_exists = [==[
 function file_exists(filename)
   local f = io.open(filename, "r")
   if f ~= nil then
@@ -140,7 +140,7 @@ function file_exists(filename)
     return false
   end
 end]==],
-  load_file = [==[
+    load_file = [==[
 function load_file(window, filename)
   io.input(filename)
   local line_index = lines
@@ -160,7 +160,7 @@ function load_file(window, filename)
     end
   end
 end]==],
-  update = [==[
+    update = [==[
 menu = {arrow="pan"}
 
 function update(window, c)
@@ -198,7 +198,7 @@ function update(window, c)
     end
   end
 end]==],
-  main = [==[
+    main = [==[
 function main()
   for i=1,7 do
     curses.init_pair(i, i, -1)

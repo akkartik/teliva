@@ -318,18 +318,18 @@ void save_to_current_definition_and_editor_buffer (lua_State *L, const char *def
   lua_getfield(L, -1, Current_definition);
   const char *contents = lua_tostring(L, -1);
   lua_pop(L, 1);
-  int outfd = open("teliva_editbuffer", O_WRONLY|O_CREAT|O_TRUNC, 0644);
+  FILE *out = fopen("teliva_editbuffer", "w");
   if (contents != NULL)
-    write(outfd, contents, strlen(contents));
-  close(outfd);
+    fprintf(out, "%s", contents);
+  fclose(out);
   lua_settop(L, 0);
 }
 
 
 static void read_contents (char *filename, char *out) {
-  int infd = open(filename, O_RDONLY);
-  read(infd, out, 8190);  /* TODO: handle overly large file */
-  close(infd);
+  FILE *in = fopen(filename, "r");
+  fread(out, 8190, 1, in);  /* TODO: handle overly large file */
+  fclose(in);
 }
 
 

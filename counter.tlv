@@ -11,8 +11,7 @@ function render(window)
   window:attroff(curses.color_pair(6))
   window:attroff(curses.A_BOLD)
   curses.refresh()
-end
-  ]==],
+end]==],
   menu = [==[menu = {Enter="increment"}]==],
   update = [==[
 function update(window)
@@ -20,8 +19,7 @@ function update(window)
   if key == 10 then
     n = n+1
   end
-end
-  ]==],
+end]==],
   main = [==[
 function main()
   for i=1,7 do
@@ -32,6 +30,5 @@ function main()
     render(window)
     update(window)
   end
-end
-  ]==],
+end]==],
 }

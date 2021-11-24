@@ -313,51 +313,51 @@ static int handle_image (lua_State *L, char **argv, int n) {
 #define CURRENT_DEFINITION_LEN 256
 char Current_definition[CURRENT_DEFINITION_LEN+1] = {0};
 void save_to_current_definition_and_editor_buffer (lua_State *L, const char *definition) {
-    strncpy(Current_definition, definition, CURRENT_DEFINITION_LEN);
-    lua_getglobal(L, "teliva_program");
-    lua_getfield(L, -1, Current_definition);
-    const char *contents = lua_tostring(L, -1);
-    lua_pop(L, 1);
-    int outfd = open("teliva_editbuffer", O_WRONLY|O_CREAT|O_TRUNC, 0644);
-    if (contents != NULL)
-      write(outfd, contents, strlen(contents));
-    close(outfd);
-    lua_settop(L, 0);
+  strncpy(Current_definition, definition, CURRENT_DEFINITION_LEN);
+  lua_getglobal(L, "teliva_program");
+  lua_getfield(L, -1, Current_definition);
+  const char *contents = lua_tostring(L, -1);
+  lua_pop(L, 1);
+  int outfd = open("teliva_editbuffer", O_WRONLY|O_CREAT|O_TRUNC, 0644);
+  if (contents != NULL)
+    write(outfd, contents, strlen(contents));
+  close(outfd);
+  lua_settop(L, 0);
 }
 
 
 static void read_contents (char *filename, char *out) {
-    int infd = open(filename, O_RDONLY);
-    read(infd, out, 8190);  /* TODO: handle overly large file */
-    close(infd);
+  int infd = open(filename, O_RDONLY);
+  read(infd, out, 8190);  /* TODO: handle overly large file */
+  close(infd);
 }
 
 
 /* table to update is at top of stack */
 static void update_definition (lua_State *L, const char *name, char *out) {
-    lua_getglobal(L, "teliva_program");
-    lua_pushstring(L, out);
-    assert(strlen(name) > 0);
-    lua_setfield(L, -2, name);
-    lua_settop(L, 0);
+  lua_getglobal(L, "teliva_program");
+  lua_pushstring(L, out);
+  assert(strlen(name) > 0);
+  lua_setfield(L, -2, name);
+  lua_settop(L, 0);
 }
 
 
 static void save_image (lua_State *L) {
-    lua_getglobal(L, "teliva_program");
-    int table = lua_gettop(L);
-    FILE* fp = fopen(Image_name, "w");
-    fprintf(fp, "teliva_program = {\n");
-    for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
-      const char* key = lua_tostring(L, -2);
-      const char* value = lua_tostring(L, -1);
-      fprintf(fp, "  %s = [==[", key);
-      fprintf(fp, "%s", value);
-      fprintf(fp, "]==],\n");
-    }
-    fprintf(fp, "}\n");
-    fclose(fp);
-    lua_settop(L, 0);
+  lua_getglobal(L, "teliva_program");
+  int table = lua_gettop(L);
+  FILE* fp = fopen(Image_name, "w");
+  fprintf(fp, "teliva_program = {\n");
+  for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
+    const char* key = lua_tostring(L, -2);
+    const char* value = lua_tostring(L, -1);
+    fprintf(fp, "  %s = [==[", key);
+    fprintf(fp, "%s", value);
+    fprintf(fp, "]==],\n");
+  }
+  fprintf(fp, "}\n");
+  fclose(fp);
+  lua_settop(L, 0);
 }
 
 

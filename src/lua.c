@@ -346,11 +346,11 @@ static void update_definition (lua_State *L, const char *name, char *out) {
 static void save_image (lua_State *L) {
   lua_getglobal(L, "teliva_program");
   int table = lua_gettop(L);
-  FILE* out = fopen(Image_name, "w");
+  FILE *out = fopen(Image_name, "w");
   fprintf(out, "teliva_program = {\n");
   for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
-    const char* key = lua_tostring(L, -2);
-    const char* value = lua_tostring(L, -1);
+    const char *key = lua_tostring(L, -2);
+    const char *value = lua_tostring(L, -1);
     fprintf(out, "  %s = [==[", key);
     fprintf(out, "%s", value);
     fprintf(out, "]==],\n");

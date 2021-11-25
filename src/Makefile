@@ -8,7 +8,7 @@
 PLAT= none
 
 CC= gcc
-CFLAGS= -g -O2 -Wall -Wpedantic -Wshadow $(MYCFLAGS)
+CFLAGS= -g -O2 -Wall -Wpedantic -Wshadow $(MYCFLAGS) -fsanitize=address
 AR= ar rc
 RANLIB= ranlib
 RM= rm -f
@@ -53,7 +53,7 @@ $(LUA_A): $(CORE_O) $(LIB_O)
 $(LUA_T): $(LUA_O) $(LUA_A)
 	make -C luasocket linux
 	make -C luasec linux
-	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) luasocket/socket.a luasocket/mime.a luasec/ssl.a $(LIBS)
+	$(CC) -o $@ -fsanitize=address -static-libasan $(MYLDFLAGS) $(LUA_O) $(LUA_A) luasocket/socket.a luasocket/mime.a luasec/ssl.a $(LIBS)
 
 clean:
 	make -C luasocket clean

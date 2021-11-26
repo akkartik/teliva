@@ -311,17 +311,8 @@ static const char *look_up_definition (lua_State *L, const char *name) {
 }
 
 
-char *Image_name = NULL;
-static int handle_image (lua_State *L, char **argv, int n) {
+int resume_loading_definitions(lua_State *L) {
   int status;
-  int narg = getargs(L, argv, n);  /* collect arguments */
-  lua_setglobal(L, "arg");
-  /* parse and load file contents (teliva_program array) */
-  Image_name = argv[n];
-  status = luaL_loadfile(L, Image_name);
-  lua_insert(L, -(narg+1));
-  if (status != 0) return status;
-  status = docall(L, narg, 0);
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
   /* iterate over mutations in teliva_program history in reverse order */
@@ -342,6 +333,23 @@ static int handle_image (lua_State *L, char **argv, int n) {
     lua_pop(L, 1);
   }
   lua_pop(L, 1);
+  return 0;
+}
+
+
+char *Image_name = NULL;
+static int handle_image (lua_State *L, char **argv, int n) {
+  int status;
+  int narg = getargs(L, argv, n);  /* collect arguments */
+  lua_setglobal(L, "arg");
+  /* parse and load file contents (teliva_program array) */
+  Image_name = argv[n];
+  status = luaL_loadfile(L, Image_name);
+  lua_insert(L, -(narg+1));
+  if (status != 0) return status;
+  status = docall(L, narg, 0);
+  status = resume_loading_definitions(L);
+  if (status != 0) return 0;
   /* call main() */
   lua_getglobal(L, "main");
   status = docall(L, 0, 1);

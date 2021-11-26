@@ -17,6 +17,7 @@ function M.getstr (s) return curses.stdscr():getstr(s) end
 function M.mvgetstr (y, x, s) return curses.stdscr():mvgetstr(y, x, s) end
 
 function M.getyx ()    return curses.stdscr():getyx() end
+function M.getmaxyx () return curses.stdscr():getmaxyx() end
 function M.keypad (b)  return curses.stdscr():keypad(b) end
 function M.move (y,x)  return curses.stdscr():move(y,x) end
 function M.refresh ()  return curses.stdscr():refresh() end

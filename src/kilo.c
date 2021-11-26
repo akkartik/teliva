@@ -103,6 +103,7 @@ static struct editorConfig E;
 
 enum KEY_ACTION {
         KEY_NULL = 0,
+        CTRL_B = 2,
         CTRL_C = 3,
         CTRL_D = 4,
         CTRL_E = 5,
@@ -667,6 +668,7 @@ static void editorMenu(void) {
       attroff(A_BOLD);
     }
     draw_menu_item("^g", "go");
+    draw_menu_item("^b", "big picture");
     draw_menu_item("^f", "find");
     attrset(A_NORMAL);
 }
@@ -1041,7 +1043,8 @@ static void editorGo(lua_State* L) {
 
 /* Process events arriving from the standard input, which is, the user
  * is typing stuff on the terminal. */
-int Quit = 0;
+static int Quit = 0;
+static int Back_to_big_picture = 0;
 static void editorProcessKeypress(lua_State* L) {
     int c = getch();
     switch(c) {
@@ -1060,6 +1063,12 @@ static void editorProcessKeypress(lua_State* L) {
     case CTRL_G:
         /* Go to a different definition. */
         editorGo(L);
+        break;
+    case CTRL_B:
+        /* Go to big-picture view. */
+        editorSaveToDisk();
+        Quit = 1;
+        Back_to_big_picture = 1;
         break;
     case CTRL_F:
         editorFind();
@@ -1110,7 +1119,10 @@ static void initEditor(void) {
     E.syntax = &HLDB[0];
 }
 
-void edit(lua_State* L, char* filename, const char* message) {
+/* return true if user chose to back into the big picture view */
+int edit(lua_State* L, char* filename, const char* message) {
+    Quit = 0;
+    Back_to_big_picture = 0;
     initEditor();
     editorOpen(filename);
     editorSetStatusMessage(message);
@@ -1118,13 +1130,16 @@ void edit(lua_State* L, char* filename, const char* message) {
         editorRefreshScreen(editorMenu);
         editorProcessKeypress(L);
     }
+    return Back_to_big_picture;
 }
 
-void resumeEdit(lua_State* L) {
+int resumeEdit(lua_State* L) {
     Quit = 0;
+    Back_to_big_picture = 0;
     editorSetStatusMessage(Previous_error);
     while(!Quit) {
         editorRefreshScreen(editorMenu);
         editorProcessKeypress(L);
     }
+    return Back_to_big_picture;
 }

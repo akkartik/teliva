@@ -412,17 +412,16 @@ static void save_image (lua_State *L) {
 
 /* death and rebirth */
 char **Argv = NULL;
-extern void edit (lua_State *L, char *filename, const char *message);
+extern int edit (lua_State *L, char *filename, const char *message);
 extern void clearEditor (void);
 extern int editorOpen (char *filename);
-void edit_buffer (lua_State *L, const char *message) {
-  edit(L, "teliva_editbuffer", message);
+int edit_buffer (lua_State *L, const char *message) {
+  return edit(L, "teliva_editbuffer", message);
 }
 void editor_refresh_buffer (void) {
   clearEditor();
   editorOpen("teliva_editbuffer");
 }
-extern void resumeEdit (lua_State *L);
 
 
 int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
@@ -436,10 +435,13 @@ int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
 }
 
 
+/* return true if user chose to back into the big picture view */
+/* But only if there are no errors. Otherwise things can get confusing. */
 const char *Previous_error = NULL;
-void edit_image (lua_State *L, const char *definition) {
+extern int resumeEdit (lua_State *L);
+int edit_image (lua_State *L, const char *definition) {
   save_to_current_definition_and_editor_buffer(L, definition);
-  edit_buffer(L, /*status message*/ "");
+  int back_to_big_picture = edit_buffer(L, /*status message*/ "");
   // error handling
   while (1) {
     int status;
@@ -448,9 +450,10 @@ void edit_image (lua_State *L, const char *definition) {
       break;
     Previous_error = lua_tostring(L, -1);
     if (Previous_error == NULL) Previous_error = "(error object is not a string)";
-    resumeEdit(L);
+    back_to_big_picture = resumeEdit(L);
     lua_pop(L, 1);
   }
+  return back_to_big_picture;
 }
 
 
@@ -600,7 +603,8 @@ int big_picture (lua_State *L) {
     } else if (c == ESC) {
       return 0;
     } else if (c == ENTER) {
-      edit_image(L, query);
+      int back_to_browse = edit_image(L, query);
+      if (back_to_browse) return big_picture(L);  // retry while leaking stack
       return 1;
     } else if (c == CTRL_U) {
       qlen = 0;
@@ -624,7 +628,8 @@ void switch_to_editor (lua_State *L) {
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, -1, i);
   nodelay(stdscr, 0);
-  if (big_picture(L))
+  int submitted = big_picture(L);
+  if (submitted)
     cleanup_curses();
   execv(Argv[0], Argv);
   /* never returns */

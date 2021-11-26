@@ -51,8 +51,8 @@ $(LUA_A): $(CORE_O) $(LIB_O)
 	$(RANLIB) $@
 
 $(LUA_T): $(LUA_O) $(LUA_A)
-	make -C luasocket linux
-	make -C luasec linux
+	make -C luasocket MYCFLAGS= MYLDFLAGS= linux
+	make -C luasec MYCFLAGS= MYLDFLAGS= linux
 	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) luasocket/socket.a luasocket/mime.a luasec/ssl.a $(LIBS)
 
 clean:

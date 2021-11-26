@@ -19,6 +19,7 @@
 #define lua_c
 
 #include "lua.h"
+#include "lstate.h"
 
 #include "lauxlib.h"
 #include "lualib.h"
@@ -472,6 +473,37 @@ static void big_picture_menu (void) {
 }
 
 
+static int is_current_definition(lua_State *L, const char *definition_name, int current_history_array_index, int history_array_location, int history_array_size) {
+  /* Sequentially scan back through history_array until current_history_array_index.
+   * Is there an earlier definition of definition_name? */
+  int oldsize = L->top-L->stack;
+  int found = 0;
+  for (int i = history_array_size; i > current_history_array_index; --i) {
+    lua_rawgeti(L, history_array_location, i);
+    int t = lua_gettop(L);
+    for (lua_pushnil(L); lua_next(L, t) != 0;) {
+      lua_pop(L, 1);  // value
+      const char *curr = lua_tostring(L, -1);
+      if (strcmp(curr, definition_name) == 0) {
+        found = 1;
+        lua_pop(L, 1); // key
+        break;
+      }
+      // leave key on stack for next iteration
+    }
+    lua_pop(L, 1);  // history element
+    if (found)
+      break;
+  }
+  if(oldsize != L->top-L->stack) {
+    endwin();
+    printf("%d %d\n", oldsize, L->top-L->stack);
+    exit(1);
+  }
+  return !found;
+}
+
+
 #define BG(i) (COLOR_PAIR((i)+8))
 #define FG(i) (COLOR_PAIR(i))
 void draw_definition_name (const char *definition_name) {
@@ -511,7 +543,8 @@ int big_picture (lua_State *L) {
           && !is_userdata  // including curses window objects
                            // (unlikely to have an interesting definition)
       ) {
-        draw_definition_name(definition_name);
+        if (is_current_definition(L, definition_name, i, history_array, history_array_size))
+          draw_definition_name(definition_name);
       }
       lua_pop(L, 1);  // value
       // leave key on stack for next iteration
@@ -531,7 +564,8 @@ int big_picture (lua_State *L) {
       if (strcmp(definition_name, "menu") == 0
           || is_userdata  // including curses window objects
       ) {
-        draw_definition_name(definition_name);
+        if (is_current_definition(L, definition_name, i, history_array, history_array_size))
+          draw_definition_name(definition_name);
       }
       lua_pop(L, 1);  // value
       // leave key on stack for next iteration
@@ -553,7 +587,8 @@ int big_picture (lua_State *L) {
         lua_getfield(L, cgt, definition_name);
         int depth = lua_tointeger(L, -1);
         if (depth == level)
-          draw_definition_name(definition_name);
+          if (is_current_definition(L, definition_name, i, history_array, history_array_size))
+            draw_definition_name(definition_name);
         lua_pop(L, 1);  // depth of value
         lua_pop(L, 1);  // value
         // leave key on stack for next iteration
@@ -575,7 +610,8 @@ int big_picture (lua_State *L) {
       lua_pop(L, 1);
       lua_getfield(L, cgt, definition_name);
       if (is_function && lua_isnoneornil(L, -1))
-        draw_definition_name(definition_name);
+        if (is_current_definition(L, definition_name, i, history_array, history_array_size))
+          draw_definition_name(definition_name);
       lua_pop(L, 1);  // depth of value
       lua_pop(L, 1);  // value
       // leave key on stack for next iteration

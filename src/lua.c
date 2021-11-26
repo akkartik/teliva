@@ -339,7 +339,9 @@ static int handle_image (lua_State *L, char **argv, int n) {
       status = dostring(L, value, key);
       if (status != 0) return report(L, status);
     }
+    lua_pop(L, 1);
   }
+  lua_pop(L, 1);
   /* call main() */
   lua_getglobal(L, "main");
   status = docall(L, 0, 1);

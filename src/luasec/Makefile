@@ -21,7 +21,7 @@ macosx_CFLAGS=-O2 -fno-common $(WARN) $(DEFS)
 macosx_LDFLAGS=-bundle -undefined dynamic_lookup
 
 INSTALL  = install
-CC      ?= gcc
+CC       = gcc
 CCLD      ?= $(MYENV) $(CC)
 CFLAGS  = $(MYCFLAGS)
 LDFLAGS += $(MYLDFLAGS)

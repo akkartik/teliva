@@ -19,7 +19,7 @@
 #define lua_c
 
 #include "lua.h"
-#include "lstate.h"
+//? #include "lstate.h"
 
 #include "lauxlib.h"
 #include "lualib.h"
@@ -476,7 +476,7 @@ static void big_picture_menu (void) {
 static int is_current_definition(lua_State *L, const char *definition_name, int current_history_array_index, int history_array_location, int history_array_size) {
   /* Sequentially scan back through history_array until current_history_array_index.
    * Is there an earlier definition of definition_name? */
-  int oldsize = L->top-L->stack;
+//?   int oldsize = L->top-L->stack;
   int found = 0;
   for (int i = history_array_size; i > current_history_array_index; --i) {
     lua_rawgeti(L, history_array_location, i);
@@ -495,11 +495,11 @@ static int is_current_definition(lua_State *L, const char *definition_name, int 
     if (found)
       break;
   }
-  if(oldsize != L->top-L->stack) {
-    endwin();
-    printf("%d %d\n", oldsize, L->top-L->stack);
-    exit(1);
-  }
+//?   if(oldsize != L->top-L->stack) {
+//?     endwin();
+//?     printf("%d %d\n", oldsize, L->top-L->stack);
+//?     exit(1);
+//?   }
   return !found;
 }
 

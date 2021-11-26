@@ -513,6 +513,7 @@ int big_picture (lua_State *L) {
       lua_pop(L, 1);  // value
       // leave key on stack for next iteration
     }
+    lua_pop(L, 1);  // history element
   }
 
   // second: menu and other userdata
@@ -532,6 +533,7 @@ int big_picture (lua_State *L) {
       lua_pop(L, 1);  // value
       // leave key on stack for next iteration
     }
+    lua_pop(L, 1);  // history element
   }
 
   // functions by level
@@ -553,6 +555,7 @@ int big_picture (lua_State *L) {
         lua_pop(L, 1);  // value
         // leave key on stack for next iteration
       }
+      lua_pop(L, 1);  // history element
     }
     y += 2;
   }
@@ -574,6 +577,7 @@ int big_picture (lua_State *L) {
       lua_pop(L, 1);  // value
       // leave key on stack for next iteration
     }
+    lua_pop(L, 1);  // history element
   }
 
   lua_settop(L, 0);

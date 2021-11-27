@@ -20,6 +20,7 @@
 
 #include "lua.h"
 //? #include "lstate.h"
+#include "teliva.h"
 
 #include "lauxlib.h"
 #include "lualib.h"
@@ -631,11 +632,6 @@ int big_picture (lua_State *L) {
 
   lua_settop(L, 0);
 
-  enum {
-    ENTER = 10,
-    CTRL_U = 21,
-    ESC = 27,
-  };
   char query[CURRENT_DEFINITION_LEN+1] = {0};
   int qlen = 0;
   while (1) {

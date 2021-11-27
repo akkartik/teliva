@@ -12,9 +12,8 @@
 ## What's this, then?
 
 An extremely naïve, [brutalist](https://en.wikipedia.org/wiki/Brutalist_architecture)
-attempt at packaging up simple [Lua](http://www.lua.org) apps with almost all
-the stuff needed to edit and build them. You will need some Unix-like
-platform[1] with a C compiler and the ncurses and openssl libraries.
+environment for little text-mode [Lua](http://www.lua.org) apps that are easy
+to modify.
 
 Here's how you run one of the example apps (the [Tower of Hanoi](https://en.wikipedia.org/wiki/Tower_of_Hanoi)):
 
@@ -29,10 +28,13 @@ src/teliva hanoi.tlv
 
 No matter what app you run, you are always guaranteed access to a single
 obvious, consistent way (currently the hotkey `ctrl-e`) to edit its sources.
-And to run the updates after editing. ([video](https://archive.org/details/akkartik-2021-11-14))
+Make a change, hit `ctrl-e` again, and the app will run with your updates.
+([video](https://archive.org/details/akkartik-2021-11-14))
 
-[1] Tested so far on Linux, Mac OS X and OpenBSD; should also work on other
-flavors of BSD, WSL on Windows, etc. with only minor modifications.
+You will need some Unix-like platform with a C compiler and the ncurses and
+openssl libraries. So far I've tested Teliva on Linux, Mac OS X and OpenBSD;
+should also work on other flavors of BSD, WSL on Windows, etc. with only minor
+modifications.
 
 ## Isn't this just an IDE?
 

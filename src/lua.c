@@ -525,7 +525,7 @@ void draw_definition_name (const char *definition_name) {
 }
 
 /* return true if submitted */
-int big_picture (lua_State *L) {
+void big_picture (lua_State *L) {
   clear();
   luaL_newmetatable(L, "__teliva_call_graph_depth");
   int cgt = lua_gettop(L);
@@ -643,11 +643,11 @@ int big_picture (lua_State *L) {
     if (c == KEY_BACKSPACE) {
       if (qlen != 0) query[--qlen] = '\0';
     } else if (c == ESC) {
-      return 0;
+      return;
     } else if (c == ENTER) {
       int back_to_big_picture = edit_image(L, query);
-      if (back_to_big_picture) return big_picture(L);  // retry while leaking stack
-      return 1;
+      if (back_to_big_picture) big_picture(L);  // retry while leaking stack
+      return;
     } else if (c == CTRL_U) {
       qlen = 0;
       query[qlen] = '\0';
@@ -670,9 +670,8 @@ void switch_to_editor (lua_State *L) {
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, -1, i);
   nodelay(stdscr, 0);
-  int submitted = big_picture(L);
-  if (submitted)
-    cleanup_curses();
+  big_picture(L);
+  cleanup_curses();
   execv(Argv[0], Argv);
   /* never returns */
 }

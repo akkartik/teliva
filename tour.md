@@ -38,15 +38,20 @@ Run the simplest example app:
 src/teliva counter.tlv
 ```
 
+<img alt='screenshot of Teliva running a counter app' src='doc/counter.png'>
+
 Can you figure out what this app does, what you can do with it? There's a
 number on screen. Hit `enter`. The number increments by 1. Hit `ctrl-x` to
 exit (press `ctrl` and `x` on your keyboard at the same time).
 
 Run the app again. Try editing the app by hitting `ctrl-e`. You see a "big
-picture" view of the app. Spend a few moments scanning this page. All programs
-consist of data and _functions_: code that operates on data in some way.
-Teliva apps always start by running the special function `main`. The big
-picture orders functions from the _top down_. It shows `main` up top,
+picture" view of the app. Spend a few moments scanning this page.
+
+<img alt='editing the code for the counter app' src='doc/counter-edit.png'>
+
+All programs consist of data and _functions_: code that operates on data in
+some way. Teliva apps always start by running the special function `main`. The
+big picture orders functions from the _top down_. It shows `main` up top,
 functions that `main` calls below, functions called by _those_ functions next,
 and so on.
 

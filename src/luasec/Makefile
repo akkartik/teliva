@@ -17,8 +17,8 @@ BSD_LDFLAGS=-O -fPIC -shared
 linux_CFLAGS=-g -O2 $(WARN) $(DEFS)
 
 macosx_ENV=env MACOSX_DEPLOYMENT_TARGET='$(MACVER)'
-macosx_CFLAGS=-O2 -fno-common $(WARN) $(DEFS)
-macosx_LDFLAGS=-bundle -undefined dynamic_lookup
+macosx_CFLAGS=-O2 -fno-common $(WARN) $(DEFS) -I/usr/local/opt/openssl@3/include
+macosx_LDFLAGS=-bundle -undefined dynamic_lookup -L/usr/local/opt/openssl@3/lib
 
 INSTALL  = install
 CC       = gcc

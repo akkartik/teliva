@@ -99,6 +99,8 @@ linux:
 	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-Wl,-E -ldl -lncursesw"
 
 macosx:
+	make -C luasocket macosx
+	make -C luasec macosx
 	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-lncurses"
 # use this on Mac OS X 10.3-
 #	$(MAKE) all MYCFLAGS=-DLUA_USE_MACOSX

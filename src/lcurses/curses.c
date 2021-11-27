@@ -81,7 +81,10 @@
 
 
 #include "_helpers.c"
+
+#ifdef __linux__
 #include "strlcpy.c"
+#endif
 
 #include "chstr.c"
 #include "window.c"

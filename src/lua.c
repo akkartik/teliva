@@ -454,7 +454,7 @@ static void save_image (lua_State *L) {
     for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
       const char* key = lua_tostring(L, -2);
       if (strcmp(key, "__teliva_undo") == 0) {
-        fprintf(out, "    %s = %ld\n", key, lua_tointeger(L, -1));
+        fprintf(out, "    %s = %ld,\n", key, lua_tointeger(L, -1));
         continue;
       }
       const char* value = lua_tostring(L, -1);

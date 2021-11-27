@@ -556,6 +556,14 @@ void render_recent_changes (lua_State *L, int history_array, int start_index, in
     lua_rawgeti(L, history_array, i);
     int t = lua_gettop(L);
     for (lua_pushnil(L); lua_next(L, t) != 0; lua_pop(L, 1)) {
+      if (strcmp(lua_tostring(L, -2), "__teliva_undo") == 0) {
+        addstr("undo to ");
+        attron(A_BOLD);
+        printw("%d", lua_tointeger(L, -1));
+        attroff(A_BOLD);
+        y++;
+        continue;
+      }
       const char *definition_name = lua_tostring(L, -2);
       if (is_special_history_key(definition_name)) continue;
       addstr(definition_name);

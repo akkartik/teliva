@@ -470,6 +470,104 @@ int edit_image (lua_State *L, const char *definition) {
 
 
 extern void draw_menu_item (const char* key, const char* name);
+extern void draw_string_on_menu (const char* s);
+static void recent_changes_menu (void) {
+  attrset(A_REVERSE);
+  for (int x = 0; x < COLS; ++x)
+    mvaddch(LINES-1, x, ' ');
+  attrset(A_NORMAL);
+  extern int menu_column;
+  menu_column = 2;
+  draw_menu_item("Esc", "go back");
+  /* draw_menu_item("↓", "older"); */
+  attroff(A_REVERSE);
+  mvaddstr(LINES-1, menu_column, " ↓ ");
+  menu_column += 3;  /* strlen isn't sufficient */
+  attron(A_REVERSE);
+  draw_string_on_menu("older");
+  /* draw_menu_item("↑", "newer"); */
+  attroff(A_REVERSE);
+  mvaddstr(LINES-1, menu_column, " ↑ ");
+  menu_column += 3;  /* strlen isn't sufficient */
+  attron(A_REVERSE);
+  draw_string_on_menu("newer");
+  attrset(A_NORMAL);
+}
+
+
+void render_recent_changes (lua_State *L, int history_array, int start_index) {
+  clear();
+  attrset(A_BOLD);
+  mvaddstr(1, 1, "Recent changes");
+  attrset(A_NORMAL);
+  int y = 3;
+  attron(A_REVERSE);
+  for (int i = start_index; i > 0; --i) {
+    attron(A_BOLD);
+    mvprintw(y, 1, "%3d. ", i);
+    attrset(A_NORMAL);
+    lua_rawgeti(L, history_array, i);
+    int t = lua_gettop(L);
+    for (lua_pushnil(L); lua_next(L, t) != 0; lua_pop(L, 1)) {
+      const char *definition_name = lua_tostring(L, -2);
+      addstr(definition_name);
+      y++;
+      const char *definition_contents = lua_tostring(L, -1);
+      int x = 1;
+      move(y, x);
+      for (int j = 0; j < strlen(definition_contents); ++j) {
+        char c = definition_contents[j];
+        if (c != '\n') {
+          addch(definition_contents[j]);
+          ++x;
+        }
+        else {
+          ++y;
+          x = 1;
+          move(y, x);
+        }
+      }
+      y++;
+    }
+    lua_pop(L, 1);  // history element
+    y++;
+  }
+  recent_changes_menu();
+  refresh();
+}
+
+
+// TODO:
+//  jump to current change
+//  add a note
+void recent_changes (lua_State *L) {
+  // segment definitions by depth
+  lua_getglobal(L, "teliva_program");
+  int history_array = lua_gettop(L);
+  assert(history_array == 1);
+  int history_array_size = luaL_getn(L, history_array);
+  int cursor = history_array_size;
+  int quit = 0;
+  while (!quit) {
+    render_recent_changes(L, history_array, cursor);
+    int c = getch();
+    switch (c) {
+      case ESC:
+        quit = 1;
+        break;
+      case KEY_DOWN:
+        if (cursor > 1) --cursor;
+        break;
+      case KEY_UP:
+        if (cursor < history_array_size) ++cursor;
+        break;
+    }
+  }
+  lua_pop(L, 1);
+}
+
+
+extern void draw_menu_item (const char* key, const char* name);
 static void big_picture_menu (void) {
   attrset(A_REVERSE);
   for (int x = 0; x < COLS; ++x)
@@ -480,6 +578,7 @@ static void big_picture_menu (void) {
   draw_menu_item("Esc", "go back");
   draw_menu_item("Enter", "submit");
   draw_menu_item("^u", "clear");
+  draw_menu_item("^r", "recent changes");
   attrset(A_NORMAL);
 }
 
@@ -652,6 +751,9 @@ restart:
     } else if (c == CTRL_U) {
       qlen = 0;
       query[qlen] = '\0';
+    } else if (c == CTRL_R) {
+      recent_changes(L);
+      goto restart;
     } else if (isprint(c)) {
       if (qlen < CURRENT_DEFINITION_LEN) {
           query[qlen++] = c;

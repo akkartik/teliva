@@ -649,8 +649,8 @@ int big_picture (lua_State *L) {
     } else if (c == ESC) {
       return 0;
     } else if (c == ENTER) {
-      int back_to_browse = edit_image(L, query);
-      if (back_to_browse) return big_picture(L);  // retry while leaking stack
+      int to_big_picture = edit_image(L, query);
+      if (to_big_picture) return big_picture(L);  // retry while leaking stack
       return 1;
     } else if (c == CTRL_U) {
       qlen = 0;

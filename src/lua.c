@@ -528,16 +528,16 @@ static void recent_changes_menu (int cursor, int history_array_size) {
   extern int menu_column;
   menu_column = 2;
   draw_menu_item("Esc", "go back");
-  /* draw_menu_item("↓", "older"); */
+  /* draw_menu_item("↓/space", "older"); */
   attroff(A_REVERSE);
-  mvaddstr(LINES-1, menu_column, " ↓ ");
-  menu_column += 3;  /* strlen isn't sufficient */
+  mvaddstr(LINES-1, menu_column, " ↓/space ");
+  menu_column += 9;  /* strlen isn't sufficient */
   attron(A_REVERSE);
   draw_string_on_menu("older");
-  /* draw_menu_item("↑", "newer"); */
+  /* draw_menu_item("↑/backspace", "newer"); */
   attroff(A_REVERSE);
-  mvaddstr(LINES-1, menu_column, " ↑ ");
-  menu_column += 3;  /* strlen isn't sufficient */
+  mvaddstr(LINES-1, menu_column, " ↑/backspace ");
+  menu_column += 13;  /* strlen isn't sufficient */
   attron(A_REVERSE);
   draw_string_on_menu("newer");
   draw_menu_item("^e", "edit/add note");
@@ -685,9 +685,11 @@ void recent_changes (lua_State *L) {
         quit = 1;
         break;
       case KEY_DOWN:
+      case ' ':
         if (cursor > 1) --cursor;
         break;
       case KEY_UP:
+      case KEY_BACKSPACE:
         if (cursor < history_array_size) ++cursor;
         break;
       case CTRL_E:

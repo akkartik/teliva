@@ -17,10 +17,10 @@ to modify.
 
 Here's how you run one of the example apps (the [Tower of Hanoi](https://en.wikipedia.org/wiki/Tower_of_Hanoi)):
 
-```
+```sh
 git clone https://github.com/akkartik/teliva
 cd teliva
-make linux
+make linux  # replace with 'macosx' or 'bsd' depending on your OS
 src/teliva hanoi.tlv
 ```
 

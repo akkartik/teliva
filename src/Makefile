@@ -53,6 +53,7 @@ $(LUA_T): $(LUA_O) $(LUA_A)
 	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) lcurses/curses.o luasocket/socket.a luasocket/mime.a luasec/ssl.a $(LIBS)
 
 clean:
+	$(RM) lcurses/curses.o
 	$(MAKE) -C luasocket clean
 	$(MAKE) -C luasec clean
 	$(RM) $(ALL_T) $(ALL_O)

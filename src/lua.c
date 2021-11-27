@@ -405,7 +405,7 @@ void save_to_current_definition_and_editor_buffer (lua_State *L, const char *def
   if (contents != NULL)
     fprintf(out, "%s", contents);
   fclose(out);
-  lua_settop(L, 0);
+  lua_settop(L, 0);  /* reclaim contents */
 }
 
 

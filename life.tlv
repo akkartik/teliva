@@ -13,6 +13,7 @@ end
 ]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     window = [==[
 window = curses.stdscr()
 -- animation-based app
@@ -20,6 +21,7 @@ window:nodelay(true)
 lines, cols = window:getmaxyx()]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     grid_char = [==[
 -- grab a 4x2 chunk of grid
 function grid_char(line, col)
@@ -31,6 +33,7 @@ function grid_char(line, col)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     print_grid_char = [==[
 function print_grid_char(window, x)
   result = {}
@@ -43,6 +46,7 @@ function print_grid_char(window, x)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     glyph = [==[
 -- look up the braille pattern corresponding to a 4x2 chunk of grid
 -- https://en.wikipedia.org/wiki/Braille_Patterns
@@ -68,6 +72,7 @@ glyph = {
 }]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     utf8 = [==[
 -- https://stackoverflow.com/questions/7983574/how-to-write-a-unicode-symbol-in-lua
 function utf8(decimal)
@@ -89,6 +94,7 @@ function utf8(decimal)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     grid_char_to_glyph_index = [==[
 -- convert a chunk of grid into a number
 function grid_char_to_glyph_index(g)
@@ -98,6 +104,7 @@ function grid_char_to_glyph_index(g)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     render = [==[
 function render(window)
   window:clear()
@@ -111,6 +118,7 @@ end
 ]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     state = [==[
 function state(line, col)
   if line < 1 or line > table.getn(grid) or col < 1 or col > table.getn(grid[1]) then
@@ -120,6 +128,7 @@ function state(line, col)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     num_live_neighbors = [==[
 function num_live_neighbors(line, col)
   return state(line-1, col-1) + state(line-1, col) + state(line-1, col+1) +
@@ -128,6 +137,7 @@ function num_live_neighbors(line, col)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     step = [==[
 function step()
   local new_grid = {}
@@ -148,6 +158,7 @@ function step()
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     sleep = [==[
 function sleep(a)
     local sec = tonumber(os.clock() + a);
@@ -156,6 +167,7 @@ function sleep(a)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     file_exists = [==[
 function file_exists(filename)
   local f = io.open(filename, "r")
@@ -168,6 +180,7 @@ function file_exists(filename)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     load_file = [==[
 function load_file(window, filename)
   io.input(filename)
@@ -190,6 +203,7 @@ function load_file(window, filename)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     update = [==[
 menu = {arrow="pan"}
 
@@ -230,6 +244,7 @@ function update(window, c)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     main = [==[
 function main()
   for i=1,7 do

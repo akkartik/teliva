@@ -1,14 +1,17 @@
 teliva_program = {
   {
-  window = [==[
+    __teliva_timestamp = [==[original]==],
+    window = [==[
 window = curses.stdscr()]==],
   },
   {
-  n = [==[
+    __teliva_timestamp = [==[original]==],
+    n = [==[
 n = 0]==],
   },
   {
-  render = [==[
+    __teliva_timestamp = [==[original]==],
+    render = [==[
 function render(window)
   window:clear()
   window:attron(curses.A_BOLD)
@@ -21,11 +24,13 @@ function render(window)
 end]==],
   },
   {
-  menu = [==[
+    __teliva_timestamp = [==[original]==],
+    menu = [==[
 menu = {Enter="increment"}]==],
   },
   {
-  update = [==[
+    __teliva_timestamp = [==[original]==],
+    update = [==[
 function update(window)
   local key = curses.getch()
   if key == 10 then
@@ -34,7 +39,8 @@ function update(window)
 end]==],
   },
   {
-  main = [==[
+    __teliva_timestamp = [==[original]==],
+    main = [==[
 function main()
   for i=1,7 do
     curses.init_pair(i, 0, i)

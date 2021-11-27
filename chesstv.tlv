@@ -1,5 +1,6 @@
 teliva_program = {
   {
+    __teliva_timestamp = [==[original]==],
     window = [==[
 window = curses.stdscr()
 -- animation-based app
@@ -7,10 +8,12 @@ window:nodelay(true)
 lines, cols = window:getmaxyx()]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     current_game = [==[
 current_game = {}]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     piece_glyph = [==[
 piece_glyph = {
   -- for legibility, white pieces also use unicode glyphs for black pieces
@@ -30,6 +33,7 @@ piece_glyph = {
 }]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     top_player = [==[
 function top_player(current_game)
   if current_game.players[1].color == "black" then
@@ -39,6 +43,7 @@ function top_player(current_game)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     bottom_player = [==[
 function bottom_player(current_game)
   if current_game.players[1].color == "white" then
@@ -48,6 +53,7 @@ function bottom_player(current_game)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     render_player = [==[
 function render_player(y, x, player)
   curses.mvaddstr(y, x, player.user.name)
@@ -56,6 +62,7 @@ function render_player(y, x, player)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     render_square = [==[
 function render_square(current_game, rank, file, highlighted_squares)
   -- decide whether to highlight
@@ -78,6 +85,7 @@ function render_square(current_game, rank, file, highlighted_squares)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     render_fen_rank = [==[
 function render_fen_rank(rank, fen_rank, highlighted_squares)
   local file = 1
@@ -116,6 +124,7 @@ function render_fen_rank(rank, fen_rank, highlighted_squares)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     render_time = [==[
 function render_time(y, x, seconds)
   if seconds == nil then return end
@@ -124,6 +133,7 @@ function render_time(y, x, seconds)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     render_board = [==[
 function render_board(current_game)
 --?   curses.mvaddstr(1, 50, dump(current_game.fen))
@@ -141,6 +151,7 @@ function render_board(current_game)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     parse_lm = [==[
 function parse_lm(move)
 --?   curses.mvaddstr(4, 50, move)
@@ -153,6 +164,7 @@ function parse_lm(move)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     render = [==[
 function render(chunk)
   local o = json.decode(chunk)
@@ -175,6 +187,7 @@ function render(chunk)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     init_colors = [==[
 function init_colors()
   -- colors
@@ -196,6 +209,7 @@ function init_colors()
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     main = [==[
 function main()
   init_colors()
@@ -214,6 +228,7 @@ function main()
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     utf8 = [==[
 -- https://stackoverflow.com/questions/7983574/how-to-write-a-unicode-symbol-in-lua
 function utf8(decimal)
@@ -235,6 +250,7 @@ function utf8(decimal)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     split = [==[
 function split(s, pat)
   result = {}
@@ -245,6 +261,7 @@ function split(s, pat)
 end]==],
   },
   {
+    __teliva_timestamp = [==[original]==],
     dump = [==[
 -- https://stackoverflow.com/questions/9168058/how-to-dump-a-table-to-console
 function dump(o)

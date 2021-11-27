@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #define lua_c
@@ -25,6 +26,9 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
+
+#define BG(i) (COLOR_PAIR((i)+8))
+#define FG(i) (COLOR_PAIR(i))
 
 
 static lua_State *globalL = NULL;
@@ -407,6 +411,13 @@ static void update_definition (lua_State *L, const char *name, char *new_content
   lua_pushstring(L, new_contents);
   assert(strlen(name) > 0);
   lua_setfield(L, -2, name);
+  /* include timestamp at which binding was created */
+  time_t t;
+  time(&t);
+  char time_string[50] = {0};
+  ctime_r(&t, time_string);
+  lua_pushstring(L, time_string);
+  lua_setfield(L, -2, "__teliva_timestamp");
   /* append the new table to the history of mutations */
   int history_array_size = luaL_getn(L, history_array);
   ++history_array_size;
@@ -531,7 +542,16 @@ void render_recent_changes (lua_State *L, int history_array, int start_index, in
     int t = lua_gettop(L);
     for (lua_pushnil(L); lua_next(L, t) != 0; lua_pop(L, 1)) {
       const char *definition_name = lua_tostring(L, -2);
+      if (is_special_history_key(definition_name)) continue;
       addstr(definition_name);
+      /* save timestamp of binding if available */
+      lua_getfield(L, t, "__teliva_timestamp");
+      if (!lua_isnil(L, -1)) {
+        attron(FG(7));
+        printw("  %s", lua_tostring(L, -1));
+        attroff(FG(7));
+      }
+      lua_pop(L, 1);
       y++;
       const char *definition_contents = lua_tostring(L, -1);
       int x = 1;
@@ -641,8 +661,6 @@ static int is_current_definition(lua_State *L, const char *definition_name, int 
 }
 
 
-#define BG(i) (COLOR_PAIR((i)+8))
-#define FG(i) (COLOR_PAIR(i))
 void draw_definition_name (const char *definition_name) {
   attron(BG(7));
   addstr(definition_name);

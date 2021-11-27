@@ -23,7 +23,7 @@ You will need the following to build Teliva:
 
 ## Task 1: getting started
 
-Read the first question in [the Readme](https://github.com/akkartik/teliva/blob/main/README.md)
+Read the first question in [the Readme](https://github.com/akkartik/teliva/blob/main/README.md).
 Try running the commands to download and build Teliva. If you have any trouble
 at this point, don't waste _any_ time thinking about it. Just [get in
 touch](http://akkartik.name/contact).

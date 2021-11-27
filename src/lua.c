@@ -526,6 +526,7 @@ void draw_definition_name (const char *definition_name) {
 
 /* return true if submitted */
 void big_picture (lua_State *L) {
+restart:
   clear();
   luaL_newmetatable(L, "__teliva_call_graph_depth");
   int cgt = lua_gettop(L);
@@ -646,7 +647,7 @@ void big_picture (lua_State *L) {
       return;
     } else if (c == ENTER) {
       int back_to_big_picture = edit_image(L, query);
-      if (back_to_big_picture) big_picture(L);  // retry while leaking stack
+      if (back_to_big_picture) goto restart;
       return;
     } else if (c == CTRL_U) {
       qlen = 0;

@@ -9,15 +9,15 @@ OBJS= \
  config.o  \
  ec.o
 
-WARN=-Wall -Wpedantic -Wshadow
+WARN=-Wall -Wshadow
 
 BSD_CFLAGS=-O2 -fPIC $(WARN) $(DEFS)
 BSD_LDFLAGS=-O -fPIC -shared
 
-linux_CFLAGS=-g -O2 -std=c99 $(WARN) $(DEFS)
+linux_CFLAGS=-g -O2 -std=c99 $(WARN) -Wpedantic $(DEFS)
 
 macosx_ENV=env MACOSX_DEPLOYMENT_TARGET='$(MACVER)'
-macosx_CFLAGS=-g -O2 -std=c99 -fno-common $(WARN) $(DEFS) -I/usr/local/opt/openssl@3/include
+macosx_CFLAGS=-g -O2 -std=c99 -fno-common $(WARN) -Wpedantic $(DEFS) -I/usr/local/opt/openssl@3/include
 macosx_LDFLAGS=-bundle -undefined dynamic_lookup -L/usr/local/opt/openssl@3/lib
 
 INSTALL  = install

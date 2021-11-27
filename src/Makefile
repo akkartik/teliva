@@ -8,7 +8,7 @@
 PLAT= none
 
 CC= gcc
-CFLAGS= -g -O2 -std=c99 -Wall -Wpedantic -Wshadow $(MYCFLAGS)
+CFLAGS= -g -O2 -std=c99 -Wall -Wshadow $(MYCFLAGS)
 AR= ar rc
 RANLIB= ranlib
 RM= rm -f
@@ -28,8 +28,7 @@ CORE_O=	lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \
 	lundump.o lvm.o lzio.o \
 	kilo.o
 LIB_O=	lauxlib.o lbaselib.o menu.o ldblib.o liolib.o lmathlib.o \
-	loslib.o ltablib.o lstrlib.o loadlib.o linit.o \
-	lcurses/curses.o
+	loslib.o ltablib.o lstrlib.o loadlib.o linit.o
 
 LUA_T=	teliva
 LUA_O=	lua.o
@@ -51,7 +50,7 @@ $(LUA_A): $(CORE_O) $(LIB_O)
 	$(RANLIB) $@
 
 $(LUA_T): $(LUA_O) $(LUA_A)
-	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) luasocket/socket.a luasocket/mime.a luasec/ssl.a $(LIBS)
+	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) lcurses/curses.o luasocket/socket.a luasocket/mime.a luasec/ssl.a $(LIBS)
 
 clean:
 	$(MAKE) -C luasocket clean
@@ -85,7 +84,10 @@ ansi:
 	$(MAKE) all MYCFLAGS=-DLUA_ANSI
 
 bsd:
-	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E"
+	$(MAKE) -C lcurses
+	$(MAKE) -C luasocket freebsd
+	$(MAKE) -C luasec bsd
+	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lncurses"
 
 freebsd:
 	$(MAKE) all MYCFLAGS="-DLUA_USE_LINUX" MYLIBS="-Wl,-E"
@@ -94,14 +96,16 @@ generic:
 	$(MAKE) all MYCFLAGS=
 
 linux:
+	$(MAKE) -C lcurses
 	$(MAKE) -C luasocket linux
 	$(MAKE) -C luasec linux
-	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-Wl,-E -ldl -lncursesw"
+	$(MAKE) all MYCFLAGS="-Wpedantic -DLUA_USE_LINUX" MYLIBS="-Wl,-E -ldl -lncursesw"
 
 macosx:
+	$(MAKE) -C lcurses
 	$(MAKE) -C luasocket macosx
 	$(MAKE) -C luasec macosx
-	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-lncurses"
+	$(MAKE) all MYCFLAGS="-Wpedantic -DLUA_USE_LINUX" MYLIBS="-lncurses"
 # use this on Mac OS X 10.3-
 #	$(MAKE) all MYCFLAGS=-DLUA_USE_MACOSX
 
@@ -176,9 +180,5 @@ lzio.o: lzio.c lua.h luaconf.h llimits.h lmem.h lstate.h lobject.h ltm.h \
   lzio.h
 print.o: print.c ldebug.h lstate.h lua.h luaconf.h lobject.h llimits.h \
   ltm.h lzio.h lmem.h lopcodes.h lundump.h
-
-lcurses/curses.o: lcurses/curses.c lcurses/window.c lcurses/chstr.c \
-  lcurses/_helpers.c lcurses/compat-5.2.c lcurses/compat-5.2.h \
-  lcurses/strlcpy.c
 
 # (end of Makefile)

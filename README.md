@@ -31,8 +31,8 @@ No matter what app you run, you are always guaranteed access to a single
 obvious, consistent way (currently the hotkey `ctrl-e`) to edit its sources.
 And to run the updates after editing. ([video](https://archive.org/details/akkartik-2021-11-14))
 
-[1] Tested so far on Linux and Mac OSX; should also work on BSD, WSL on
-Windows, etc.
+[1] Tested so far on Linux, Mac OS X and OpenBSD; should also work on other
+flavors of BSD, WSL on Windows, etc. with only minor modifications.
 
 ## Isn't this just an IDE?
 

@@ -1,12 +1,9 @@
 # A guided tour of Teliva
 
-Teliva is intended to be a safe environment for running shareable little
-text-mode Lua apps that are easy to modify. Apps aren't sandboxed yet, but I'm
-working on that.
-
-This page is an in-progress guided tour through [Teliva's Readme](https://github.com/akkartik/teliva#readme)
-and Lua's reference documentation. We'll start out really slow and gradually
-accelerate.
+Teliva is an environment for running shareable little text-mode Lua apps that
+are easy to modify. This page is an in-progress guided tour through [Teliva's
+Readme](https://github.com/akkartik/teliva#readme) and Lua's reference
+documentation. We'll start out really slow and gradually accelerate.
 
 _Prerequisites_
 

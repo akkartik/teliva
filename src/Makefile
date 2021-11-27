@@ -85,7 +85,7 @@ ansi:
 	$(MAKE) all MYCFLAGS=-DLUA_ANSI
 
 bsd:
-	$(MAKE) -C lcurses
+	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
 	$(MAKE) -C luasocket freebsd
 	$(MAKE) -C luasec bsd
 	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lncurses"
@@ -97,13 +97,13 @@ generic:
 	$(MAKE) all MYCFLAGS=
 
 linux:
-	$(MAKE) -C lcurses
+	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
 	$(MAKE) -C luasocket linux
 	$(MAKE) -C luasec linux
 	$(MAKE) all MYCFLAGS="-Wpedantic -DLUA_USE_LINUX" MYLIBS="-Wl,-E -ldl -lncursesw"
 
 macosx:
-	$(MAKE) -C lcurses
+	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
 	$(MAKE) -C luasocket macosx
 	$(MAKE) -C luasec macosx
 	$(MAKE) all MYCFLAGS="-Wpedantic -DLUA_USE_LINUX" MYLIBS="-L/usr/local/opt/openssl@3/lib -lncurses"

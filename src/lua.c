@@ -454,7 +454,7 @@ static void save_image (lua_State *L) {
     for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
       const char* key = lua_tostring(L, -2);
       if (strcmp(key, "__teliva_undo") == 0) {
-        fprintf(out, "    %s = %d\n", key, lua_tointeger(L, -1));
+        fprintf(out, "    %s = %ld\n", key, lua_tointeger(L, -1));
         continue;
       }
       const char* value = lua_tostring(L, -1);
@@ -641,9 +641,9 @@ void recent_changes (lua_State *L) {
   while (!quit) {
     /* refresh state after each operation so we pick up modifications */
     lua_getglobal(L, "teliva_program");
-    int history_array = lua_gettop(L);
+    history_array = lua_gettop(L);
     assert(history_array == 1);
-    int history_array_size = luaL_getn(L, history_array);
+    history_array_size = luaL_getn(L, history_array);
     render_recent_changes(L, history_array, cursor, history_array_size);
     int c = getch();
     switch (c) {

@@ -634,7 +634,6 @@ void add_undo_event(lua_State *L, int cursor) {
 //  jump to current change
 //  add a note
 void recent_changes (lua_State *L) {
-  // segment definitions by depth
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
   assert(history_array == 1);

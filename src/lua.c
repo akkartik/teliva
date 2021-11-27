@@ -471,7 +471,7 @@ int edit_image (lua_State *L, const char *definition) {
 
 extern void draw_menu_item (const char* key, const char* name);
 extern void draw_string_on_menu (const char* s);
-static void recent_changes_menu (void) {
+static void recent_changes_menu (int cursor, int history_array_size) {
   attrset(A_REVERSE);
   for (int x = 0; x < COLS; ++x)
     mvaddch(LINES-1, x, ' ');
@@ -491,11 +491,13 @@ static void recent_changes_menu (void) {
   menu_column += 3;  /* strlen isn't sufficient */
   attron(A_REVERSE);
   draw_string_on_menu("newer");
+  if (cursor < history_array_size)
+    draw_menu_item("^u", "undo everything after this");
   attrset(A_NORMAL);
 }
 
 
-void render_recent_changes (lua_State *L, int history_array, int start_index) {
+void render_recent_changes (lua_State *L, int history_array, int start_index, int history_array_size) {
   clear();
   attrset(A_BOLD);
   mvaddstr(1, 1, "Recent changes");
@@ -532,7 +534,7 @@ void render_recent_changes (lua_State *L, int history_array, int start_index) {
     lua_pop(L, 1);  // history element
     y++;
   }
-  recent_changes_menu();
+  recent_changes_menu(start_index, history_array_size);
   refresh();
 }
 
@@ -549,7 +551,7 @@ void recent_changes (lua_State *L) {
   int cursor = history_array_size;
   int quit = 0;
   while (!quit) {
-    render_recent_changes(L, history_array, cursor);
+    render_recent_changes(L, history_array, cursor, history_array_size);
     int c = getch();
     switch (c) {
       case ESC:
@@ -560,6 +562,12 @@ void recent_changes (lua_State *L) {
         break;
       case KEY_UP:
         if (cursor < history_array_size) ++cursor;
+        break;
+      case CTRL_U:
+        if (cursor < history_array_size) {
+          luaL_setn(L, history_array, cursor);
+          history_array_size = cursor;
+        }
         break;
     }
   }

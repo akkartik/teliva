@@ -12,7 +12,7 @@ CFLAGS= -g -O2 -std=c99 -Wall -Wshadow $(MYCFLAGS)
 AR= ar rc
 RANLIB= ranlib
 RM= rm -f
-LIBS= -lm -lssl -lcrypto $(MYLIBS)
+LIBS= -lm $(MYLIBS) -lssl -lcrypto
 
 MYCFLAGS=
 MYLDFLAGS=
@@ -105,7 +105,7 @@ macosx:
 	$(MAKE) -C lcurses
 	$(MAKE) -C luasocket macosx
 	$(MAKE) -C luasec macosx
-	$(MAKE) all MYCFLAGS="-Wpedantic -DLUA_USE_LINUX" MYLIBS="-lncurses"
+	$(MAKE) all MYCFLAGS="-Wpedantic -DLUA_USE_LINUX" MYLIBS="-L/usr/local/opt/openssl@3/lib -lncurses"
 # use this on Mac OS X 10.3-
 #	$(MAKE) all MYCFLAGS=-DLUA_USE_MACOSX
 

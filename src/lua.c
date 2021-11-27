@@ -540,6 +540,7 @@ static void recent_changes_menu (int cursor, int history_array_size) {
   menu_column += 3;  /* strlen isn't sufficient */
   attron(A_REVERSE);
   draw_string_on_menu("newer");
+  draw_menu_item("^e", "edit/add note");
   if (cursor < history_array_size)
     draw_menu_item("^u", "undo everything after this");
   attrset(A_NORMAL);
@@ -577,6 +578,13 @@ void render_recent_changes (lua_State *L, int history_array, int start_index, in
         attron(FG(7));
         printw("  %s", lua_tostring(L, -1));
         attroff(FG(7));
+      }
+      lua_pop(L, 1);
+      lua_getfield(L, t, "__teliva_note");
+      if (!lua_isnil(L, -1)) {
+        attron(FG(6));
+        printw("  -- %s", lua_tostring(L, -1));
+        attroff(FG(6));
       }
       lua_pop(L, 1);
       y++;
@@ -628,8 +636,30 @@ void add_undo_event(lua_State *L, int cursor) {
 }
 
 
-// TODO:
-//  add a note
+/* precondition: teliva_program is at top of stack */
+void save_note_to_editor_buffer (lua_State *L, int cursor) {
+  lua_rawgeti(L, -1, cursor);
+  lua_getfield(L, -1, "__teliva_note");
+  const char *contents = lua_tostring(L, -1);
+  FILE *out = fopen("teliva_editbuffer", "w");
+  if (contents != NULL)
+    fprintf(out, "%s", contents);
+  fclose(out);
+  lua_pop(L, 2);  /* contents, table at cursor */
+}
+
+
+/* precondition: teliva_program is at top of stack */
+void load_note_from_editor_buffer (lua_State *L, int cursor) {
+  char new_contents[8192] = {0};
+  read_editor_buffer(new_contents);
+  lua_rawgeti(L, -1, cursor);
+  lua_pushstring(L, new_contents);
+  lua_setfield(L, -2, "__teliva_note");
+  lua_pop(L, 1);  /* table at cursor */
+}
+
+
 void recent_changes (lua_State *L) {
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
@@ -655,6 +685,12 @@ void recent_changes (lua_State *L) {
         break;
       case KEY_UP:
         if (cursor < history_array_size) ++cursor;
+        break;
+      case CTRL_E:
+        save_note_to_editor_buffer(L, cursor);
+        edit_buffer(L, "");
+        load_note_from_editor_buffer(L, cursor);
+        save_image(L);
         break;
       case CTRL_U:
         if (cursor < history_array_size) {

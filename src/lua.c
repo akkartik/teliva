@@ -625,13 +625,10 @@ void add_undo_event(lua_State *L, int cursor) {
   lua_rawseti(L, history_array, history_array_size);
   /* clean up */
   lua_pop(L, 1);
-  /* persist */
-  save_image(L);
 }
 
 
 // TODO:
-//  jump to current change
 //  add a note
 void recent_changes (lua_State *L) {
   lua_getglobal(L, "teliva_program");
@@ -660,8 +657,10 @@ void recent_changes (lua_State *L) {
         if (cursor < history_array_size) ++cursor;
         break;
       case CTRL_U:
-        if (cursor < history_array_size)
+        if (cursor < history_array_size) {
           add_undo_event(L, cursor);
+          save_image(L);
+        }
         break;
     }
     lua_pop(L, 1);

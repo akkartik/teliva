@@ -329,7 +329,7 @@ static const char *look_up_definition (lua_State *L, const char *name) {
 }
 
 
-int resume_loading_definitions(lua_State *L) {
+int load_definitions(lua_State *L) {
   int status;
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
@@ -367,7 +367,7 @@ static int handle_image (lua_State *L, char **argv, int n) {
   lua_insert(L, -(narg+1));
   if (status != 0) return status;
   status = docall(L, narg, 0);
-  status = resume_loading_definitions(L);
+  status = load_definitions(L);
   if (status != 0) return 0;
   /* call main() */
   lua_getglobal(L, "main");

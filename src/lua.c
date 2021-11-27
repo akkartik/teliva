@@ -637,7 +637,11 @@ restart:
   int history_array = lua_gettop(L);
   int history_array_size = luaL_getn(L, history_array);
 
-  int y = 2;
+  int y = 1;
+  attrset(A_BOLD);
+  mvaddstr(y, 0, "Big picture");
+  attrset(A_NORMAL);
+  y += 2;
   mvaddstr(y, 0, "data:           ");
   // first: data (non-functions) that's not the Teliva menu or curses variables
   for (int i = history_array_size; i > 0; --i) {

@@ -367,6 +367,7 @@ static int handle_image (lua_State *L, char **argv, int n) {
   lua_insert(L, -(narg+1));
   if (status != 0) return status;
   status = docall(L, narg, 0);
+  if (status != 0) return report(L, status);
   status = load_definitions(L);
   if (status != 0) return 0;
   /* call main() */

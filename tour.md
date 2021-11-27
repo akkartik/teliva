@@ -86,7 +86,7 @@ Once you're happy with your change, try exiting Teliva and restarting it with
 the same app. Do you still see your changes?
 
 You could save the file `counter.tlv` anywhere you like at this point. Or
-share it with someone else. Everything needed for the app is in that file.` If
+share it with someone else. Everything needed for the app is in that file. If
 you get stuck or have a question, [send it to me!](http://akkartik.name/contact)
 
 ## Task 3: variables and arithmetic

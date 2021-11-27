@@ -44,8 +44,9 @@ hit `enter`? Don't be afraid to experiment. The menu at the bottom always
 shows the hotkeys available to you at any point in time. Don't worry,
 everything you do can be undone.
 
-Check out some of the short sections from [the Lua book](https://www.lua.org/pil/contents.html)
-that might be useful at this point: [assignment](https://www.lua.org/pil/4.1.html); [what you can do with numbers](https://www.lua.org/pil/3.1.html).
+Check out some of the short sections from [the Lua book](https://www.lua.org/pil/contents.html):
+[getting started](https://www.lua.org/pil/1.html); [assignment](https://www.lua.org/pil/4.1.html);
+[what you can do with numbers](https://www.lua.org/pil/3.1.html).
 
 (Buy the Lua book to support the creators of Lua. Teliva is a tiny molehill on
 the mountain of awesome that is Lua.)

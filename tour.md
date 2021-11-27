@@ -18,6 +18,13 @@ You will need the following to build Teliva:
 * Some fluency in typing commands at the terminal and interpreting their
   output.
 
+If you have trouble with any of this, [I'm always nearby and available to
+answer questions](http://akkartik.name/contact). The prerequisites are just
+things I haven't figured out how to explain yet. In particular, I want this
+page to be accessible to people who are in the process of learning
+programming, but I'm sure it isn't good enough yet for that. Ask me questions
+and help me improve it.
+
 ## Task 1: running a Teliva app
 
 Read the first question in [the Readme](https://github.com/akkartik/teliva/blob/main/README.md).

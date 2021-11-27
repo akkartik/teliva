@@ -323,6 +323,13 @@ static const char *look_up_definition (lua_State *L, const char *name) {
     /* really we expect only one */
     for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
       const char* key = lua_tostring(L, -2);
+      if (strcmp(key, "__teliva_undo") == 0) {
+        int next_i = lua_tointeger(L, -1);
+        assert(next_i < i);
+        i = next_i + 1;  /* account for decrement */
+        lua_pop(L, 1);
+        break;
+      }
       if (is_special_history_key(key)) continue;
       if (strcmp(key, name) == 0)
         return lua_tostring(L, -1);
@@ -346,6 +353,13 @@ int load_definitions(lua_State *L) {
     /* really we expect only one */
     for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
       const char* key = lua_tostring(L, -2);
+      if (strcmp(key, "__teliva_undo") == 0) {
+        int next_i = lua_tointeger(L, -1);
+        assert(next_i < i);
+        i = next_i + 1;  /* account for decrement */
+        lua_pop(L, 1);
+        break;
+      }
       if (is_special_history_key(key)) continue;
       if (binding_exists(L, key))
         continue;  // most recent binding trumps older ones

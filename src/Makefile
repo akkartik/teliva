@@ -54,8 +54,8 @@ $(LUA_T): $(LUA_O) $(LUA_A)
 	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) luasocket/socket.a luasocket/mime.a luasec/ssl.a $(LIBS)
 
 clean:
-	make -C luasocket clean
-	make -C luasec clean
+	$(MAKE) -C luasocket clean
+	$(MAKE) -C luasec clean
 	$(RM) $(ALL_T) $(ALL_O)
 
 depend:
@@ -94,13 +94,13 @@ generic:
 	$(MAKE) all MYCFLAGS=
 
 linux:
-	make -C luasocket linux
-	make -C luasec linux
+	$(MAKE) -C luasocket linux
+	$(MAKE) -C luasec linux
 	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-Wl,-E -ldl -lncursesw"
 
 macosx:
-	make -C luasocket macosx
-	make -C luasec macosx
+	$(MAKE) -C luasocket macosx
+	$(MAKE) -C luasec macosx
 	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-lncurses"
 # use this on Mac OS X 10.3-
 #	$(MAKE) all MYCFLAGS=-DLUA_USE_MACOSX

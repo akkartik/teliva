@@ -405,7 +405,8 @@ static void read_editor_buffer (char *out) {
 static void update_definition (lua_State *L, const char *name, char *new_contents) {
   assert(lua_gettop(L) == 0);
   lua_getglobal(L, "teliva_program");
-  int history_array = 1;
+  int history_array = lua_gettop(L);
+  assert(history_array == 1);
   /* create a new table containing a single binding */
   lua_createtable(L, /*number of fields per mutation*/2, 0);
   lua_pushstring(L, new_contents);
@@ -448,7 +449,7 @@ static void save_image (lua_State *L) {
   }
   fprintf(out, "}\n");
   fclose(out);
-  lua_settop(L, 0);
+  lua_pop(L, 1);
 }
 
 
@@ -578,6 +579,31 @@ void render_recent_changes (lua_State *L, int history_array, int start_index, in
 }
 
 
+void add_undo_event(lua_State *L, int cursor) {
+  lua_getglobal(L, "teliva_program");
+  int history_array = lua_gettop(L);
+  /* create a new table containing the undo event */
+  lua_createtable(L, /*number of fields per mutation*/2, 0);
+  lua_pushinteger(L, cursor);
+  lua_setfield(L, -2, "__teliva_undo");
+  /* include timestamp at which event was created */
+  time_t t;
+  time(&t);
+  char time_string[50] = {0};
+  ctime_r(&t, time_string);
+  lua_pushstring(L, time_string);
+  lua_setfield(L, -2, "__teliva_timestamp");
+  /* append the new table to the history of mutations */
+  int history_array_size = luaL_getn(L, history_array);
+  ++history_array_size;
+  lua_rawseti(L, history_array, history_array_size);
+  /* clean up */
+  lua_pop(L, 1);
+  /* persist */
+  save_image(L);
+}
+
+
 // TODO:
 //  jump to current change
 //  add a note
@@ -603,10 +629,8 @@ void recent_changes (lua_State *L) {
         if (cursor < history_array_size) ++cursor;
         break;
       case CTRL_U:
-        if (cursor < history_array_size) {
-          luaL_setn(L, history_array, cursor);
-          history_array_size = cursor;
-        }
+        if (cursor < history_array_size)
+          add_undo_event(L, cursor);
         break;
     }
   }

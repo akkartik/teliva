@@ -38,10 +38,13 @@ Can you figure out what this app does, what you can do with it? There's a
 number on screen. Hit `enter`. The number increments by 1. Hit `ctrl-x` to
 exit (press `ctrl` and `x` on your keyboard at the same time).
 
-Try editing the app by hitting `ctrl-e`. You see a "big picture" view of the
-app. Spend a few moments scanning this page. All programs consist of data and
-_functions_: code that operates on data in some way. Teliva apps always start
-by running the special function `main`.
+Run the app again. Try editing the app by hitting `ctrl-e`. You see a "big
+picture" view of the app. Spend a few moments scanning this page. All programs
+consist of data and _functions_: code that operates on data in some way.
+Teliva apps always start by running the special function `main`. The big
+picture orders functions from the _top down_. It shows `main` up top,
+functions that `main` calls below, functions called by _those_ functions next,
+and so on.
 
 Try browsing to some of the names visible on screen. Don't be afraid to
 experiment. The menu at the bottom always shows the hotkeys available to you
@@ -62,8 +65,9 @@ when the app runs?
 Start by looking inside `main`. Most Teliva apps tend to share a basic
 structure in `main`:
 - some initialization, followed by
-- a loop that repeatedly updates the screen and then waits for the user to
-  press a key
+- a loop that repeatedly:
+  * updates the screen, and then
+  * waits for the user to press a key
 
 Can you map the lines of `main` to this structure? Which function describes
 how the app updates the screen?

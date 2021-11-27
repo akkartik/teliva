@@ -8,7 +8,7 @@
 PLAT= none
 
 CC= gcc
-CFLAGS= -g -O2 -Wall -Wpedantic -Wshadow $(MYCFLAGS)
+CFLAGS= -g -O2 -std=c99 -Wall -Wpedantic -Wshadow $(MYCFLAGS)
 AR= ar rc
 RANLIB= ranlib
 RM= rm -f

@@ -603,6 +603,8 @@ union luai_Cast { double l_d; long l_l; };
 
 #if defined(LUA_USE_MKSTEMP)
 #include <unistd.h>
+/* we have newer libraries even though the dialect is C99 */
+extern int mkstemp(char *);
 #define LUA_TMPNAMBUFSIZE	32
 #define lua_tmpnam(b,e)	{ \
 	strcpy(b, "/tmp/lua_XXXXXX"); \
@@ -624,6 +626,11 @@ union luai_Cast { double l_d; long l_l; };
 ** CHANGE it if you have a way to implement it in your system.
 */
 #if defined(LUA_USE_POPEN)
+
+/* we have newer libraries even though the dialect is C99 */
+#include <stdio.h>
+extern FILE *popen(const char *, const char *);
+extern int pclose(FILE *);
 
 #define lua_popen(L,c,m)	((void)L, fflush(NULL), popen(c,m))
 #define lua_pclose(L,file)	((void)L, (pclose(file) != -1))

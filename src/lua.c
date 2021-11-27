@@ -429,8 +429,7 @@ static void update_definition (lua_State *L, const char *name, char *new_content
   /* include timestamp at which binding was created */
   time_t t;
   time(&t);
-  char time_string[50] = {0};
-  ctime_r(&t, time_string);
+  char *time_string = ctime(&t);
   lua_pushstring(L, time_string);
   lua_setfield(L, -2, "__teliva_timestamp");
   /* append the new table to the history of mutations */
@@ -627,8 +626,7 @@ void add_undo_event(lua_State *L, int cursor) {
   /* include timestamp at which event was created */
   time_t t;
   time(&t);
-  char time_string[50] = {0};
-  ctime_r(&t, time_string);
+  char *time_string = ctime(&t);
   lua_pushstring(L, time_string);
   lua_setfield(L, -2, "__teliva_timestamp");
   /* append the new table to the history of mutations */

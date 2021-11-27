@@ -5,12 +5,12 @@
 #
 # These are equivalent:
 #
-#    export PLAT=linux DEBUG=DEBUG LUAV=5.2 prefix=/sw
+#    export PLAT=linux DEBUG=DEBUG
 #    make
 #
 # and
 #
-#   make PLAT=linux DEBUG=DEBUG LUAV=5.2 prefix=/sw
+#   make PLAT=linux DEBUG=DEBUG
 
 # PLAT: linux macosx win32 win64 mingw
 # platform to build for
@@ -31,87 +31,6 @@ MYLDFLAGS?=
 # for testing and debugging luasocket itself
 DEBUG?=NODEBUG
 
-# where lua headers are found for macosx builds
-# LUAINC_macosx:
-# /opt/local/include
-LUAINC_macosx_base?=/opt/local/include
-LUAINC_macosx?=$(LUAINC_macosx_base)/lua/$(LUAV) $(LUAINC_macosx_base)/lua$(LUAV) $(LUAINC_macosx_base)/lua-$(LUAV)
-
-# FIXME default should this default to fink or to macports?
-# What happens when more than one Lua version is installed?
-LUAPREFIX_macosx?=/opt/local
-CDIR_macosx?=lib/lua/$(LUAV)
-LDIR_macosx?=share/lua/$(LUAV)
-
-# LUAINC_linux:
-# /usr/include/lua$(LUAV)
-# /usr/local/include
-# /usr/local/include/lua$(LUAV)
-# where lua headers are found for linux builds
-LUAINC_linux_base?=/usr/include
-LUAINC_linux?=..
-LUAPREFIX_linux?=/usr/local
-CDIR_linux?=lib/lua/$(LUAV)
-LDIR_linux?=share/lua/$(LUAV)
-
-# LUAINC_freebsd:
-# /usr/local/include/lua$(LUAV)
-# where lua headers are found for freebsd builds
-LUAINC_freebsd_base?=/usr/local/include/
-LUAINC_freebsd?=$(LUAINC_freebsd_base)/lua/$(LUAV) $(LUAINC_freebsd_base)/lua$(LUAV)
-LUAPREFIX_freebsd?=/usr/local/
-CDIR_freebsd?=lib/lua/$(LUAV)
-LDIR_freebsd?=share/lua/$(LUAV)
-
-# where lua headers are found for mingw builds
-# LUAINC_mingw:
-# /opt/local/include
-LUAINC_mingw_base?=/usr/include
-LUAINC_mingw?=$(LUAINC_mingw_base)/lua/$(LUAV) $(LUAINC_mingw_base)/lua$(LUAV)
-LUALIB_mingw_base?=/usr/bin
-LUALIB_mingw?=$(LUALIB_mingw_base)/lua/$(LUAV)/lua$(subst .,,$(LUAV)).dll
-LUAPREFIX_mingw?=/usr
-CDIR_mingw?=lua/$(LUAV)
-LDIR_mingw?=lua/$(LUAV)/lua
-
-
-# LUAINC_win32:
-# LUALIB_win32:
-# where lua headers and libraries are found for win32 builds
-LUAPREFIX_win32?=
-LUAINC_win32?=$(LUAPREFIX_win32)/include/lua/$(LUAV) $(LUAPREFIX_win32)/include/lua$(LUAV)
-PLATFORM_win32?=Release
-CDIR_win32?=bin/lua/$(LUAV)/$(PLATFORM_win32)
-LDIR_win32?=bin/lua/$(LUAV)/$(PLATFORM_win32)/lua
-LUALIB_win32?=$(LUAPREFIX_win32)/lib/lua/$(LUAV)/$(PLATFORM_win32)
-LUALIBNAME_win32?=lua$(subst .,,$(LUAV)).lib
-
-# LUAINC_win64:
-# LUALIB_win64:
-# where lua headers and libraries are found for win64 builds
-LUAPREFIX_win64?=
-LUAINC_win64?=$(LUAPREFIX_win64)/include/lua/$(LUAV) $(LUAPREFIX_win64)/include/lua$(LUAV)
-PLATFORM_win64?=x64/Release
-CDIR_win64?=bin/lua/$(LUAV)/$(PLATFORM_win64)
-LDIR_win64?=bin/lua/$(LUAV)/$(PLATFORM_win64)/lua
-LUALIB_win64?=$(LUAPREFIX_win64)/lib/lua/$(LUAV)/$(PLATFORM_win64)
-LUALIBNAME_win64?=lua$(subst .,,$(LUAV)).lib
-
-
-# LUAINC_solaris:
-LUAINC_solaris_base?=/usr/include
-LUAINC_solaris?=$(LUAINC_solaris_base)/lua/$(LUAV) $(LUAINC_solaris_base)/lua$(LUAV)
-LUAPREFIX_solaris?=/usr/local
-CDIR_solaris?=lib/lua/$(LUAV)
-LDIR_solaris?=share/lua/$(LUAV)
-
-# prefix: /usr/local /usr /opt/local /sw
-# the top of the default install tree
-prefix?=$(LUAPREFIX_$(PLAT))
-
-CDIR?=$(CDIR_$(PLAT))
-LDIR?=$(LDIR_$(PLAT))
-
 # DESTDIR: (no default)
 # used by package managers to install into a temporary destination
 DESTDIR?=
@@ -121,32 +40,9 @@ DESTDIR?=
 # shouldn't have to be.
 
 
-#------
-# Install directories
-#
-
-INSTALL_DIR=install -d
-INSTALL_DATA=install -m644
-INSTALL_EXEC=install
-INSTALL_TOP=$(DESTDIR)$(prefix)
-
-INSTALL_TOP_LDIR=$(INSTALL_TOP)/$(LDIR)
-INSTALL_TOP_CDIR=$(INSTALL_TOP)/$(CDIR)
-
-INSTALL_SOCKET_LDIR=$(INSTALL_TOP_LDIR)/socket
-INSTALL_SOCKET_CDIR=$(INSTALL_TOP_CDIR)/socket
-INSTALL_MIME_LDIR=$(INSTALL_TOP_LDIR)/mime
-INSTALL_MIME_CDIR=$(INSTALL_TOP_CDIR)/mime
-
 print:
 	@echo PLAT=$(PLAT)
-	@echo LUAV=$(LUAV)
 	@echo DEBUG=$(DEBUG)
-	@echo prefix=$(prefix)
-	@echo LUAINC_$(PLAT)=$(LUAINC_$(PLAT))
-	@echo LUALIB_$(PLAT)=$(LUALIB_$(PLAT))
-	@echo INSTALL_TOP_CDIR=$(INSTALL_TOP_CDIR)
-	@echo INSTALL_TOP_LDIR=$(INSTALL_TOP_LDIR)
 	@echo CFLAGS=$(CFLAGS)
 	@echo LDFLAGS=$(LDFLAGS)
 
@@ -162,7 +58,7 @@ SO_macosx=so
 O_macosx=o
 CC_macosx=gcc
 DEF_macosx= -DLUASOCKET_$(DEBUG) -DUNIX_HAS_SUN_LEN
-CFLAGS_macosx=$(LUAINC:%=-I%) $(DEF) -Wall -O2 -fno-common
+CFLAGS_macosx=-Wall -O2 -fno-common $(DEF)
 LDFLAGS_macosx= -bundle -undefined dynamic_lookup -o 
 LD_macosx=gcc
 SOCKET_macosx=usocket.o
@@ -186,8 +82,7 @@ SO_freebsd=so
 O_freebsd=o
 CC_freebsd=gcc
 DEF_freebsd=-DLUASOCKET_$(DEBUG) -DUNIX_HAS_SUN_LEN
-CFLAGS_freebsd=$(LUAINC:%=-I%) $(DEF) -Wall -Wshadow -Wextra \
-	-Wimplicit -O2 -ggdb3 -fpic
+CFLAGS_freebsd=-g -O2 -Wall -Wshadow -Wextra -Wimplicit $(DEF)
 LDFLAGS_freebsd=-O -shared -fpic -o
 LD_freebsd=gcc
 SOCKET_freebsd=usocket.o
@@ -199,8 +94,7 @@ SO_solaris=so
 O_solaris=o
 CC_solaris=gcc
 DEF_solaris=-DLUASOCKET_$(DEBUG)
-CFLAGS_solaris=$(LUAINC:%=-I%) $(DEF) -Wall -Wshadow -Wextra \
-	-Wimplicit -O2 -ggdb3 -fpic
+CFLAGS_solaris=-g -O2 -Wall -Wshadow -Wextra -Wimplicit $(DEF)
 LDFLAGS_solaris=-lnsl -lsocket -lresolv -O -shared -fpic -o 
 LD_solaris=gcc
 SOCKET_solaris=usocket.o
@@ -211,10 +105,9 @@ SOCKET_solaris=usocket.o
 SO_mingw=dll
 O_mingw=o
 CC_mingw=gcc
-DEF_mingw= -DLUASOCKET_$(DEBUG) \
-	-DWINVER=0x0501
-CFLAGS_mingw=$(LUAINC:%=-I%) $(DEF) -Wall -O2 -fno-common
-LDFLAGS_mingw= $(LUALIB) -shared -Wl,-s -lws2_32 -o 
+DEF_mingw= -DLUASOCKET_$(DEBUG) -DWINVER=0x0501
+CFLAGS_mingw= -O2 -Wall -fno-common $(DEF)
+LDFLAGS_mingw= -shared -Wl,-s -lws2_32 -o 
 LD_mingw=gcc
 SOCKET_mingw=wsocket.o
 
@@ -229,13 +122,13 @@ DEF_win32= //D "WIN32" //D "NDEBUG" //D "_WINDOWS" //D "_USRDLL" \
      //D "_CRT_SECURE_NO_WARNINGS" \
      //D "_WINDLL"  \
      //D "LUASOCKET_$(DEBUG)"
-CFLAGS_win32=$(LUAINC:%=//I "%") $(DEF) //O2 //Ot //MD //W3 //nologo
+CFLAGS_win32=$(DEF) //O2 //Ot //MD //W3 //nologo
 LDFLAGS_win32= //nologo //link //NOLOGO //DLL //INCREMENTAL:NO \
     //MANIFEST //MANIFESTFILE:"intermediate.manifest" \
     /MANIFESTUAC:"level='asInvoker' uiAccess='false'" \
-	//SUBSYSTEM:WINDOWS //OPT:REF //OPT:ICF //DYNAMICBASE:NO \
-    //MACHINE:X86 /LIBPATH:"$(LUALIB)" \
-	$(LUALIBNAME_win32) ws2_32.lib //OUT:
+    //SUBSYSTEM:WINDOWS //OPT:REF //OPT:ICF //DYNAMICBASE:NO \
+    //MACHINE:X86 \
+    ws2_32.lib //OUT:
 
 LD_win32=cl
 SOCKET_win32=wsocket.obj
@@ -250,13 +143,12 @@ DEF_win64= //D "WIN32" //D "NDEBUG" //D "_WINDOWS" //D "_USRDLL" \
      //D "_CRT_SECURE_NO_WARNINGS" \
      //D "_WINDLL"  \
      //D "LUASOCKET_$(DEBUG)"
-CFLAGS_win64=$(LUAINC:%=//I "%") $(DEF) //O2 //Ot //MD //W3 //nologo
+CFLAGS_win64=$(DEF) //O2 //Ot //MD //W3 //nologo
 LDFLAGS_win64= //nologo //link //NOLOGO //DLL //INCREMENTAL:NO \
     //MANIFEST //MANIFESTFILE:"intermediate.manifest" \
     /MANIFESTUAC:"level='asInvoker' uiAccess='false'" \
-	//SUBSYSTEM:WINDOWS //OPT:REF //OPT:ICF //DYNAMICBASE:NO \
-    /LIBPATH:"$(LUALIB)" \
-	$(LUALIBNAME_win64) ws2_32.lib //OUT:
+    //SUBSYSTEM:WINDOWS //OPT:REF //OPT:ICF //DYNAMICBASE:NO \
+    ws2_32.lib //OUT:
 
 LD_win64=cl
 SOCKET_win64=wsocket.obj
@@ -288,8 +180,6 @@ RANLIB= ranlib
 CFLAGS=$(CFLAGS_$(PLAT)) $(MYCFLAGS)
 LDFLAGS=$(LDFLAGS_$(PLAT)) $(MYLDFLAGS)
 LD=$(LD_$(PLAT))
-LUAINC= $(LUAINC_$(PLAT))
-LUALIB= $(LUALIB_$(PLAT))
 
 #------
 # Modules belonging to socket-core
@@ -412,23 +302,6 @@ $(UNIX_A): $(UNIX_OBJS)
 $(SERIAL_A): $(SERIAL_OBJS)
 	$(AR) $@ $(SERIAL_OBJS)
 	$(RANLIB) $@
-
-install:
-	$(INSTALL_DIR) $(INSTALL_TOP_LDIR)
-	$(INSTALL_DATA) $(TO_TOP_LDIR) $(INSTALL_TOP_LDIR)
-	$(INSTALL_DIR) $(INSTALL_SOCKET_LDIR)
-	$(INSTALL_DATA) $(TO_SOCKET_LDIR) $(INSTALL_SOCKET_LDIR)
-	$(INSTALL_DIR) $(INSTALL_SOCKET_CDIR)
-	$(INSTALL_EXEC) $(SOCKET_SO) $(INSTALL_SOCKET_CDIR)/core.$(SO)
-	$(INSTALL_DIR) $(INSTALL_MIME_CDIR)
-	$(INSTALL_EXEC) $(MIME_SO) $(INSTALL_MIME_CDIR)/core.$(SO)
-
-install-unix: install
-	$(INSTALL_EXEC) $(UNIX_SO) $(INSTALL_SOCKET_CDIR)/$(UNIX_SO)
-	$(INSTALL_EXEC) $(SERIAL_SO) $(INSTALL_SOCKET_CDIR)/$(SERIAL_SO)
-
-local:
-	$(MAKE) install INSTALL_TOP_CDIR=.. INSTALL_TOP_LDIR=..
 
 clean:
 	rm -f $(SOCKET_A) $(SOCKET_OBJS) $(SERIAL_OBJS)

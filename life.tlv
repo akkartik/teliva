@@ -1,5 +1,6 @@
 teliva_program = {
   {
+    __teliva_timestamp = [==[original]==],
     grid = [==[
 -- main data structure
 grid = {}

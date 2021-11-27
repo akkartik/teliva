@@ -291,6 +291,22 @@ static int binding_exists (lua_State *L, const char *name) {
 }
 
 
+static const char *special_history_keys[] = {
+  "__teliva_timestamp",
+  "__teliva_undo",
+  "__teliva_note",
+  NULL,
+};
+
+int is_special_history_key(const char *key) {
+  for (const char **curr = special_history_keys; *curr != NULL; ++curr) {
+    if (strcmp(*curr, key) == 0)
+      return 1;
+  }
+  return 0;
+}
+
+
 static const char *look_up_definition (lua_State *L, const char *name) {
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
@@ -303,6 +319,7 @@ static const char *look_up_definition (lua_State *L, const char *name) {
     /* really we expect only one */
     for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
       const char* key = lua_tostring(L, -2);
+      if (is_special_history_key(key)) continue;
       if (strcmp(key, name) == 0)
         return lua_tostring(L, -1);
     }
@@ -325,6 +342,7 @@ int resume_loading_definitions(lua_State *L) {
     /* really we expect only one */
     for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
       const char* key = lua_tostring(L, -2);
+      if (is_special_history_key(key)) continue;
       if (binding_exists(L, key))
         continue;  // most recent binding trumps older ones
       const char* value = lua_tostring(L, -1);
@@ -655,8 +673,9 @@ restart:
   for (int i = history_array_size; i > 0; --i) {
     lua_rawgeti(L, history_array, i);
     int t = lua_gettop(L);
-    for (lua_pushnil(L); lua_next(L, t) != 0;) {
+    for (lua_pushnil(L); lua_next(L, t) != 0; lua_pop(L, 1)) {
       const char *definition_name = lua_tostring(L, -2);
+      if (is_special_history_key(definition_name)) continue;
       lua_getglobal(L, definition_name);
       int is_userdata = lua_isuserdata(L, -1);
       int is_function = lua_isfunction(L, -1);
@@ -669,8 +688,6 @@ restart:
         if (is_current_definition(L, definition_name, i, history_array, history_array_size))
           draw_definition_name(definition_name);
       }
-      lua_pop(L, 1);  // value
-      // leave key on stack for next iteration
     }
     lua_pop(L, 1);  // history element
   }
@@ -679,8 +696,9 @@ restart:
   for (int i = history_array_size; i > 0; --i) {
     lua_rawgeti(L, history_array, i);
     int t = lua_gettop(L);
-    for (lua_pushnil(L); lua_next(L, t) != 0;) {
+    for (lua_pushnil(L); lua_next(L, t) != 0; lua_pop(L, 1)) {
       const char* definition_name = lua_tostring(L, -2);
+      if (is_special_history_key(definition_name)) continue;
       lua_getglobal(L, definition_name);
       int is_userdata = lua_isuserdata(L, -1);
       lua_pop(L, 1);
@@ -690,8 +708,6 @@ restart:
         if (is_current_definition(L, definition_name, i, history_array, history_array_size))
           draw_definition_name(definition_name);
       }
-      lua_pop(L, 1);  // value
-      // leave key on stack for next iteration
     }
     lua_pop(L, 1);  // history element
   }
@@ -705,16 +721,15 @@ restart:
     for (int i = history_array_size; i > 0; --i) {
       lua_rawgeti(L, history_array, i);
       int t = lua_gettop(L);
-      for (lua_pushnil(L); lua_next(L, t) != 0;) {
+      for (lua_pushnil(L); lua_next(L, t) != 0; lua_pop(L, 1)) {
         const char* definition_name = lua_tostring(L, -2);
+        if (is_special_history_key(definition_name)) continue;
         lua_getfield(L, cgt, definition_name);
         int depth = lua_tointeger(L, -1);
         if (depth == level)
           if (is_current_definition(L, definition_name, i, history_array, history_array_size))
             draw_definition_name(definition_name);
         lua_pop(L, 1);  // depth of value
-        lua_pop(L, 1);  // value
-        // leave key on stack for next iteration
       }
       lua_pop(L, 1);  // history element
     }
@@ -726,8 +741,9 @@ restart:
   for (int i = history_array_size; i > 0; --i) {
     lua_rawgeti(L, history_array, i);
     int t = lua_gettop(L);
-    for (lua_pushnil(L); lua_next(L, t) != 0;) {
+    for (lua_pushnil(L); lua_next(L, t) != 0; lua_pop(L, 1)) {
       const char* definition_name = lua_tostring(L, -2);
+      if (is_special_history_key(definition_name)) continue;
       lua_getglobal(L, definition_name);
       int is_function = lua_isfunction(L, -1);
       lua_pop(L, 1);
@@ -736,8 +752,6 @@ restart:
         if (is_current_definition(L, definition_name, i, history_array, history_array_size))
           draw_definition_name(definition_name);
       lua_pop(L, 1);  // depth of value
-      lua_pop(L, 1);  // value
-      // leave key on stack for next iteration
     }
     lua_pop(L, 1);  // history element
   }

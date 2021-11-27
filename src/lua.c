@@ -550,13 +550,13 @@ static void recent_changes_menu (int cursor, int history_array_size) {
 void render_recent_changes (lua_State *L, int history_array, int start_index, int history_array_size) {
   clear();
   attrset(A_BOLD);
-  mvaddstr(1, 1, "Recent changes");
+  mvaddstr(1, 0, "Recent changes");
   attrset(A_NORMAL);
   int y = 3;
   attron(A_REVERSE);
   for (int i = start_index; i > 0; --i) {
     attron(A_BOLD);
-    mvprintw(y, 1, "%3d. ", i);
+    mvprintw(y, 0, "%3d. ", i);
     attrset(A_NORMAL);
     lua_rawgeti(L, history_array, i);
     int t = lua_gettop(L);
@@ -589,7 +589,7 @@ void render_recent_changes (lua_State *L, int history_array, int start_index, in
       lua_pop(L, 1);
       y++;
       const char *definition_contents = lua_tostring(L, -1);
-      int x = 1;
+      int x = 0;
       move(y, x);
       for (int j = 0; j < strlen(definition_contents); ++j) {
         char c = definition_contents[j];
@@ -602,7 +602,7 @@ void render_recent_changes (lua_State *L, int history_array, int start_index, in
         else {
           /* newline */
           ++y;
-          x = 1;
+          x = 0;
           move(y, x);
           attroff(FG(6));
         }

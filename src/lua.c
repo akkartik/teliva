@@ -593,14 +593,18 @@ void render_recent_changes (lua_State *L, int history_array, int start_index, in
       move(y, x);
       for (int j = 0; j < strlen(definition_contents); ++j) {
         char c = definition_contents[j];
+        if (c == '-' && j+1 < strlen(definition_contents) && definition_contents[j+1] == '-')
+          attron(FG(6));
         if (c != '\n') {
           addch(definition_contents[j]);
           ++x;
         }
         else {
+          /* newline */
           ++y;
           x = 1;
           move(y, x);
+          attroff(FG(6));
         }
       }
       y++;

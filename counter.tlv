@@ -1,16 +1,19 @@
 teliva_program = {
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     window = [==[
 window = curses.stdscr()]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     n = [==[
 n = 0]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     render = [==[
 function render(window)
   window:clear()
@@ -24,12 +27,14 @@ function render(window)
 end]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     menu = [==[
 menu = {Enter="increment"}]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     update = [==[
 function update(window)
   local key = curses.getch()
@@ -39,7 +44,8 @@ function update(window)
 end]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     main = [==[
 function main()
   for i=1,7 do

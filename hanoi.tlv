@@ -1,6 +1,7 @@
 teliva_program = {
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     render = [==[
 function render(window)
   window:clear()
@@ -14,7 +15,8 @@ function render(window)
 end]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     lines = [==[
 function lines(window)
   local lines, cols = window:getmaxyx()
@@ -22,19 +24,22 @@ function lines(window)
 end]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     pop = [==[
 function pop(array)
   return table.remove(array)
 end]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     window = [==[
 window = curses.stdscr()]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     render_tower = [==[
 function render_tower(window, line, col, tower_index, tower)
   window:attron(curses.A_BOLD)
@@ -56,12 +61,14 @@ function render_tower(window, line, col, tower_index, tower)
 end]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     tower = [==[
 tower = {{6, 5, 4, 3, 2}, {}, {}}]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     render_disk = [==[
 function render_disk(window, line, col, size)
   col = col-size+1
@@ -74,7 +81,8 @@ function render_disk(window, line, col, size)
 end]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     main = [==[
 function main()
   for i=1,7 do
@@ -89,7 +97,8 @@ end
 ]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     len = [==[
 function len(array)
   local result = 0
@@ -100,7 +109,8 @@ function len(array)
 end]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     update = [==[
 function update(window)
   window:mvaddstr(lines(window)-2, 5, "tower to remove top disk from? ")
@@ -111,7 +121,8 @@ function update(window)
 end]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     make_move = [==[
 function make_move(from, to)
   local disk = pop(tower[from])
@@ -119,7 +130,8 @@ function make_move(from, to)
 end]==],
   },
   {
-    __teliva_timestamp = [==[original]==],
+    __teliva_timestamp = [==[
+original]==],
     cols = [==[
 function cols(window)
   local lines, cols = window:getmaxyx()

@@ -964,7 +964,7 @@ void developer_mode (lua_State *L) {
     init_pair(i, i, -1);
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, -1, i);
-  nodelay(stdscr, 0);
+  nodelay(stdscr, 0);  /* make getch() block */
   if (load_view_from_editor_state(L))
     big_picture_view(L);
   cleanup_curses();

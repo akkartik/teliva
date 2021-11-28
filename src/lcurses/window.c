@@ -1313,8 +1313,10 @@ Wgetch(lua_State *L)
 
 	if (c == ERR)
 		return 0;
-	if (c == CTRL_X)
+	if (c == CTRL_X) {
+		unlink("teliva_editor_state");
 		exit(0);
+	}
 	if (c == CTRL_E)
 		switch_to_editor(L);
 	/* handle other standard menu hotkeys here */

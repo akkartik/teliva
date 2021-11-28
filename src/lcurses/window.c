@@ -36,8 +36,8 @@
 @classmod curses.window
 */
 
+#include "../teliva.h"
 #include "_helpers.c"
-
 #include "chstr.c"
 
 
@@ -1313,9 +1313,9 @@ Wgetch(lua_State *L)
 
 	if (c == ERR)
 		return 0;
-	if (c == 24)  /* ctrl-x */
+	if (c == CTRL_X)
 		exit(0);
-	if (c == 5)  /* ctrl-e */
+	if (c == CTRL_E)
 		switch_to_editor(L);
 	/* handle other standard menu hotkeys here */
 

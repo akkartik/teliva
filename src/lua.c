@@ -674,7 +674,6 @@ void recent_changes_view (lua_State *L) {
     /* refresh state after each operation so we pick up modifications */
     lua_getglobal(L, "teliva_program");
     history_array = lua_gettop(L);
-    assert(history_array == 1);
     history_array_size = luaL_getn(L, history_array);
     render_recent_changes(L, history_array, cursor, history_array_size);
     int c = getch();
@@ -692,7 +691,8 @@ void recent_changes_view (lua_State *L) {
         break;
       case CTRL_E:
         save_note_to_editor_buffer(L, cursor);
-        /* TODO: some hotkeys advertised but broken: go, big picture */
+        /* big picture hotkey unnecessarily available here */
+        /* TODO: go hotkey is misleading. edits will not be persisted until you return to recent changes */
         edit(L, "teliva_editor_buffer", /*status message*/ "");
         load_note_from_editor_buffer(L, cursor);
         save_image(L);

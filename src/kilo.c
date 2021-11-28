@@ -972,6 +972,7 @@ void word_at_cursor(char* out, int capacity) {
   int cidx = E.coloff + E.cx;
   int len = 0;
   memset(out, 0, capacity);
+  if (row == NULL) return;
   /* scan back to first identifier char */
   while (cidx > 0) {
     --cidx;
@@ -989,15 +990,20 @@ void word_at_cursor(char* out, int capacity) {
     strncpy(out, &row->chars[cidx], len);
 }
 
+/* Jump to some definition. */
 extern void save_to_current_definition_and_editor_buffer(lua_State *L, char *name);
 extern void load_editor_buffer_to_current_definition_in_image(lua_State *L);
+extern char Current_definition[];
 #define CURRENT_DEFINITION_LEN 256
 static void editorGo(lua_State* L) {
     char query[CURRENT_DEFINITION_LEN+1] = {0};
     int qlen = 0;
 
-    editorSaveToDisk();
-    load_editor_buffer_to_current_definition_in_image(L);
+    if (strlen(Current_definition) > 0) {
+      /* We're currently editing a definition. Save it. */
+      editorSaveToDisk();
+      load_editor_buffer_to_current_definition_in_image(L);
+    }
 
     word_at_cursor(query, CURRENT_DEFINITION_LEN);
     qlen = strlen(query);

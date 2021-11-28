@@ -433,10 +433,8 @@ static void read_editor_buffer (char *out) {
 
 
 static void update_definition (lua_State *L, const char *name, char *new_contents) {
-  assert(lua_gettop(L) == 0);
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
-  assert(history_array == 1);
   /* create a new table containing a single binding */
   lua_createtable(L, /*number of fields per mutation*/2, 0);
   lua_pushstring(L, new_contents);
@@ -452,7 +450,7 @@ static void update_definition (lua_State *L, const char *name, char *new_content
   int history_array_size = luaL_getn(L, history_array);
   ++history_array_size;
   lua_rawseti(L, history_array, history_array_size);
-  lua_settop(L, 0);
+  lua_settop(L, history_array);
 }
 
 
@@ -943,7 +941,17 @@ int restore_editor_view (lua_State *L) {
   int cx = lua_tointeger(L, -1);
   lua_settop(L, editor_state_index);
   int back_to_big_picture = edit_from(L, "teliva_editor_buffer", /*error message*/ "", rowoff, coloff, cy, cx);
-  // TODO: error handling like in edit_current_definition
+  // error handling
+  while (1) {
+    int status;
+    status = load_editor_buffer_to_current_definition_in_image(L);
+    if (status == 0 || lua_isnil(L, -1))
+      break;
+    Previous_error = lua_tostring(L, -1);
+    if (Previous_error == NULL) Previous_error = "(error object is not a string)";
+    back_to_big_picture = resumeEdit(L);
+    lua_pop(L, 1);
+  }
   return back_to_big_picture;
 }
 

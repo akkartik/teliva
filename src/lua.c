@@ -403,9 +403,9 @@ static int handle_image (lua_State *L, char **argv, int n) {
 #define CURRENT_DEFINITION_LEN 256
 char Current_definition[CURRENT_DEFINITION_LEN+1] = {0};
 
-void save_snapshot (int rowoff, int coloff, int cy, int cx) {
-  FILE *out = fopen("teliva_snapshot", "w");
-  fprintf(out, "__teliva_snapshot = {\n");
+void save_editor_state (int rowoff, int coloff, int cy, int cx) {
+  FILE *out = fopen("teliva_editor_state", "w");
+  fprintf(out, "__teliva_editor_state = {\n");
   fprintf(out, "  image = \"%s\", definition = \"%s\",\n", Image_name, Current_definition);
   fprintf(out, "  rowoff = %d, coloff = %d,\n", rowoff, coloff);
   fprintf(out, "  cy = %d, cx = %d,\n", cy, cx);
@@ -417,7 +417,7 @@ void save_to_current_definition_and_editor_buffer (lua_State *L, const char *def
   int current_stack_index = lua_gettop(L);
   strncpy(Current_definition, definition, CURRENT_DEFINITION_LEN);
   int status = look_up_definition(L, Current_definition);
-  FILE *out = fopen("teliva_editbuffer", "w");
+  FILE *out = fopen("teliva_editor_buffer", "w");
   if (status)
     fprintf(out, "%s", lua_tostring(L, -1));
   fclose(out);
@@ -426,7 +426,7 @@ void save_to_current_definition_and_editor_buffer (lua_State *L, const char *def
 
 
 static void read_editor_buffer (char *out) {
-  FILE *in = fopen("teliva_editbuffer", "r");
+  FILE *in = fopen("teliva_editor_buffer", "r");
   fread(out, 8190, 1, in);  /* TODO: handle overly large file */
   fclose(in);
 }
@@ -492,11 +492,11 @@ extern int edit (lua_State *L, char *filename, const char *message);
 extern void clearEditor (void);
 extern int editorOpen (char *filename);
 int edit_buffer (lua_State *L, const char *message) {
-  return edit(L, "teliva_editbuffer", message);
+  return edit(L, "teliva_editor_buffer", message);
 }
 void editor_refresh_buffer (void) {
   clearEditor();
-  editorOpen("teliva_editbuffer");
+  editorOpen("teliva_editor_buffer");
 }
 
 
@@ -659,7 +659,7 @@ void save_note_to_editor_buffer (lua_State *L, int cursor) {
   lua_rawgeti(L, -1, cursor);
   lua_getfield(L, -1, "__teliva_note");
   const char *contents = lua_tostring(L, -1);
-  FILE *out = fopen("teliva_editbuffer", "w");
+  FILE *out = fopen("teliva_editor_buffer", "w");
   if (contents != NULL)
     fprintf(out, "%s", contents);
   fclose(out);
@@ -921,44 +921,44 @@ restart:
 
 
 /* return true if:
- *  - snapshot was successfully loaded, and
- *  - snapshot is applicable to this run, and
+ *  - editor_state was successfully loaded, and
+ *  - editor_state is applicable to this run, and
  *  - we successfully switched to the desired view */
 extern int edit_from(lua_State* L, char* filename, const char* message, int rowoff, int coloff, int cy, int cx);
-int load_view_from_snapshot (lua_State *L) {
+int load_view_from_editor_state (lua_State *L) {
   int status;
-  status = luaL_loadfile(L, "teliva_snapshot");
+  status = luaL_loadfile(L, "teliva_editor_state");
   if (status != 0) return 0;
   status = docall(L, 0, 0);
   if (status != 0) return 0;
-  lua_getglobal(L, "__teliva_snapshot");
-  int snapshot_index = lua_gettop(L);
-  lua_getfield(L, snapshot_index, "image");
+  lua_getglobal(L, "__teliva_editor_state");
+  int editor_state_index = lua_gettop(L);
+  lua_getfield(L, editor_state_index, "image");
   const char *image_name = lua_tostring(L, -1);
   if (strcmp(image_name, Image_name) != 0) {
-    lua_settop(L, snapshot_index);
+    lua_settop(L, editor_state_index);
     return 0;
   }
-  lua_getfield(L, snapshot_index, "definition");
+  lua_getfield(L, editor_state_index, "definition");
   const char *definition = lua_tostring(L, -1);
   int before = lua_gettop(L);
   save_to_current_definition_and_editor_buffer(L, definition);
-  lua_getfield(L, snapshot_index, "rowoff");
+  lua_getfield(L, editor_state_index, "rowoff");
   int rowoff = lua_tointeger(L, -1);
-  lua_getfield(L, snapshot_index, "coloff");
+  lua_getfield(L, editor_state_index, "coloff");
   int coloff = lua_tointeger(L, -1);
-  lua_getfield(L, snapshot_index, "cy");
+  lua_getfield(L, editor_state_index, "cy");
   int cy = lua_tointeger(L, -1);
-  lua_getfield(L, snapshot_index, "cx");
+  lua_getfield(L, editor_state_index, "cx");
   int cx = lua_tointeger(L, -1);
-  edit_from(L, "teliva_editbuffer", /*error message*/ "", rowoff, coloff, cy, cx);
-  lua_settop(L, snapshot_index);
+  edit_from(L, "teliva_editor_buffer", /*error message*/ "", rowoff, coloff, cy, cx);
+  lua_settop(L, editor_state_index);
   return 1;
 }
 
 
 void select_view (lua_State *L) {
-  if (!load_view_from_snapshot(L))
+  if (!load_view_from_editor_state(L))
     big_picture_view(L);
 }
 

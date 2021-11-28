@@ -991,7 +991,6 @@ void word_at_cursor(char* out, int capacity) {
 
 extern void save_to_current_definition_and_editor_buffer(lua_State *L, char *name);
 extern void load_editor_buffer_to_current_definition_in_image(lua_State *L);
-extern void editor_refresh_buffer(void);
 #define CURRENT_DEFINITION_LEN 256
 static void editorGo(lua_State* L) {
     char query[CURRENT_DEFINITION_LEN+1] = {0};
@@ -1014,7 +1013,8 @@ static void editorGo(lua_State* L) {
             editorSetStatusMessage("");
             if (c == ENTER) {
               save_to_current_definition_and_editor_buffer(L, query);
-              editor_refresh_buffer();
+              clearEditor();
+              editorOpen("teliva_editor_buffer");
             }
             return;
         } else if (c == CTRL_U) {

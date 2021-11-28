@@ -489,14 +489,8 @@ static void save_image (lua_State *L) {
 /* death and rebirth */
 char **Argv = NULL;
 extern int edit (lua_State *L, char *filename, const char *message);
-extern void clearEditor (void);
-extern int editorOpen (char *filename);
 int edit_buffer (lua_State *L, const char *message) {
   return edit(L, "teliva_editor_buffer", message);
-}
-void editor_refresh_buffer (void) {
-  clearEditor();
-  editorOpen("teliva_editor_buffer");
 }
 
 

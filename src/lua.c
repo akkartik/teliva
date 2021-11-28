@@ -398,6 +398,17 @@ static int handle_image (lua_State *L, char **argv, int n) {
 
 #define CURRENT_DEFINITION_LEN 256
 char Current_definition[CURRENT_DEFINITION_LEN+1] = {0};
+
+void save_snapshot (int rowoff, int coloff, int cy, int cx) {
+  FILE *out = fopen("teliva_snapshot", "w");
+  fprintf(out, "__teliva_snapshot = {\n");
+  fprintf(out, "  image = \"%s\", definition = \"%s\",\n", Image_name, Current_definition);
+  fprintf(out, "  rowoff = %d, coloff = %d,\n", rowoff, coloff);
+  fprintf(out, "  cy = %d, cx = %d,\n", cy, cx);
+  fprintf(out, "}\n");
+  fclose(out);
+}
+
 void save_to_current_definition_and_editor_buffer (lua_State *L, const char *definition) {
   strncpy(Current_definition, definition, CURRENT_DEFINITION_LEN);
   const char *contents = look_up_definition(L, Current_definition);
@@ -444,7 +455,7 @@ static void save_image (lua_State *L) {
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
   int history_array_size = luaL_getn(L, history_array);
-  FILE* out = fopen(Image_name, "w");
+  FILE *out = fopen(Image_name, "w");
   fprintf(out, "teliva_program = {\n");
   for (int i = 1;  i <= history_array_size; ++i) {
     lua_rawgeti(L, history_array, i);

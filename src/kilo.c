@@ -1033,6 +1033,7 @@ static void editorGo(lua_State* L) {
  * is typing stuff on the terminal. */
 static int Quit = 0;
 static int Back_to_big_picture = 0;
+extern void save_snapshot(int rowoff, int coloff, int cy, int cx);
 static void editorProcessKeypress(lua_State* L) {
     int c = getch();
     switch(c) {
@@ -1046,6 +1047,7 @@ static void editorProcessKeypress(lua_State* L) {
     case CTRL_E:
         /* Save and quit. */
         editorSaveToDisk();
+        save_snapshot(E.rowoff, E.coloff, E.cy, E.cx);
         Quit = 1;
         break;
     case CTRL_G:

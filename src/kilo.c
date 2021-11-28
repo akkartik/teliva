@@ -1132,6 +1132,24 @@ int edit(lua_State* L, char* filename, const char* message) {
     return Back_to_big_picture;
 }
 
+/* return true if user chose to back into the big picture view */
+int edit_from(lua_State* L, char* filename, const char* message, int rowoff, int coloff, int cy, int cx) {
+    Quit = 0;
+    Back_to_big_picture = 0;
+    initEditor();
+    E.rowoff = rowoff;
+    E.coloff = coloff;
+    E.cy = cy;
+    E.cx = cx;
+    editorOpen(filename);
+    editorSetStatusMessage(message);
+    while(!Quit) {
+        editorRefreshScreen(editorMenu);
+        editorProcessKeypress(L);
+    }
+    return Back_to_big_picture;
+}
+
 int resumeEdit(lua_State* L) {
     Quit = 0;
     Back_to_big_picture = 0;

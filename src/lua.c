@@ -920,6 +920,49 @@ restart:
 }
 
 
+/* return true if:
+ *  - snapshot was successfully loaded, and
+ *  - snapshot is applicable to this run, and
+ *  - we successfully switched to the desired view */
+extern int edit_from(lua_State* L, char* filename, const char* message, int rowoff, int coloff, int cy, int cx);
+int load_view_from_snapshot (lua_State *L) {
+  int status;
+  status = luaL_loadfile(L, "teliva_snapshot");
+  if (status != 0) return 0;
+  status = docall(L, 0, 0);
+  if (status != 0) return 0;
+  lua_getglobal(L, "__teliva_snapshot");
+  int snapshot_index = lua_gettop(L);
+  lua_getfield(L, snapshot_index, "image");
+  const char *image_name = lua_tostring(L, -1);
+  if (strcmp(image_name, Image_name) != 0) {
+    lua_settop(L, snapshot_index);
+    return 0;
+  }
+  lua_getfield(L, snapshot_index, "definition");
+  const char *definition = lua_tostring(L, -1);
+  int before = lua_gettop(L);
+  save_to_current_definition_and_editor_buffer(L, definition);
+  lua_getfield(L, snapshot_index, "rowoff");
+  int rowoff = lua_tointeger(L, -1);
+  lua_getfield(L, snapshot_index, "coloff");
+  int coloff = lua_tointeger(L, -1);
+  lua_getfield(L, snapshot_index, "cy");
+  int cy = lua_tointeger(L, -1);
+  lua_getfield(L, snapshot_index, "cx");
+  int cx = lua_tointeger(L, -1);
+  edit_from(L, "teliva_editbuffer", /*error message*/ "", rowoff, coloff, cy, cx);
+  lua_settop(L, snapshot_index);
+  return 1;
+}
+
+
+void select_view (lua_State *L) {
+  if (!load_view_from_snapshot(L))
+    big_picture_view(L);
+}
+
+
 extern void cleanup_curses (void);
 void switch_to_editor (lua_State *L) {
   /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */
@@ -928,7 +971,7 @@ void switch_to_editor (lua_State *L) {
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, -1, i);
   nodelay(stdscr, 0);
-  big_picture_view(L);
+  select_view(L);
   cleanup_curses();
   execv(Argv[0], Argv);
   /* never returns */

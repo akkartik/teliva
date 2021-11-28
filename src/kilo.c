@@ -652,6 +652,8 @@ static void editorMenu(void) {
     draw_menu_item("^g", "go");
     draw_menu_item("^b", "big picture");
     draw_menu_item("^f", "find");
+    draw_menu_item("^a", "start of line");
+    draw_menu_item("^l", "end of line");
     attrset(A_NORMAL);
 }
 
@@ -882,6 +884,10 @@ static void editorFind() {
 
 /* ========================= Editor events handling  ======================== */
 
+static int editorAtStartOfLine() {
+  return E.coloff == 0 && E.cx == 0;
+}
+
 /* Handle cursor position change because arrow keys were pressed. */
 static void editorMoveCursor(int key) {
     int filerow = E.rowoff+E.cy;
@@ -1070,15 +1076,24 @@ static void editorProcessKeypress(lua_State* L) {
             editorMoveCursor(c == KEY_PPAGE ? KEY_UP : KEY_DOWN);
         }
         break;
-
+    case CTRL_A:
+        while (!editorAtStartOfLine())
+          editorMoveCursor(KEY_LEFT);
+        break;
+    case CTRL_L:
+        while (1) {
+          editorMoveCursor(KEY_RIGHT);
+          if (editorAtStartOfLine()) {
+            editorMoveCursor(KEY_LEFT);
+            break;
+          }
+        }
+        break;
     case KEY_UP:
     case KEY_DOWN:
     case KEY_LEFT:
     case KEY_RIGHT:
         editorMoveCursor(c);
-        break;
-    case CTRL_L:
-        /* Just refresh the line as side effect. */
         break;
     case ESC:
         /* Nothing to do for ESC in this mode. */

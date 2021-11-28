@@ -3,6 +3,7 @@
 
 enum KEY_ACTION {
   KEY_NULL = 0,
+  CTRL_A = 1,
   CTRL_B = 2,
   CTRL_C = 3,
   CTRL_D = 4,

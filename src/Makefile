@@ -49,7 +49,7 @@ $(LUA_A): $(CORE_O) $(LIB_O)
 	$(AR) $@ $(CORE_O) $(LIB_O)
 	$(RANLIB) $@
 
-$(LUA_T): $(LUA_O) $(LUA_A)
+$(LUA_T): $(LUA_O) $(LUA_A) lcurses/curses.o luasocket/socket.a luasocket/mime.a luasec/ssl.a
 	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) lcurses/curses.o luasocket/socket.a luasocket/mime.a luasec/ssl.a $(LIBS)
 
 clean:

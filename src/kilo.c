@@ -810,7 +810,7 @@ static void editorFind() {
         mvprintw(LINES-2, 0, "Find: %s", query);
 
         int c = getch();
-        if (c == KEY_BACKSPACE) {
+        if (c == TELIVA_BACKSPACE) {
             if (qlen != 0) query[--qlen] = '\0';
             last_match = -1;
         } else if (c == ESC || c == ENTER) {

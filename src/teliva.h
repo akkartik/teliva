@@ -11,6 +11,11 @@ enum KEY_ACTION {
   CTRL_F = 6,
   CTRL_G = 7,
   CTRL_H = 8,
+#if APPLE
+  TELIVA_BACKSPACE = KEY_DELETE,
+#else
+  TELIVA_BACKSPACE = KEY_BACKSPACE,
+#endif
   TAB = 9,
   ENTER = 10,
   CTRL_L = 12,

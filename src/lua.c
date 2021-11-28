@@ -404,6 +404,7 @@ static int handle_image (lua_State *L, char **argv, int n) {
 char Current_definition[CURRENT_DEFINITION_LEN+1] = {0};
 
 void save_editor_state (int rowoff, int coloff, int cy, int cx) {
+  if (strlen(Current_definition) == 0) return;
   FILE *out = fopen("teliva_editor_state", "w");
   fprintf(out, "__teliva_editor_state = {\n");
   fprintf(out, "  image = \"%s\", definition = \"%s\",\n", Image_name, Current_definition);

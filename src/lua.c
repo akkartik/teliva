@@ -941,7 +941,6 @@ int load_view_from_editor_state (lua_State *L) {
   }
   lua_getfield(L, editor_state_index, "definition");
   const char *definition = lua_tostring(L, -1);
-  int before = lua_gettop(L);
   save_to_current_definition_and_editor_buffer(L, definition);
   lua_getfield(L, editor_state_index, "rowoff");
   int rowoff = lua_tointeger(L, -1);

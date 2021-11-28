@@ -311,7 +311,10 @@ int is_special_history_key(const char *key) {
 }
 
 
-static const char *look_up_definition (lua_State *L, const char *name) {
+/* when found, return 1 and leave string on top of stack
+ * when not found, return 0
+ * caller is responsible for cleaning up the stack. */
+static int look_up_definition (lua_State *L, const char *name) {
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
   /* iterate over mutations in teliva_program history in reverse order */
@@ -332,11 +335,12 @@ static const char *look_up_definition (lua_State *L, const char *name) {
       }
       if (is_special_history_key(key)) continue;
       if (strcmp(key, name) == 0)
-        return lua_tostring(L, -1);
+        return 1;
     }
+    lua_pop(L, 1);
   }
   lua_pop(L, 1);
-  return NULL;
+  return 0;
 }
 
 
@@ -410,13 +414,14 @@ void save_snapshot (int rowoff, int coloff, int cy, int cx) {
 }
 
 void save_to_current_definition_and_editor_buffer (lua_State *L, const char *definition) {
+  int current_stack_index = lua_gettop(L);
   strncpy(Current_definition, definition, CURRENT_DEFINITION_LEN);
-  const char *contents = look_up_definition(L, Current_definition);
+  int status = look_up_definition(L, Current_definition);
   FILE *out = fopen("teliva_editbuffer", "w");
-  if (contents != NULL)
-    fprintf(out, "%s", contents);
+  if (status)
+    fprintf(out, "%s", lua_tostring(L, -1));
   fclose(out);
-  lua_settop(L, 0);  /* reclaim contents */
+  lua_settop(L, current_stack_index);
 }
 
 

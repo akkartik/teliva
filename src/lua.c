@@ -515,8 +515,7 @@ int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
 /* But only if there are no errors. Otherwise things can get confusing. */
 const char *Previous_error = NULL;
 extern int resumeEdit (lua_State *L);
-int edit_image (lua_State *L, const char *definition) {
-  save_to_current_definition_and_editor_buffer(L, definition);
+int edit_current_definition (lua_State *L) {
   int back_to_big_picture = edit_buffer(L, /*status message*/ "");
   // error handling
   while (1) {
@@ -900,7 +899,8 @@ restart:
     } else if (c == ESC) {
       return;
     } else if (c == ENTER) {
-      int back_to_big_picture = edit_image(L, query);
+      save_to_current_definition_and_editor_buffer(L, query);
+      int back_to_big_picture = edit_current_definition(L);
       if (back_to_big_picture) goto restart;
       return;
     } else if (c == CTRL_U) {
@@ -952,7 +952,7 @@ int load_view_from_editor_state (lua_State *L) {
   int cx = lua_tointeger(L, -1);
   int back_to_big_picture = edit_from(L, "teliva_editor_buffer", /*error message*/ "", rowoff, coloff, cy, cx);
   lua_settop(L, editor_state_index);
-  // TODO: error handling like in edit_image
+  // TODO: error handling like in edit_current_definition
   return back_to_big_picture;
 }
 

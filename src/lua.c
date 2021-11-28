@@ -486,14 +486,6 @@ static void save_image (lua_State *L) {
 }
 
 
-/* death and rebirth */
-char **Argv = NULL;
-extern int edit (lua_State *L, char *filename, const char *message);
-int edit_buffer (lua_State *L, const char *message) {
-  return edit(L, "teliva_editor_buffer", message);
-}
-
-
 int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
   char new_contents[8192] = {0};
   read_editor_buffer(new_contents);
@@ -508,9 +500,10 @@ int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
 /* return true if user chose to back into the big picture view */
 /* But only if there are no errors. Otherwise things can get confusing. */
 const char *Previous_error = NULL;
+extern int edit (lua_State *L, char *filename, const char *message);
 extern int resumeEdit (lua_State *L);
 int edit_current_definition (lua_State *L) {
-  int back_to_big_picture = edit_buffer(L, /*status message*/ "");
+  int back_to_big_picture = edit(L, "teliva_editor_buffer", /*status message*/ "");
   // error handling
   while (1) {
     int status;
@@ -701,7 +694,8 @@ void recent_changes_view (lua_State *L) {
         break;
       case CTRL_E:
         save_note_to_editor_buffer(L, cursor);
-        edit_buffer(L, "");
+        /* TODO: some hotkeys advertised but broken: go, big picture */
+        edit(L, "teliva_editor_buffer", /*status message*/ "");
         load_note_from_editor_buffer(L, cursor);
         save_image(L);
         break;
@@ -951,6 +945,7 @@ int load_view_from_editor_state (lua_State *L) {
 }
 
 
+char **Argv = NULL;
 extern void cleanup_curses (void);
 void developer_mode (lua_State *L) {
   /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */

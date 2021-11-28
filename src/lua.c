@@ -908,25 +908,28 @@ restart:
 }
 
 
-/* return false if:
- *  - editor_state was successfully loaded, and
- *  - editor_state is applicable to this run, and
- *  - we successfully switched to the desired view */
-extern int edit_from(lua_State* L, char* filename, const char* message, int rowoff, int coloff, int cy, int cx);
-int load_view_from_editor_state (lua_State *L) {
+/* return true if:
+ *  - editor_state exists, and
+ *  - editor_state is applicable to the current image */
+int editor_view_in_progress (lua_State *L) {
   int status;
   status = luaL_loadfile(L, "teliva_editor_state");
-  if (status != 0) return 1;
+  if (status != 0) return 0;
   status = docall(L, 0, 0);
-  if (status != 0) return 1;
+  if (status != 0) return 0;
   lua_getglobal(L, "__teliva_editor_state");
   int editor_state_index = lua_gettop(L);
   lua_getfield(L, editor_state_index, "image");
   const char *image_name = lua_tostring(L, -1);
-  if (strcmp(image_name, Image_name) != 0) {
-    lua_settop(L, editor_state_index);
-    return 1;
-  }
+  const int result = (strcmp(image_name, Image_name) == 0);
+  lua_settop(L, editor_state_index);
+  return result;
+}
+
+extern int edit_from(lua_State* L, char* filename, const char* message, int rowoff, int coloff, int cy, int cx);
+int editor_view (lua_State *L) {
+  lua_getglobal(L, "__teliva_editor_state");
+  int editor_state_index = lua_gettop(L);
   lua_getfield(L, editor_state_index, "definition");
   const char *definition = lua_tostring(L, -1);
   save_to_current_definition_and_editor_buffer(L, definition);
@@ -954,7 +957,10 @@ void developer_mode (lua_State *L) {
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, -1, i);
   nodelay(stdscr, 0);  /* make getch() block */
-  if (load_view_from_editor_state(L))
+  int switch_to_big_picture_view = 1;
+  if (editor_view_in_progress(L))
+    switch_to_big_picture_view = editor_view(L);
+  if (switch_to_big_picture_view)
     big_picture_view(L);
   cleanup_curses();
   execv(Argv[0], Argv);

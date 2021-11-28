@@ -957,12 +957,6 @@ int load_view_from_editor_state (lua_State *L) {
 }
 
 
-void select_view (lua_State *L) {
-  if (load_view_from_editor_state(L))
-    big_picture_view(L);
-}
-
-
 extern void cleanup_curses (void);
 void developer_mode (lua_State *L) {
   /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */
@@ -971,7 +965,8 @@ void developer_mode (lua_State *L) {
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, -1, i);
   nodelay(stdscr, 0);
-  select_view(L);
+  if (load_view_from_editor_state(L))
+    big_picture_view(L);
   cleanup_curses();
   execv(Argv[0], Argv);
   /* never returns */

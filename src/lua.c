@@ -662,7 +662,7 @@ void load_note_from_editor_buffer (lua_State *L, int cursor) {
 }
 
 
-void recent_changes (lua_State *L) {
+void recent_changes_view (lua_State *L) {
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
   assert(history_array == 1);
@@ -763,7 +763,7 @@ void draw_definition_name (const char *definition_name) {
 }
 
 /* return true if submitted */
-void big_picture (lua_State *L) {
+void big_picture_view (lua_State *L) {
 restart:
   clear();
   luaL_newmetatable(L, "__teliva_call_graph_depth");
@@ -891,7 +891,7 @@ restart:
       qlen = 0;
       query[qlen] = '\0';
     } else if (c == CTRL_R) {
-      recent_changes(L);
+      recent_changes_view(L);
       goto restart;
     } else if (isprint(c)) {
       if (qlen < CURRENT_DEFINITION_LEN) {
@@ -912,7 +912,7 @@ void switch_to_editor (lua_State *L) {
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, -1, i);
   nodelay(stdscr, 0);
-  big_picture(L);
+  big_picture_view(L);
   cleanup_curses();
   execv(Argv[0], Argv);
   /* never returns */

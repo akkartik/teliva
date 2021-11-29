@@ -1013,7 +1013,7 @@ static void editorGo(lua_State* L) {
         mvprintw(LINES-2, 0, "Go to: %s", query);
 
         int c = getch();
-        if (c == KEY_BACKSPACE) {
+        if (c == TELIVA_BACKSPACE) {
             if (qlen != 0) query[--qlen] = '\0';
         } else if (c == ESC || c == ENTER) {
             editorSetStatusMessage("");
@@ -1069,7 +1069,7 @@ static void editorProcessKeypress(lua_State* L) {
     case CTRL_F:
         editorFind();
         break;
-    case KEY_BACKSPACE:
+    case TELIVA_BACKSPACE:
         editorDelChar();
         break;
     case KEY_NPAGE:

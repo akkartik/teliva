@@ -11,8 +11,8 @@ enum KEY_ACTION {
   CTRL_F = 6,
   CTRL_G = 7,
   CTRL_H = 8,
-#if APPLE
-  TELIVA_BACKSPACE = KEY_DELETE,
+#if __APPLE__
+  TELIVA_BACKSPACE = KEY_DC,  /* delete */
 #else
   TELIVA_BACKSPACE = KEY_BACKSPACE,
 #endif

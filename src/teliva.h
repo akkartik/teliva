@@ -18,6 +18,7 @@ enum KEY_ACTION {
 #endif
   TAB = 9,
   ENTER = 10,
+  CTRL_K = 11,
   CTRL_L = 12,
   CTRL_Q = 17,
   CTRL_R = 18,

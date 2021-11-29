@@ -389,7 +389,7 @@ static void editorFreeRow(erow *row) {
     free(row->hl);
 }
 
-/* Remove the row at the specified position, shifting the remainign on the
+/* Remove the row at the specified position, shifting the remaining on the
  * top. */
 static void editorDelRow(int at) {
     erow *row;
@@ -654,6 +654,8 @@ static void editorMenu(void) {
     draw_menu_item("^f", "find");
     draw_menu_item("^a", "start of line");
     draw_menu_item("^l", "end of line");
+    draw_menu_item("^u", "delete to start of line");
+    draw_menu_item("^k", "delete to end of line");
     attrset(A_NORMAL);
 }
 
@@ -1095,6 +1097,20 @@ static void editorProcessKeypress(lua_State* L) {
                 editorMoveCursor(KEY_LEFT);
                 break;
             }
+        }
+        break;
+    case CTRL_U:
+        while (!editorAtStartOfLine())
+            editorDelChar();
+        break;
+    case CTRL_K:
+        while (1) {
+            editorMoveCursor(KEY_RIGHT);
+            if (editorAtStartOfLine()) {
+                editorMoveCursor(KEY_LEFT);
+                break;
+            }
+            editorDelChar();
         }
         break;
     case KEY_UP:

@@ -1,0 +1,15 @@
+run a program
+run a program, edit
+run a program, edit, make an edit, run | edit takes effect
+run a program with error | big picture
+run a program, edit, make an error, run
+run a program, edit, ^g to a different definition, make an edit, ^e to run again
+run a program, edit, ^g to a non-existent definition
+run a program, edit, ^g to a different definition, ^g to a different definition, ^e to run again
+start -> big picture -> edit -> move cursor -> run -> edit | cursor preserved
+start -> big picture -> edit A -> move cursor -> big picture -> edit B | cursor initialized
+start -> big picture -> edit -> move cursor -> run -> exit -> start | big picture (optional)
+start -> big picture -> edit A -> move cursor -> run -> exit -> start -> ... -> edit B | cursor initialized
+start -> big picture -> edit A -> move cursor -> run -> exit -> start -> ... -> edit B | big picture
+syntax highlighting for line comments
+syntax highlighting for multiline comments

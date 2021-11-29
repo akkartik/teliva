@@ -75,6 +75,7 @@ static void l_message (const char *pname, const char *msg) {
   printw(msg);
   mvprintw(LINES-1, 0, "sorry, you'll need to edit the image directly. press any key to exit.");
   refresh();
+  nodelay(stdscr, 0);  /* make getch() block */
   getch();
 }
 
@@ -85,6 +86,19 @@ static int report (lua_State *L, int status) {
     if (msg == NULL) msg = "(error object is not a string)";
     l_message(progname, msg);
     lua_pop(L, 1);
+  }
+  return status;
+}
+
+
+char *strdup(const char *s);
+extern void developer_mode (lua_State *L, const char *status_message);
+static int report_in_big_picture (lua_State *L, int status) {
+  if (status && !lua_isnil(L, -1)) {
+    const char *msg = strdup(lua_tostring(L, -1));
+    if (msg == NULL) msg = "(error object is not a string)";
+    lua_pop(L, 1);
+    developer_mode(L, msg);
   }
   return status;
 }
@@ -151,20 +165,20 @@ static int getargs (lua_State *L, char **argv, int n) {
 
 static int dofile (lua_State *L, const char *name) {
   int status = luaL_loadfile(L, name) || docall(L, 0, 1);
-  return report(L, status);
+  return report_in_big_picture(L, status);
 }
 
 
 static int dostring (lua_State *L, const char *s, const char *name) {
   int status = luaL_loadbuffer(L, s, strlen(s), name) || docall(L, 0, 1);
-  return report(L, status);
+  return report_in_big_picture(L, status);
 }
 
 
 static int dolibrary (lua_State *L, const char *name) {
   lua_getglobal(L, "require");
   lua_pushstring(L, name);
-  return report(L, docall(L, 1, 1));
+  return report_in_big_picture(L, docall(L, 1, 1));
 }
 
 
@@ -369,7 +383,7 @@ int load_definitions(lua_State *L) {
         continue;  // most recent binding trumps older ones
       const char* value = lua_tostring(L, -1);
       status = dostring(L, value, key);
-      if (status != 0) return report(L, status);
+      if (status != 0) return report_in_big_picture(L, status);
     }
     lua_pop(L, 1);
   }
@@ -389,13 +403,13 @@ static int handle_image (lua_State *L, char **argv, int n) {
   lua_insert(L, -(narg+1));
   if (status != 0) return status;
   status = docall(L, narg, 0);
-  if (status != 0) return report(L, status);
+  if (status != 0) return report(L, status);  /* can't recover within teliva */
   status = load_definitions(L);
   if (status != 0) return 0;
   /* call main() */
   lua_getglobal(L, "main");
   status = docall(L, 0, 1);
-  if (status != 0) return report(L, status);
+  if (status != 0) return report_in_big_picture(L, status);
   return 0;
 }
 
@@ -765,7 +779,7 @@ void draw_definition_name (const char *definition_name) {
 }
 
 /* return true if submitted */
-void big_picture_view (lua_State *L) {
+void big_picture_view (lua_State *L, const char *status_message) {
 restart:
   clear();
   luaL_newmetatable(L, "__teliva_call_graph_depth");
@@ -872,6 +886,7 @@ restart:
   }
 
   lua_settop(L, 0);
+  mvprintw(LINES-3, 0, status_message);
 
   char query[CURRENT_DEFINITION_LEN+1] = {0};
   int qlen = 0;
@@ -959,7 +974,7 @@ int restore_editor_view (lua_State *L) {
 
 char **Argv = NULL;
 extern void cleanup_curses (void);
-void developer_mode (lua_State *L) {
+void developer_mode (lua_State *L, const char *status_message) {
   /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */
   for (int i = 0; i < 8; ++i)
     init_pair(i, i, -1);
@@ -970,7 +985,7 @@ void developer_mode (lua_State *L) {
   if (editor_view_in_progress(L))
     switch_to_big_picture_view = restore_editor_view(L);
   if (switch_to_big_picture_view)
-    big_picture_view(L);
+    big_picture_view(L, status_message);
   cleanup_curses();
   execv(Argv[0], Argv);
   /* never returns */
@@ -1057,7 +1072,7 @@ static int handle_luainit (lua_State *L) {
  *  globalname = require(filename) */
 static int dorequire (lua_State *L, const char *filename, const char *globalname) {
   int status = luaL_loadfile(L, filename) || docall(L, /*nargs*/0, /*don't clean up stack*/0);
-  if (status != 0) return report(L, status);
+  if (status != 0) return report_in_big_picture(L, status);
   if (lua_isnil(L, -1)) {
     endwin();
     printf("%s didn't return a module\n", filename);
@@ -1075,6 +1090,7 @@ struct Smain {
 };
 
 
+/* does its own error handling, always returns 0 to prevent duplicate messages */
 static int pmain (lua_State *L) {
   struct Smain *s = (struct Smain *)lua_touserdata(L, 1);
   char **argv = s->argv;

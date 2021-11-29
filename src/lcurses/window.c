@@ -1304,7 +1304,7 @@ Read a character from the window input.
 @see curses.echo
 @see keypad
 */
-extern void developer_mode (lua_State *L);
+extern void developer_mode (lua_State *L, const char *status_message);
 static int
 Wgetch(lua_State *L)
 {
@@ -1318,7 +1318,7 @@ Wgetch(lua_State *L)
 		exit(0);
 	}
 	if (c == CTRL_E)
-		developer_mode(L);
+		developer_mode(L, /*status message*/ "");
 	/* handle other standard menu hotkeys here */
 
 	return pushintresult(c);

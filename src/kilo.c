@@ -574,12 +574,13 @@ static void editorDelChar() {
 
 static void editorUncommentCursorRow() {
     erow *row = &E.row[E.rowoff+E.cy];
-    editorRowDelChar(row, 0);
-    editorRowDelChar(row, 0);
-    editorRowDelChar(row, 0);
-    editorRowDelChar(row, 0);
     E.coloff = 0;
-    E.cx = 0;
+    E.cx = 4;
+    editorUpdateRow(row);
+    editorDelChar();
+    editorDelChar();
+    editorDelChar();
+    editorDelChar();
 }
 
 static void editorCommentCursorRow() {

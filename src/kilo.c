@@ -672,10 +672,6 @@ static void editorMenu(void) {
     draw_menu_item("^g", "go");
     draw_menu_item("^b", "big picture");
     draw_menu_item("^f", "find");
-    draw_menu_item("^a", "start of line");
-    draw_menu_item("^l", "end of line");
-    draw_menu_item("^u", "delete to start of line");
-    draw_menu_item("^k", "delete to end of line");
     draw_menu_item("^/", "(un)comment line");
     attrset(A_NORMAL);
 }

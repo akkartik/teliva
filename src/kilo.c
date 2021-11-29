@@ -126,16 +126,16 @@ static void editorSetStatusMessage(const char *fmt, ...);
 
 /* Lua */
 char *Lua_HL_keywords[] = {
-  /* keywords */
-  "do", "end", "function", "return", "require", "local"
-  "if", "then", "else", "elseif",
-  "while", "for", "repeat", "until", "break",
-  "and", "or", "not", "in",
+    /* keywords */
+    "do", "end", "function", "return", "require", "local"
+    "if", "then", "else", "elseif",
+    "while", "for", "repeat", "until", "break",
+    "and", "or", "not", "in",
 
-  /* types */
-  "nil", "false", "true",
+    /* types */
+    "nil", "false", "true",
 
-  NULL
+    NULL
 };
 
 /* Here we define an array of syntax highlights by extensions, keywords,
@@ -885,7 +885,7 @@ static void editorFind() {
 /* ========================= Editor events handling  ======================== */
 
 static int editorAtStartOfLine() {
-  return E.coloff == 0 && E.cx == 0;
+    return E.coloff == 0 && E.cx == 0;
 }
 
 /* Handle cursor position change because arrow keys were pressed. */
@@ -963,31 +963,31 @@ static void editorMoveCursor(int key) {
 }
 
 int identifier_char(char c) {
-  /* keep sync'd with llex */
-  return isalnum(c) || c == '_';
+    /* keep sync'd with llex */
+    return isalnum(c) || c == '_';
 }
 
 void word_at_cursor(char* out, int capacity) {
-  erow* row = &E.row[E.rowoff + E.cy];
-  int cidx = E.coloff + E.cx;
-  int len = 0;
-  memset(out, 0, capacity);
-  if (row == NULL) return;
-  /* scan back to first identifier char */
-  while (cidx > 0) {
-    --cidx;
-    if (!identifier_char(row->chars[cidx])) {
-      ++cidx;
-      break;
+    erow* row = &E.row[E.rowoff + E.cy];
+    int cidx = E.coloff + E.cx;
+    int len = 0;
+    memset(out, 0, capacity);
+    if (row == NULL) return;
+    /* scan back to first identifier char */
+    while (cidx > 0) {
+        --cidx;
+        if (!identifier_char(row->chars[cidx])) {
+            ++cidx;
+            break;
+        }
     }
-  }
-  /* now scan forward */
-  for (len = 0; cidx+len < row->size; ++len) {
-    if (!identifier_char(row->chars[cidx+len]))
-      break;
-  }
-  if (len < capacity)
-    strncpy(out, &row->chars[cidx], len);
+    /* now scan forward */
+    for (len = 0; cidx+len < row->size; ++len) {
+        if (!identifier_char(row->chars[cidx+len]))
+            break;
+    }
+    if (len < capacity)
+        strncpy(out, &row->chars[cidx], len);
 }
 
 /* Jump to some definition. */
@@ -1048,7 +1048,7 @@ static void editorProcessKeypress(lua_State* L) {
         break;
     case CTRL_C:
         if (Previous_error != NULL)
-          exit(1);
+            exit(1);
         break;
     case CTRL_E:
         /* Save and quit. */
@@ -1079,22 +1079,22 @@ static void editorProcessKeypress(lua_State* L) {
         else if (c == KEY_NPAGE && E.cy != LINES-1-1)
             E.cy = LINES-1-1;
         {
-          int times = LINES-1;
-          while(times--)
-            editorMoveCursor(c == KEY_PPAGE ? KEY_UP : KEY_DOWN);
+            int times = LINES-1;
+            while(times--)
+                editorMoveCursor(c == KEY_PPAGE ? KEY_UP : KEY_DOWN);
         }
         break;
     case CTRL_A:
         while (!editorAtStartOfLine())
-          editorMoveCursor(KEY_LEFT);
+            editorMoveCursor(KEY_LEFT);
         break;
     case CTRL_L:
         while (1) {
-          editorMoveCursor(KEY_RIGHT);
-          if (editorAtStartOfLine()) {
-            editorMoveCursor(KEY_LEFT);
-            break;
-          }
+            editorMoveCursor(KEY_RIGHT);
+            if (editorAtStartOfLine()) {
+                editorMoveCursor(KEY_LEFT);
+                break;
+            }
         }
         break;
     case KEY_UP:

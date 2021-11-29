@@ -1063,7 +1063,13 @@ static void editorProcessKeypress(lua_State* L) {
     int c = getch();
     switch(c) {
     case ENTER:
-        editorInsertNewline();
+        {
+            erow* oldrow = &E.row[E.rowoff + E.cy];
+            editorInsertNewline();
+            /* auto-indent */
+            for (int x = 0; x < oldrow->size && oldrow->chars[x] == ' '; ++x)
+                editorInsertChar(' ');
+        }
         break;
     case CTRL_C:
         if (Previous_error != NULL)

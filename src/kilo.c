@@ -572,6 +572,26 @@ static void editorDelChar() {
     E.dirty++;
 }
 
+static void editorUncommentCursorRow() {
+    erow *row = &E.row[E.rowoff+E.cy];
+    editorRowDelChar(row, 0);
+    editorRowDelChar(row, 0);
+    editorRowDelChar(row, 0);
+    editorRowDelChar(row, 0);
+    E.coloff = 0;
+    E.cx = 0;
+}
+
+static void editorCommentCursorRow() {
+    erow *row = &E.row[E.rowoff+E.cy];
+    editorRowInsertChar(row, 0, ' ');
+    editorRowInsertChar(row, 0, '?');
+    editorRowInsertChar(row, 0, '-');
+    editorRowInsertChar(row, 0, '-');
+    E.coloff = 0;
+    E.cx = 0;
+}
+
 /* Load the specified program in the editor memory and returns 0 on success
  * or 1 on error. */
 int editorOpen(char *filename) {
@@ -656,6 +676,7 @@ static void editorMenu(void) {
     draw_menu_item("^l", "end of line");
     draw_menu_item("^u", "delete to start of line");
     draw_menu_item("^k", "delete to end of line");
+    draw_menu_item("^/", "(un)comment line");
     attrset(A_NORMAL);
 }
 
@@ -1112,6 +1133,12 @@ static void editorProcessKeypress(lua_State* L) {
             }
             editorDelChar();
         }
+        break;
+    case CTRL_SLASH:
+        if (starts_with(E.row[E.rowoff+E.cy].chars, "--? "))
+            editorUncommentCursorRow();
+        else
+            editorCommentCursorRow();
         break;
     case KEY_UP:
     case KEY_DOWN:

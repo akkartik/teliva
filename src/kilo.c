@@ -1166,3 +1166,6 @@ int resumeEdit(lua_State* L) {
     }
     return Back_to_big_picture;
 }
+
+/* vim:tabstop=4:shiftwidth=0:expandtab:softtabstop=-1
+ */

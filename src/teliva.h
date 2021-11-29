@@ -12,7 +12,7 @@ enum KEY_ACTION {
   CTRL_G = 7,
   CTRL_H = 8,
 #if __APPLE__
-  TELIVA_BACKSPACE = KEY_DC,  /* delete */
+  TELIVA_BACKSPACE = 127,  /* delete */
 #else
   TELIVA_BACKSPACE = KEY_BACKSPACE,
 #endif

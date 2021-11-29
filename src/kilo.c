@@ -1145,6 +1145,11 @@ static void editorProcessKeypress(lua_State* L) {
     case ESC:
         /* Nothing to do for ESC in this mode. */
         break;
+    case TAB:
+        /* insert 2 spaces */
+        editorInsertChar(' ');
+        editorInsertChar(' ');
+        break;
     default:
         editorInsertChar(c);
         break;

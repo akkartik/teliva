@@ -550,8 +550,8 @@ static void recent_changes_menu (int cursor, int history_array_size) {
   draw_string_on_menu("older");
   /* draw_menu_item("↑/backspace", "newer"); */
   attroff(A_REVERSE);
-  mvaddstr(LINES-1, menu_column, " ↑/backspace ");
-  menu_column += 13;  /* strlen isn't sufficient */
+  mvaddstr(LINES-1, menu_column, " ↑/" TELIVA_BACKSPACE_KEY_NAME " ");
+  menu_column += (strlen(TELIVA_BACKSPACE_KEY_NAME) + 4);
   attron(A_REVERSE);
   draw_string_on_menu("newer");
   draw_menu_item("^e", "edit/add note");
@@ -701,7 +701,7 @@ void recent_changes_view (lua_State *L) {
         if (cursor > 1) --cursor;
         break;
       case KEY_UP:
-      case KEY_BACKSPACE:
+      case TELIVA_BACKSPACE:
         if (cursor < history_array_size) ++cursor;
         break;
       case CTRL_E:
@@ -896,7 +896,7 @@ restart:
       mvaddch(LINES-2, x, ' ');
     mvprintw(LINES-2, 0, "Edit: %s", query);
     int c = getch();
-    if (c == KEY_BACKSPACE) {
+    if (c == TELIVA_BACKSPACE) {
       if (qlen != 0) query[--qlen] = '\0';
     } else if (c == ESC) {
       return;

@@ -29,4 +29,10 @@ enum KEY_ACTION {
   CTRL_SLASH = 31,
 };
 
+#if __APPLE__
+  #define TELIVA_BACKSPACE_KEY_NAME "delete/backspace"
+#else
+  #define TELIVA_BACKSPACE_KEY_NAME "backspace"
+#endif
+
 #endif

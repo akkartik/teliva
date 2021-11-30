@@ -127,7 +127,7 @@ static void editorSetStatusMessage(const char *fmt, ...);
 /* Lua */
 char *Lua_HL_keywords[] = {
     /* keywords */
-    "do", "end", "function", "return", "require", "local"
+    "do", "end", "function", "return", "require", "local",
     "if", "then", "else", "elseif",
     "while", "for", "repeat", "until", "break",
     "and", "or", "not", "in",

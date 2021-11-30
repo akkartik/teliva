@@ -6,7 +6,10 @@ function M.mvaddch (y, x, c) return curses.stdscr():mvaddch(y, x, c) end
 function M.addstr (s) return curses.stdscr():addstr(s) end
 function M.mvaddstr (y, x, s) return curses.stdscr():mvaddstr(y, x, s) end
 
+function M.attron (a) return curses.stdscr():attron(a) end
+function M.attroff (a) return curses.stdscr():attroff(a) end
 function M.attrset (a) return curses.stdscr():attrset(a) end
+
 function M.clear ()    return curses.stdscr():clear() end
 function M.clrtobot () return curses.stdscr():clrtobot() end
 function M.clrtoeol () return curses.stdscr():clrtoeol() end

@@ -940,8 +940,8 @@ int editor_view_in_progress (lua_State *L) {
   return result;
 }
 
-extern int edit_from(lua_State* L, char* filename, const char* message, int rowoff, int coloff, int cy, int cx);
-int restore_editor_view (lua_State *L) {
+extern int edit_from(lua_State *L, char *filename, const char *message, int rowoff, int coloff, int cy, int cx);
+int restore_editor_view (lua_State *L, const char *status_message) {
   lua_getglobal(L, "__teliva_editor_state");
   int editor_state_index = lua_gettop(L);
   lua_getfield(L, editor_state_index, "definition");
@@ -956,7 +956,7 @@ int restore_editor_view (lua_State *L) {
   lua_getfield(L, editor_state_index, "cx");
   int cx = lua_tointeger(L, -1);
   lua_settop(L, editor_state_index);
-  int back_to_big_picture = edit_from(L, "teliva_editor_buffer", /*error message*/ "", rowoff, coloff, cy, cx);
+  int back_to_big_picture = edit_from(L, "teliva_editor_buffer", status_message, rowoff, coloff, cy, cx);
   // error handling
   while (1) {
     int status;
@@ -983,7 +983,7 @@ void developer_mode (lua_State *L, const char *status_message) {
   nodelay(stdscr, 0);  /* make getch() block */
   int switch_to_big_picture_view = 1;
   if (editor_view_in_progress(L))
-    switch_to_big_picture_view = restore_editor_view(L);
+    switch_to_big_picture_view = restore_editor_view(L, status_message);
   if (switch_to_big_picture_view)
     big_picture_view(L, status_message);
   cleanup_curses();

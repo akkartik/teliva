@@ -279,7 +279,7 @@ static void editorUpdateSyntax(erow *row) {
                 int kw2 = keywords[j][klen-1] == '|';
                 if (kw2) klen--;
 
-                if (klen < ileft && !memcmp(p,keywords[j],klen) &&
+                if (klen <= ileft && !memcmp(p,keywords[j],klen) &&
                     is_separator(*(p+klen)))
                 {
                     /* Keyword */

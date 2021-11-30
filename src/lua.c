@@ -93,7 +93,7 @@ static int report (lua_State *L, int status) {
 
 char *strdup(const char *s);
 extern void developer_mode (lua_State *L, const char *status_message);
-static int report_in_big_picture (lua_State *L, int status) {
+static int report_in_developer_mode (lua_State *L, int status) {
   if (status && !lua_isnil(L, -1)) {
     const char *msg = strdup(lua_tostring(L, -1));
     if (msg == NULL) msg = "(error object is not a string)";
@@ -165,20 +165,20 @@ static int getargs (lua_State *L, char **argv, int n) {
 
 static int dofile (lua_State *L, const char *name) {
   int status = luaL_loadfile(L, name) || docall(L, 0, 1);
-  return report_in_big_picture(L, status);
+  return report_in_developer_mode(L, status);
 }
 
 
 static int dostring (lua_State *L, const char *s, const char *name) {
   int status = luaL_loadbuffer(L, s, strlen(s), name) || docall(L, 0, 1);
-  return report_in_big_picture(L, status);
+  return report_in_developer_mode(L, status);
 }
 
 
 static int dolibrary (lua_State *L, const char *name) {
   lua_getglobal(L, "require");
   lua_pushstring(L, name);
-  return report_in_big_picture(L, docall(L, 1, 1));
+  return report_in_developer_mode(L, docall(L, 1, 1));
 }
 
 
@@ -383,7 +383,7 @@ int load_definitions(lua_State *L) {
         continue;  // most recent binding trumps older ones
       const char* value = lua_tostring(L, -1);
       status = dostring(L, value, key);
-      if (status != 0) return report_in_big_picture(L, status);
+      if (status != 0) return report_in_developer_mode(L, status);
     }
     lua_pop(L, 1);
   }
@@ -409,7 +409,7 @@ static int handle_image (lua_State *L, char **argv, int n) {
   /* call main() */
   lua_getglobal(L, "main");
   status = docall(L, 0, 1);
-  if (status != 0) return report_in_big_picture(L, status);
+  if (status != 0) return report_in_developer_mode(L, status);
   return 0;
 }
 
@@ -1072,7 +1072,7 @@ static int handle_luainit (lua_State *L) {
  *  globalname = require(filename) */
 static int dorequire (lua_State *L, const char *filename, const char *globalname) {
   int status = luaL_loadfile(L, filename) || docall(L, /*nargs*/0, /*don't clean up stack*/0);
-  if (status != 0) return report_in_big_picture(L, status);
+  if (status != 0) return report_in_developer_mode(L, status);
   if (lua_isnil(L, -1)) {
     endwin();
     printf("%s didn't return a module\n", filename);

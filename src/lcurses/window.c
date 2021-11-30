@@ -520,7 +520,6 @@ Fetch the absolute top-left coordinates of a window.
 @function getbegyx
 @treturn int y coordinate of top line
 @treturn int x coordinate of left column
-@treturn bool `true`, if successful
 @see getbegyx(3x)
 */
 static int
@@ -540,7 +539,6 @@ Fetch the absolute bottom-right coordinates of a window.
 @function getmaxyx
 @treturn int y coordinate of bottom line
 @treturn int x coordinate of right column
-@treturn bool `true`, if successful
 @see getmaxyx(3x)
 */
 static int

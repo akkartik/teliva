@@ -100,11 +100,11 @@ function render(window)
   clear()
   -- draw stuff to screen here
   bold()
-  mvaddstr(1, 5, "example app")
+  mpr(1, 5, "example app")
   norm()
   for i=0,15 do
     color(i)
-    mvaddstr(3+i, 5, "========================")
+    mpr(3+i, 5, "========================")
   end
   refresh()
 end]==],

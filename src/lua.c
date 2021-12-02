@@ -774,7 +774,7 @@ static int is_current_definition(lua_State *L, const char *definition_name, int 
 void draw_definition_name (const char *definition_name) {
   attron(BG(7));
   addstr(definition_name);
-  attrset(A_NORMAL);
+  attroff(BG(7));
   addstr("  ");
 }
 

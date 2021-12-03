@@ -561,6 +561,35 @@ static void recent_changes_menu (int cursor, int history_array_size) {
 }
 
 
+/* return final y containing text */
+static int render_wrapped_lua_text (int y, int xmin, int xmax, const char *text) {
+  int x = xmin;
+  move(y, x);
+  for (int j = 0; j < strlen(text); ++j) {
+    char c = text[j];
+    if (c == '-' && j+1 < strlen(text) && text[j+1] == '-')
+      attron(FG(6));
+    if (c != '\n') {
+      addch(text[j]);
+      ++x;
+      if (x >= xmax) {
+        ++y;
+        x = xmin;
+        move(y, x);
+      }
+    }
+    else {
+      /* newline */
+      ++y;
+      x = 0;
+      move(y, x);
+      attroff(FG(6));
+    }
+  }
+  return y;
+}
+
+
 void render_recent_changes (lua_State *L, int history_array, int start_index, int history_array_size) {
   clear();
   attrset(A_BOLD);
@@ -603,28 +632,13 @@ void render_recent_changes (lua_State *L, int history_array, int start_index, in
       lua_pop(L, 1);
       y++;
       const char *definition_contents = lua_tostring(L, -1);
-      int x = 0;
-      move(y, x);
-      for (int j = 0; j < strlen(definition_contents); ++j) {
-        char c = definition_contents[j];
-        if (c == '-' && j+1 < strlen(definition_contents) && definition_contents[j+1] == '-')
-          attron(FG(6));
-        if (c != '\n') {
-          addch(definition_contents[j]);
-          ++x;
-        }
-        else {
-          /* newline */
-          ++y;
-          x = 0;
-          move(y, x);
-          attroff(FG(6));
-        }
-      }
+      y = render_wrapped_lua_text(y, 0, COLS, definition_contents);
       y++;
+      if (y >= LINES-1) break;
     }
     lua_pop(L, 1);  // history element
     y++;
+    if (y >= LINES-1) break;
   }
   recent_changes_menu(start_index, history_array_size);
   refresh();

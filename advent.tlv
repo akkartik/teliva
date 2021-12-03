@@ -99,12 +99,9 @@ original]==],
 function render(window)
   clear()
   -- draw stuff to screen here
-  bold()
-  mpr(1, 5, "example app")
-  norm()
-  for i=0,15 do
-    color(i)
-    mpr(3+i, 5, "========================")
+  for line in io.lines("input") do
+    pr(line)
+    pr("\n")
   end
   refresh()
 end]==],

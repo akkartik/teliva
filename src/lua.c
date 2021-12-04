@@ -95,7 +95,7 @@ char *strdup(const char *s);
 extern void developer_mode (lua_State *L, const char *status_message);
 static int report_in_developer_mode (lua_State *L, int status) {
   if (status && !lua_isnil(L, -1)) {
-    const char *msg = strdup(lua_tostring(L, -1));
+    const char *msg = strdup(lua_tostring(L, -1));  /* memory leak */
     if (msg == NULL) msg = "(error object is not a string)";
     lua_pop(L, 1);
     developer_mode(L, msg);

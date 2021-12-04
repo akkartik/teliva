@@ -116,6 +116,14 @@ with the Teliva experience. If you find Teliva of use, please [introduce yoursel
 to me so that I am aware of your use cases. Anybody who is interested can gain
 a say in its future direction.
 
+## Known issues
+
+* Colors are currently hardcoded. To obtain say a dark background, modify the
+  call to `assume_default_colors()` in function `main()` at the bottom of
+  `src/lua.c`. If you do this, you'll likely also need to tweak other colors
+  for legibility. Look for calls to `FG()`, `BG()` and `COLOR_PAIR()`.
+  ```
+
 ## What's with the name?
 
 Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.

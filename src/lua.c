@@ -1183,7 +1183,7 @@ int main (int argc, char **argv) {
   initscr();
   keypad(stdscr, 1);
   start_color();
-  use_default_colors();
+  assume_default_colors(0, 15);
   draw_menu(L);
   echo();
   s.argc = argc;

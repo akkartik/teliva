@@ -642,7 +642,7 @@ static int editorSaveToDisk(void) {
     close(fd);
     free(buf);
     E.dirty = 0;
-    editorSetStatusMessage("%d bytes written on disk", len);
+    memset(E.statusmsg, '\0', 80);
     return 0;
 
 writeerr:

@@ -443,19 +443,19 @@ static void recent_changes_menu (int cursor, int history_array_size) {
   extern int menu_column;
   menu_column = 2;
   draw_menu_item("^x", "go back");
-  /* draw_menu_item("↓/space", "older"); */
+  /* draw_menu_item("↓|space", "older"); */
   attroff(A_REVERSE);
-  mvaddstr(LINES-1, menu_column, " ↓/space ");
+  mvaddstr(LINES-1, menu_column, " ↓|space ");
   menu_column += 9;  /* strlen isn't sufficient */
   attron(A_REVERSE);
   draw_string_on_menu("older");
-  /* draw_menu_item("↑/backspace", "newer"); */
+  /* draw_menu_item("↑|backspace", "newer"); */
   attroff(A_REVERSE);
-  mvaddstr(LINES-1, menu_column, " ↑/backspace/delete/^h ");
+  mvaddstr(LINES-1, menu_column, " ↑|backspace|delete|^h ");
   menu_column += 23;
   attron(A_REVERSE);
   draw_string_on_menu("newer");
-  draw_menu_item("^e", "edit/add note");
+  draw_menu_item("^e", "edit|add note");
   if (cursor < history_array_size)
     draw_menu_item("^u", "undo everything after this");
   attrset(A_NORMAL);

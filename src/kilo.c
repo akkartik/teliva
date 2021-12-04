@@ -691,15 +691,15 @@ static void editorFindMenu(void) {
     draw_menu_item("Enter", "submit");
     draw_menu_item("^h", "back up cursor");
     draw_menu_item("^u", "clear");
-    /* draw_menu_item("←/↑", "previous"); */
+    /* draw_menu_item("←|↑", "previous"); */
     attroff(A_REVERSE);
-    mvaddstr(LINES-1, menu_column, " ←/↑ ");
+    mvaddstr(LINES-1, menu_column, " ←|↑ ");
     menu_column += 5;  /* strlen isn't sufficient */
     attron(A_REVERSE);
     draw_string_on_menu("previous");
-    /* draw_menu_item("↓/→", "next"); */
+    /* draw_menu_item("↓|→", "next"); */
     attroff(A_REVERSE);
-    mvaddstr(LINES-1, menu_column, " ↓/→ ");
+    mvaddstr(LINES-1, menu_column, " ↓|→ ");
     menu_column += 5;  /* strlen isn't sufficient */
     attron(A_REVERSE);
     draw_string_on_menu("next");

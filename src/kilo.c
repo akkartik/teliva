@@ -412,8 +412,8 @@ void clearEditor(void) {
 
 /* Turn the editor rows into a single heap-allocated string.
  * Returns the pointer to the heap-allocated string and populate the
- * integer pointed by 'buflen' with the size of the string, escluding
- * the final nulterm. */
+ * integer pointed by 'buflen' with the size of the string, excluding
+ * the final null term. */
 static char *editorRowsToString(int *buflen) {
     char *buf = NULL, *p;
     int totlen = 0;
@@ -423,7 +423,7 @@ static char *editorRowsToString(int *buflen) {
     for (j = 0; j < E.numrows; j++)
         totlen += E.row[j].size+1; /* +1 is for "\n" at end of every row */
     *buflen = totlen;
-    totlen++; /* Also make space for nulterm */
+    totlen++; /* Also make space for null term */
 
     p = buf = malloc(totlen);
     for (j = 0; j < E.numrows; j++) {

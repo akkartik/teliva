@@ -1066,6 +1066,8 @@ static int Back_to_big_picture = 0;
 extern void save_editor_state(int rowoff, int coloff, int cy, int cx);
 static void editorProcessKeypress(lua_State* L) {
     int c = getch();
+//?     mvprintw(LINES-3, 60, "key: %d\n", c);
+//?     getch();
     switch(c) {
     case ENTER:
         {

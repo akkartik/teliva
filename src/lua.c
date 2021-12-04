@@ -442,7 +442,7 @@ static void recent_changes_menu (int cursor, int history_array_size) {
   attrset(A_NORMAL);
   extern int menu_column;
   menu_column = 2;
-  draw_menu_item("Esc", "go back");
+  draw_menu_item("^x", "go back");
   /* draw_menu_item("↓/space", "older"); */
   attroff(A_REVERSE);
   mvaddstr(LINES-1, menu_column, " ↓/space ");
@@ -608,7 +608,7 @@ void recent_changes_view (lua_State *L) {
     render_recent_changes(L, history_array, cursor, history_array_size);
     int c = getch();
     switch (c) {
-      case ESC:
+      case CTRL_X:
         quit = 1;
         break;
       case KEY_DOWN:
@@ -649,7 +649,7 @@ static void big_picture_menu (void) {
   attrset(A_NORMAL);
   extern int menu_column;
   menu_column = 2;
-  draw_menu_item("Esc", "go back");
+  draw_menu_item("^x", "go back");
   draw_menu_item("Enter", "submit");
   draw_menu_item("^h", "back up cursor");
   draw_menu_item("^u", "clear");
@@ -816,7 +816,7 @@ restart:
     int c = getch();
     if (c == KEY_BACKSPACE || c == DELETE || c == CTRL_H) {
       if (qlen != 0) query[--qlen] = '\0';
-    } else if (c == ESC) {
+    } else if (c == CTRL_X) {
       return;
     } else if (c == ENTER) {
       save_to_current_definition_and_editor_buffer(L, query);

@@ -687,7 +687,7 @@ static void editorFindMenu(void) {
     attrset(A_NORMAL);
     extern int menu_column;
     menu_column = 2;
-    draw_menu_item("Esc", "cancel");
+    draw_menu_item("^x", "cancel");
     draw_menu_item("Enter", "submit");
     draw_menu_item("^h", "back up cursor");
     draw_menu_item("^u", "clear");
@@ -713,7 +713,7 @@ static void editorGoMenu(void) {
     attrset(A_NORMAL);
     extern int menu_column;
     menu_column = 2;
-    draw_menu_item("Esc", "cancel");
+    draw_menu_item("^x", "cancel");
     draw_menu_item("Enter", "submit");
     draw_menu_item("^h", "back up cursor");
     draw_menu_item("^u", "clear");
@@ -837,8 +837,8 @@ static void editorFind() {
         if (c == KEY_BACKSPACE || c == DELETE || c == CTRL_H) {
             if (qlen != 0) query[--qlen] = '\0';
             last_match = -1;
-        } else if (c == ESC || c == ENTER) {
-            if (c == ESC) {
+        } else if (c == CTRL_X || c == ENTER) {
+            if (c == CTRL_X) {
                 E.cx = saved_cx; E.cy = saved_cy;
                 E.coloff = saved_coloff; E.rowoff = saved_rowoff;
             }
@@ -1039,7 +1039,7 @@ static void editorGo(lua_State* L) {
         int c = getch();
         if (c == KEY_BACKSPACE || c == DELETE || c == CTRL_H) {
             if (qlen != 0) query[--qlen] = '\0';
-        } else if (c == ESC || c == ENTER) {
+        } else if (c == CTRL_X || c == ENTER) {
             editorSetStatusMessage("");
             if (c == ENTER) {
               save_to_current_definition_and_editor_buffer(L, query);

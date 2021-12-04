@@ -20,7 +20,6 @@ enum KEY_ACTION {
   CTRL_S = 19,
   CTRL_U = 21,
   CTRL_X = 24,
-  ESC = 27,
   CTRL_SLASH = 31,
   DELETE = 127,
 };

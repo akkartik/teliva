@@ -32,9 +32,16 @@ Make a change, hit `ctrl-e` again, and the app will run with your updates.
 ([video](https://archive.org/details/akkartik-2021-11-14))
 
 You will need some Unix-like platform with a C compiler and the ncurses and
-openssl libraries. So far I've tested Teliva on Linux, Mac OS X and OpenBSD;
-should also work on other flavors of BSD, WSL on Windows, etc. with only minor
-modifications.
+openssl libraries. Some possible commands to install them, depending on your
+OS and package manager of choice:
+
+* `guix shell -D lua openssl -- make linux`
+* `nix-shell --pure` (from a directory containing shell.nix in this repo)
+* `sudo apt install libncursesw6-dev openssl`
+* `brew install ncurses openssl`
+
+So far I've tested Teliva on Linux, Mac OS X and OpenBSD; it should also work
+on other flavors of BSD, WSL on Windows, etc. with only minor modifications.
 
 ## Isn't this just an IDE?
 

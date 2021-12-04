@@ -81,21 +81,56 @@ static int report (lua_State *L, int status) {
 }
 
 
-char *strdup(const char *s);
-extern void developer_mode (lua_State *L, const char *status_message);
+/* return final y containing text */
+static int render_wrapped_text (int y, int xmin, int xmax, const char *text) {
+  int x = xmin;
+  move(y, x);
+  for (int j = 0; j < strlen(text); ++j) {
+    char c = text[j];
+    if (c != '\n') {
+      addch(text[j]);
+      ++x;
+      if (x >= xmax) {
+        ++y;
+        x = xmin;
+        move(y, x);
+      }
+    }
+    else {
+      /* newline */
+      ++y;
+      x = xmin;
+      move(y, x);
+    }
+  }
+  return y;
+}
+
+
+const char *Previous_error = NULL;
+void render_previous_error (void) {
+  if (!Previous_error) return;
+  attrset(COLOR_PAIR(255));
+  render_wrapped_text(LINES-10, COLS/2, COLS, Previous_error);
+  attrset(A_NORMAL);
+}
+
+
+extern char *strdup(const char *s);
+extern void developer_mode (lua_State *L);
 static int report_in_developer_mode (lua_State *L, int status) {
   if (status && !lua_isnil(L, -1)) {
-    const char *msg = strdup(lua_tostring(L, -1));  /* memory leak */
-    if (msg == NULL) msg = "(error object is not a string)";
+    Previous_error = strdup(lua_tostring(L, -1));  /* memory leak */
+    if (Previous_error == NULL) Previous_error = "(error object is not a string)";
     lua_pop(L, 1);
     for (int x = 0; x < COLS; ++x) {
       mvaddch(LINES-2, x, ' ');
       mvaddch(LINES-1, x, ' ');
     }
-    mvaddstr(LINES-2, 0, msg);
+    render_previous_error();
     mvaddstr(LINES-1, 0, "press any key to continue");
     getch();
-    developer_mode(L, msg);
+    developer_mode(L);
   }
   return status;
 }
@@ -413,11 +448,10 @@ int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
 
 /* return true if user chose to back into the big picture view */
 /* But only if there are no errors. Otherwise things can get confusing. */
-const char *Previous_error = NULL;
-extern int edit (lua_State *L, char *filename, const char *message);
+extern int edit (lua_State *L, char *filename);
 extern int resumeEdit (lua_State *L);
 int edit_current_definition (lua_State *L) {
-  int back_to_big_picture = edit(L, "teliva_editor_buffer", /*status message*/ "");
+  int back_to_big_picture = edit(L, "teliva_editor_buffer");
   // error handling
   while (1) {
     int status;
@@ -482,7 +516,7 @@ static int render_wrapped_lua_text (int y, int xmin, int xmax, const char *text)
     else {
       /* newline */
       ++y;
-      x = 0;
+      x = xmin;
       move(y, x);
       attroff(FG(6));
     }
@@ -625,7 +659,7 @@ void recent_changes_view (lua_State *L) {
         save_note_to_editor_buffer(L, cursor);
         /* big picture hotkey unnecessarily available here */
         /* TODO: go hotkey is misleading. edits will not be persisted until you return to recent changes */
-        edit(L, "teliva_editor_buffer", /*status message*/ "");
+        edit(L, "teliva_editor_buffer");
         load_note_from_editor_buffer(L, cursor);
         save_image(L);
         break;
@@ -697,7 +731,7 @@ void draw_definition_name (const char *definition_name) {
 }
 
 /* return true if submitted */
-void big_picture_view (lua_State *L, const char *status_message) {
+void big_picture_view (lua_State *L) {
 restart:
   clear();
   luaL_newmetatable(L, "__teliva_call_graph_depth");
@@ -804,7 +838,7 @@ restart:
   }
 
   lua_settop(L, 0);
-  mvprintw(LINES-3, 0, status_message);
+  render_previous_error();
 
   char query[CURRENT_DEFINITION_LEN+1] = {0};
   int qlen = 0;
@@ -858,8 +892,8 @@ int editor_view_in_progress (lua_State *L) {
   return result;
 }
 
-extern int edit_from(lua_State *L, char *filename, const char *message, int rowoff, int coloff, int cy, int cx);
-int restore_editor_view (lua_State *L, const char *status_message) {
+extern int edit_from(lua_State *L, char *filename, int rowoff, int coloff, int cy, int cx);
+int restore_editor_view (lua_State *L) {
   lua_getglobal(L, "__teliva_editor_state");
   int editor_state_index = lua_gettop(L);
   lua_getfield(L, editor_state_index, "definition");
@@ -874,7 +908,7 @@ int restore_editor_view (lua_State *L, const char *status_message) {
   lua_getfield(L, editor_state_index, "cx");
   int cx = lua_tointeger(L, -1);
   lua_settop(L, editor_state_index);
-  int back_to_big_picture = edit_from(L, "teliva_editor_buffer", status_message, rowoff, coloff, cy, cx);
+  int back_to_big_picture = edit_from(L, "teliva_editor_buffer", rowoff, coloff, cy, cx);
   // error handling
   while (1) {
     int status;
@@ -892,18 +926,19 @@ int restore_editor_view (lua_State *L, const char *status_message) {
 
 char **Argv = NULL;
 extern void cleanup_curses (void);
-void developer_mode (lua_State *L, const char *status_message) {
+void developer_mode (lua_State *L) {
   /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */
   for (int i = 0; i < 8; ++i)
     init_pair(i, i, 15);
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, 0, i);
+  init_pair(255, /*white fg*/ 15, /*red bg*/ 1);  /* for teliva error messages */
   nodelay(stdscr, 0);  /* make getch() block */
   int switch_to_big_picture_view = 1;
   if (editor_view_in_progress(L))
-    switch_to_big_picture_view = restore_editor_view(L, status_message);
+    switch_to_big_picture_view = restore_editor_view(L);
   if (switch_to_big_picture_view)
-    big_picture_view(L, status_message);
+    big_picture_view(L);
   cleanup_curses();
   execv(Argv[0], Argv);
   /* never returns */

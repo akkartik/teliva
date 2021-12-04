@@ -219,6 +219,7 @@ function init_colors()
   curses.init_pair(6, dark_piece, light_last_moved_square)
   curses.init_pair(7, light_piece, dark_last_moved_square)
   curses.init_pair(8, dark_piece, dark_last_moved_square)
+  curses.init_pair(255, 15, 1)  -- reserved for Teliva error messages
 end]==],
   },
   {

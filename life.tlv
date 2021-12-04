@@ -266,6 +266,7 @@ function main()
   for i=1,7 do
     curses.init_pair(i, i, -1)
   end
+  curses.init_pair(255, 15, 1)  -- reserved for Teliva error messages
 
   -- initialize grid based on commandline args
   if (#arg == 0) then

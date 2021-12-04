@@ -95,14 +95,10 @@ struct editorConfig {
     erow *row;      /* Rows */
     int dirty;      /* File modified but not saved. */
     char *filename; /* Currently open filename */
-    char statusmsg[80];
-    time_t statusmsg_time;
     struct editorSyntax *syntax;    /* Current syntax highlight, or NULL. */
 };
 
 static struct editorConfig E;
-
-static void editorSetStatusMessage(const char *fmt, ...);
 
 /* =========================== Syntax highlights DB =========================
  *
@@ -642,13 +638,16 @@ static int editorSaveToDisk(void) {
     close(fd);
     free(buf);
     E.dirty = 0;
-    memset(E.statusmsg, '\0', 80);
     return 0;
 
 writeerr:
     free(buf);
     if (fd != -1) close(fd);
-    editorSetStatusMessage("Can't save! I/O error: %s",strerror(errno));
+    /* TODO: better error handling. */
+    /* I haven't gotten to this yet since we have version control. */
+    endwin();
+    printf("Can't save! I/O error: %s",strerror(errno));
+    exit(1);
     return 1;
 }
 
@@ -720,6 +719,7 @@ static void editorGoMenu(void) {
     attrset(A_NORMAL);
 }
 
+extern int render_previous_error();
 static void editorRefreshScreen(void (*menu_func)(void)) {
     int y;
     erow *r;
@@ -771,12 +771,9 @@ static void editorRefreshScreen(void (*menu_func)(void)) {
         }
     }
 
-    (*menu_func)();
+    render_previous_error();
 
-    attrset(A_REVERSE);
-    addstr("    ");
-    addstr(E.statusmsg);
-    attrset(A_NORMAL);
+    (*menu_func)();
 
     /* Put cursor at its current position. Note that the horizontal position
      * at which the cursor is displayed may be different compared to 'E.cx'
@@ -793,16 +790,6 @@ static void editorRefreshScreen(void (*menu_func)(void)) {
     }
     mvaddstr(E.cy, cx, "");
     curs_set(1);
-}
-
-/* Set an editor status message for the second line of the status, at the
- * end of the screen. */
-static void editorSetStatusMessage(const char *fmt, ...) {
-    va_list ap;
-    va_start(ap,fmt);
-    vsnprintf(E.statusmsg,sizeof(E.statusmsg),fmt,ap);
-    va_end(ap);
-    E.statusmsg_time = time(NULL);
 }
 
 /* =============================== Find mode ================================ */
@@ -843,7 +830,6 @@ static void editorFind() {
                 E.coloff = saved_coloff; E.rowoff = saved_rowoff;
             }
             FIND_RESTORE_HL;
-            editorSetStatusMessage("");
             return;
         } else if (c == CTRL_U) {
             qlen = 0;
@@ -1040,7 +1026,6 @@ static void editorGo(lua_State* L) {
         if (c == KEY_BACKSPACE || c == DELETE || c == CTRL_H) {
             if (qlen != 0) query[--qlen] = '\0';
         } else if (c == CTRL_X || c == ENTER) {
-            editorSetStatusMessage("");
             if (c == ENTER) {
               save_to_current_definition_and_editor_buffer(L, query);
               clearEditor();
@@ -1182,12 +1167,11 @@ static void initEditor(void) {
 }
 
 /* return true if user chose to back into the big picture view */
-int edit(lua_State* L, char* filename, const char* message) {
+int edit(lua_State* L, char* filename) {
     Quit = 0;
     Back_to_big_picture = 0;
     initEditor();
     editorOpen(filename);
-    editorSetStatusMessage(message);
     while(!Quit) {
         editorRefreshScreen(editorMenu);
         editorProcessKeypress(L);
@@ -1196,7 +1180,7 @@ int edit(lua_State* L, char* filename, const char* message) {
 }
 
 /* return true if user chose to back into the big picture view */
-int edit_from(lua_State* L, char* filename, const char* message, int rowoff, int coloff, int cy, int cx) {
+int edit_from(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx) {
     Quit = 0;
     Back_to_big_picture = 0;
     initEditor();
@@ -1205,7 +1189,6 @@ int edit_from(lua_State* L, char* filename, const char* message, int rowoff, int
     E.cy = cy;
     E.cx = cx;
     editorOpen(filename);
-    editorSetStatusMessage(message);
     while(!Quit) {
         editorRefreshScreen(editorMenu);
         editorProcessKeypress(L);
@@ -1216,7 +1199,6 @@ int edit_from(lua_State* L, char* filename, const char* message, int rowoff, int
 int resumeEdit(lua_State* L) {
     Quit = 0;
     Back_to_big_picture = 0;
-    editorSetStatusMessage(Previous_error);
     while(!Quit) {
         editorRefreshScreen(editorMenu);
         editorProcessKeypress(L);

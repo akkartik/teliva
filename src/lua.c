@@ -98,6 +98,13 @@ static int report_in_developer_mode (lua_State *L, int status) {
     const char *msg = strdup(lua_tostring(L, -1));  /* memory leak */
     if (msg == NULL) msg = "(error object is not a string)";
     lua_pop(L, 1);
+    for (int x = 0; x < COLS; ++x) {
+      mvaddch(LINES-2, x, ' ');
+      mvaddch(LINES-1, x, ' ');
+    }
+    mvaddstr(LINES-2, 0, msg);
+    mvaddstr(LINES-1, 0, "press any key to continue");
+    getch();
     developer_mode(L, msg);
   }
   return status;

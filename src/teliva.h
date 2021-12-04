@@ -21,6 +21,7 @@ enum KEY_ACTION {
   CTRL_U = 21,
   CTRL_X = 24,
   CTRL_SLASH = 31,
+  CTRL_UNDERSCORE = 31,
   DELETE = 127,
 };
 

@@ -673,7 +673,7 @@ static void editorMenu(void) {
     draw_menu_item("^g", "go");
     draw_menu_item("^b", "big picture");
     draw_menu_item("^f", "find");
-    draw_menu_item("^/", "(un)comment line");
+    draw_menu_item("^/|^-|^_", "(un)comment line");
     draw_menu_item("^h", "back up cursor");
     draw_menu_item("^l", "end of line");
     attrset(A_NORMAL);
@@ -1145,7 +1145,7 @@ static void editorProcessKeypress(lua_State* L) {
             editorDelChar();
         }
         break;
-    case CTRL_SLASH:
+    case CTRL_SLASH:  /* same as CTRL_UNDERSCORE */
         if (starts_with(E.row[E.rowoff+E.cy].chars, "--? "))
             editorUncommentCursorRow();
         else

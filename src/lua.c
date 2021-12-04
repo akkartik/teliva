@@ -1155,9 +1155,10 @@ static int pmain (lua_State *L) {
   if (has_v) print_version();
   s->status = runargs(L, argv, (image > 0) ? image : s->argc);
   if (s->status != 0) return 0;
-  if (image)
+  if (image) {
     s->status = handle_image(L, argv, image);
-  if (s->status != 0) return 0;
+    if (s->status != 0) return 0;
+  }
   if (has_i)
     dotty(L);
   else if (image == 0 && !has_e && !has_v) {

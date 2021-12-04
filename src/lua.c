@@ -895,9 +895,9 @@ extern void cleanup_curses (void);
 void developer_mode (lua_State *L, const char *status_message) {
   /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */
   for (int i = 0; i < 8; ++i)
-    init_pair(i, i, -1);
+    init_pair(i, i, 15);
   for (int i = 0; i < 8; ++i)
-    init_pair(i+8, -1, i);
+    init_pair(i+8, 0, i);
   nodelay(stdscr, 0);  /* make getch() block */
   int switch_to_big_picture_view = 1;
   if (editor_view_in_progress(L))

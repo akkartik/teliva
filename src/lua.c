@@ -52,17 +52,7 @@ static void laction (int i) {
 
 
 static void print_usage (void) {
-  printw(
-  "usage: %s [options] [script [args]].\n"
-  "Available options are:\n"
-  "  -e stat  execute string " LUA_QL("stat") "\n"
-  "  -l name  require library " LUA_QL("name") "\n"
-  "  -i       enter interactive mode after executing " LUA_QL("script") "\n"
-  "  -v       show version information\n"
-  "  --       stop handling options\n"
-  ,
-  progname);
-  refresh();
+  printf("usage: %s ___.tlv [args]\n", progname);
 }
 
 
@@ -146,11 +136,6 @@ static int docall (lua_State *L, int narg, int clear) {
 }
 
 
-static void print_version (void) {
-  l_message(NULL, LUA_RELEASE "  " LUA_COPYRIGHT);
-}
-
-
 /* pushes commandline args to the stack, then an array of all commandline args */
 static int getargs (lua_State *L, char **argv, int n) {
   int narg;
@@ -179,97 +164,6 @@ static int dofile (lua_State *L, const char *name) {
 static int dostring (lua_State *L, const char *s, const char *name) {
   int status = luaL_loadbuffer(L, s, strlen(s), name) || docall(L, 0, 1);
   return report_in_developer_mode(L, status);
-}
-
-
-static int dolibrary (lua_State *L, const char *name) {
-  lua_getglobal(L, "require");
-  lua_pushstring(L, name);
-  return report_in_developer_mode(L, docall(L, 1, 1));
-}
-
-
-static const char *get_prompt (lua_State *L, int firstline) {
-  const char *p;
-  lua_getfield(L, LUA_GLOBALSINDEX, firstline ? "_PROMPT" : "_PROMPT2");
-  p = lua_tostring(L, -1);
-  if (p == NULL) p = (firstline ? LUA_PROMPT : LUA_PROMPT2);
-  lua_pop(L, 1);  /* remove global */
-  return p;
-}
-
-
-static int incomplete (lua_State *L, int status) {
-  if (status == LUA_ERRSYNTAX) {
-    size_t lmsg;
-    const char *msg = lua_tolstring(L, -1, &lmsg);
-    const char *tp = msg + lmsg - (sizeof(LUA_QL("<eof>")) - 1);
-    if (strstr(msg, LUA_QL("<eof>")) == tp) {
-      lua_pop(L, 1);
-      return 1;
-    }
-  }
-  return 0;  /* else... */
-}
-
-
-static int pushline (lua_State *L, int firstline) {
-  char buffer[LUA_MAXINPUT];
-  char *b = buffer;
-  size_t l;
-  const char *prmt = get_prompt(L, firstline);
-  addstr(prmt);
-  refresh();
-  getnstr(b, LUA_MAXINPUT);
-  l = strlen(b);
-  if (l > 0 && b[l-1] == '\n')  /* line ends with newline? */
-    b[l-1] = '\0';  /* remove it */
-  if (firstline && b[0] == '=')  /* first line starts with `=' ? */
-    lua_pushfstring(L, "return %s", b+1);  /* change it to `return' */
-  else
-    lua_pushstring(L, b);
-  return 1;
-}
-
-
-static int loadline (lua_State *L) {
-  int status;
-  lua_settop(L, 0);
-  if (!pushline(L, 1))
-    return -1;  /* no input */
-  for (;;) {  /* repeat until gets a complete line */
-    status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=keyboard");
-    if (!incomplete(L, status)) break;  /* cannot try to add lines? */
-    if (!pushline(L, 0))  /* no more input? */
-      return -1;
-    lua_pushliteral(L, "\n");  /* add a new line... */
-    lua_insert(L, -2);  /* ...between the two lines */
-    lua_concat(L, 3);  /* join them */
-  }
-  lua_remove(L, 1);  /* remove line */
-  return status;
-}
-
-
-static void dotty (lua_State *L) {
-  int status;
-  const char *oldprogname = progname;
-  progname = NULL;
-  while ((status = loadline(L)) != -1) {
-    if (status == 0) status = docall(L, 0, 0);
-    report(L, status);
-    if (status == 0 && lua_gettop(L) > 0) {  /* any result to print? */
-      lua_getglobal(L, "print");
-      lua_insert(L, 1);
-      if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0)
-        l_message(progname, lua_pushfstring(L,
-                               "error calling " LUA_QL("print") " (%s)",
-                               lua_tostring(L, -1)));
-    }
-  }
-  lua_settop(L, 0);  /* clear stack */
-  refresh();
-  progname = oldprogname;
 }
 
 
@@ -1013,72 +907,6 @@ void developer_mode (lua_State *L, const char *status_message) {
 }
 
 
-/* check that argument has no extra characters at the end */
-#define notail(x)	{if ((x)[2] != '\0') return -1;}
-
-
-static int collectargs (char **argv, int *pi, int *pv, int *pe) {
-  int i;
-  for (i = 1; argv[i] != NULL; i++) {
-    if (argv[i][0] != '-')  /* not an option? */
-        return i;
-    switch (argv[i][1]) {  /* option */
-      case '-':
-        notail(argv[i]);
-        return (argv[i+1] != NULL ? i+1 : 0);
-      case '\0':
-        return i;
-      case 'i':
-        notail(argv[i]);
-        *pi = 1;  /* fall through */
-      case 'v':
-        notail(argv[i]);
-        *pv = 1;
-        break;
-      case 'e':
-        *pe = 1;  /* fall through */
-      case 'l':
-        if (argv[i][2] == '\0') {
-          i++;
-          if (argv[i] == NULL) return -1;
-        }
-        break;
-      default: return -1;  /* invalid option */
-    }
-  }
-  return 0;
-}
-
-
-static int runargs (lua_State *L, char **argv, int n) {
-  int i;
-  for (i = 1; i < n; i++) {
-    if (argv[i] == NULL) continue;
-    lua_assert(argv[i][0] == '-');
-    switch (argv[i][1]) {  /* option */
-      case 'e': {
-        const char *chunk = argv[i] + 2;
-        if (*chunk == '\0') chunk = argv[++i];
-        lua_assert(chunk != NULL);
-        if (dostring(L, chunk, "=(command line)") != 0)
-          return 1;
-        break;
-      }
-      case 'l': {
-        const char *filename = argv[i] + 2;
-        if (*filename == '\0') filename = argv[++i];
-        lua_assert(filename != NULL);
-        if (dolibrary(L, filename))
-          return 1;  /* stop if file fails */
-        break;
-      }
-      default: break;
-    }
-  }
-  return 0;
-}
-
-
 static int handle_luainit (lua_State *L) {
   const char *init = getenv(LUA_INIT);
   if (init == NULL) return 0;  /* status OK */
@@ -1116,8 +944,6 @@ static int pmain (lua_State *L) {
   struct Smain *s = (struct Smain *)lua_touserdata(L, 1);
   char **argv = s->argv;
   int status;
-  int image;
-  int has_i = 0, has_v = 0, has_e = 0;
   globalL = L;
   if (argv[0] && argv[0][0]) progname = argv[0];
   lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
@@ -1145,26 +971,8 @@ static int pmain (lua_State *L) {
   lua_gc(L, LUA_GCRESTART, 0);
   s->status = handle_luainit(L);
   if (s->status != 0) return 0;
-  image = collectargs(argv, &has_i, &has_v, &has_e);
-  if (image < 0) {  /* invalid args? */
-    print_usage();
-    getch();
-    s->status = 1;
-    return 0;
-  }
-  if (has_v) print_version();
-  s->status = runargs(L, argv, (image > 0) ? image : s->argc);
+  s->status = handle_image(L, argv, 1);
   if (s->status != 0) return 0;
-  if (image) {
-    s->status = handle_image(L, argv, image);
-    if (s->status != 0) return 0;
-  }
-  if (has_i)
-    dotty(L);
-  else if (image == 0 && !has_e && !has_v) {
-    print_version();
-    dotty(L);
-  }
   return 0;
 }
 
@@ -1179,6 +987,10 @@ int main (int argc, char **argv) {
   if (L == NULL) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
+  }
+  if (argc == 1) {
+    print_usage();
+    exit(1);
   }
   setlocale(LC_ALL, "");
   initscr();

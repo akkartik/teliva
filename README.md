@@ -122,7 +122,15 @@ a say in its future direction.
   call to `assume_default_colors()` in function `main()` at the bottom of
   `src/lua.c`. If you do this, you'll likely also need to tweak other colors
   for legibility. Look for calls to `FG()`, `BG()` and `COLOR_PAIR()`.
-  ```
+
+* Backspace is known to not work in some configurations. As a workaround,
+  typing `ctrl-h` tends to work in those situations.
+
+* Keys outside the main keyboard area are mostly not supported. This includes
+  the delete key when it's set away from the main keyboard area. (Macs call
+  the backspace key &ldquo;delete&rdquo;; it should behave like backspace. As
+  a consequence the menu sometimes mentions keys that don't work, just to
+  encourage people to try options.)
 
 ## What's with the name?
 

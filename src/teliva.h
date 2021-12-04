@@ -11,11 +11,6 @@ enum KEY_ACTION {
   CTRL_F = 6,
   CTRL_G = 7,
   CTRL_H = 8,
-#if __APPLE__
-  TELIVA_BACKSPACE = 127,  /* delete */
-#else
-  TELIVA_BACKSPACE = KEY_BACKSPACE,
-#endif
   TAB = 9,
   ENTER = 10,
   CTRL_K = 11,
@@ -27,12 +22,7 @@ enum KEY_ACTION {
   CTRL_X = 24,
   ESC = 27,
   CTRL_SLASH = 31,
+  DELETE = 127,
 };
-
-#if __APPLE__
-  #define TELIVA_BACKSPACE_KEY_NAME "delete/backspace"
-#else
-  #define TELIVA_BACKSPACE_KEY_NAME "backspace"
-#endif
 
 #endif

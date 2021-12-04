@@ -674,6 +674,8 @@ static void editorMenu(void) {
     draw_menu_item("^b", "big picture");
     draw_menu_item("^f", "find");
     draw_menu_item("^/", "(un)comment line");
+    draw_menu_item("^h", "back up cursor");
+    draw_menu_item("^l", "end of line");
     attrset(A_NORMAL);
 }
 
@@ -830,7 +832,7 @@ static void editorFind() {
         mvprintw(LINES-2, 0, "Find: %s", query);
 
         int c = getch();
-        if (c == TELIVA_BACKSPACE) {
+        if (c == KEY_BACKSPACE || c == DELETE || c == CTRL_H) {
             if (qlen != 0) query[--qlen] = '\0';
             last_match = -1;
         } else if (c == ESC || c == ENTER) {
@@ -1033,7 +1035,7 @@ static void editorGo(lua_State* L) {
         mvprintw(LINES-2, 0, "Go to: %s", query);
 
         int c = getch();
-        if (c == TELIVA_BACKSPACE) {
+        if (c == KEY_BACKSPACE || c == DELETE || c == CTRL_H) {
             if (qlen != 0) query[--qlen] = '\0';
         } else if (c == ESC || c == ENTER) {
             editorSetStatusMessage("");
@@ -1095,7 +1097,9 @@ static void editorProcessKeypress(lua_State* L) {
     case CTRL_F:
         editorFind();
         break;
-    case TELIVA_BACKSPACE:
+    case KEY_BACKSPACE:
+    case DELETE:
+    case CTRL_H:
         editorDelChar();
         break;
     case KEY_NPAGE:

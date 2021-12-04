@@ -451,8 +451,8 @@ static void recent_changes_menu (int cursor, int history_array_size) {
   draw_string_on_menu("older");
   /* draw_menu_item("↑/backspace", "newer"); */
   attroff(A_REVERSE);
-  mvaddstr(LINES-1, menu_column, " ↑/" TELIVA_BACKSPACE_KEY_NAME " ");
-  menu_column += (strlen(TELIVA_BACKSPACE_KEY_NAME) + 4);
+  mvaddstr(LINES-1, menu_column, " ↑/backspace/delete/^h ");
+  menu_column += 23;
   attron(A_REVERSE);
   draw_string_on_menu("newer");
   draw_menu_item("^e", "edit/add note");
@@ -616,7 +616,9 @@ void recent_changes_view (lua_State *L) {
         if (cursor > 1) --cursor;
         break;
       case KEY_UP:
-      case TELIVA_BACKSPACE:
+      case KEY_BACKSPACE:
+      case DELETE:
+      case CTRL_H:
         if (cursor < history_array_size) ++cursor;
         break;
       case CTRL_E:
@@ -649,6 +651,7 @@ static void big_picture_menu (void) {
   menu_column = 2;
   draw_menu_item("Esc", "go back");
   draw_menu_item("Enter", "submit");
+  draw_menu_item("^h", "back up cursor");
   draw_menu_item("^u", "clear");
   draw_menu_item("^r", "recent changes");
   attrset(A_NORMAL);
@@ -811,7 +814,7 @@ restart:
       mvaddch(LINES-2, x, ' ');
     mvprintw(LINES-2, 0, "Edit: %s", query);
     int c = getch();
-    if (c == TELIVA_BACKSPACE) {
+    if (c == KEY_BACKSPACE || c == DELETE || c == CTRL_H) {
       if (qlen != 0) query[--qlen] = '\0';
     } else if (c == ESC) {
       return;

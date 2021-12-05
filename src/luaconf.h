@@ -234,7 +234,7 @@
 ** CHANGE it if your stand-alone interpreter has a different name and
 ** your system is not able to detect that name automatically.
 */
-#define LUA_PROGNAME		"lua"
+#define LUA_PROGNAME		"teliva"
 
 
 /*

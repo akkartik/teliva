@@ -45,17 +45,17 @@ function render_tower(window, line, col, tower_index, tower)
   window:attron(curses.A_BOLD)
   window:mvaddch(line+2, col, string.char(96+tower_index))
   window:attroff(curses.A_BOLD)
-  window:attron(curses.color_pair(7))
+  window:attron(curses.color_pair(15))
   window:mvaddstr(line+1, col-6, "              ")
-  window:attroff(curses.color_pair(7))
+  window:attroff(curses.color_pair(15))
   for i, n in ipairs(tower) do
     render_disk(window, line, col, n)
     line = line - 1
   end
   for i=1,5-len(tower)+1 do
-    window:attron(curses.color_pair(7))
+    window:attron(curses.color_pair(15))
     window:mvaddstr(line, col, "  ")
-    window:attroff(curses.color_pair(7))
+    window:attroff(curses.color_pair(15))
     line = line - 1
   end
 end]==],
@@ -88,6 +88,7 @@ function main()
   for i=1,7 do
     curses.init_pair(i, 0, i)
   end
+  curses.init_pair(15, 0, 15)
   curses.init_pair(255, 15, 1)  -- reserved for Teliva error messages
 
   while true do

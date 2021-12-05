@@ -929,7 +929,7 @@ extern void cleanup_curses (void);
 void developer_mode (lua_State *L) {
   /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */
   for (int i = 0; i < 8; ++i)
-    init_pair(i, i, 15);
+    init_pair(i, i, 7);
   for (int i = 0; i < 8; ++i)
     init_pair(i+8, 0, i);
   init_pair(255, /*white fg*/ 15, /*red bg*/ 1);  /* for teliva error messages */
@@ -1034,7 +1034,7 @@ int main (int argc, char **argv) {
   initscr();
   keypad(stdscr, 1);
   start_color();
-  assume_default_colors(0, 15);
+  assume_default_colors(0, 7);
   draw_menu(L);
   echo();
   s.argc = argc;

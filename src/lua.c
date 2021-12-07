@@ -475,17 +475,33 @@ static void recent_changes_menu (int cursor, int history_array_size) {
   draw_menu_item("^x", "go back");
   /* draw_menu_item("↓|space", "older"); */
   attroff(A_REVERSE);
-  mvaddstr(LINES-1, menu_column, " ↓|space ");
+  mvaddstr(LINES-1, menu_column, " ↓");
+  attron(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+  addstr("|");
+  attroff(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+  addstr("space ");
   menu_column += 9;  /* strlen isn't sufficient */
   attron(A_REVERSE);
   draw_string_on_menu("older");
-  /* draw_menu_item("↑|backspace", "newer"); */
+  /* draw_menu_item("↑|backspace|delete|^h", "newer"); */
   attroff(A_REVERSE);
-  mvaddstr(LINES-1, menu_column, " ↑|backspace|delete|^h ");
+  mvaddstr(LINES-1, menu_column, " ↑");
+  attron(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+  addstr("|");
+  attroff(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+  addstr("backspace");
+  attron(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+  addstr("|");
+  attroff(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+  addstr("delete");
+  attron(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+  addstr("|");
+  attroff(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+  addstr("^h ");
   menu_column += 23;
   attron(A_REVERSE);
   draw_string_on_menu("newer");
-  draw_menu_item("^e", "edit|add note");
+  draw_menu_item("^e", "edit note");
   if (cursor < history_array_size)
     draw_menu_item("^u", "undo everything after this");
   attrset(A_NORMAL);
@@ -930,6 +946,7 @@ void developer_mode (lua_State *L) {
   init_pair(COLOR_PAIR_NORMAL, COLOR_FOREGROUND, COLOR_BACKGROUND);
   init_pair(COLOR_PAIR_HIGHLIGHT, COLOR_HIGHLIGHT_FOREGROUND, COLOR_HIGHLIGHT_BACKGROUND);
   init_pair(COLOR_PAIR_FADE, COLOR_FADE, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_MENU_ALTERNATE, COLOR_MENU_ALTERNATE, COLOR_BACKGROUND);
   init_pair(COLOR_PAIR_LUA_COMMENT, COLOR_LUA_COMMENT, COLOR_BACKGROUND);
   init_pair(COLOR_PAIR_LUA_KEYWORD, COLOR_LUA_KEYWORD, COLOR_BACKGROUND);
   init_pair(COLOR_PAIR_LUA_CONSTANT, COLOR_LUA_CONSTANT, COLOR_BACKGROUND);

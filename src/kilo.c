@@ -674,7 +674,21 @@ static void editorMenu(void) {
     draw_menu_item("^f", "find");
     draw_menu_item("^h", "backspace");
     draw_menu_item("^l", "end of line");
-    draw_menu_item("^/|^-|^_", "(un)comment line");
+    /* draw_menu_item("^/|^-|^_", "(un)comment line"); */
+    attroff(A_REVERSE);
+    mvaddstr(LINES-1, menu_column, " ^/");
+    attron(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+    addstr("|");
+    attroff(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+    addstr("^-");
+    attron(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+    addstr("|");
+    attroff(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+    addstr("^_ ");
+    menu_column += 10;
+    attron(A_REVERSE);
+    mvaddstr(LINES-1, menu_column, " (un)comment line ");
+    menu_column += 18;
     attrset(A_NORMAL);
 }
 

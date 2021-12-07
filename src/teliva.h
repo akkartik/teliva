@@ -56,6 +56,7 @@ enum color {
   COLOR_FOREGROUND = 238,                     // almost black
   COLOR_BACKGROUND = 253,                     // almost white
   COLOR_FADE = 244,                           // closer to background
+  COLOR_MENU_ALTERNATE = 248,
   COLOR_HIGHLIGHT_FOREGROUND = 238,
   COLOR_HIGHLIGHT_BACKGROUND = 250,
   COLOR_ERROR_FOREGROUND = COLOR_BACKGROUND,
@@ -72,6 +73,7 @@ enum color {
   COLOR_FOREGROUND = 253,                     // almost white
   COLOR_BACKGROUND = 238,                     // almost black
   COLOR_FADE = 244,                           // closer to background
+  COLOR_MENU_ALTERNATE = 244,
   COLOR_HIGHLIGHT_FOREGROUND = 238,
   COLOR_HIGHLIGHT_BACKGROUND = 250,
   COLOR_ERROR_FOREGROUND = COLOR_BACKGROUND,
@@ -88,6 +90,7 @@ enum color {
   COLOR_FOREGROUND = 250,                     // almost white
   COLOR_BACKGROUND = 24,                      // dark blue-green
   COLOR_FADE = 246,                           // closer to background
+  COLOR_MENU_ALTERNATE = 244,
   COLOR_HIGHLIGHT_FOREGROUND = 250,
   COLOR_HIGHLIGHT_BACKGROUND = 31,
   COLOR_ERROR_FOREGROUND = 250,
@@ -104,10 +107,11 @@ enum color_pair {
   COLOR_PAIR_NORMAL = 0,
   COLOR_PAIR_HIGHLIGHT = 1,
   COLOR_PAIR_FADE = 2,
-  COLOR_PAIR_LUA_COMMENT = 3,
-  COLOR_PAIR_LUA_KEYWORD = 4,
-  COLOR_PAIR_LUA_CONSTANT = 5,
-  COLOR_PAIR_MATCH = 6,
+  COLOR_PAIR_MENU_ALTERNATE = 3,
+  COLOR_PAIR_LUA_COMMENT = 4,
+  COLOR_PAIR_LUA_KEYWORD = 5,
+  COLOR_PAIR_LUA_CONSTANT = 6,
+  COLOR_PAIR_MATCH = 7,
   COLOR_PAIR_ERROR = 255,
 };
 

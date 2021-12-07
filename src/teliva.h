@@ -88,7 +88,7 @@ enum color {
   COLOR_FOREGROUND = 250,                     // almost white
   COLOR_BACKGROUND = 24,                      // dark blue-green
   COLOR_FADE = 246,                           // closer to background
-  COLOR_HIGHLIGHT_FOREGROUND = 238,
+  COLOR_HIGHLIGHT_FOREGROUND = 250,
   COLOR_HIGHLIGHT_BACKGROUND = 31,
   COLOR_ERROR_FOREGROUND = 250,
   COLOR_ERROR_BACKGROUND = 124,               // deep red

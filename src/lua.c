@@ -334,7 +334,7 @@ static int handle_image (lua_State *L, char **argv, int n) {
   Image_name = argv[n];
   status = luaL_loadfile(L, Image_name);
   lua_insert(L, -(narg+1));
-  if (status != 0) return status;
+  if (status != 0) return report(L, status);  /* can't recover within teliva */
   status = docall(L, narg, 0);
   if (status != 0) return report(L, status);  /* can't recover within teliva */
   status = load_definitions(L);

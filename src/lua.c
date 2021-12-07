@@ -27,10 +27,6 @@
 #include "lualib.h"
 
 
-#define BG(i) (COLOR_PAIR((i)+8))
-#define FG(i) (COLOR_PAIR(i))
-
-
 static lua_State *globalL = NULL;
 
 static const char *progname = LUA_PROGNAME;
@@ -503,7 +499,7 @@ static int render_wrapped_lua_text (int y, int xmin, int xmax, const char *text)
   for (int j = 0; j < strlen(text); ++j) {
     char c = text[j];
     if (c == '-' && j+1 < strlen(text) && text[j+1] == '-')
-      attron(FG(6));
+      attron(COLOR_PAIR(COLOR_PAIR_LUA_COMMENT));
     if (c != '\n') {
       addch(text[j]);
       ++x;
@@ -518,7 +514,7 @@ static int render_wrapped_lua_text (int y, int xmin, int xmax, const char *text)
       ++y;
       x = xmin;
       move(y, x);
-      attroff(FG(6));
+      attroff(COLOR_PAIR(COLOR_PAIR_LUA_COMMENT));
     }
   }
   return y;
@@ -553,16 +549,16 @@ void render_recent_changes (lua_State *L, int history_array, int start_index, in
       /* save timestamp of binding if available */
       lua_getfield(L, t, "__teliva_timestamp");
       if (!lua_isnil(L, -1)) {
-        attron(FG(7));
+        attron(COLOR_PAIR(COLOR_PAIR_FADE));
         printw("  %s", lua_tostring(L, -1));
-        attroff(FG(7));
+        attroff(COLOR_PAIR(COLOR_PAIR_FADE));
       }
       lua_pop(L, 1);
       lua_getfield(L, t, "__teliva_note");
       if (!lua_isnil(L, -1)) {
-        attron(FG(6));
+        attron(COLOR_PAIR(COLOR_PAIR_FADE));
         printw("  -- %s", lua_tostring(L, -1));
-        attroff(FG(6));
+        attroff(COLOR_PAIR(COLOR_PAIR_FADE));
       }
       lua_pop(L, 1);
       y++;
@@ -724,9 +720,11 @@ static int is_current_definition(lua_State *L, const char *definition_name, int 
 
 
 void draw_definition_name (const char *definition_name) {
-  attron(BG(7));
+  attron(COLOR_PAIR(COLOR_PAIR_HIGHLIGHT));
+  addstr(" ");
   addstr(definition_name);
-  attroff(BG(7));
+  addstr(" ");
+  attroff(COLOR_PAIR(COLOR_PAIR_HIGHLIGHT));
   addstr("  ");
 }
 
@@ -928,11 +926,15 @@ char **Argv = NULL;
 extern void cleanup_curses (void);
 void developer_mode (lua_State *L) {
   /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */
-  for (int i = 0; i < 8; ++i)
-    init_pair(i, i, 7);
-  for (int i = 0; i < 8; ++i)
-    init_pair(i+8, 0, i);
-  init_pair(255, /*white fg*/ 15, /*red bg*/ 1);  /* for teliva error messages */
+  assume_default_colors(COLOR_FOREGROUND, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_NORMAL, COLOR_FOREGROUND, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_HIGHLIGHT, COLOR_HIGHLIGHT_FOREGROUND, COLOR_HIGHLIGHT_BACKGROUND);
+  init_pair(COLOR_PAIR_FADE, COLOR_FADE, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_LUA_COMMENT, COLOR_LUA_COMMENT, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_LUA_KEYWORD, COLOR_LUA_KEYWORD, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_LUA_CONSTANT, COLOR_LUA_CONSTANT, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_MATCH, COLOR_MATCH_FOREGROUND, COLOR_MATCH_BACKGROUND);
+  init_pair(COLOR_PAIR_ERROR, COLOR_ERROR_FOREGROUND, COLOR_ERROR_BACKGROUND);
   nodelay(stdscr, 0);  /* make getch() block */
   int switch_to_big_picture_view = 1;
   if (editor_view_in_progress(L))
@@ -1034,7 +1036,7 @@ int main (int argc, char **argv) {
   initscr();
   keypad(stdscr, 1);
   start_color();
-  assume_default_colors(0, 7);
+  assume_default_colors(COLOR_FOREGROUND, COLOR_BACKGROUND);
   draw_menu(L);
   echo();
   s.argc = argc;

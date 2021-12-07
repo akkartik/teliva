@@ -129,7 +129,7 @@ char *Lua_HL_keywords[] = {
     "and", "or", "not", "in",
 
     /* types */
-    "nil", "false", "true",
+    "nil|", "false|", "true|",
 
     NULL
 };
@@ -306,16 +306,16 @@ static void editorUpdateSyntax(erow *row) {
 }
 
 /* Maps syntax highlight token types to terminal colors. */
-static int editorSyntaxToColor(int hl) {
+static int editorSyntaxToColorPair(int hl) {
     switch(hl) {
     case HL_COMMENT:
-    case HL_MLCOMMENT: return 6;  /* cyan */
-    case HL_KEYWORD1: return 3;   /* yellow */
-    case HL_KEYWORD2: return 2;   /* green */
-    case HL_STRING: return 5;     /* magenta */
-    case HL_NUMBER: return 1;     /* red */
-    case HL_MATCH: return 4;      /* blue */
-    default: return 7;            /* white */
+    case HL_MLCOMMENT: return COLOR_PAIR_LUA_COMMENT;
+    case HL_KEYWORD1: return COLOR_PAIR_LUA_KEYWORD;
+    case HL_KEYWORD2: return COLOR_PAIR_LUA_CONSTANT;
+    case HL_STRING: return COLOR_PAIR_LUA_CONSTANT;
+    case HL_NUMBER: return COLOR_PAIR_LUA_CONSTANT;
+    case HL_MATCH: return COLOR_PAIR_MATCH;
+    default: return COLOR_PAIR_NORMAL;
     }
 }
 
@@ -760,7 +760,7 @@ static void editorRefreshScreen(void (*menu_func)(void)) {
                     }
                     addch(c[j]);
                 } else {
-                    int color = editorSyntaxToColor(hl[j]);
+                    int color = editorSyntaxToColorPair(hl[j]);
                     if (color != current_color) {
                         attrset(COLOR_PAIR(color));
                         current_color = color;

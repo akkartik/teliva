@@ -116,11 +116,13 @@ original]==],
     render = [==[
 function render(window)
   window:clear()
+  curses.attron(curses.color_pair(1))
   for line=1,lines do
     for col=1,cols do
       window:addstr(utf8(glyph[grid_char_to_glyph_index(grid_char(line, col))]))
     end
   end
+  curses.attroff(curses.color_pair(1))
   curses.refresh()
 end
 ]==],
@@ -263,10 +265,8 @@ end]==],
 original]==],
     main = [==[
 function main()
-  for i=1,7 do
-    curses.init_pair(i, i, -1)
-  end
   curses.init_pair(255, 15, 1)  -- reserved for Teliva error messages
+  curses.init_pair(1, 22, 189)
 
   -- initialize grid based on commandline args
   if (#arg == 0) then

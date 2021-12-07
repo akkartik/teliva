@@ -172,7 +172,7 @@ ltable.o: ltable.c lua.h luaconf.h ldebug.h lstate.h lobject.h llimits.h \
 ltablib.o: ltablib.c lua.h luaconf.h lauxlib.h lualib.h
 ltm.o: ltm.c lua.h luaconf.h lobject.h llimits.h lstate.h ltm.h lzio.h \
   lmem.h lstring.h lgc.h ltable.h
-lua.o: lua.c lua.h luaconf.h lauxlib.h lualib.h
+lua.o: lua.c lua.h luaconf.h lauxlib.h lualib.h teliva.h
 lundump.o: lundump.c lua.h luaconf.h ldebug.h lstate.h lobject.h \
   llimits.h ltm.h lzio.h lmem.h ldo.h lfunc.h lstring.h lgc.h lundump.h
 lvm.o: lvm.c lua.h luaconf.h ldebug.h lstate.h lobject.h llimits.h ltm.h \
@@ -181,5 +181,6 @@ lzio.o: lzio.c lua.h luaconf.h llimits.h lmem.h lstate.h lobject.h ltm.h \
   lzio.h
 print.o: print.c ldebug.h lstate.h lua.h luaconf.h lobject.h llimits.h \
   ltm.h lzio.h lmem.h lopcodes.h lundump.h
+kilo.o: kilo.c teliva.h
 
 # (end of Makefile)

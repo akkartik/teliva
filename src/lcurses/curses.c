@@ -367,6 +367,22 @@ Puse_default_colors(lua_State *L)
 
 
 /***
+Set -1 foreground and background colors.
+@function use_default_colors
+@treturn bool `true`, if successful
+@see use_default_colors(3x)
+@fixme ncurses only?
+*/
+static int
+Passume_default_colors(lua_State *L)
+{
+	int fg = checkint(L, 1);
+	int bg = checkint(L, 2);
+	return pushokresult(assume_default_colors(fg, bg));
+}
+
+
+/***
 Associate a color pair id with a specific foreground and background color.
 @function init_pair
 @int pair color pair id to act on
@@ -1289,6 +1305,7 @@ static const luaL_Reg curseslib[] =
 	LCURSES_FUNC( Punctrl		),
 	LCURSES_FUNC( Pungetch		),
 	LCURSES_FUNC( Puse_default_colors),
+	LCURSES_FUNC( Passume_default_colors),
 	{NULL, NULL}
 };
 

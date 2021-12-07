@@ -85,10 +85,11 @@ end]==],
 original]==],
     main = [==[
 function main()
+  curses.assume_default_colors(250, 30)
   for i=1,7 do
     curses.init_pair(i, 0, i)
   end
-  curses.init_pair(15, 0, 15)
+  curses.init_pair(15, 0, 250)  -- tower frames
   curses.init_pair(255, 15, 1)  -- reserved for Teliva error messages
 
   while true do

@@ -89,6 +89,50 @@ end
   {
     __teliva_timestamp = [==[
 original]==],
+    map = [==[
+-- only for arrays
+function map(l, f)
+  result = {}
+  for _, x in q(l) do
+    result[#result+1] = f(x)
+  end
+  return result
+end
+]==],
+  },
+  {
+    __teliva_timestamp = [==[
+original]==],
+    reduce = [==[
+-- only for arrays
+function reduce(l, f, init)
+  result = init
+  for _, x in q(l) do
+    result = f(result, x)
+  end
+  return result
+end
+]==],
+  },
+  {
+    __teliva_timestamp = [==[
+original]==],
+    filter = [==[
+-- only for arrays
+function filter(l, f)
+  result = {}
+  for _, x in q(l) do
+    if f(x) then
+      result[#result+1] = x
+    end
+  end
+  return result
+end
+]==],
+  },
+  {
+    __teliva_timestamp = [==[
+original]==],
     window = [==[
 window = curses.stdscr()]==],
   },

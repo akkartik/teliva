@@ -106,6 +106,7 @@ static int render_wrapped_text (int y, int xmin, int xmax, const char *text) {
 const char *Previous_error = NULL;
 void render_previous_error (void) {
   if (!Previous_error) return;
+  init_pair(COLOR_PAIR_ERROR, COLOR_ERROR_FOREGROUND, COLOR_ERROR_BACKGROUND);
   attrset(COLOR_PAIR(255));
   render_wrapped_text(LINES-10, COLS/2, COLS, Previous_error);
   attrset(A_NORMAL);

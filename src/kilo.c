@@ -672,9 +672,9 @@ static void editorMenu(void) {
     draw_menu_item("^g", "go");
     draw_menu_item("^b", "big picture");
     draw_menu_item("^f", "find");
-    draw_menu_item("^/|^-|^_", "(un)comment line");
-    draw_menu_item("^h", "back up cursor");
+    draw_menu_item("^h", "backspace");
     draw_menu_item("^l", "end of line");
+    draw_menu_item("^/|^-|^_", "(un)comment line");
     attrset(A_NORMAL);
 }
 

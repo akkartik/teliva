@@ -133,6 +133,19 @@ end
   {
     __teliva_timestamp = [==[
 original]==],
+    split = [==[
+function split(s, d)
+  result = {}
+  for match in (s..d):gmatch("(.-)"..d) do
+    table.insert(result, match);
+  end
+  return result
+end
+]==],
+  },
+  {
+    __teliva_timestamp = [==[
+original]==],
     window = [==[
 window = curses.stdscr()]==],
   },

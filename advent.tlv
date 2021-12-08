@@ -150,6 +150,28 @@ end
   {
     __teliva_timestamp = [==[
 original]==],
+    find_index = [==[
+function find_index(arr, x)
+  for n, y in q(arr) do
+    if x == y then
+      return n
+    end
+  end
+end
+]==],
+  },
+  {
+    __teliva_timestamp = [==[
+original]==],
+    trim = [==[
+function trim(s)
+  return s:gsub('^%s*', ''):gsub('%s*$', '')
+end
+]==],
+  },
+  {
+    __teliva_timestamp = [==[
+original]==],
     split = [==[
 function split(s, d)
   result = {}

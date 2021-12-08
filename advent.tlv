@@ -89,6 +89,17 @@ end
   {
     __teliva_timestamp = [==[
 original]==],
+    prn = [==[
+-- functional form of 'print'
+-- use this in map/reduce/filter
+function prn(...)
+  print(unpack(arg))
+  return arg[1]
+end]==],
+  },
+  {
+    __teliva_timestamp = [==[
+original]==],
     add = [==[
 add = table.insert]==],
   },

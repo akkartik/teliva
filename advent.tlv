@@ -89,12 +89,18 @@ end
   {
     __teliva_timestamp = [==[
 original]==],
+    add = [==[
+add = table.insert]==],
+  },
+  {
+    __teliva_timestamp = [==[
+original]==],
     map = [==[
 -- only for arrays
 function map(l, f)
   result = {}
   for _, x in q(l) do
-    result[#result+1] = f(x)
+    add(result, f(x))
   end
   return result
 end
@@ -123,7 +129,7 @@ function filter(l, f)
   result = {}
   for _, x in q(l) do
     if f(x) then
-      result[#result+1] = x
+      add(result, x)
     end
   end
   return result
@@ -137,7 +143,7 @@ original]==],
 function split(s, d)
   result = {}
   for match in (s..d):gmatch("(.-)"..d) do
-    table.insert(result, match);
+    add(result, match);
   end
   return result
 end

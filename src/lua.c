@@ -698,7 +698,7 @@ static void big_picture_menu (void) {
   menu_column = 2;
   draw_menu_item("^x", "go back");
   draw_menu_item("Enter", "submit");
-  draw_menu_item("^h", "back up cursor");
+  draw_menu_item("^h", "backspace");
   draw_menu_item("^u", "clear");
   draw_menu_item("^r", "recent changes");
   attrset(A_NORMAL);

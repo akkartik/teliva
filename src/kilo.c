@@ -744,6 +744,8 @@ static void editorRefreshScreen(void (*menu_func)(void)) {
     curs_set(0);
     clear();
     attrset(A_NORMAL);
+    /* Draw all line numbers first so they don't mess up curses state later
+     * when rendering lines. */
     for (y = 0; y < LINES-1; y++) {
         int filerow = E.rowoff+y;
 

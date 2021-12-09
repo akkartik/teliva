@@ -1070,10 +1070,10 @@ static void editorProcessKeypress(lua_State* L) {
     switch(c) {
     case ENTER:
         {
-            erow* oldrow = &E.row[E.rowoff + E.cy];
             editorInsertNewline();
             /* auto-indent */
-            for (int x = 0; x < oldrow->size && oldrow->chars[x] == ' '; ++x)
+            erow* prevrow = &E.row[E.rowoff + E.cy - 1];
+            for (int x = 0; x < prevrow->size && prevrow->chars[x] == ' '; ++x)
                 editorInsertChar(' ');
         }
         break;

@@ -85,7 +85,7 @@ end]==],
 original]==],
     main = [==[
 function main()
-  curses.assume_default_colors(250, 30)
+  curses.assume_default_colors(250, 139)
   for i=1,7 do
     curses.init_pair(i, 0, i)
   end

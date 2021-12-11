@@ -107,10 +107,14 @@ static void teliva_load_definition(lua_State* L, FILE* in) {
 }
 
 void load_tlv(lua_State* L, char* filename) {
-  endwin();
   lua_newtable(L);
   int history_array = lua_gettop(L);
   FILE* in = fopen(filename, "r");
+  if (in == NULL) {
+    endwin();
+    fprintf(stderr, "no such file\n");
+    exit(1);
+  }
   for (int i = 1; !feof(in); ++i) {
     teliva_load_definition(L, in);
     if (lua_isnil(L, -1)) break;

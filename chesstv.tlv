@@ -1,298 +1,263 @@
-teliva_program = {
-  {
-    __teliva_timestamp = [==[
-original]==],
-    window = [==[
-window = curses.stdscr()
--- animation-based app
-window:nodelay(true)
-lines, cols = window:getmaxyx()]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    current_game = [==[
-current_game = {}]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    piece_glyph = [==[
-piece_glyph = {
-  -- for legibility, white pieces also use unicode glyphs for black pieces
-  -- we rely on colors to distinguish them
-  K = 0x265a,
-  Q = 0x265b,
-  R = 0x265c,
-  B = 0x265d,
-  N = 0x265e,
-  P = 0x265f,
-  k = 0x265a,
-  q = 0x265b,
-  r = 0x265c,
-  b = 0x265d,
-  n = 0x265e,
-  p = 0x265f,
-}]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    top_player = [==[
-function top_player(current_game)
-  if current_game.players[1].color == "black" then
-    return current_game.players[1]
-  end
-  return current_game.players[2]
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    bottom_player = [==[
-function bottom_player(current_game)
-  if current_game.players[1].color == "white" then
-    return current_game.players[1]
-  end
-  return current_game.players[2]
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    render_player = [==[
-function render_player(y, x, player)
-  curses.mvaddstr(y, x, player.user.name)
-  curses.addstr(" · ")
-  curses.addstr(tostring(player.rating))
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    render_square = [==[
-function render_square(current_game, rank, file, highlighted_squares)
-  -- decide whether to highlight
-  local hl = 0
-  if (rank == highlighted_squares.from.rank and file == highlighted_squares.from.file)
-      or (rank == highlighted_squares.to.rank and file == highlighted_squares.to.file) then
-    hl = 4
-  end
-  if (rank+file)%2 == 1 then
-    -- light square
-    curses.attrset(curses.color_pair(1+hl))
-  else
-    -- dark square
-    curses.attrset(curses.color_pair(3+hl))
-  end
-  curses.mvaddstr((8 - rank + 1)*3,   file*5, "     ")
-  curses.mvaddstr((8 - rank + 1)*3+1, file*5, "     ")
-  curses.mvaddstr((8 - rank + 1)*3+2, file*5, "     ")
-  curses.attrset(curses.A_NORMAL)
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    render_fen_rank = [==[
-function render_fen_rank(rank, fen_rank, highlighted_squares)
-  local file = 1
-  for x in fen_rank:gmatch(".") do
-    if x:match("%d") then
-      file = file + tonumber(x)
-    else
-      -- decide whether to highlight
-      local hl = 0
-      if (rank == highlighted_squares.from.rank and file == highlighted_squares.from.file)
-          or (rank == highlighted_squares.to.rank and file == highlighted_squares.to.file) then
-        hl = 4
-      end
-      if (rank+file)%2 == 1 then
-        if x < 'Z' then
-          -- white piece on light square
-          curses.attrset(curses.color_pair(1+hl))
-        else
-          -- black piece on light square
-          curses.attrset(curses.color_pair(2+hl))
-        end
-      else
-        if x < 'Z' then
-          -- white piece on dark square
-          curses.attrset(curses.color_pair(3+hl))
-        else
-          -- black piece on dark square
-          curses.attrset(curses.color_pair(4+hl))
-        end
-      end
-      curses.mvaddstr((8 - rank + 1)*3+1, file*5+2, utf8(piece_glyph[x]))
-      curses.attrset(curses.A_NORMAL)
-      file = file + 1
-    end
-  end
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    render_time = [==[
-function render_time(y, x, seconds)
-  if seconds == nil then return end
-  curses.mvaddstr(y, x, tostring(math.floor(seconds/60)))
-  curses.addstr(string.format(":%02d", seconds%60))
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    render_board = [==[
-function render_board(current_game)
---?   curses.mvaddstr(1, 50, dump(current_game.fen))
---?   curses.mvaddstr(6, 50, dump(current_game.previously_moved_squares))
-  render_player(2, 5, top_player(current_game))
-  render_time(2, 35, current_game.bc)
-  for rank=8,1,-1 do
-    for file=1,8 do
-      render_square(current_game, rank, file, current_game.previously_moved_squares)
-    end
-    render_fen_rank(rank, current_game.fen_rank[8-rank+1], current_game.previously_moved_squares)
-  end
-  render_player(27, 5, bottom_player(current_game))
-  render_time(27, 35, current_game.wc)
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    parse_lm = [==[
-function parse_lm(move)
---?   curses.mvaddstr(4, 50, move)
-  local file1 = string.byte(move:sub(1, 1)) - 96  -- 'a'-1
-  local rank1 = string.byte(move:sub(2, 2)) - 48  -- '0'
-  local file2 = string.byte(move:sub(3, 3)) - 96  -- 'a'-1
-  local rank2 = string.byte(move:sub(4, 4)) - 48  -- '0'
---?   curses.mvaddstr(5, 50, dump({{rank1, file1}, {rank2, file2}}))
-  return {from={rank=rank1, file=file1}, to={rank=rank2, file=file2}}
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    render = [==[
-function render(chunk)
-  local o = json.decode(chunk)
-  if o.t == "featured" then
-    current_game = o.d
---?     current_game.lm = "__"
-    current_game.previously_moved_squares = {from={rank=0, file=0}, to={rank=0, file=0}}  -- no highlight
-  else
-    current_game.fen = o.d.fen
-    current_game.wc = o.d.wc
-    current_game.bc = o.d.bc
---?     current_game.lm = o.d.lm
-    current_game.previously_moved_squares = parse_lm(o.d.lm)
---?     window:nodelay(false)
---?     curses.mvaddstr(3, 50, "paused")
-  end
-  current_game.fen_rank = split(current_game.fen, "%w+")
-  render_board(current_game)
-  curses.refresh()
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    init_colors = [==[
-function init_colors()
-  -- colors
-  local light_piece = 1
-  local dark_piece = 0
-  local light_square = 252
-  local dark_square = 242
-  local light_last_moved_square = 229
-  local dark_last_moved_square = 226
-  -- initialize colors
-  curses.init_pair(1, light_piece, light_square)
-  curses.init_pair(2, dark_piece, light_square)
-  curses.init_pair(3, light_piece, dark_square)
-  curses.init_pair(4, dark_piece, dark_square)
-  curses.init_pair(5, light_piece, light_last_moved_square)
-  curses.init_pair(6, dark_piece, light_last_moved_square)
-  curses.init_pair(7, light_piece, dark_last_moved_square)
-  curses.init_pair(8, dark_piece, dark_last_moved_square)
-  curses.init_pair(255, 15, 1)  -- reserved for Teliva error messages
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    main = [==[
-function main()
-  init_colors()
-  local request = {
-    url = "https://lichess.org/api/tv/feed",
-    sink = function(chunk, err)
-             if chunk then
-               curses.clear()
-               render(chunk)
-               curses.getch()
-             end
-             return 1
-           end,
-  }
-  http.request(request)
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    utf8 = [==[
--- https://stackoverflow.com/questions/7983574/how-to-write-a-unicode-symbol-in-lua
-function utf8(decimal)
-  local bytemarkers = { {0x7FF,192}, {0xFFFF,224}, {0x1FFFFF,240} }
-  if decimal<128 then return string.char(decimal) end
-  local charbytes = {}
-  for bytes,vals in ipairs(bytemarkers) do
-    if decimal<=vals[1] then
-      for b=bytes+1,2,-1 do
-        local mod = decimal%64
-        decimal = (decimal-mod)/64
-        charbytes[b] = string.char(128+mod)
-      end
-      charbytes[1] = string.char(vals[2]+decimal)
-      break
-    end
-  end
-  return table.concat(charbytes)
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    split = [==[
-function split(s, pat)
-  result = {}
-  for x in s:gmatch(pat) do
-    table.insert(result, x)
-  end
-  return result
-end]==],
-  },
-  {
-    __teliva_timestamp = [==[
-original]==],
-    dump = [==[
--- https://stackoverflow.com/questions/9168058/how-to-dump-a-table-to-console
-function dump(o)
-  if type(o) == 'table' then
-    local s = '{ '
-    for k,v in pairs(o) do
-      if type(k) ~= 'number' then k = '"'..k..'"' end
-      s = s .. '['..k..'] = ' .. dump(v) .. ','
-    end
-    return s .. '} '
-  else
-    return tostring(o)
-  end
-end]==],
-  },
-}
+# .tlv file generated by https://github.com/akkartik/teliva
+# You may edit it if you are careful; however, you may see cryptic errors if you
+# violate Teliva's assumptions.
+#
+# .tlv files are representations of Teliva programs. Teliva programs consist of
+# sequences of definitions. Each definition is a table of key/value pairs. Keys
+# and values are both strings.
+#
+# Lines in .tlv files always follow exactly one of the following forms:
+# - comment lines at the top of the file starting with '#' at column 0
+# - beginnings of definitions starting with '- ' at column 0, followed by a
+#   key/value pair
+# - key/value pairs consisting of '  ' at column 0, containing either a
+#   spaceless value on the same line, or a multi-line value
+# - multiline values indented by more than 2 spaces, starting with a '>'
+#
+# If these constraints are violated, Teliva may unceremoniously crash. Please
+# report bugs at http://akkartik.name/contact
+- __teliva_timestamp: original
+  window:
+    >window = curses.stdscr()
+    >-- animation-based app
+    >window:nodelay(true)
+    >lines, cols = window:getmaxyx()
+- __teliva_timestamp: original
+  current_game:
+    >current_game = {}
+- __teliva_timestamp: original
+  piece_glyph:
+    >piece_glyph = {
+    >  -- for legibility, white pieces also use unicode glyphs for black pieces
+    >  -- we rely on colors to distinguish them
+    >  K = 0x265a,
+    >  Q = 0x265b,
+    >  R = 0x265c,
+    >  B = 0x265d,
+    >  N = 0x265e,
+    >  P = 0x265f,
+    >  k = 0x265a,
+    >  q = 0x265b,
+    >  r = 0x265c,
+    >  b = 0x265d,
+    >  n = 0x265e,
+    >  p = 0x265f,
+    >}
+- __teliva_timestamp: original
+  top_player:
+    >function top_player(current_game)
+    >  if current_game.players[1].color == "black" then
+    >    return current_game.players[1]
+    >  end
+    >  return current_game.players[2]
+    >end
+- __teliva_timestamp: original
+  bottom_player:
+    >function bottom_player(current_game)
+    >  if current_game.players[1].color == "white" then
+    >    return current_game.players[1]
+    >  end
+    >  return current_game.players[2]
+    >end
+- __teliva_timestamp: original
+  render_player:
+    >function render_player(y, x, player)
+    >  curses.mvaddstr(y, x, player.user.name)
+    >  curses.addstr(" · ")
+    >  curses.addstr(tostring(player.rating))
+    >end
+- __teliva_timestamp: original
+  render_square:
+    >function render_square(current_game, rank, file, highlighted_squares)
+    >  -- decide whether to highlight
+    >  local hl = 0
+    >  if (rank == highlighted_squares.from.rank and file == highlighted_squares.from.file)
+    >      or (rank == highlighted_squares.to.rank and file == highlighted_squares.to.file) then
+    >    hl = 4
+    >  end
+    >  if (rank+file)%2 == 1 then
+    >    -- light square
+    >    curses.attrset(curses.color_pair(1+hl))
+    >  else
+    >    -- dark square
+    >    curses.attrset(curses.color_pair(3+hl))
+    >  end
+    >  curses.mvaddstr((8 - rank + 1)*3,   file*5, "     ")
+    >  curses.mvaddstr((8 - rank + 1)*3+1, file*5, "     ")
+    >  curses.mvaddstr((8 - rank + 1)*3+2, file*5, "     ")
+    >  curses.attrset(curses.A_NORMAL)
+    >end
+- __teliva_timestamp: original
+  render_fen_rank:
+    >function render_fen_rank(rank, fen_rank, highlighted_squares)
+    >  local file = 1
+    >  for x in fen_rank:gmatch(".") do
+    >    if x:match("%d") then
+    >      file = file + tonumber(x)
+    >    else
+    >      -- decide whether to highlight
+    >      local hl = 0
+    >      if (rank == highlighted_squares.from.rank and file == highlighted_squares.from.file)
+    >          or (rank == highlighted_squares.to.rank and file == highlighted_squares.to.file) then
+    >        hl = 4
+    >      end
+    >      if (rank+file)%2 == 1 then
+    >        if x < 'Z' then
+    >          -- white piece on light square
+    >          curses.attrset(curses.color_pair(1+hl))
+    >        else
+    >          -- black piece on light square
+    >          curses.attrset(curses.color_pair(2+hl))
+    >        end
+    >      else
+    >        if x < 'Z' then
+    >          -- white piece on dark square
+    >          curses.attrset(curses.color_pair(3+hl))
+    >        else
+    >          -- black piece on dark square
+    >          curses.attrset(curses.color_pair(4+hl))
+    >        end
+    >      end
+    >      curses.mvaddstr((8 - rank + 1)*3+1, file*5+2, utf8(piece_glyph[x]))
+    >      curses.attrset(curses.A_NORMAL)
+    >      file = file + 1
+    >    end
+    >  end
+    >end
+- __teliva_timestamp: original
+  render_time:
+    >function render_time(y, x, seconds)
+    >  if seconds == nil then return end
+    >  curses.mvaddstr(y, x, tostring(math.floor(seconds/60)))
+    >  curses.addstr(string.format(":%02d", seconds%60))
+    >end
+- __teliva_timestamp: original
+  render_board:
+    >function render_board(current_game)
+    >--?   curses.mvaddstr(1, 50, dump(current_game.fen))
+    >--?   curses.mvaddstr(6, 50, dump(current_game.previously_moved_squares))
+    >  render_player(2, 5, top_player(current_game))
+    >  render_time(2, 35, current_game.bc)
+    >  for rank=8,1,-1 do
+    >    for file=1,8 do
+    >      render_square(current_game, rank, file, current_game.previously_moved_squares)
+    >    end
+    >    render_fen_rank(rank, current_game.fen_rank[8-rank+1], current_game.previously_moved_squares)
+    >  end
+    >  render_player(27, 5, bottom_player(current_game))
+    >  render_time(27, 35, current_game.wc)
+    >end
+- __teliva_timestamp: original
+  parse_lm:
+    >function parse_lm(move)
+    >--?   curses.mvaddstr(4, 50, move)
+    >  local file1 = string.byte(move:sub(1, 1)) - 96  -- 'a'-1
+    >  local rank1 = string.byte(move:sub(2, 2)) - 48  -- '0'
+    >  local file2 = string.byte(move:sub(3, 3)) - 96  -- 'a'-1
+    >  local rank2 = string.byte(move:sub(4, 4)) - 48  -- '0'
+    >--?   curses.mvaddstr(5, 50, dump({{rank1, file1}, {rank2, file2}}))
+    >  return {from={rank=rank1, file=file1}, to={rank=rank2, file=file2}}
+    >end
+- __teliva_timestamp: original
+  render:
+    >function render(chunk)
+    >  local o = json.decode(chunk)
+    >  if o.t == "featured" then
+    >    current_game = o.d
+    >--?     current_game.lm = "__"
+    >    current_game.previously_moved_squares = {from={rank=0, file=0}, to={rank=0, file=0}}  -- no highlight
+    >  else
+    >    current_game.fen = o.d.fen
+    >    current_game.wc = o.d.wc
+    >    current_game.bc = o.d.bc
+    >--?     current_game.lm = o.d.lm
+    >    current_game.previously_moved_squares = parse_lm(o.d.lm)
+    >--?     window:nodelay(false)
+    >--?     curses.mvaddstr(3, 50, "paused")
+    >  end
+    >  current_game.fen_rank = split(current_game.fen, "%w+")
+    >  render_board(current_game)
+    >  curses.refresh()
+    >end
+- __teliva_timestamp: original
+  init_colors:
+    >function init_colors()
+    >  -- colors
+    >  local light_piece = 1
+    >  local dark_piece = 0
+    >  local light_square = 252
+    >  local dark_square = 242
+    >  local light_last_moved_square = 229
+    >  local dark_last_moved_square = 226
+    >  -- initialize colors
+    >  curses.init_pair(1, light_piece, light_square)
+    >  curses.init_pair(2, dark_piece, light_square)
+    >  curses.init_pair(3, light_piece, dark_square)
+    >  curses.init_pair(4, dark_piece, dark_square)
+    >  curses.init_pair(5, light_piece, light_last_moved_square)
+    >  curses.init_pair(6, dark_piece, light_last_moved_square)
+    >  curses.init_pair(7, light_piece, dark_last_moved_square)
+    >  curses.init_pair(8, dark_piece, dark_last_moved_square)
+    >  curses.init_pair(255, 15, 1)  -- reserved for Teliva error messages
+    >end
+- __teliva_timestamp: original
+  main:
+    >function main()
+    >  init_colors()
+    >  local request = {
+    >    url = "https://lichess.org/api/tv/feed",
+    >    sink = function(chunk, err)
+    >             if chunk then
+    >               curses.clear()
+    >               render(chunk)
+    >               curses.getch()
+    >             end
+    >             return 1
+    >           end,
+    >  }
+    >  http.request(request)
+    >end
+- __teliva_timestamp: original
+  utf8:
+    >-- https://stackoverflow.com/questions/7983574/how-to-write-a-unicode-symbol-in-lua
+    >function utf8(decimal)
+    >  local bytemarkers = { {0x7FF,192}, {0xFFFF,224}, {0x1FFFFF,240} }
+    >  if decimal<128 then return string.char(decimal) end
+    >  local charbytes = {}
+    >  for bytes,vals in ipairs(bytemarkers) do
+    >    if decimal<=vals[1] then
+    >      for b=bytes+1,2,-1 do
+    >        local mod = decimal%64
+    >        decimal = (decimal-mod)/64
+    >        charbytes[b] = string.char(128+mod)
+    >      end
+    >      charbytes[1] = string.char(vals[2]+decimal)
+    >      break
+    >    end
+    >  end
+    >  return table.concat(charbytes)
+    >end
+- __teliva_timestamp: original
+  split:
+    >function split(s, pat)
+    >  result = {}
+    >  for x in s:gmatch(pat) do
+    >    table.insert(result, x)
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  dump:
+    >-- https://stackoverflow.com/questions/9168058/how-to-dump-a-table-to-console
+    >function dump(o)
+    >  if type(o) == 'table' then
+    >    local s = '{ '
+    >    for k,v in pairs(o) do
+    >      if type(k) ~= 'number' then k = '"'..k..'"' end
+    >      s = s .. '['..k..'] = ' .. dump(v) .. ','
+    >    end
+    >    return s .. '} '
+    >  else
+    >    return tostring(o)
+    >  end
+    >end

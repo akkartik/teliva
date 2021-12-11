@@ -89,7 +89,9 @@ static void teliva_load_definition(lua_State* L, FILE* in) {
         strcpy(line, "-\n");
       }
       else {
-        assert(fgets(line, 1024, in));
+        memset(line, '\0', 1024);
+//?         printf("%d\n", feof(in));
+        fgets(line, 1024, in);
 //?         printf("new line: %s", line);
       }
     }

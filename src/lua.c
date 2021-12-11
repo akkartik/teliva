@@ -168,6 +168,23 @@ static int docall (lua_State *L, int narg, int clear) {
 }
 
 
+/* initialize global binding "args" for commandline args */
+static void set_args (lua_State *L, char **argv, int n) {
+  int narg;
+  int i;
+  int argc = 0;
+  while (argv[argc]) argc++;  /* count total number of arguments */
+  narg = argc - (n + 1);  /* number of arguments to the script */
+  luaL_checkstack(L, narg + 3, "too many arguments to script");
+  lua_newtable(L);
+  for (i=0; i < argc; i++) {
+    lua_pushstring(L, argv[i]);
+    lua_rawseti(L, -2, i - n);
+  }
+  lua_setglobal(L, "arg");
+}
+
+
 static int dofile (lua_State *L, const char *name) {
   int status = luaL_loadfile(L, name) || docall(L, 0, 1);
   return report_in_developer_mode(L, status);
@@ -310,7 +327,7 @@ char *Image_name = NULL;
 extern void load_tlv (lua_State *L, char *filename);
 static int handle_image (lua_State *L, char **argv, int n) {
   int status;
-  /* TODO: pass args in */
+  set_args(L, argv, n);
   /* parse and load file contents (teliva_program array) */
   Image_name = argv[n];
   load_tlv(L, Image_name);

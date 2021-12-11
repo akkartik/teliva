@@ -582,8 +582,8 @@ void add_undo_event(lua_State *L, int cursor) {
 }
 
 
-/* precondition: teliva_program is at top of stack */
 void save_note_to_editor_buffer (lua_State *L, int cursor) {
+  lua_getglobal(L, "teliva_program");
   lua_rawgeti(L, -1, cursor);
   lua_getfield(L, -1, "__teliva_note");
   const char *contents = lua_tostring(L, -1);
@@ -591,18 +591,18 @@ void save_note_to_editor_buffer (lua_State *L, int cursor) {
   if (contents != NULL)
     fprintf(out, "%s", contents);
   fclose(out);
-  lua_pop(L, 2);  /* contents, table at cursor */
+  lua_pop(L, 3);  /* contents, table at cursor, teliva_program */
 }
 
 
-/* precondition: teliva_program is at top of stack */
 void load_note_from_editor_buffer (lua_State *L, int cursor) {
+  lua_getglobal(L, "teliva_program");
   char new_contents[8192] = {0};
   read_editor_buffer(new_contents);
   lua_rawgeti(L, -1, cursor);
   lua_pushstring(L, new_contents);
   lua_setfield(L, -2, "__teliva_note");
-  lua_pop(L, 1);  /* table at cursor */
+  lua_pop(L, 2);  /* table at cursor, teliva_program */
 }
 
 

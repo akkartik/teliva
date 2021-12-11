@@ -168,25 +168,6 @@ static int docall (lua_State *L, int narg, int clear) {
 }
 
 
-/* pushes commandline args to the stack, then an array of all commandline args */
-static int getargs (lua_State *L, char **argv, int n) {
-  int narg;
-  int i;
-  int argc = 0;
-  while (argv[argc]) argc++;  /* count total number of arguments */
-  narg = argc - (n + 1);  /* number of arguments to the script */
-  luaL_checkstack(L, narg + 3, "too many arguments to script");
-  for (i=n+1; i < argc; i++)
-    lua_pushstring(L, argv[i]);
-  lua_createtable(L, narg, n + 1);
-  for (i=0; i < argc; i++) {
-    lua_pushstring(L, argv[i]);
-    lua_rawseti(L, -2, i - n);
-  }
-  return narg;
-}
-
-
 static int dofile (lua_State *L, const char *name) {
   int status = luaL_loadfile(L, name) || docall(L, 0, 1);
   return report_in_developer_mode(L, status);
@@ -326,17 +307,13 @@ int load_definitions(lua_State *L) {
 
 
 char *Image_name = NULL;
+void load_tlv (lua_State *L, char *filename);
 static int handle_image (lua_State *L, char **argv, int n) {
   int status;
-  int narg = getargs(L, argv, n);  /* collect arguments */
-  lua_setglobal(L, "arg");
+  /* TODO: pass args in */
   /* parse and load file contents (teliva_program array) */
   Image_name = argv[n];
-  status = luaL_loadfile(L, Image_name);
-  lua_insert(L, -(narg+1));
-  if (status != 0) return report(L, status);  /* can't recover within teliva */
-  status = docall(L, narg, 0);
-  if (status != 0) return report(L, status);  /* can't recover within teliva */
+  load_tlv(L, Image_name);
   status = load_definitions(L);
   if (status != 0) return 0;
   /* call main() */

@@ -307,13 +307,15 @@ int load_definitions(lua_State *L) {
 
 
 char *Image_name = NULL;
-void load_tlv (lua_State *L, char *filename);
+extern void load_tlv (lua_State *L, char *filename);
 static int handle_image (lua_State *L, char **argv, int n) {
   int status;
   /* TODO: pass args in */
   /* parse and load file contents (teliva_program array) */
   Image_name = argv[n];
   load_tlv(L, Image_name);
+//?   save_tlv(L, Image_name);  // manual test; should always return identical result, modulo key order
+//?   exit(1);
   status = load_definitions(L);
   if (status != 0) return 0;
   /* call main() */
@@ -379,41 +381,12 @@ static void update_definition (lua_State *L, const char *name, char *new_content
 }
 
 
-static void save_image (lua_State *L) {
-  lua_getglobal(L, "teliva_program");
-  int history_array = lua_gettop(L);
-  int history_array_size = luaL_getn(L, history_array);
-  FILE *out = fopen(Image_name, "w");
-  fprintf(out, "teliva_program = {\n");
-  for (int i = 1;  i <= history_array_size; ++i) {
-    lua_rawgeti(L, history_array, i);
-    int table = lua_gettop(L);
-    fprintf(out, "  {\n");
-    for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
-      const char* key = lua_tostring(L, -2);
-      if (strcmp(key, "__teliva_undo") == 0) {
-        fprintf(out, "    %s = %ld,\n", key, lua_tointeger(L, -1));
-        continue;
-      }
-      const char* value = lua_tostring(L, -1);
-      fprintf(out, "    %s = [==[\n", key);
-      fprintf(out, "%s", value);
-      fprintf(out, "]==],\n");
-    }
-    fprintf(out, "  },\n");
-    lua_pop(L, 1);
-  }
-  fprintf(out, "}\n");
-  fclose(out);
-  lua_pop(L, 1);
-}
-
-
+extern void save_tlv (lua_State *L, char *filename);
 int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
   char new_contents[8192] = {0};
   read_editor_buffer(new_contents);
   update_definition(L, Current_definition, new_contents);
-  save_image(L);
+  save_tlv(L, Image_name);
   /* reload binding */
   return luaL_loadbuffer(L, new_contents, strlen(new_contents), Current_definition)
           || docall(L, 0, 1);
@@ -651,12 +624,12 @@ void recent_changes_view (lua_State *L) {
         /* TODO: go hotkey is misleading. edits will not be persisted until you return to recent changes */
         edit(L, "teliva_editor_buffer");
         load_note_from_editor_buffer(L, cursor);
-        save_image(L);
+        save_tlv(L, Image_name);
         break;
       case CTRL_U:
         if (cursor < history_array_size) {
           add_undo_event(L, cursor);
-          save_image(L);
+          save_tlv(L, Image_name);
         }
         break;
     }

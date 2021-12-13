@@ -79,7 +79,7 @@
 - __teliva_timestamp: original
   main:
     >function main()
-    >  curses.assume_default_colors(250, 139)
+    >  curses.assume_default_colors(238, 139)
     >  for i=1,7 do
     >    curses.init_pair(i, 0, i)
     >  end

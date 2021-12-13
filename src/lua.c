@@ -779,8 +779,9 @@ restart:
   y += 2;
   mvprintw(y, 0, "functions: ");
   y++;
-  for (int level = 1; level < 5; ++level) {
+  for (int level = 1; ; ++level) {
     mvaddstr(y, 0, "                ");
+    bool drew_anything = false;
     for (int i = history_array_size; i > 0; --i) {
       lua_rawgeti(L, history_array, i);
       int t = lua_gettop(L);
@@ -789,14 +790,17 @@ restart:
         if (is_special_history_key(definition_name)) continue;
         lua_getfield(L, cgt, definition_name);
         int depth = lua_tointeger(L, -1);
-        if (depth == level)
+        if (depth == level) {
           if (is_current_definition(L, definition_name, i, history_array, history_array_size))
             draw_definition_name(definition_name);
+          drew_anything = true;
+        }
         lua_pop(L, 1);  // depth of value
       }
       lua_pop(L, 1);  // history element
     }
     y += 2;
+    if (!drew_anything) break;
   }
 
   // unused functions

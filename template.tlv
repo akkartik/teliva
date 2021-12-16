@@ -17,6 +17,102 @@
 # If these constraints are violated, Teliva may unceremoniously crash. Please
 # report bugs at http://akkartik.name/contact
 - __teliva_timestamp: original
+  str_helpers:
+    >-- some string helpers from http://lua-users.org/wiki/StringIndexing
+    >
+    >-- index characters using []
+    >getmetatable('').__index = function(str,i)
+    >  if type(i) == 'number' then
+    >    return string.sub(str,i,i)
+    >  else
+    >    return string[i]
+    >  end
+    >end
+    >
+    >-- ranges using (), selected bytes using {}
+    >getmetatable('').__call = function(str,i,j)
+    >  if type(i)~='table' then
+    >    return string.sub(str,i,j)
+    >  else
+    >    local t={}
+    >    for k,v in ipairs(i) do
+    >      t[k]=string.sub(str,v,v)
+    >    end
+    >    return table.concat(t)
+    >  end
+    >end
+    >
+    >-- iterate over an ordered sequence
+    >function q(x)
+    >  if type(x) == 'string' then
+    >    return x:gmatch('.')
+    >  else
+    >    return ipairs(x)
+    >  end
+    >end
+    >
+    >-- insert within string
+    >function string.insert(str1, str2, pos)
+    >  return str1:sub(1,pos)..str2..str1:sub(pos+1)
+    >end
+    >
+    >-- TODO: backport utf-8 support from Lua 5.3
+- __teliva_timestamp: original
+  map:
+    >-- only for arrays
+    >function map(l, f)
+    >  result = {}
+    >  for _, x in ipairs(l) do
+    >    table.insert(result, f(x))
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  reduce:
+    >-- only for arrays
+    >function reduce(l, f, init)
+    >  result = init
+    >  for _, x in ipairs(l) do
+    >    result = f(result, x)
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  filter:
+    >-- only for arrays
+    >function filter(l, f)
+    >  result = {}
+    >  for _, x in ipairs(l) do
+    >    if f(x) then
+    >      table.insert(result, x)
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  find_index:
+    >function find_index(arr, x)
+    >  for n, y in ipairs(arr) do
+    >    if x == y then
+    >      return n
+    >    end
+    >  end
+    >end
+- __teliva_timestamp: original
+  trim:
+    >function trim(s)
+    >  return s:gsub('^%s*', ''):gsub('%s*$', '')
+    >end
+- __teliva_timestamp: original
+  split:
+    >function split(s, d)
+    >  result = {}
+    >  for match in (s..d):gmatch("(.-)"..d) do
+    >    table.insert(result, match);
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
   window:
     >window = curses.stdscr()
 - __teliva_timestamp: original

@@ -901,10 +901,10 @@ int restore_editor_view (lua_State *L) {
     status = load_editor_buffer_to_current_definition_in_image(L);
     if (status == 0 || lua_isnil(L, -1))
       break;
-    Previous_error = lua_tostring(L, -1);
+    Previous_error = strdup(lua_tostring(L, -1));  /* memory leak */
     if (Previous_error == NULL) Previous_error = "(error object is not a string)";
-    back_to_big_picture = resumeEdit(L);
     lua_pop(L, 1);
+    back_to_big_picture = resumeEdit(L);
   }
   return back_to_big_picture;
 }

@@ -42,7 +42,8 @@
     >  local key = curses.getch()
     >  -- process key here
     >end
-- init_colors:
+- __teliva_timestamp: original
+  init_colors:
     >function init_colors()
     >  for i=0,7 do
     >    curses.init_pair(i, i, -1)
@@ -56,7 +57,6 @@
     >  curses.init_pair(14, 7, 6)
     >  curses.init_pair(15, -1, 15)
     >end
-  __teliva_timestamp: original
 - main:
     >function main()
     >  init_colors()

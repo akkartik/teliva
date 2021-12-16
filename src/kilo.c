@@ -1080,7 +1080,6 @@ static int Quit = 0;
 static int Back_to_big_picture = 0;
 extern void save_editor_state(int rowoff, int coloff, int cy, int cx);
 static void editorProcessKeypress(lua_State* L) {
-    lua_settop(L, 0);  /* big hammer to avoid overflowing the stack */
     int c = getch();
 //?     mvprintw(LINES-3, 60, "key: %d\n", c);
 //?     getch();

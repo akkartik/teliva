@@ -376,7 +376,7 @@ void save_to_current_definition_and_editor_buffer (lua_State *L, const char *def
   int outfd = mkstemp(outfilename);
   if (outfd == -1) {
     endwin();
-    perror("error in creating temporary file");
+    perror("save_to_current_definition_and_editor_buffer: error in creating temporary file");
     abort();
   }
   FILE *out = fdopen(outfd, "w");
@@ -634,7 +634,7 @@ void save_note_to_editor_buffer (lua_State *L, int cursor) {
   int outfd = mkstemp(outfilename);
   if (outfd == -1) {
     endwin();
-    perror("error in creating temporary file");
+    perror("save_note_to_editor_buffer: error in creating temporary file");
     abort();
   }
   FILE *out = fdopen(outfd, "w");

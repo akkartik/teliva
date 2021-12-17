@@ -13,3 +13,10 @@ start -> big picture -> edit A -> move cursor -> run -> exit -> start -> ... -> 
 start -> big picture -> edit A -> move cursor -> run -> exit -> start -> ... -> edit B | big picture
 syntax highlighting for line comments
 syntax highlighting for multiline comments
+start -> big picture -> recent changes -> add note -> save | note visible
+
+It's very important not to leak space on the Lua stack, particularly
+proportionate to keypresses. That's a recipe for segfaults.
+
+This implies that bouncing around between big picture, editor, recent changes,
+running app.. shouldn't grow the call stack either.

@@ -358,14 +358,14 @@ void save_editor_state (int rowoff, int coloff, int cy, int cx) {
 }
 
 void save_to_current_definition_and_editor_buffer (lua_State *L, const char *definition) {
-  int current_stack_index = lua_gettop(L);
+  int oldtop = lua_gettop(L);
   strncpy(Current_definition, definition, CURRENT_DEFINITION_LEN);
   int status = look_up_definition(L, Current_definition);
   FILE *out = fopen("teliva_editor_buffer", "w");
   if (status)
     fprintf(out, "%s", lua_tostring(L, -1));
   fclose(out);
-  lua_settop(L, current_stack_index);
+  lua_settop(L, oldtop);
 }
 
 
@@ -377,6 +377,7 @@ static void read_editor_buffer (char *out) {
 
 
 static void update_definition (lua_State *L, const char *name, char *new_contents) {
+  int oldtop = lua_gettop(L);
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
   /* create a new table containing a single binding */
@@ -394,19 +395,26 @@ static void update_definition (lua_State *L, const char *name, char *new_content
   int history_array_size = luaL_getn(L, history_array);
   ++history_array_size;
   lua_rawseti(L, history_array, history_array_size);
-  lua_settop(L, history_array);
+  lua_settop(L, oldtop);
 }
 
 
 extern void save_tlv (lua_State *L, char *filename);
 int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
+  int oldtop = lua_gettop(L);
   char new_contents[8192] = {0};
   read_editor_buffer(new_contents);
   update_definition(L, Current_definition, new_contents);
   save_tlv(L, Image_name);
   /* reload binding */
-  return luaL_loadbuffer(L, new_contents, strlen(new_contents), Current_definition)
-          || docall(L, 0, 1);
+  int status = luaL_loadbuffer(L, new_contents, strlen(new_contents), Current_definition);
+  if (status == 0) status = docall(L, 0, 1);
+  if (lua_gettop(L) != oldtop) {
+    endwin();
+    printf("load_editor_buffer_to_current_definition_in_image: memory leak %d -> %d\n", oldtop, lua_gettop(L));
+    exit(1);
+  }
+  return status;
 }
 
 
@@ -505,11 +513,14 @@ static int render_wrapped_lua_text (int y, int xmin, int xmax, const char *text)
 }
 
 
-void render_recent_changes (lua_State *L, int history_array, int start_index, int history_array_size) {
+void render_recent_changes (lua_State *L, int start_index) {
   clear();
   attrset(A_BOLD);
   mvaddstr(1, 0, "Recent changes");
   attrset(A_NORMAL);
+  lua_getglobal(L, "teliva_program");
+  int history_array = lua_gettop(L);
+  int history_array_size = luaL_getn(L, history_array);
   int y = 3;
   attron(A_REVERSE);
   for (int i = start_index; i > 0; --i) {
@@ -555,6 +566,7 @@ void render_recent_changes (lua_State *L, int history_array, int start_index, in
     y++;
     if (y >= LINES-1) break;
   }
+  lua_pop(L, 1);
   recent_changes_menu(start_index, history_array_size);
   refresh();
 }
@@ -616,10 +628,7 @@ void recent_changes_view (lua_State *L) {
   int quit = 0;
   while (!quit) {
     /* refresh state after each operation so we pick up modifications */
-    lua_getglobal(L, "teliva_program");
-    history_array = lua_gettop(L);
-    history_array_size = luaL_getn(L, history_array);
-    render_recent_changes(L, history_array, cursor, history_array_size);
+    render_recent_changes(L, cursor);
     int c = getch();
     switch (c) {
       case CTRL_X:
@@ -650,7 +659,6 @@ void recent_changes_view (lua_State *L) {
         }
         break;
     }
-    lua_pop(L, 1);
   }
 }
 

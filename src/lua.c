@@ -544,8 +544,12 @@ void render_recent_changes (lua_State *L, int start_index) {
       /* save timestamp of binding if available */
       lua_getfield(L, t, "__teliva_timestamp");
       if (!lua_isnil(L, -1)) {
+        char buffer[128] = {0};
+        strncpy(buffer, lua_tostring(L, -1), 120);
+        if (buffer[strlen(buffer)-1] == '\n')
+          buffer[strlen(buffer)-1] = '\0';
         attron(COLOR_PAIR(COLOR_PAIR_FADE));
-        printw("  %s", lua_tostring(L, -1));
+        printw("  %s", buffer);
         attroff(COLOR_PAIR(COLOR_PAIR_FADE));
       }
       lua_pop(L, 1);

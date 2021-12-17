@@ -389,9 +389,9 @@ void save_to_current_definition_and_editor_buffer (lua_State *L, const char *def
 }
 
 
-static void read_editor_buffer (char *out) {
+static void read_editor_buffer (char *out, int capacity) {
   FILE *in = fopen("teliva_editor_buffer", "r");
-  fread(out, 8190, 1, in);  /* TODO: handle overly large file */
+  fread(out, capacity, 1, in);  /* TODO: handle overly large file */
   fclose(in);
 }
 
@@ -423,7 +423,7 @@ extern void save_tlv (lua_State *L, char *filename);
 int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
   int oldtop = lua_gettop(L);
   char new_contents[8192] = {0};
-  read_editor_buffer(new_contents);
+  read_editor_buffer(new_contents, 8190);
   update_definition(L, Current_definition, new_contents);
   save_tlv(L, Image_name);
   /* reload binding */
@@ -650,7 +650,7 @@ void save_note_to_editor_buffer (lua_State *L, int cursor) {
 void load_note_from_editor_buffer (lua_State *L, int cursor) {
   lua_getglobal(L, "teliva_program");
   char new_contents[8192] = {0};
-  read_editor_buffer(new_contents);
+  read_editor_buffer(new_contents, 8190);
   lua_rawgeti(L, -1, cursor);
   lua_pushstring(L, new_contents);
   lua_setfield(L, -2, "__teliva_note");

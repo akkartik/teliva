@@ -518,6 +518,7 @@ void render_recent_changes (lua_State *L, int start_index) {
   attrset(A_BOLD);
   mvaddstr(1, 0, "Recent changes");
   attrset(A_NORMAL);
+  int oldtop = lua_gettop(L);
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
   int history_array_size = luaL_getn(L, history_array);
@@ -564,13 +565,19 @@ void render_recent_changes (lua_State *L, int start_index) {
       const char *definition_contents = lua_tostring(L, -1);
       y = render_wrapped_lua_text(y, 0, COLS, definition_contents);
       y++;
-      if (y >= LINES-1) break;
+      if (y >= LINES-1) break;  /* leave cruft on the stack */
     }
+    lua_settop(L, t);  /* clean up cruft on the stack */
     lua_pop(L, 1);  // history element
     y++;
     if (y >= LINES-1) break;
   }
-  lua_pop(L, 1);
+  lua_pop(L, 1);  // history array
+  if (lua_gettop(L) != oldtop) {
+    endwin();
+    printf("render_recent_changes: memory leak %d -> %d\n", oldtop, lua_gettop(L));
+    exit(1);
+  }
   recent_changes_menu(start_index, history_array_size);
   refresh();
 }

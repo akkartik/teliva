@@ -389,6 +389,9 @@ void save_to_current_definition_and_editor_buffer (lua_State *L, const char *def
 }
 
 
+/* I don't understand the best way to read all of a text file.
+ * I'm currently using fread, but its error handling is really designed for
+ * binary data containing fixed-size records. */
 static void read_editor_buffer (char *out, int capacity) {
   FILE *in = fopen("teliva_editor_buffer", "r");
   fread(out, capacity, 1, in);  /* TODO: handle overly large file */

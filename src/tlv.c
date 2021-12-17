@@ -24,7 +24,6 @@ static void teliva_load_multiline_string(lua_State* L, FILE* in, char* line, int
   while (1) {
     if (feof(in)) break;
     char c = fgetc(in);
-//?     printf("^%d$\n", (int)c);
     ungetc(c, in);
     if (c != ' ') {
       /* new definition; signal end to caller without reading a new line */
@@ -33,7 +32,6 @@ static void teliva_load_multiline_string(lua_State* L, FILE* in, char* line, int
     }
     memset(line, '\0', capacity);
     if (fgets(line, capacity, in) == NULL) break;  /* eof */
-//?     printf("ml: %s", line);
     int max = strlen(line);
     assert(line[max-1] == '\n');
     int indent = 0;
@@ -53,7 +51,6 @@ static void teliva_load_multiline_string(lua_State* L, FILE* in, char* line, int
 
 /* leave a single table on stack containing the next top-level definition from the file */
 static void teliva_load_definition(lua_State* L, FILE* in) {
-//?   printf("== new definition\n");
   lua_newtable(L);
   int def_idx = lua_gettop(L);
   char line[1024] = {'\0'};
@@ -67,7 +64,6 @@ static void teliva_load_definition(lua_State* L, FILE* in) {
   do {
     assert(line[0] == '-' || line[0] == ' ');
     assert(line[1] == ' ');
-//?     printf("l: %s", line);
     /* key/value pair always indented at 0, never empty, unambiguously not a multiline string */
     char key[512] = {'\0'};
     char value[1024] = {'\0'};
@@ -81,9 +77,7 @@ static void teliva_load_definition(lua_State* L, FILE* in) {
     assert(key[strlen(key)-1] == ':');
     key[strlen(key)-1] = '\0';
     lua_pushstring(L, key);
-//?     printf("value: %s$\n", value);
     if (value[0] != '\0') {
-//?       printf("single-line\n");
       lua_pushstring(L, value);  /* value string on same line */
       char c = fgetc(in);
       ungetc(c, in);
@@ -92,18 +86,12 @@ static void teliva_load_definition(lua_State* L, FILE* in) {
       }
       else {
         memset(line, '\0', 1024);
-//?         printf("%d\n", feof(in));
         fgets(line, 1024, in);
-//?         printf("new line: %s", line);
       }
     }
     else {
-//?       printf("multi-line\n");
       teliva_load_multiline_string(L, in, line, 1024);  /* load from later lines */
-//?       printf("new line: %s", line);
     }
-//?     printf("adding key: %s$\n", lua_tostring(L, -2));
-//?     printf("adding value: %s$\n", lua_tostring(L, -1));
     lua_settable(L, def_idx);
   } while (line[0] == ' ');
 }
@@ -137,7 +125,6 @@ static void emit_multiline_string(FILE* out, const char* value) {
 }
 
 void save_tlv(lua_State* L, char* filename) {
-//?   printf("SAVE\n");
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
   int history_array_size = luaL_getn(L, history_array);

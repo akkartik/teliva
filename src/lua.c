@@ -346,25 +346,45 @@ static int handle_image (lua_State *L, char **argv, int n) {
 #define CURRENT_DEFINITION_LEN 256
 char Current_definition[CURRENT_DEFINITION_LEN+1] = {0};
 
+extern int mkstemp(char *template);
+extern FILE *fdopen(int fd, const char *mode);
 void save_editor_state (int rowoff, int coloff, int cy, int cx) {
   if (strlen(Current_definition) == 0) return;
-  FILE *out = fopen("teliva_editor_state", "w");
+  char outfilename[] = "teliva_editor_state_XXXXXX";
+  int outfd = mkstemp(outfilename);
+  if (outfd == -1) {
+    endwin();
+    perror("error in creating temporary file");
+    abort();
+  }
+  FILE *out = fdopen(outfd, "w");
+  assert(out != NULL);
   fprintf(out, "__teliva_editor_state = {\n");
   fprintf(out, "  image = \"%s\", definition = \"%s\",\n", Image_name, Current_definition);
   fprintf(out, "  rowoff = %d, coloff = %d,\n", rowoff, coloff);
   fprintf(out, "  cy = %d, cx = %d,\n", cy, cx);
   fprintf(out, "}\n");
   fclose(out);
+  rename(outfilename, "teliva_editor_state");
 }
 
 void save_to_current_definition_and_editor_buffer (lua_State *L, const char *definition) {
   int oldtop = lua_gettop(L);
   strncpy(Current_definition, definition, CURRENT_DEFINITION_LEN);
   int status = look_up_definition(L, Current_definition);
-  FILE *out = fopen("teliva_editor_buffer", "w");
+  char outfilename[] = "teliva_editor_buffer_XXXXXX";
+  int outfd = mkstemp(outfilename);
+  if (outfd == -1) {
+    endwin();
+    perror("error in creating temporary file");
+    abort();
+  }
+  FILE *out = fdopen(outfd, "w");
+  assert(out != NULL);
   if (status)
     fprintf(out, "%s", lua_tostring(L, -1));
   fclose(out);
+  rename(outfilename, "teliva_editor_buffer");
   lua_settop(L, oldtop);
 }
 
@@ -610,10 +630,19 @@ void save_note_to_editor_buffer (lua_State *L, int cursor) {
   lua_rawgeti(L, -1, cursor);
   lua_getfield(L, -1, "__teliva_note");
   const char *contents = lua_tostring(L, -1);
-  FILE *out = fopen("teliva_editor_buffer", "w");
+  char outfilename[] = "teliva_editor_buffer_XXXXXX";
+  int outfd = mkstemp(outfilename);
+  if (outfd == -1) {
+    endwin();
+    perror("error in creating temporary file");
+    abort();
+  }
+  FILE *out = fdopen(outfd, "w");
+  assert(out != NULL);
   if (contents != NULL)
     fprintf(out, "%s", contents);
   fclose(out);
+  rename(outfilename, "teliva_editor_buffer");
   lua_pop(L, 3);  /* contents, table at cursor, teliva_program */
 }
 

@@ -424,20 +424,13 @@ static void update_definition (lua_State *L, const char *name, char *new_content
 
 extern void save_tlv (lua_State *L, char *filename);
 int load_editor_buffer_to_current_definition_in_image(lua_State *L) {
-  int oldtop = lua_gettop(L);
   char new_contents[8192] = {0};
   read_editor_buffer(new_contents, 8190);
   update_definition(L, Current_definition, new_contents);
   save_tlv(L, Image_name);
   /* reload binding */
-  int status = luaL_loadbuffer(L, new_contents, strlen(new_contents), Current_definition);
-  if (status == 0) status = docall(L, 0, 1);
-  if (lua_gettop(L) != oldtop) {
-    endwin();
-    printf("load_editor_buffer_to_current_definition_in_image: memory leak %d -> %d\n", oldtop, lua_gettop(L));
-    exit(1);
-  }
-  return status;
+  return luaL_loadbuffer(L, new_contents, strlen(new_contents), Current_definition)
+      || docall(L, 0, 1);
 }
 
 
@@ -448,6 +441,7 @@ extern int resumeEdit (lua_State *L);
 int edit_current_definition (lua_State *L) {
   int back_to_big_picture = edit(L, "teliva_editor_buffer");
   // error handling
+  int oldtop = lua_gettop(L);
   while (1) {
     int status;
     status = load_editor_buffer_to_current_definition_in_image(L);
@@ -457,6 +451,11 @@ int edit_current_definition (lua_State *L) {
     if (Previous_error == NULL) Previous_error = "(error object is not a string)";
     back_to_big_picture = resumeEdit(L);
     lua_pop(L, 1);
+  }
+  if (lua_gettop(L) != oldtop) {
+    endwin();
+    printf("edit_current_definition: memory leak %d -> %d\n", oldtop, lua_gettop(L));
+    exit(1);
   }
   return back_to_big_picture;
 }
@@ -947,6 +946,7 @@ int restore_editor_view (lua_State *L) {
   lua_settop(L, editor_state_index);
   int back_to_big_picture = edit_from(L, "teliva_editor_buffer", rowoff, coloff, cy, cx);
   // error handling
+  int oldtop = lua_gettop(L);
   while (1) {
     int status;
     status = load_editor_buffer_to_current_definition_in_image(L);
@@ -956,6 +956,11 @@ int restore_editor_view (lua_State *L) {
     if (Previous_error == NULL) Previous_error = "(error object is not a string)";
     back_to_big_picture = resumeEdit(L);
     lua_pop(L, 1);
+  }
+  if (lua_gettop(L) != oldtop) {
+    endwin();
+    printf("edit_from: memory leak %d -> %d\n", oldtop, lua_gettop(L));
+    exit(1);
   }
   return back_to_big_picture;
 }

@@ -98,6 +98,12 @@ them in Teliva and let people use regular Lua. Or other platforms!
 - To create a well-behaved sandbox, Teliva doesn't support adding libraries
   with C bindings beyond the few it starts up with.
 
+- Functions that start with `test_` are special. They're considered automated
+  tests and called without arguments every time an app starts up.
+
+- The function `main` is special. It runs every time an app starts up, if all
+  its automated tests pass.
+
 Teliva is not tested much at all yet. This is my first time programming either
 in Lua or within Lua. So bug reports are most appreciated if Lua programs
 behave unexpectedly under Teliva.

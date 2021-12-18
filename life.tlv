@@ -31,6 +31,7 @@
     >window = curses.stdscr()
     >-- animation-based app
     >window:nodelay(true)
+    >curses.curs_set(0)
     >lines, cols = window:getmaxyx()
 - __teliva_timestamp: original
   grid_char:

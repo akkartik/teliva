@@ -1042,7 +1042,8 @@ void developer_mode (lua_State *L) {
   init_pair(COLOR_PAIR_LUA_CONSTANT, COLOR_LUA_CONSTANT, COLOR_BACKGROUND);
   init_pair(COLOR_PAIR_MATCH, COLOR_MATCH_FOREGROUND, COLOR_MATCH_BACKGROUND);
   init_pair(COLOR_PAIR_ERROR, COLOR_ERROR_FOREGROUND, COLOR_ERROR_BACKGROUND);
-  nodelay(stdscr, 0);  /* make getch() block */
+  nodelay(stdscr, 0);  /* always make getch() block in developer mode */
+  curs_set(1);  /* always display cursor in developer mode */
   int switch_to_big_picture_view = 1;
   if (editor_view_in_progress(L))
     switch_to_big_picture_view = restore_editor_view(L);

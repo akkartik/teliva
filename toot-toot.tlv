@@ -147,6 +147,7 @@
 - __teliva_timestamp: original
   window:
     >window = curses.stdscr()
+    >curses.curs_set(0)  -- we'll simulate our own cursor
 - __teliva_timestamp: original
   render:
     >function render(window)

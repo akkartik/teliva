@@ -9133,3 +9133,99 @@
     >  end
     >  return newpos
     >end
+- update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor)
+    >  elseif key == curses.KEY_BACKSPACE then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 21 then  -- ctrl-u
+    >    prose = ''
+    >    cursor = 1
+    >  end
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 23:12:03 2021
+- update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor)
+    >  elseif key == curses.KEY_BACKSPACE then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 21 then  -- ctrl-u
+    >    prose = ''
+    >    cursor = 1
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 23:12:07 2021
+- update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor)
+    >  elseif key == curses.KEY_BACKSPACE then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 21 then  -- ctrl-u
+    >    prose = ''
+    >    cursor = 1
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 23:12:14 2021
+- menu:
+    >menu = {}
+    >menu['^u'] = 'clear'
+  __teliva_timestamp:
+    >Fri Dec 17 23:13:04 2021

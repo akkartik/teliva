@@ -351,7 +351,7 @@ int run_tests(lua_State *L) {
   int num_failures = lua_tointeger(L, -1);
   lua_pop(L, 1);
   if (num_failures == 0) return 0;
-  printf("%ld failures", lua_tointeger(L, -1));
+  printf("%d failures", num_failures);
   fflush(stdout);
   getch();
   /* take first failure back to developer mode */

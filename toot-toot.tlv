@@ -1252,10 +1252,7 @@
     >end
   __teliva_timestamp:
     >Tue Dec 14 20:10:44 2021
-- __teliva_note: 
-  __teliva_timestamp:
-    >Tue Dec 14 20:11:36 2021
-  update:
+- update:
     >function update(window)
     >  local key = curses.getch()
     >  if key == curses.KEY_LEFT then
@@ -1276,6 +1273,9 @@
     >    cursor = cursor+1
     >  end
     >end
+  __teliva_timestamp:
+    >Tue Dec 14 20:11:36 2021
+  __teliva_note: 
 - render:
     >function render(window)
     >  window:clear()
@@ -8451,3 +8451,685 @@
     >end
   __teliva_timestamp:
     >Fri Dec 17 23:02:05 2021
+- render:
+    >function render(window)
+    >  window:clear()
+    >  debugy = 5
+    >--?   render_text(window, prose, 1, cursor)
+    >--?   curses.refresh()
+    >--? end
+    >
+    >--? function unused()
+    >  local toots = split(prose, '\n\n===\n\n')
+    >  pos = 1
+    >  debugy = 5
+    >  for i, toot in ipairs(toots) do
+    >    if i > 1 then
+    >      pos = render_delimiter(window, '\n\n===\n\n', pos, cursor)
+    >    end
+    >    pos = render_text(window, toot, pos, cursor)
+    >--?     if pos == cursor then
+    >--?       window:attron(curses.A_REVERSE)
+    >--?       window:addch(' ')
+    >--?       window:attroff(curses.A_REVERSE)
+    >--?     end
+    >    print('')
+    >    window:attron(curses.A_BOLD)
+    >    window:addstr(string.len(toot))
+    >    window:attroff(curses.A_BOLD)
+    >--?     print('')
+    >  end
+    >  curses.refresh()
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 23:04:57 2021
+- __teliva_timestamp:
+    >Fri Dec 17 23:05:47 2021
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addch(string.char(s[i]))
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addch(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 23:05:56 2021
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addch(string.byte(s[i]))
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addch(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 23:06:09 2021
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addch('a'..s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addch(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 23:06:33 2021
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(string.char(s[i]))
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addch(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 23:06:44 2021
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(string.char('a'..s[i]))
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addch(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 23:06:58 2021
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(s[i]))
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addch(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 23:07:08 2021
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addch(string.char(s[i]))
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 23:07:21 2021
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addch(tostring(s[i]))
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 23:07:39 2021
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      dbg(window, type(s[i]))
+    >      window:addch(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 23:08:03 2021
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      dbg(window, type(s[i]))
+    >      window:addstr(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 23:08:23 2021
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addstr(s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addstr(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addstr(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 23:08:32 2021
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addstr(s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addstr(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addstr(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end

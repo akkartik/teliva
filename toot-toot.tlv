@@ -6596,3 +6596,1833 @@
     >end
   __teliva_timestamp:
     >Fri Dec 17 21:55:29 2021
+- col_within_line:
+    >function col_within_line(s, idx)
+    >  if idx <= 1 then
+    >    return idx
+    >  end
+    >  idx = idx-1
+    >  local result = 1
+    >  while idx >= 1 do
+    >    if s[idx] == '\n' then break end
+    >    idx = idx-1
+    >    result=result+1
+    >  end
+    >  return result
+    >end
+    >
+    >function test_col_within_line()
+    >  check_eq(col_within_line('',         4), 4, 'col_within_line("")')
+    >  check_eq(col_within_line('abc\ndef', 1), 1, 'col_within_line(..., 1)')
+    >  check_eq(col_within_line('abc\ndef', 3), 3, 'col_within_line(..., -1)')
+    >  check_eq(col_within_line('abc\ndef', 4), 4, 'col_within_line(..., newline)')
+    >  check_eq(col_within_line('abc\ndef', 5), 1, 'col_within_line(..., after newline)')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:25:28 2021
+- col_within_line:
+    >function col_within_line(s, idx)
+    >  if idx <= 1 then
+    >    return idx
+    >  end
+    >  idx = idx-1
+    >  local result = 1
+    >  while idx >= 1 do
+    >    if s[idx] == '\n' then break end
+    >    idx = idx-1
+    >    result=result+1
+    >  end
+    >  return result
+    >end
+    >
+    >function test_col_within_line()
+    >  check_eq(col_within_line('',         4), 4, 'col_within_line("")')
+    >  check_eq(col_within_line('abc\ndef', 1), 1, 'col_within_line(..., 1)')
+    >  check_eq(col_within_line('abc\ndef', 3), 3, 'col_within_line(..., -1)')
+    >  check_eq(col_within_line('abc\ndef', 4), 4, 'col_within_line(..., newline)')
+    >  check_eq(col_within_line('abc\ndef', 5), 1, 'col_within_line(..., after newline)')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:25:50 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:27:38 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:29:33 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 2, 'cursor_up: top line')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:29:42 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:29:47 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:30:58 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:31:47 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:32:15 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:32:27 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:32:58 2021
+- __teliva_timestamp:
+    >Fri Dec 17 22:34:11 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: 1, 1')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:39:38 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:40:19 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:40:28 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:40:33 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >end
+- col_within_line:
+    >function col_within_line(s, idx)
+    >  if idx <= 1 then
+    >    return idx
+    >  end
+    >  idx = idx-1
+    >  local result = 1
+    >  while idx >= 1 do
+    >    if s[idx] == '\n' then break end
+    >    idx = idx-1
+    >    result=result+1
+    >  end
+    >  return result
+    >end
+    >
+    >function test_col_within_line()
+    >  check_eq(col_within_line('',         4), 4, 'col_within_line("")')
+    >  check_eq(col_within_line('abc\ndef', 1), 1, 'col_within_line(..., 1)')
+    >  check_eq(col_within_line('abc\ndef', 3), 3, 'col_within_line(..., -1)')
+    >  check_eq(col_within_line('abc\ndef', 4), 4, 'col_within_line(..., newline)')
+    >  check_eq(col_within_line('abc\ndef', 5), 1, 'col_within_line(..., after newline)')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:40:43 2021
+- __teliva_timestamp:
+    >Fri Dec 17 22:41:12 2021
+  check_eq:
+    >function check_eq(x, expected, msg)
+    >  if x == expected then
+    >    io.write('.')
+    >  else
+    >    print('F - '..msg)
+    >    print('  expected '..tostring(expected)..' but got '..x)
+    >    teliva_num_test_failures = teliva_num_test_failures + 1
+    >    if teliva_first_failure == nil then
+    >      teliva_first_failure = msg
+    >    end
+    >  end
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:41:24 2021
+  check_eq:
+    >function check_eq(x, expected, msg)
+    >  if x == expected then
+    >    io.write('.')
+    >  else
+    >    print('F - '..msg)
+    >    print('  expected '..tostring(expected)..' but got '..x)
+    >    teliva_num_test_failures = teliva_num_test_failures + 1
+    >    if teliva_first_failure == nil then
+    >      teliva_first_failure = msg
+    >    end
+    >  end
+    >end
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:41:31 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:41:34 2021
+- __teliva_timestamp:
+    >Fri Dec 17 22:42:11 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:42:19 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:42:22 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >end
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:42:39 2021
+- __teliva_timestamp:
+    >Fri Dec 17 22:43:15 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:44:25 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result=result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:44:46 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, result)
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:45:03 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:45:14 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:45:53 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:46:01 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:46:30 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return result
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:47:50 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  if idx == 1 then return 1 end
+    >  result = result-1  -- just in case we start out on a newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return result
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:48:27 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  if idx == 1 then return 1 end
+    >  result = result-1  -- just in case we start out on a newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return result
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 6), 2, 'start of previous line: second line, mid char')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:48:54 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  if idx == 1 then return 1 end
+    >  result = result-1  -- just in case we start out on a newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return result
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 6), 1, 'start of previous line: second line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 7), 1, 'start of previous line: second line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 8), 1, 'start of previous line: second line, newline')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:49:58 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  if idx == 1 then return 1 end
+    >  result = result-1  -- just in case we start out on a newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return result
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 6), 1, 'start of previous line: second line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 7), 1, 'start of previous line: second line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 8), 1, 'start of previous line: second line, newline')
+    >  
+    >  check_eq(skip_to_start_of_previous_line('abc\n\nghi', 7), 5, 'start of previous line: to empty line')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:50:49 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  if idx == 1 then return 1 end
+    >  result = result-1  -- just in case we start out on a newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return result
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 6), 1, 'start of previous line: second line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 7), 1, 'start of previous line: second line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 8), 1, 'start of previous line: second line, newline')
+    >  
+    >  check_eq(skip_to_start_of_previous_line('abc\n\nghi', 7), 5, 'start of previous line: to empty line')
+    >  check_eq(skip_to_start_of_previous_line('abc\nd\nghi', 8), 5, 'start of previous line: to shorter line')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:51:19 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  if idx == 1 then return 1 end
+    >  result = result-1  -- just in case we start out on a newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return result
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 6), 1, 'start of previous line: second line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 7), 1, 'start of previous line: second line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 8), 1, 'start of previous line: second line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 8), 1, 'start of previous line: second line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 8), 1, 'start of previous line: second line, newline')
+    >
+    >  check_eq(skip_to_start_of_previous_line('abc\n\nghi', 7), 5, 'start of previous line: to empty line')
+    >  check_eq(skip_to_start_of_previous_line('abc\nd\nghi', 8), 5, 'start of previous line: to shorter line')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:52:38 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  if idx == 1 then return 1 end
+    >  result = result-1  -- just in case we start out on a newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return result
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 6), 1, 'start of previous line: second line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 7), 1, 'start of previous line: second line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 8), 1, 'start of previous line: second line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 9), 1, 'start of previous line: final line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 10), 1, 'start of previous line: final line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 11), 1, 'start of previous line: final line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 12), 1, 'start of previous line: end of file')
+    >
+    >  check_eq(skip_to_start_of_previous_line('abc\n\nghi', 7), 5, 'start of previous line: to empty line')
+    >  check_eq(skip_to_start_of_previous_line('abc\nd\nghi', 8), 5, 'start of previous line: to shorter line')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:52:57 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  if idx == 1 then return 1 end
+    >  result = result-1  -- just in case we start out on a newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return result
+    >    end
+    >    if s[result] == '\n' then
+    >      return result
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 6), 1, 'start of previous line: second line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 7), 1, 'start of previous line: second line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 8), 1, 'start of previous line: second line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 9), 4, 'start of previous line: final line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 10), 4, 'start of previous line: final line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 11), 4, 'start of previous line: final line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 12), 4, 'start of previous line: end of file')
+    >
+    >  check_eq(skip_to_start_of_previous_line('abc\n\nghi', 7), 5, 'start of previous line: to empty line')
+    >  check_eq(skip_to_start_of_previous_line('abc\nd\nghi', 8), 5, 'start of previous line: to shorter line')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:53:31 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  if idx == 1 then return 1 end
+    >  result = result-1  -- just in case we start out on a newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return result
+    >    end
+    >    if s[result] == '\n' then
+    >      return result+1
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 6), 1, 'start of previous line: second line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 7), 1, 'start of previous line: second line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 8), 1, 'start of previous line: second line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 9), 4, 'start of previous line: final line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 10), 4, 'start of previous line: final line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 11), 4, 'start of previous line: final line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 12), 4, 'start of previous line: end of file')
+    >
+    >  check_eq(skip_to_start_of_previous_line('abc\n\nghi', 7), 4, 'start of previous line: to empty line')
+    >  check_eq(skip_to_start_of_previous_line('abc\nd\nghi', 8), 4, 'start of previous line: to shorter line')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:53:58 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  if idx == 1 then return 1 end
+    >  result = result-1  -- just in case we start out on a newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return result
+    >    end
+    >    if s[result] == '\n' then
+    >      return result+1
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 6), 1, 'start of previous line: second line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 7), 1, 'start of previous line: second line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 8), 1, 'start of previous line: second line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 9), 5, 'start of previous line: final line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 10), 5, 'start of previous line: final line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 11), 5, 'start of previous line: final line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 12), 5, 'start of previous line: end of file')
+    >
+    >  check_eq(skip_to_start_of_previous_line('abc\n\nghi', 7), 5, 'start of previous line: to empty line')
+    >  check_eq(skip_to_start_of_previous_line('abc\nd\nghi', 8), 5, 'start of previous line: to shorter line')
+    >end
+- __teliva_timestamp:
+    >Fri Dec 17 22:54:12 2021
+  skip_to_start_of_previous_line:
+    >function skip_to_start_of_previous_line(s, idx)
+    >  local result = idx
+    >  -- skip to newline
+    >  if idx == 1 then return 1 end
+    >  result = result-1  -- just in case we start out on a newline
+    >  while true do
+    >    if result <= 1 then
+    >      return idx
+    >    end
+    >    if s[result] == '\n' then
+    >      result = result-1
+    >      break
+    >    end
+    >    result = result-1
+    >  end
+    >  dbg(window, 'skip: '..tostring(result))
+    >  while true do
+    >    if result <= 1 then
+    >      return result
+    >    end
+    >    if s[result] == '\n' then
+    >      return result+1
+    >    end
+    >    result = result-1
+    >  end
+    >end
+    >
+    >function test_skip_to_start_of_previous_line()
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 6), 1, 'start of previous line: second line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 7), 1, 'start of previous line: second line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 8), 1, 'start of previous line: second line, newline')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 9), 5, 'start of previous line: final line, first char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 10), 5, 'start of previous line: final line, mid char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 11), 5, 'start of previous line: final line, final char')
+    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 12), 5, 'start of previous line: end of file')
+    >
+    >  check_eq(skip_to_start_of_previous_line('abc\n\nghi', 7), 5, 'start of previous line: to empty line')
+    >  check_eq(skip_to_start_of_previous_line('abc\nd\nghi', 8), 5, 'start of previous line: to shorter line')
+    >end
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  if s[newidx] == '\n' then return newidx end
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:54:58 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  if s[newidx] == '\n' then return newidx end
+    >  dbg(curses.stdscr(), tostring(idx))
+    >  dbg(curses.stdscr(), tostring(colidx))
+    >  dbg(curses.stdscr(), tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:55:17 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  if s[newidx] == '\n' then return newidx end
+    >  dbg(curses.stdscr(), 'idx '..tostring(idx))
+    >  dbg(curses.stdscr(), 'colidx'..tostring(colidx))
+    >  dbg(curses.stdscr(), 'prev line start idx'..tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:55:43 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  if s[newidx] == '\n' then return newidx end
+    >  dbg(curses.stdscr(), 'idx '..tostring(idx))
+    >  dbg(curses.stdscr(), 'colidx'..tostring(colidx))
+    >  dbg(curses.stdscr(), 'prev line start idx'..tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:55:59 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  if s[newidx] == '\n' then return newidx end
+    >  dbg(curses.stdscr(), 'idx '..tostring(idx))
+    >  dbg(curses.stdscr(), 'col '..tostring(colidx))
+    >  dbg(curses.stdscr(), 'prev line start idx '..tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:56:18 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  if s[newidx] == '\n' then return newidx end
+    >  dbg(curses.stdscr(), 'idx '..tostring(idx))
+    >  dbg(curses.stdscr(), 'col '..tostring(colidx))
+    >  dbg(curses.stdscr(), 'prev line start idx '..tostring(newidx))
+    >  newidx = newidx+1
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    dbg(curses.stdscr(), '  col '..tostring(newcolidx))
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:56:54 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  if s[newidx] == '\n' then return newidx end
+    >  dbg(curses.stdscr(), 'idx '..tostring(idx))
+    >  dbg(curses.stdscr(), 'col '..tostring(colidx))
+    >  dbg(curses.stdscr(), 'prev line start idx '..tostring(newidx))
+    >  while newidx < string.len(s) do
+    >    dbg(window, newidx)
+    >    if s[newidx] == '\n' then break end
+    >    local newcolidx = col_within_line(s, newidx)
+    >    dbg(curses.stdscr(), '  col '..tostring(newcolidx))
+    >    if newcolidx == colidx then break end
+    >    newidx = newidx+1
+    >  end
+    >  dbg(window, '=> '..tostring(newidx))
+    >  curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:57:12 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  if s[newidx] == '\n' then return newidx end
+    >--?   dbg(curses.stdscr(), 'idx '..tostring(idx))
+    >--?   dbg(curses.stdscr(), 'col '..tostring(colidx))
+    >--?   dbg(curses.stdscr(), 'prev line start idx '..tostring(newidx))
+    >  for i=1,colidx do
+    >    if newidx >= string.len(s) then break end
+    >    if s[newidx] == '\n' then break end
+    >    newidx = newidx+1
+    >  end
+    >--?   while newidx < string.len(s) do
+    >--?     dbg(window, newidx)
+    >--?     if s[newidx] == '\n' then break end
+    >--?     local newcolidx = col_within_line(s, newidx)
+    >--?     dbg(curses.stdscr(), '  col '..tostring(newcolidx))
+    >--?     if newcolidx == colidx then break end
+    >--?     newidx = newidx+1
+    >--?   end
+    >--?   dbg(window, '=> '..tostring(newidx))
+    >--?   curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:59:23 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  if s[newidx] == '\n' then return newidx end
+    >  dbg(curses.stdscr(), 'idx '..tostring(idx))
+    >  dbg(curses.stdscr(), 'col '..tostring(colidx))
+    >  dbg(curses.stdscr(), 'prev line start idx '..tostring(newidx))
+    >  for i=1,colidx do
+    >    if newidx >= string.len(s) then break end
+    >    if s[newidx] == '\n' then break end
+    >    newidx = newidx+1
+    >  end
+    >--?   while newidx < string.len(s) do
+    >--?     dbg(window, newidx)
+    >--?     if s[newidx] == '\n' then break end
+    >--?     local newcolidx = col_within_line(s, newidx)
+    >--?     dbg(curses.stdscr(), '  col '..tostring(newcolidx))
+    >--?     if newcolidx == colidx then break end
+    >--?     newidx = newidx+1
+    >--?   end
+    >--?   dbg(window, '=> '..tostring(newidx))
+    >--?   curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 22:59:47 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  if s[newidx] == '\n' then return newidx end
+    >  dbg(curses.stdscr(), 'idx '..tostring(idx))
+    >  dbg(curses.stdscr(), 'col '..tostring(colidx))
+    >  dbg(curses.stdscr(), 'prev line start idx '..tostring(newidx))
+    >  for i=1,colidx do
+    >    if newidx >= string.len(s) then break end
+    >    if s[newidx] == '\n' then break end
+    >    newidx = newidx+1
+    >  end
+    >--?   while newidx < string.len(s) do
+    >--?     dbg(window, newidx)
+    >--?     if s[newidx] == '\n' then break end
+    >--?     local newcolidx = col_within_line(s, newidx)
+    >--?     dbg(curses.stdscr(), '  col '..tostring(newcolidx))
+    >--?     if newcolidx == colidx then break end
+    >--?     newidx = newidx+1
+    >--?   end
+    >--?   dbg(window, '=> '..tostring(newidx))
+    >--?   curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 23:00:02 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  if s[newidx] == '\n' then return newidx end
+    >  dbg(curses.stdscr(), 'idx '..tostring(idx))
+    >  dbg(curses.stdscr(), 'col '..tostring(colidx))
+    >  dbg(curses.stdscr(), 'prev line start idx '..tostring(newidx))
+    >  for i=2,colidx do  -- we're already starting at col 1
+    >    if newidx >= string.len(s) then break end
+    >    if s[newidx] == '\n' then break end
+    >    newidx = newidx+1
+    >  end
+    >--?   while newidx < string.len(s) do
+    >--?     dbg(window, newidx)
+    >--?     if s[newidx] == '\n' then break end
+    >--?     local newcolidx = col_within_line(s, newidx)
+    >--?     dbg(curses.stdscr(), '  col '..tostring(newcolidx))
+    >--?     if newcolidx == colidx then break end
+    >--?     newidx = newidx+1
+    >--?   end
+    >--?   dbg(window, '=> '..tostring(newidx))
+    >--?   curses.getch()
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 23:00:36 2021

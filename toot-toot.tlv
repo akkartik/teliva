@@ -1252,7 +1252,10 @@
     >end
   __teliva_timestamp:
     >Tue Dec 14 20:10:44 2021
-- update:
+- __teliva_note: 
+  __teliva_timestamp:
+    >Tue Dec 14 20:11:36 2021
+  update:
     >function update(window)
     >  local key = curses.getch()
     >  if key == curses.KEY_LEFT then
@@ -1273,9 +1276,6 @@
     >    cursor = cursor+1
     >  end
     >end
-  __teliva_timestamp:
-    >Tue Dec 14 20:11:36 2021
-  __teliva_note: 
 - render:
     >function render(window)
     >  window:clear()
@@ -8426,3 +8426,28 @@
     >end
   __teliva_timestamp:
     >Fri Dec 17 23:00:36 2021
+- cursor_up:
+    >function cursor_up(s, idx)
+    >  if idx <= 1 then return idx end
+    >  -- check column within current line, then go to start of previous line, then count off columns there
+    >  local colidx = col_within_line(s, idx)
+    >  local newidx = skip_to_start_of_previous_line(s, idx)
+    >  if newidx == idx then return idx end
+    >  if s[newidx] == '\n' then return newidx end
+    >  for i=2,colidx do  -- we're already starting at col 1
+    >    if newidx >= string.len(s) then break end
+    >    if s[newidx] == '\n' then break end
+    >    newidx = newidx+1
+    >  end
+    >  return newidx
+    >end
+    >
+    >function test_cursor_up()
+    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >end
+  __teliva_timestamp:
+    >Fri Dec 17 23:02:05 2021

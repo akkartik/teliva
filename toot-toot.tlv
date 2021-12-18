@@ -166,6 +166,7 @@
   menu:
     >menu = {}
     >menu['^u'] = 'clear'
+    >menu['^w'] = "write prose to file 'toot' (edit does NOT save)"
 - __teliva_timestamp: original
   update:
     >function update(window)
@@ -190,6 +191,10 @@
     >  elseif key == 21 then  -- ctrl-u
     >    prose = ''
     >    cursor = 1
+    >  elseif key == 23 then  -- ctrl-w
+    >    local out = io.open('toot', 'w')
+    >    out:write(prose, '\n')
+    >    out:close()
     >  elseif key == 10 or (key >= 32 and key < 127) then
     >    prose = prose:insert(string.char(key), cursor-1)
     >    cursor = cursor+1

@@ -323,6 +323,39 @@ int load_definitions(lua_State *L) {
 }
 
 
+int run_tests(lua_State *L) {
+  clear();
+  lua_pushinteger(L, 0);
+  lua_setglobal(L, "teliva_num_test_failures");
+  lua_pushnil(L);
+  lua_setglobal(L, "teliva_first_failure");
+  lua_pushvalue(L, LUA_GLOBALSINDEX);
+  int table = lua_gettop(L);
+  for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
+    const char* key = lua_tostring(L, -2);
+    if (strncmp("test_", key, strlen("test_")) != 0) continue;
+    if (!lua_isfunction(L, -1)) continue;
+    int status = lua_pcall(L, 0, 0, 0);
+    if (status)
+      printf("E%d: %s\n", status, lua_tostring(L, -1));
+    else
+      lua_pushnil(L);  /* just to undo loop update */
+  }
+  lua_pop(L, 1);
+  lua_getglobal(L, "teliva_num_test_failures");
+  int num_failures = lua_tointeger(L, -1);
+  lua_pop(L, 1);
+  if (num_failures == 0) return 0;
+  printf("%ld failures", lua_tointeger(L, -1));
+  fflush(stdout);
+  getch();
+  /* take first failure back to developer mode */
+  lua_getglobal(L, "teliva_first_failure");
+  assert(!lua_isnil(L, -1));
+  return 1;
+}
+
+
 char *Image_name = NULL;
 extern void load_tlv (lua_State *L, char *filename);
 static int handle_image (lua_State *L, char **argv, int n) {
@@ -335,6 +368,8 @@ static int handle_image (lua_State *L, char **argv, int n) {
 //?   exit(1);
   status = load_definitions(L);
   if (status != 0) return 0;
+  status = run_tests(L);
+  if (status != 0) return report_in_developer_mode(L, status);
   /* call main() */
   lua_getglobal(L, "main");
   status = docall(L, 0, 1);

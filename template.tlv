@@ -56,7 +56,39 @@
     >  return str1:sub(1,pos)..str2..str1:sub(pos+1)
     >end
     >
+    >function string.remove(s, pos)
+    >  return s:sub(1,pos-1)..s:sub(pos+1)
+    >end
+    >
     >-- TODO: backport utf-8 support from Lua 5.3
+- __teliva_timestamp: original
+  debugy:
+    >debugy = 5
+- __teliva_timestamp: original
+  dbg:
+    >function dbg(window, s)
+    >  local oldy = 0
+    >  local oldx = 0
+    >  oldy, oldx = window:getyx()
+    >  window:mvaddstr(debugy, 60, s)
+    >  debugy = debugy+1
+    >  window:mvaddstr(oldy, oldx, '')
+    >end
+- __teliva_timestamp: original
+  check_eq:
+    >function check_eq(x, expected, msg)
+    >  if x == expected then
+    >    curses.addch('.')
+    >  else
+    >    print('F - '..msg)
+    >    print('  expected '..tostring(expected)..' but got '..x)
+    >    teliva_num_test_failures = teliva_num_test_failures + 1
+    >    -- overlay first test failure on editors
+    >    if teliva_first_failure == nil then
+    >      teliva_first_failure = msg
+    >    end
+    >  end
+    >end
 - __teliva_timestamp: original
   map:
     >-- only for arrays

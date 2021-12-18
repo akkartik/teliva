@@ -361,6 +361,23 @@ int run_tests(lua_State *L) {
 }
 
 
+void clear_call_graph(lua_State *L) {
+  int oldtop = lua_gettop(L);
+  luaL_newmetatable(L, "__teliva_call_graph_depth");
+  int cgt = lua_gettop(L);
+  lua_pushnil(L);
+  while (lua_next(L, cgt) != 0) {
+    lua_pop(L, 1);  /* old value */
+    lua_pushvalue(L, -1);  /* duplicate key */
+    lua_pushnil(L);  /* new value */
+    lua_settable(L, cgt);
+    /* one copy of key left for lua_next */
+  }
+  lua_pop(L, 1);
+  assert(lua_gettop(L) == oldtop);
+}
+
+
 char *Image_name = NULL;
 extern void load_tlv (lua_State *L, char *filename);
 static int handle_image (lua_State *L, char **argv, int n) {
@@ -375,6 +392,8 @@ static int handle_image (lua_State *L, char **argv, int n) {
   if (status != 0) return 0;
   status = run_tests(L);
   if (status != 0) return report_in_developer_mode(L, status);
+  /* clear callgraph stats from running tests */
+  clear_call_graph(L);
   /* call main() */
   lua_getglobal(L, "main");
   status = docall(L, 0, 1);

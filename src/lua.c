@@ -336,10 +336,15 @@ int run_tests(lua_State *L) {
     if (strncmp("test_", key, strlen("test_")) != 0) continue;
     if (!lua_isfunction(L, -1)) continue;
     int status = lua_pcall(L, 0, 0, 0);
-    if (status)
+    if (status) {
       printf("E%d: %s\n", status, lua_tostring(L, -1));
-    else
-      lua_pushnil(L);  /* just to undo loop update */
+      lua_getglobal(L, "teliva_first_failure");
+      int first_failure_clear = lua_isnil(L, -1);
+      lua_pop(L, 1);
+      if (first_failure_clear)
+        lua_setglobal(L, "teliva_first_failure");
+    }
+    lua_pushnil(L);  /* just to undo loop update */
   }
   lua_pop(L, 1);
   lua_getglobal(L, "teliva_num_test_failures");

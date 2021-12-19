@@ -66,6 +66,8 @@
     >debugy = 5
 - __teliva_timestamp: original
   dbg:
+    >-- helper for debug by print; overlay debug information towards the right
+    >-- reset debugy within refresh when using this
     >function dbg(window, s)
     >  local oldy = 0
     >  local oldx = 0

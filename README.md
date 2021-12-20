@@ -139,10 +139,9 @@ a say in its future direction.
 
 ## Known issues
 
-* Colors are currently hardcoded. To obtain say a dark background, modify the
-  call to `assume_default_colors()` in function `main()` at the bottom of
-  `src/lua.c`. If you do this, you'll likely also need to tweak other colors
-  for legibility. Look for calls to `FG()`, `BG()` and `COLOR_PAIR()`.
+* Colors are currently hardcoded. To tweak them, look for calls to
+  `assume_default_colors()` and `init_pair()`, either in .tlv files for a
+  specific app, or in the C sources for the standard code browser/editor.
 
 * Backspace is known to not work in some configurations. As a workaround,
   typing `ctrl-h` tends to work in those situations.

@@ -1126,6 +1126,11 @@ static int pmain (lua_State *L) {
 
 
 extern void draw_menu (lua_State *);
+void render_trusted_teliva_data (lua_State *L) {
+  init_pair(COLOR_PAIR_ERROR, COLOR_ERROR_FOREGROUND, COLOR_ERROR_BACKGROUND);
+  init_pair(COLOR_PAIR_MENU, COLOR_FOREGROUND, COLOR_BACKGROUND);
+  draw_menu(L);
+}
 
 
 int main (int argc, char **argv) {
@@ -1145,7 +1150,7 @@ int main (int argc, char **argv) {
   keypad(stdscr, 1);
   start_color();
   assume_default_colors(COLOR_FOREGROUND, COLOR_BACKGROUND);
-  draw_menu(L);
+  render_trusted_teliva_data(L);
   echo();
   s.argc = argc;
   s.argv = argv;

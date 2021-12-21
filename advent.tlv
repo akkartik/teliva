@@ -186,7 +186,6 @@
     >  curses.init_pair(13, 7, 5)
     >  curses.init_pair(14, 7, 6)
     >  curses.init_pair(15, -1, 15)
-    >  curses.init_pair(255, 15, 1)  -- reserved for Teliva error messages
     >end
 - main:
     >function main()

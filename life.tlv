@@ -234,7 +234,6 @@
 - __teliva_timestamp: original
   main:
     >function main()
-    >  curses.init_pair(255, 15, 1)  -- reserved for Teliva error messages
     >  curses.init_pair(1, 22, 189)
     >
     >  -- initialize grid based on commandline args

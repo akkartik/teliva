@@ -112,7 +112,8 @@ enum color_pair {
   COLOR_PAIR_LUA_KEYWORD = 5,
   COLOR_PAIR_LUA_CONSTANT = 6,
   COLOR_PAIR_MATCH = 7,
-  COLOR_PAIR_ERROR = 255,
+  COLOR_PAIR_MENU = 254,  // reserved for teliva; apps shouldn't use it
+  COLOR_PAIR_ERROR = 255,  // reserved for teliva; apps shouldn't use it
 };
 
 #endif

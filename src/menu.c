@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "lua.h"
+#include "teliva.h"
 
 
 int menu_column = 0;
@@ -21,7 +22,7 @@ void draw_menu_item (const char* key, const char* name) {
 }
 
 void draw_menu (lua_State *L) {
-  attron(A_BOLD|A_REVERSE);
+  attron(A_BOLD|A_REVERSE|COLOR_PAIR(COLOR_PAIR_MENU));
   for (int x = 0; x < COLS; ++x)
     mvaddch(LINES-1, x, ' ');
   menu_column = 2;
@@ -36,5 +37,5 @@ void draw_menu (lua_State *L) {
       draw_menu_item(lua_tostring(L, -2), lua_tostring(L, -1));
 
   lua_pop(L, 1);
-  attroff(A_BOLD|A_REVERSE);
+  attrset(A_NORMAL);
 }

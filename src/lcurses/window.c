@@ -309,12 +309,12 @@ Refresh the window terminal display from the virtual screen.
 @see curses.doupdate
 @see noutrefresh
 */
-extern void draw_menu (lua_State *L);
+extern void render_trusted_teliva_data (lua_State *L);
 static int
 Wrefresh(lua_State *L)
 {
 	int result = wrefresh(checkwin(L, 1));
-	draw_menu(L);
+	render_trusted_teliva_data(L);
 	return pushokresult(result);
 }
 
@@ -1307,9 +1307,9 @@ static int
 Wgetch(lua_State *L)
 {
 	WINDOW *w = checkwin(L, 1);
-	draw_menu(L);  /* Apps can draw what they want on screen,
-	                * but Teliva's menu is always visible when
-	                * asking the user to make a decision. */
+	render_trusted_teliva_data(L);  /* Apps can draw what they want on screen,
+	                                 * but Teliva's UI is always visible when
+	                                 * asking the user to make a decision. */
 	int c = wgetch(w);
 
 	if (c == ERR)

@@ -67,7 +67,7 @@
 - __teliva_timestamp: original
   dbg:
     >-- helper for debug by print; overlay debug information towards the right
-    >-- reset debugy within refresh when using this
+    >-- reset debugy every time you refresh screen
     >function dbg(window, s)
     >  local oldy = 0
     >  local oldx = 0
@@ -162,7 +162,6 @@
     >    window:attrset(curses.color_pair(i))
     >    window:mvaddstr(3+i, 5, "========================")
     >  end
-    >  curses.refresh()
     >end
 - __teliva_timestamp: original
   menu:
@@ -238,11 +237,8 @@
 - render_delimiter:
     >function render_delimiter(window, s, pos, cursor)
     >  local newpos = pos
-    >--?   dbg(window, '==')
     >  for i=1,string.len(s) do
-    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
     >    if newpos == cursor and i ~= 1 then
-    >--?       dbg(window, 'cursor: '..tostring(cursor))
     >      if s[i] == '\n' then
     >        -- newline at cursor = render extra space in reverse video before jumping to new line
     >        window:attron(curses.A_REVERSE)
@@ -268,10 +264,6 @@
     >function cursor_down(s, idx)
     >  local colidx = col_within_line(s, idx)
     >  local newidx = skip_past_newline(s, idx)
-    >--?   dbg(curses.stdscr(), tostring(idx))
-    >--?   dbg(curses.stdscr(), tostring(colidx))
-    >--?   dbg(curses.stdscr(), tostring(newidx))
-    >--?   curses.getch()
     >  while true do
     >    if s[newidx] == '\n' then break end
     >    local newcolidx = col_within_line(s, newidx)
@@ -397,11 +389,6 @@
     >function render(window)
     >  window:clear()
     >  debugy = 5
-    >--?   render_text(window, prose, 1, cursor)
-    >--?   curses.refresh()
-    >--? end
-    >
-    >--? function unused()
     >  local toots = split(prose, '\n\n===\n\n')
     >  pos = 1
     >  debugy = 5
@@ -410,16 +397,10 @@
     >      pos = render_delimiter(window, '\n\n===\n\n', pos, cursor)
     >    end
     >    pos = render_text(window, toot, pos, cursor)
-    >--?     if pos == cursor then
-    >--?       window:attron(curses.A_REVERSE)
-    >--?       window:addch(' ')
-    >--?       window:attroff(curses.A_REVERSE)
-    >--?     end
     >    print('')
     >    window:attron(curses.A_BOLD)
     >    window:addstr(string.len(toot))
     >    window:attroff(curses.A_BOLD)
-    >--?     print('')
     >  end
     >  curses.refresh()
     >end

@@ -147,30 +147,112 @@
     >  return result
     >end
 - __teliva_timestamp: original
+  append:
+    >function append(target, src)
+    >  for _, line in ipairs(src) do
+    >    table.insert(target, line)
+    >  end
+    >end
+- __teliva_timestamp: original
+  clear:
+    >function clear(lines)
+    >  while #lines > 0 do
+    >    table.remove(lines)
+    >  end
+    >end
+- __teliva_timestamp: original
+  zap:
+    >function zap(target, src)
+    >  clear(target)
+    >  append(target, src)
+    >end
+- __teliva_timestamp: original
   window:
     >window = curses.stdscr()
 - __teliva_timestamp: original
-  render:
-    >function render(window)
-    >  window:clear()
-    >  -- draw stuff to screen here
-    >  window:attron(curses.A_BOLD)
-    >  window:mvaddstr(1, 5, "example app")
-    >  window:attrset(curses.A_NORMAL)
-    >  for i=0,15 do
-    >    window:attrset(curses.color_pair(i))
-    >    window:mvaddstr(3+i, 5, "========================")
+  render_line:
+    >function render_line(window, y, line)
+    >  window:mvaddstr(y, 0, '')
+    >  for i=1,string.len(line) do
+    >    window:addstr(line[i])
     >  end
-    >  curses.refresh()
+    >end
+- __teliva_timestamp: original
+  render_page:
+    >function render_page(window, lines)
+    >  local y = 0
+    >  for _, line in pairs(lines) do
+    >    render_line(window, y, line)
+    >    y = y+1
+    >  end
+    >end
+- __teliva_timestamp: original
+  render:
+    >function render(window, lines)
+    >  window:clear()
+    >  render_page(window, lines)
+    >  curses.curs_set(0)
+    >  window:refresh()
     >end
 - __teliva_timestamp: original
   menu:
     >menu = {}
+    >menu['^g'] = 'go'
+- __teliva_timestamp: original
+  edit_line:
+    >function edit_line(window)
+    >  local result = ''
+    >  local cursor = 1
+    >  while true do
+    >    local key = curses.getch()
+    >    if key >= 32 and key < 127 then
+    >      local screen_rows, screen_cols = window:getmaxyx()
+    >      if #result < screen_cols then
+    >        result = result:insert(string.char(key), cursor-1)
+    >        cursor = cursor+1
+    >      end
+    >    elseif key == curses.KEY_LEFT then
+    >      if cursor > 1 then
+    >        cursor = cursor-1
+    >      end
+    >    elseif key == curses.KEY_RIGHT then
+    >      if cursor <= #result then
+    >        cursor = cursor+1
+    >      end
+    >    elseif key == curses.KEY_BACKSPACE then
+    >      if cursor > 1 then
+    >        cursor = cursor-1
+    >        result = result:remove(cursor)
+    >      end
+    >    elseif key == 21 then  -- ctrl-u
+    >      result = ''
+    >      cursor = 1
+    >    elseif key == 10 then  -- enter
+    >      return result
+    >    elseif key == 24 then  -- ctrl-x
+    >      return nil
+    >    end
+    >  end
+    >end
 - __teliva_timestamp: original
   update:
-    >function update(window)
+    >function update(window, lines)
     >  local key = curses.getch()
-    >  -- process key here
+    >  local screen_rows, screen_cols = window:getmaxyx()
+    >  if key == 7 then  -- ctrl-g
+    >    window:mvaddstr(screen_rows-2, 0, '')
+    >    window:clrtoeol()
+    >    window:mvaddstr(screen_rows-1, 0, '')
+    >    window:clrtoeol()
+    >    window:mvaddstr(screen_rows-1, 5, 'go: ')
+    >    curses.curs_set(2)
+    >    local new_url = edit_line(window)
+    >    if new_url then
+    >      local new_lines = gemini_get(new_url)
+    >      zap(lines, new_lines)
+    >    end
+    >    curses.curs_set(0)
+    >  end
     >end
 - __teliva_timestamp: original
   init_colors:
@@ -191,14 +273,18 @@
   main:
     >function main()
     >  init_colors()
-    >
+    >  local lines = {}
+    >  local url = ''
+    >  if #arg > 0 then
+    >    url = arg[1]
+    >    lines = gemini_get(url)
+    >  end
     >  while true do
-    >    render(window)
-    >    update(window)
+    >    render(window, lines)
+    >    update(window, lines)
     >  end
     >end
-- __teliva_timestamp:
-    >Sun Dec 19 16:23:47 2021
+- __teliva_timestamp: original
   http_get:
     >function http_get(url)
     >  -- https://stackoverflow.com/questions/42445423/luasocket-serveraccept-timeout-tcp
@@ -235,15 +321,8 @@
     >  end
     >  return body
     >end
-- __teliva_timestamp:
-    >Mon Dec 20 07:40:17 2021
-  render_page:
-    >function render_page(window, s)
-    >  for i=1,string.len(s) do
-    >    window:addstr(s[i])
-    >  end
-    >end
-- https_get:
+- __teliva_timestamp: original
+  https_get:
     >-- http://notebook.kulchenko.com/programming/https-ssl-calls-with-lua-and-luasec
     >function https_get(url)
     >  local parsed_url = socket.url.parse(url)
@@ -266,65 +345,34 @@
     >  local line, err = conn:receive()
     >  return line or err
     >end
-  __teliva_timestamp:
-    >Mon Dec 20 07:40:46 2021
-- render:
-    >function render(window)
-    >  window:clear()
-    >  if #arg > 0 then
-    >    print(arg[1])
-    >    local text = gemini_get(arg[1])
-    >    render_page(window, text)
-    >  else
-    >    print('pass in a URL at the commandline')
-    >  end
-    >  window:refresh()
-    >end
-  __teliva_timestamp:
-    >Mon Dec 20 08:54:44 2021
-- __teliva_timestamp:
-    >Mon Dec 20 09:02:31 2021
+- __teliva_timestamp: original
   parse_gemini_body:
     >function parse_gemini_body(conn, type)
-    >  local result = ''
+    >  local result = {}
     >  if type == 'text/gemini' then
     >    while true do
     >      local line, err = conn:receive()
     >      if line == nil then break end
-    >      result = result..line..'\n'
+    >      table.insert(result, line)
     >    end
     >  elseif string.sub(type, 1, 5) == 'text/' then
     >    while true do
     >      local line, err = conn:receive()
     >      if line == nil then break end
-    >      result = result..line
+    >      table.insert(result, line)
     >    end
     >  end
     >  return result
     >end
-- render:
-    >function render(window)
-    >  window:clear()
-    >  if #arg > 0 then
-    >    print(arg[1])
-    >    local text = gemini_get(arg[1])
-    >    render_page(window, text)
-    >  else
-    >    print('pass in a URL at the commandline')
-    >  end
-    >  window:refresh()
-    >end
-  __teliva_timestamp:
-    >Mon Dec 20 12:12:08 2021
-- __teliva_timestamp:
-    >Mon Dec 20 12:13:45 2021
+- __teliva_timestamp: original
   gemini_get:
     >-- http://notebook.kulchenko.com/programming/https-ssl-calls-with-lua-and-luasec
     >-- https://tildegit.org/solderpunk/gemini-demo-2
+    >-- returns an array of lines, containing either the body or just an error
     >function gemini_get(url)
     >  if string.find(url, "://") == nil then
     >    url = "gemini://" .. url
-    >  end              
+    >  end
     >  local parsed_url = socket.url.parse(url)
     >  local params = {
     >    mode = 'client',
@@ -343,15 +391,15 @@
     >
     >  conn:send(url .. "\r\n")
     >  local line, err = conn:receive()
-    >  if line == nil then return err end
+    >  if line == nil then return {err} end
     >  local status, meta = string.match(line, "(%S+) (%S+)")
     >  if status[1] == '2' then
     >    return parse_gemini_body(conn, meta)
     >  elseif status[1] == '3' then
     >    return gemini_get(socket.url.absolute(url, meta))
     >  elseif status[1] == '4' or line[1] == '5' then
-    >    return 'Error: '..meta
+    >    return {'Error: '..meta}
     >  else
-    >    return 'invalid response from server: '..line
+    >    return {'invalid response from server: '..line}
     >  end
     >end

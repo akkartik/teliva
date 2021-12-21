@@ -20,3 +20,6 @@ proportionate to keypresses. That's a recipe for segfaults.
 
 This implies that bouncing around between big picture, editor, recent changes,
 running app.. shouldn't grow the call stack either.
+
+== security/privacy
+program draws over menu -> getch -> Teliva menu is still visible

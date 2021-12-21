@@ -1307,6 +1307,9 @@ static int
 Wgetch(lua_State *L)
 {
 	WINDOW *w = checkwin(L, 1);
+	draw_menu(L);  /* Apps can draw what they want on screen,
+	                * but Teliva's menu is always visible when
+	                * asking the user to make a decision. */
 	int c = wgetch(w);
 
 	if (c == ERR)

@@ -314,18 +314,14 @@
     >  local screen_rows, screen_cols = window:getmaxyx()
     >  if key == 258 then  -- down arrow
     >    next_link()
-    >  end
-    >  if key == 259 then  -- up arrow
+    >  elseif key == 259 then  -- up arrow
     >    previous_link()
-    >  end
-    >  if key == 21 then  -- ctrl-u
+    >  elseif key == 21 then  -- ctrl-u
     >    state.source = not state.source
-    >  end
-    >  if key == 10 then  -- enter
+    >  elseif key == 10 then  -- enter
     >    local s, e, new_url = string.find(state.lines[state.highlight_index], '=>%s*(%S*)')
     >    gemini_get(url.absolute(state.url, new_url))
-    >  end
-    >  if key == 7 then  -- ctrl-g
+    >  elseif key == 7 then  -- ctrl-g
     >    window:mvaddstr(screen_rows-2, 0, '')
     >    window:clrtoeol()
     >    window:mvaddstr(screen_rows-1, 0, '')

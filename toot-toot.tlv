@@ -271,6 +271,16 @@
     >  end
     >  return newidx
     >end
+    >
+    >function test_cursor_down()
+    >  check_eq(cursor_down('abc\ndef', 1), 5, 'cursor_down: non-bottom line first char')
+    >  check_eq(cursor_down('abc\ndef', 2), 6, 'cursor_down: non-bottom line mid char')
+    >  check_eq(cursor_down('abc\ndef', 3), 7, 'cursor_down: non-bottom line final char')
+    >  check_eq(cursor_down('abc\ndef', 4), 8, 'cursor_down: non-bottom line end')
+    >  check_eq(cursor_down('abc\ndef', 5), 5, 'cursor_down: bottom line first char')
+    >  check_eq(cursor_down('abc\ndef', 6), 6, 'cursor_down: bottom line mid char')
+    >  check_eq(cursor_down('abc\ndef', 7), 7, 'cursor_down: bottom line final char')
+    >end
 - __teliva_timestamp: original
   skip_past_newline:
     >function skip_past_newline(s, idx)
@@ -376,7 +386,12 @@
     >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
     >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
     >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
-    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
+    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: non-top line first char')
+    >  check_eq(cursor_up('abc\ndef', 6), 2, 'cursor_up: non-top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 7), 3, 'cursor_up: non-top line final char')
+    >  check_eq(cursor_up('abc\ndef\n', 8), 4, 'cursor_up: non-top line end')
+    >  check_eq(cursor_up('ab\ndef\n', 7), 3, 'cursor_up: to shorter line')
+    >  -- idx that's too high for s not working; let's see if that matters
     >end
 - __teliva_timestamp: original
   render:

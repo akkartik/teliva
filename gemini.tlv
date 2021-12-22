@@ -203,8 +203,15 @@
     >function edit_line(window)
     >  local result = ''
     >  local cursor = 1
+    >  local screen_rows, screen_cols = window:getmaxyx()
     >  while true do
+    >    window:mvaddstr(screen_rows-1, 9, '')
+    >    window:clrtoeol()
+    >    window:mvaddstr(screen_rows-1, 9, result)
+    >    window:attron(curses.A_REVERSE)
+    >    -- window:refresh()
     >    local key = curses.getch()
+    >    window:attrset(curses.A_NORMAL)
     >    if key >= 32 and key < 127 then
     >      local screen_rows, screen_cols = window:getmaxyx()
     >      if #result < screen_cols then

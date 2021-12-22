@@ -217,7 +217,8 @@
     >  curses.init_pair(14, 7, 6)
     >  curses.init_pair(15, -1, 15)
     >end
-- main:
+- __teliva_timestamp: original
+  main:
     >function main()
     >  init_colors()
     >
@@ -226,16 +227,14 @@
     >    update(window)
     >  end
     >end
-  __teliva_timestamp: original
-- __teliva_timestamp:
-    >Tue Dec 14 17:29:11 2021
+- __teliva_timestamp: original
   prose:
     >prose = ''
-- cursor:
+- __teliva_timestamp: original
+  cursor:
     >cursor = 1
-  __teliva_timestamp:
-    >Tue Dec 14 17:29:27 2021
-- render_delimiter:
+- __teliva_timestamp: original
+  render_delimiter:
     >function render_delimiter(window, s, pos, cursor)
     >  local newpos = pos
     >  for i=1,string.len(s) do
@@ -259,9 +258,8 @@
     >  end
     >  return newpos
     >end
-  __teliva_timestamp:
-    >Fri Dec 17 15:46:51 2021
-- cursor_down:
+- __teliva_timestamp: original
+  cursor_down:
     >function cursor_down(s, idx)
     >  local colidx = col_within_line(s, idx)
     >  local newidx = skip_past_newline(s, idx)
@@ -273,9 +271,8 @@
     >  end
     >  return newidx
     >end
-  __teliva_timestamp:
-    >Fri Dec 17 16:18:34 2021
-- skip_past_newline:
+- __teliva_timestamp: original
+  skip_past_newline:
     >function skip_past_newline(s, idx)
     >  local result = idx
     >  while true do
@@ -288,9 +285,8 @@
     >    result = result+1
     >  end
     >end
-  __teliva_timestamp:
-    >Fri Dec 17 19:47:36 2021
-- col_within_line:
+- __teliva_timestamp: original
+  col_within_line:
     >function col_within_line(s, idx)
     >  if idx <= 1 then
     >    return idx
@@ -312,10 +308,7 @@
     >  check_eq(col_within_line('abc\ndef', 4), 4, 'col_within_line(..., newline)')
     >  check_eq(col_within_line('abc\ndef', 5), 1, 'col_within_line(..., after newline)')
     >end
-  __teliva_timestamp:
-    >Fri Dec 17 22:40:43 2021
-- __teliva_timestamp:
-    >Fri Dec 17 22:54:12 2021
+- __teliva_timestamp: original
   skip_to_start_of_previous_line:
     >function skip_to_start_of_previous_line(s, idx)
     >  local result = idx
@@ -361,7 +354,8 @@
     >  check_eq(skip_to_start_of_previous_line('abc\n\nghi', 7), 5, 'start of previous line: to empty line')
     >  check_eq(skip_to_start_of_previous_line('abc\nd\nghi', 8), 5, 'start of previous line: to shorter line')
     >end
-- cursor_up:
+- __teliva_timestamp: original
+  cursor_up:
     >function cursor_up(s, idx)
     >  if idx <= 1 then return idx end
     >  -- check column within current line, then go to start of previous line, then count off columns there
@@ -384,9 +378,8 @@
     >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
     >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: second line first char')
     >end
-  __teliva_timestamp:
-    >Fri Dec 17 23:02:05 2021
-- render:
+- __teliva_timestamp: original
+  render:
     >function render(window)
     >  window:clear()
     >  debugy = 5
@@ -405,10 +398,7 @@
     >  end
     >  curses.refresh()
     >end
-  __teliva_timestamp:
-    >Fri Dec 17 23:04:57 2021
-- __teliva_timestamp:
-    >Fri Dec 17 23:08:32 2021
+- __teliva_timestamp: original
   render_text:
     >-- https://gankra.github.io/blah/text-hates-you
     >-- https://lord.io/text-editing-hates-you-too

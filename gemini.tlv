@@ -234,11 +234,12 @@
     >end
 - __teliva_timestamp: original
   menu:
-    >menu = {}
-    >menu['enter'] = 'go to highlight'
-    >menu['←'] = 'back'
-    >menu['^g'] = 'enter url'
-    >menu['^u'] = 'view source'
+    >menu = {
+    >  {'Enter', 'go to highlight'},
+    >  {'<-', 'back'},
+    >  {'^g', 'enter url'},
+    >  {'^u', 'view source'},
+    >}
 - __teliva_timestamp: original
   edit_line:
     >function edit_line(window)

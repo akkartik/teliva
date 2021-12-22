@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "lua.h"
+#include "lauxlib.h"
 #include "teliva.h"
 
 
@@ -32,9 +33,16 @@ void draw_menu (lua_State *L) {
   /* render any app-specific items */
   lua_getglobal(L, "menu");
   int table = lua_gettop(L);
-  if (lua_istable(L, -1))
-    for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1))
+  if (lua_istable(L, -1)) {
+    for (int i = 1; i <= luaL_getn(L, table); ++i) {
+      lua_rawgeti(L, table, i);
+      int menu_item = lua_gettop(L);
+      lua_rawgeti(L, menu_item, 1);  /* key */
+      lua_rawgeti(L, menu_item, 2);  /* value */
       draw_menu_item(lua_tostring(L, -2), lua_tostring(L, -1));
+      lua_pop(L, 3);
+    }
+  }
 
   lua_pop(L, 1);
   attrset(A_NORMAL);

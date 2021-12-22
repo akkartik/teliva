@@ -165,6 +165,8 @@
     >end
 - __teliva_timestamp: original
   menu:
+    >-- To show app-specific hotkeys in the menu bar, add hotkey/command
+    >-- arrays of strings to the menu array.
     >menu = {}
 - __teliva_timestamp: original
   update:

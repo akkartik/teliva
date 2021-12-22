@@ -165,9 +165,10 @@
     >end
 - __teliva_timestamp: original
   menu:
-    >menu = {}
-    >menu['^u'] = 'clear'
-    >menu['^w'] = "write prose to file 'toot' (edit does NOT save)"
+    >menu = {
+    >  {'^u', 'clear'},
+    >  {'^w', 'write prose to file "toot" (edit hotkey does NOT save)'},
+    >}
 - __teliva_timestamp: original
   update:
     >function update(window)

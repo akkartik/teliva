@@ -194,7 +194,7 @@
     >end
 - __teliva_timestamp: original
   update:
-    >menu = {arrow="pan"}
+    >menu = {{"arrow", "pan"}}
     >
     >function update(window, c)
     >  if c == curses.KEY_LEFT then

@@ -37,7 +37,9 @@
   __teliva_note: foo
 - __teliva_timestamp: original
   menu:
-    >menu = {Enter="increment"}
+    >menu = {
+    >  {"Enter", "increment"}
+    >}
 - __teliva_timestamp: original
   update:
     >function update(window)

@@ -14,6 +14,7 @@ start -> big picture -> edit A -> move cursor -> run -> exit -> start -> ... -> 
 syntax highlighting for line comments
 syntax highlighting for multiline comments
 start -> big picture -> recent changes -> add note -> save | note visible
+start -> big picture -> arrow keys* | always exactly one definition highlighted
 
 It's very important not to leak space on the Lua stack, particularly
 proportionate to keypresses. That's a recipe for segfaults.

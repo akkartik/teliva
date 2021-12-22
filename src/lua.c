@@ -776,6 +776,7 @@ static void big_picture_menu (void) {
   extern int menu_column;
   menu_column = 2;
   draw_menu_item("^x", "go back");
+  draw_menu_item("^g", "go to highlight");
   draw_menu_item("Enter", "submit");
   draw_menu_item("^h", "backspace");
   draw_menu_item("^u", "clear");
@@ -816,6 +817,7 @@ static int is_current_definition(lua_State *L, const char *definition_name, int 
 
 
 void draw_definition_name (const char *definition_name) {
+  /* confusingly, unhighlighted definitions use COLOR_PAIR_HIGHLIGHT */
   attron(COLOR_PAIR(COLOR_PAIR_HIGHLIGHT));
   addstr(" ");
   addstr(definition_name);
@@ -824,8 +826,27 @@ void draw_definition_name (const char *definition_name) {
   addstr("  ");
 }
 
+
+void draw_highlighted_definition_name (const char *definition_name) {
+  /* confusingly, highlighted definitions don't use COLOR_PAIR_HIGHLIGHT */
+  attron(A_REVERSE);
+  addstr(" ");
+  addstr(definition_name);
+  addstr(" ");
+  attroff(A_REVERSE);
+  addstr("  ");
+}
+
+
 /* return true if submitted */
 void big_picture_view (lua_State *L) {
+  /* Without any intervening edits, big_picture_view always stably renders
+   * definitions in exactly the same spatial order, both in levels from top to
+   * bottom and in indexes within each level from left to right. */
+  int highlight_level = 0;
+  int highlight_index_within_level = 0;
+  int level_size[30] = {0};  /* number of indexes within each level */
+  char highlight[CURRENT_DEFINITION_LEN+1] = {0};
 restart:
   clear();
   luaL_newmetatable(L, "__teliva_call_graph_depth");
@@ -845,6 +866,9 @@ restart:
   y += 2;
   mvaddstr(y, 0, "data:           ");
   // first: data (non-functions) that's not the Teliva menu or curses variables
+  if (highlight_level < 0) highlight_level = 0;
+  int level = 0;
+  int index_within_level = 0;
   for (int i = history_array_size; i > 0; --i) {
     lua_rawgeti(L, history_array, i);
     int t = lua_gettop(L);
@@ -860,8 +884,15 @@ restart:
           && !is_userdata  // including curses window objects
                            // (unlikely to have an interesting definition)
       ) {
-        if (is_current_definition(L, definition_name, i, history_array, history_array_size))
-          draw_definition_name(definition_name);
+        if (is_current_definition(L, definition_name, i, history_array, history_array_size)) {
+          if (level == highlight_level && index_within_level == highlight_index_within_level) {
+            draw_highlighted_definition_name(definition_name);
+            strncpy(highlight, definition_name, CURRENT_DEFINITION_LEN);
+          } else {
+            draw_definition_name(definition_name);
+          }
+          ++index_within_level;
+        }
       }
     }
     lua_pop(L, 1);  // history element
@@ -880,20 +911,30 @@ restart:
       if (strcmp(definition_name, "menu") == 0
           || is_userdata  // including curses window objects
       ) {
-        if (is_current_definition(L, definition_name, i, history_array, history_array_size))
-          draw_definition_name(definition_name);
+        if (is_current_definition(L, definition_name, i, history_array, history_array_size)) {
+          if (level == highlight_level && index_within_level == highlight_index_within_level) {
+            draw_highlighted_definition_name(definition_name);
+            strncpy(highlight, definition_name, CURRENT_DEFINITION_LEN);
+          } else {
+            draw_definition_name(definition_name);
+          }
+          ++index_within_level;
+        }
       }
     }
     lua_pop(L, 1);  // history element
   }
+  level_size[level] = index_within_level;
+  level++;
 
   // functions by level
   y += 2;
   mvprintw(y, 0, "functions: ");
   y++;
-  for (int level = 1; ; ++level) {
+  for (int depth = 1; ; ++depth) {
     mvaddstr(y, 0, "                ");
     bool drew_anything = false;
+    index_within_level = 0;
     for (int i = history_array_size; i > 0; --i) {
       lua_rawgeti(L, history_array, i);
       int t = lua_gettop(L);
@@ -901,10 +942,17 @@ restart:
         const char* definition_name = lua_tostring(L, -2);
         if (is_special_history_key(definition_name)) continue;
         lua_getfield(L, cgt, definition_name);
-        int depth = lua_tointeger(L, -1);
-        if (depth == level) {
-          if (is_current_definition(L, definition_name, i, history_array, history_array_size))
-            draw_definition_name(definition_name);
+        int definition_depth = lua_tointeger(L, -1);
+        if (definition_depth == depth) {
+          if (is_current_definition(L, definition_name, i, history_array, history_array_size)) {
+            if (level == highlight_level && index_within_level == highlight_index_within_level) {
+              draw_highlighted_definition_name(definition_name);
+              strncpy(highlight, definition_name, CURRENT_DEFINITION_LEN);
+            } else {
+              draw_definition_name(definition_name);
+            }
+            ++index_within_level;
+          }
           drew_anything = true;
         }
         lua_pop(L, 1);  // depth of value
@@ -913,10 +961,14 @@ restart:
     }
     y += 2;
     if (!drew_anything) break;
+    level_size[level] = index_within_level;
+    level++;
   }
 
   // unused functions
   mvaddstr(y, 0, "                ");
+  /* no need to level++ because the final iteration above didn't draw anything */
+  index_within_level = 0;
   for (int i = history_array_size; i > 0; --i) {
     lua_rawgeti(L, history_array, i);
     int t = lua_gettop(L);
@@ -927,13 +979,23 @@ restart:
       int is_function = lua_isfunction(L, -1);
       lua_pop(L, 1);
       lua_getfield(L, cgt, definition_name);
-      if (is_function && lua_isnoneornil(L, -1))
-        if (is_current_definition(L, definition_name, i, history_array, history_array_size))
-          draw_definition_name(definition_name);
+      if (is_function && lua_isnoneornil(L, -1)) {
+        if (is_current_definition(L, definition_name, i, history_array, history_array_size)) {
+          if (level == highlight_level && index_within_level == highlight_index_within_level) {
+            draw_highlighted_definition_name(definition_name);
+            strncpy(highlight, definition_name, CURRENT_DEFINITION_LEN);
+          } else {
+            draw_definition_name(definition_name);
+          }
+          ++index_within_level;
+        }
+      }
       lua_pop(L, 1);  // depth of value
     }
     lua_pop(L, 1);  // history element
   }
+  level_size[level] = index_within_level;
+  int max_level = level;
 
   lua_settop(L, 0);
   render_previous_error();
@@ -944,6 +1006,7 @@ restart:
     big_picture_menu();
     for (int x = 0; x < COLS; ++x)
       mvaddch(LINES-2, x, ' ');
+//?     mvprintw(20, 60, "%d %d\n", highlight_level, highlight_index_within_level);
     mvprintw(LINES-2, 0, "Edit: %s", query);
     int c = getch();
     if (c == KEY_BACKSPACE || c == DELETE || c == CTRL_H) {
@@ -966,6 +1029,35 @@ restart:
           query[qlen++] = c;
           query[qlen] = '\0';
       }
+    } else if (c == KEY_LEFT) {
+      highlight_index_within_level--;
+      if (highlight_index_within_level < 0) highlight_index_within_level = 0;
+      goto restart;
+    } else if (c == KEY_RIGHT) {
+      highlight_index_within_level++;
+      if (highlight_index_within_level >= level_size[highlight_level])
+        highlight_index_within_level = level_size[highlight_level]-1;
+      if (highlight_index_within_level < 0) highlight_index_within_level = 0;
+      goto restart;
+    } else if (c == KEY_UP) {
+      highlight_level--;
+      if (highlight_level < 0) highlight_level = 0;
+      if (highlight_index_within_level >= level_size[highlight_level])
+        highlight_index_within_level = level_size[highlight_level]-1;
+      if (highlight_index_within_level < 0) highlight_index_within_level = 0;
+      goto restart;
+    } else if (c == KEY_DOWN) {
+      highlight_level++;
+      if (highlight_level > max_level) highlight_level = max_level;
+      if (highlight_index_within_level >= level_size[highlight_level])
+        highlight_index_within_level = level_size[highlight_level]-1;
+      if (highlight_index_within_level < 0) highlight_index_within_level = 0;
+      goto restart;
+    } else if (c == CTRL_G) {
+      save_to_current_definition_and_editor_buffer(L, highlight);
+      int back_to_big_picture = edit_current_definition(L);
+      if (back_to_big_picture) goto restart;
+      return;
     }
   }
   /* never gets here */

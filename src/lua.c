@@ -1024,11 +1024,6 @@ restart:
     } else if (c == CTRL_R) {
       recent_changes_view(L);
       goto restart;
-    } else if (isprint(c)) {
-      if (qlen < CURRENT_DEFINITION_LEN) {
-          query[qlen++] = c;
-          query[qlen] = '\0';
-      }
     } else if (c == KEY_LEFT) {
       highlight_index_within_level--;
       if (highlight_index_within_level < 0) highlight_index_within_level = 0;
@@ -1058,6 +1053,11 @@ restart:
       int back_to_big_picture = edit_current_definition(L);
       if (back_to_big_picture) goto restart;
       return;
+    } else if (isprint(c)) {
+      if (qlen < CURRENT_DEFINITION_LEN) {
+          query[qlen++] = c;
+          query[qlen] = '\0';
+      }
     }
   }
   /* never gets here */

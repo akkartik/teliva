@@ -234,8 +234,8 @@
 - __teliva_timestamp: original
   menu:
     >menu = {}
-    >menu['^g'] = 'enter url'
     >menu['enter'] = 'go to highlight'
+    >menu['^g'] = 'enter url'
     >menu['^u'] = 'view source'
 - __teliva_timestamp: original
   edit_line:

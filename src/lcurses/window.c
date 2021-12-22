@@ -1307,9 +1307,12 @@ static int
 Wgetch(lua_State *L)
 {
 	WINDOW *w = checkwin(L, 1);
+	int y, x;
+	getyx(w, y, x);
 	render_trusted_teliva_data(L);  /* Apps can draw what they want on screen,
 	                                 * but Teliva's UI is always visible when
 	                                 * asking the user to make a decision. */
+	mvaddstr(y, x, "");
 	int c = wgetch(w);
 
 	if (c == ERR)

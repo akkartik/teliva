@@ -337,7 +337,14 @@ int run_tests(lua_State *L) {
     if (!lua_isfunction(L, -1)) continue;
     int status = lua_pcall(L, 0, 0, 0);
     if (status) {
-      printf("E%d: %s\n", status, lua_tostring(L, -1));
+      printw("E%d: %s", status, lua_tostring(L, -1));
+      /* increment teliva_num_test_failures */
+      lua_getglobal(L, "teliva_num_test_failures");
+      int num_failures = lua_tointeger(L, -1);
+      lua_pop(L, 1);
+      lua_pushinteger(L, num_failures+1);
+      lua_setglobal(L, "teliva_num_test_failures");
+      /* if unset, set teliva_first_failure */
       lua_getglobal(L, "teliva_first_failure");
       int first_failure_clear = lua_isnil(L, -1);
       lua_pop(L, 1);

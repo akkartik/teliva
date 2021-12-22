@@ -178,11 +178,48 @@
     >  end
     >end
 - __teliva_timestamp: original
+  render_link:
+    >function render_link(window, y, line)
+    >  local rendered_line = string.gsub(line, '=>%s*%S*%s*', '')
+    >  if trim(rendered_line) == '' then
+    >    rendered_line = line
+    >  end
+    >  render_line(window, y, rendered_line)
+    >end
+- __teliva_timestamp: original
+  state:
+    >state = {
+    >  lines={},
+    >  highlight_index=0,
+    >  source=false,  -- show source (link urls, etc.)
+    >}
+- __teliva_timestamp: original
   render_page:
-    >function render_page(window, lines)
+    >function render_page(window)
     >  local y = 0
-    >  for _, line in pairs(lines) do
-    >    render_line(window, y, line)
+    >  window:attron(curses.color_pair(6))
+    >  print(state.url)
+    >  window:attroff(curses.color_pair(6))
+    >  y = y+2
+    >--?   dbg(window, state.highlight_index)
+    >  for i, line in pairs(state.lines) do
+    >    if not state.source and string.find(line, '=> ') == 1 then
+    >      if state.highlight_index == 0 or i == state.highlight_index then
+    >        -- highlighted link
+    >        state.highlight_index = i  -- TODO: ugly state update while rendering, just for first render after gemini_get
+    >        curses.attron(curses.A_REVERSE)
+    >        render_link(window, y, line)
+    >        curses.attroff(curses.A_REVERSE)
+    >      else
+    >        -- link
+    >        curses.attron(curses.A_BOLD)
+    >        render_link(window, y, line)
+    >        curses.attroff(curses.A_BOLD)
+    >      end
+    >    else
+    >      -- non-link
+    >      render_line(window, y, line)
+    >    end
     >    y = y+1
     >  end
     >end
@@ -197,7 +234,9 @@
 - __teliva_timestamp: original
   menu:
     >menu = {}
-    >menu['^g'] = 'go'
+    >menu['^g'] = 'enter url'
+    >menu['enter'] = 'go to highlight'
+    >menu['^u'] = 'view source'
 - __teliva_timestamp: original
   edit_line:
     >function edit_line(window)
@@ -242,10 +281,50 @@
     >  end
     >end
 - __teliva_timestamp: original
+  is_link:
+    >function is_link(line)
+    >  return string.find(line, '=>%s*%S*%s*') == 1
+    >end
+- __teliva_timestamp: original
+  next_link:
+    >function next_link()
+    >  local new_index = state.highlight_index
+    >  while true do
+    >    new_index = new_index+1
+    >    if new_index > #state.lines then return end
+    >    if is_link(state.lines[new_index]) then break end
+    >  end
+    >  state.highlight_index = new_index
+    >end
+- __teliva_timestamp: original
+  previous_link:
+    >function previous_link()
+    >  local new_index = state.highlight_index
+    >  while true do
+    >    new_index = new_index - 1
+    >    if new_index < 1 then return end
+    >    if is_link(state.lines[new_index]) then break end
+    >  end
+    >  state.highlight_index = new_index
+    >end
+- __teliva_timestamp: original
   update:
-    >function update(window, lines)
+    >function update(window)
     >  local key = curses.getch()
     >  local screen_rows, screen_cols = window:getmaxyx()
+    >  if key == 258 then  -- down arrow
+    >    next_link()
+    >  end
+    >  if key == 259 then  -- up arrow
+    >    previous_link()
+    >  end
+    >  if key == 21 then  -- ctrl-u
+    >    state.source = not state.source
+    >  end
+    >  if key == 10 then  -- enter
+    >    local s, e, new_url = string.find(state.lines[state.highlight_index], '=>%s*(%S*)')
+    >    gemini_get(url.absolute(state.url, new_url))
+    >  end
     >  if key == 7 then  -- ctrl-g
     >    window:mvaddstr(screen_rows-2, 0, '')
     >    window:clrtoeol()
@@ -255,8 +334,8 @@
     >    curses.curs_set(2)
     >    local new_url = edit_line(window)
     >    if new_url then
-    >      local new_lines = gemini_get(new_url)
-    >      zap(lines, new_lines)
+    >      state.url = new_url
+    >      gemini_get(new_url)
     >    end
     >    curses.curs_set(0)
     >  end
@@ -283,8 +362,8 @@
     >  local lines = {}
     >  local url = ''
     >  if #arg > 0 then
-    >    url = arg[1]
-    >    lines = gemini_get(url)
+    >    state.url = arg[1]
+    >    lines = gemini_get(state.url)
     >  end
     >  while true do
     >    render(window, lines)
@@ -355,21 +434,19 @@
 - __teliva_timestamp: original
   parse_gemini_body:
     >function parse_gemini_body(conn, type)
-    >  local result = {}
     >  if type == 'text/gemini' then
     >    while true do
     >      local line, err = conn:receive()
     >      if line == nil then break end
-    >      table.insert(result, line)
+    >      table.insert(state.lines, line)
     >    end
     >  elseif string.sub(type, 1, 5) == 'text/' then
     >    while true do
     >      local line, err = conn:receive()
     >      if line == nil then break end
-    >      table.insert(result, line)
+    >      table.insert(state.lines, line)
     >    end
     >  end
-    >  return result
     >end
 - __teliva_timestamp: original
   gemini_get:
@@ -395,18 +472,23 @@
     >      os.exit(1)
     >  end
     >  conn:dohandshake()
-    >
     >  conn:send(url .. "\r\n")
+    >  clear(state.lines)
+    >  state.highlight_index = 0  -- highlighted link not computed yet
     >  local line, err = conn:receive()
-    >  if line == nil then return {err} end
+    >  if line == nil then
+    >    table.insert(state.lines, err)
+    >    return
+    >  end
     >  local status, meta = string.match(line, "(%S+) (%S+)")
     >  if status[1] == '2' then
-    >    return parse_gemini_body(conn, meta)
+    >    parse_gemini_body(conn, meta)
+    >    state.url = url
     >  elseif status[1] == '3' then
-    >    return gemini_get(socket.url.absolute(url, meta))
+    >    gemini_get(socket.url.absolute(url, meta))
     >  elseif status[1] == '4' or line[1] == '5' then
-    >    return {'Error: '..meta}
+    >    table.insert(state.lines, 'Error: '..meta)
     >  else
-    >    return {'invalid response from server: '..line}
+    >    table.insert(state.lines, 'invalid response from server: '..line)
     >  end
     >end

@@ -817,18 +817,16 @@ static int is_current_definition(lua_State *L, const char *definition_name, int 
 
 
 void draw_definition_name (const char *definition_name) {
-  /* confusingly, unhighlighted definitions use COLOR_PAIR_HIGHLIGHT */
-  attron(COLOR_PAIR(COLOR_PAIR_HIGHLIGHT));
+  attron(COLOR_PAIR(COLOR_PAIR_SELECTABLE));
   addstr(" ");
   addstr(definition_name);
   addstr(" ");
-  attroff(COLOR_PAIR(COLOR_PAIR_HIGHLIGHT));
+  attroff(COLOR_PAIR(COLOR_PAIR_SELECTABLE));
   addstr("  ");
 }
 
 
 void draw_highlighted_definition_name (const char *definition_name) {
-  /* confusingly, highlighted definitions don't use COLOR_PAIR_HIGHLIGHT */
   attron(A_REVERSE);
   addstr(" ");
   addstr(definition_name);
@@ -1126,7 +1124,7 @@ void developer_mode (lua_State *L) {
   /* clobber the app's ncurses colors; we'll restart the app when we rerun it. */
   assume_default_colors(COLOR_FOREGROUND, COLOR_BACKGROUND);
   init_pair(COLOR_PAIR_NORMAL, COLOR_FOREGROUND, COLOR_BACKGROUND);
-  init_pair(COLOR_PAIR_HIGHLIGHT, COLOR_HIGHLIGHT_FOREGROUND, COLOR_HIGHLIGHT_BACKGROUND);
+  init_pair(COLOR_PAIR_SELECTABLE, COLOR_SELECTABLE_FOREGROUND, COLOR_SELECTABLE_BACKGROUND);
   init_pair(COLOR_PAIR_FADE, COLOR_FADE, COLOR_BACKGROUND);
   init_pair(COLOR_PAIR_MENU_ALTERNATE, COLOR_MENU_ALTERNATE, COLOR_BACKGROUND);
   init_pair(COLOR_PAIR_LUA_COMMENT, COLOR_LUA_COMMENT, COLOR_BACKGROUND);

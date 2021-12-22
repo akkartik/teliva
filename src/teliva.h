@@ -57,8 +57,8 @@ enum color {
   COLOR_BACKGROUND = 253,                     // almost white
   COLOR_FADE = 244,                           // closer to background
   COLOR_MENU_ALTERNATE = 248,
-  COLOR_HIGHLIGHT_FOREGROUND = 238,
-  COLOR_HIGHLIGHT_BACKGROUND = 250,
+  COLOR_SELECTABLE_FOREGROUND = 238,
+  COLOR_SELECTABLE_BACKGROUND = 250,
   COLOR_ERROR_FOREGROUND = COLOR_BACKGROUND,
   COLOR_ERROR_BACKGROUND = 124,               // deep red
   COLOR_LUA_COMMENT = 27,                     // blue
@@ -74,8 +74,8 @@ enum color {
   COLOR_BACKGROUND = 238,                     // almost black
   COLOR_FADE = 244,                           // closer to background
   COLOR_MENU_ALTERNATE = 244,
-  COLOR_HIGHLIGHT_FOREGROUND = 238,
-  COLOR_HIGHLIGHT_BACKGROUND = 250,
+  COLOR_SELECTABLE_FOREGROUND = 238,
+  COLOR_SELECTABLE_BACKGROUND = 250,
   COLOR_ERROR_FOREGROUND = COLOR_FOREGROUND,
   COLOR_ERROR_BACKGROUND = 124,               // deep red
   COLOR_LUA_COMMENT = 39,                     // blue
@@ -91,8 +91,8 @@ enum color {
   COLOR_BACKGROUND = 24,                      // dark blue-green
   COLOR_FADE = 246,                           // closer to background
   COLOR_MENU_ALTERNATE = 244,
-  COLOR_HIGHLIGHT_FOREGROUND = 250,
-  COLOR_HIGHLIGHT_BACKGROUND = 31,
+  COLOR_SELECTABLE_FOREGROUND = 250,
+  COLOR_SELECTABLE_BACKGROUND = 31,
   COLOR_ERROR_FOREGROUND = 250,
   COLOR_ERROR_BACKGROUND = 124,               // deep red
   COLOR_LUA_COMMENT = 45,                     // light blue
@@ -105,7 +105,7 @@ enum color {
 
 enum color_pair {
   COLOR_PAIR_NORMAL = 0,
-  COLOR_PAIR_HIGHLIGHT = 1,
+  COLOR_PAIR_SELECTABLE = 1,
   COLOR_PAIR_FADE = 2,
   COLOR_PAIR_MENU_ALTERNATE = 3,
   COLOR_PAIR_LUA_COMMENT = 4,

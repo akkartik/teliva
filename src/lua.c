@@ -1012,10 +1012,12 @@ restart:
     } else if (c == CTRL_X) {
       return;
     } else if (c == ENTER) {
-      save_to_current_definition_and_editor_buffer(L, query);
-      int back_to_big_picture = edit_current_definition(L);
-      if (back_to_big_picture) goto restart;
-      return;
+      if (query[0] != '\0') {
+        save_to_current_definition_and_editor_buffer(L, query);
+        int back_to_big_picture = edit_current_definition(L);
+        if (back_to_big_picture) goto restart;
+        return;
+      }
     } else if (c == CTRL_U) {
       qlen = 0;
       query[qlen] = '\0';

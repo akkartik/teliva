@@ -190,6 +190,7 @@
   state:
     >state = {
     >  lines={},
+    >  history={},
     >  highlight_index=0,
     >  source=false,  -- show source (link urls, etc.)
     >}
@@ -235,6 +236,7 @@
   menu:
     >menu = {}
     >menu['enter'] = 'go to highlight'
+    >menu['←'] = 'back'
     >menu['^g'] = 'enter url'
     >menu['^u'] = 'view source'
 - __teliva_timestamp: original
@@ -316,6 +318,11 @@
     >    next_link()
     >  elseif key == 259 then  -- up arrow
     >    previous_link()
+    >  elseif key == 260 then  -- left arrow
+    >    if #state.history > 1 then
+    >      table.remove(state.history)
+    >      gemini_get(table.remove(state.history))
+    >    end
     >  elseif key == 21 then  -- ctrl-u
     >    state.source = not state.source
     >  elseif key == 10 then  -- enter
@@ -480,6 +487,7 @@
     >  if status[1] == '2' then
     >    parse_gemini_body(conn, meta)
     >    state.url = url
+    >    table.insert(state.history, url)
     >  elseif status[1] == '3' then
     >    gemini_get(socket.url.absolute(url, meta))
     >  elseif status[1] == '4' or line[1] == '5' then

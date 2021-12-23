@@ -359,10 +359,9 @@ int run_tests(lua_State *L) {
   lua_pop(L, 1);
   if (num_failures == 0) return 0;
   if (num_failures == 1)
-    printf("1 failure");
+    addstr("1 failure");
   else
-    printf("%d failures", num_failures);
-  fflush(stdout);
+    printw("%d failures", num_failures);
   getch();
   /* take first failure back to developer mode */
   lua_getglobal(L, "teliva_first_failure");

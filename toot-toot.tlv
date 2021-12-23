@@ -261,28 +261,56 @@
 - __teliva_timestamp: original
   cursor_down:
     >function cursor_down(s, old_idx)
-    >  local colidx = 0
-    >  local old_colidx = -1
-    >  for i=1,string.len(s) do
+    >  local max = string.len(s)
+    >  local i = 1
+    >  -- compute oldcol, the screen column of old_idx
+    >  local oldcol = 0
+    >  local col = 0
+    >  while true do
+    >    if i > max then
+    >      -- abnormal old_idx
+    >      return old_idx
+    >    end
     >    if i == old_idx then
-    >      old_colidx = colidx
-    >    elseif colidx == old_colidx then  -- next line
+    >      oldcol = col
+    >      break
+    >    end
+    >    if s[i] == '\n' then
+    >      col = 0
+    >    else
+    >      col = col+1
+    >    end
+    >    i = i+1
+    >  end
+    >  -- skip rest of line
+    >  while true do
+    >    if i > max then
+    >      -- current line is at bottom
+    >      return old_idx
+    >    end
+    >    if s[i] == '\n' then
+    >      break
+    >    end
+    >    i = i+1
+    >  end
+    >  -- compute index at same column on next line
+    >  -- i is at a newline
+    >  i = i+1
+    >  col = 0
+    >  while true do
+    >    if i > max then
+    >      -- next line is at bottom and is too short; position at end of it
     >      return i
     >    end
-    >    -- loop update
     >    if s[i] == '\n' then
-    >      if old_colidx ~= -1 and old_colidx > colidx then
-    >        return i
-    >      end
-    >      colidx = 0
-    >    else
-    >      colidx = colidx+1
+    >      -- next line is too short; position at end of it
+    >      return i
     >    end
-    >  end
-    >  if old_colidx == colidx then
-    >    return string.len(s)+1
-    >  else
-    >    return old_idx
+    >    if col == oldcol then
+    >      return i
+    >    end
+    >    col = col+1
+    >    i = i+1
     >  end
     >end
     >

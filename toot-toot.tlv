@@ -260,16 +260,36 @@
     >end
 - __teliva_timestamp: original
   cursor_down:
-    >function cursor_down(s, idx)
-    >  local colidx = col_within_line(s, idx)
-    >  local newidx = skip_past_newline(s, idx)
-    >  while true do
-    >    if s[newidx] == '\n' then break end
-    >    local newcolidx = col_within_line(s, newidx)
-    >    if newcolidx == colidx then break end
-    >    newidx = newidx+1
+    >function cursor_down(s, old_idx)
+    >  local colidx = 0
+    >  local old_colidx = -1
+    >  for i=1,string.len(s) do
+    >    curses.addstr('|'..i..','..colidx)
+    >    if i == old_idx then
+    >      print('col:', colidx)
+    >      old_colidx = colidx
+    >    elseif colidx == old_colidx then  -- next line
+    >      print('->', i)
+    >      return i
+    >    end
+    >    -- loop update
+    >    if s[i] == '\n' then
+    >      if old_colidx ~= -1 and old_colidx > colidx then
+    >        print('=>', i)
+    >        return i
+    >      end
+    >      colidx = 0
+    >    else
+    >      colidx = colidx+1
+    >    end
     >  end
-    >  return newidx
+    >  if old_colidx == colidx then
+    >    print('->', string.len(s)+1)
+    >    return string.len(s)+1
+    >  else
+    >    print('|>', old_idx)
+    >    return old_idx
+    >  end
     >end
     >
     >function test_cursor_down()
@@ -280,6 +300,7 @@
     >  check_eq(cursor_down('abc\ndef', 5), 5, 'cursor_down: bottom line first char')
     >  check_eq(cursor_down('abc\ndef', 6), 6, 'cursor_down: bottom line mid char')
     >  check_eq(cursor_down('abc\ndef', 7), 7, 'cursor_down: bottom line final char')
+    >  check_eq(cursor_down('abc\n\ndef', 2), 5, 'cursor_down: to shorter line')
     >end
 - __teliva_timestamp: original
   skip_past_newline:

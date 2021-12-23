@@ -151,24 +151,140 @@
     >window = curses.stdscr()
     >curses.curs_set(0)  -- we'll simulate our own cursor
 - __teliva_timestamp: original
-  render:
-    >function render(window)
-    >  window:clear()
-    >  -- draw stuff to screen here
-    >  window:attron(curses.A_BOLD)
-    >  window:mvaddstr(1, 5, "example app")
-    >  window:attrset(curses.A_NORMAL)
-    >  for i=0,15 do
-    >    window:attrset(curses.color_pair(i))
-    >    window:mvaddstr(3+i, 5, "========================")
-    >  end
-    >end
-- __teliva_timestamp: original
   menu:
     >menu = {
     >  {'^u', 'clear'},
     >  {'^w', 'write prose to file "toot" (edit hotkey does NOT save)'},
     >}
+- __teliva_timestamp: original
+  main:
+    >function main()
+    >  init_colors()
+    >
+    >  while true do
+    >    render(window)
+    >    update(window)
+    >  end
+    >end
+- __teliva_timestamp: original
+  init_colors:
+    >function init_colors()
+    >  for i=0,7 do
+    >    curses.init_pair(i, i, -1)
+    >  end
+    >  curses.init_pair(8, 7, 0)
+    >  curses.init_pair(9, 7, 1)
+    >  curses.init_pair(10, 7, 2)
+    >  curses.init_pair(11, 7, 3)
+    >  curses.init_pair(12, 7, 4)
+    >  curses.init_pair(13, 7, 5)
+    >  curses.init_pair(14, 7, 6)
+    >  curses.init_pair(15, -1, 15)
+    >end
+- __teliva_timestamp: original
+  prose:
+    >prose = ''
+- __teliva_timestamp: original
+  cursor:
+    >cursor = 1
+- __teliva_timestamp: original
+  render:
+    >function render(window)
+    >  window:clear()
+    >  debugy = 5
+    >  local toots = split(prose, '\n\n===\n\n')
+    >  pos = 1
+    >  debugy = 5
+    >  for i, toot in ipairs(toots) do
+    >    if i > 1 then
+    >      pos = render_delimiter(window, '\n\n===\n\n', pos, cursor)
+    >    end
+    >    pos = render_text(window, toot, pos, cursor)
+    >    print('')
+    >    window:attron(curses.A_BOLD)
+    >    window:addstr(string.len(toot))
+    >    window:attroff(curses.A_BOLD)
+    >  end
+    >  curses.refresh()
+    >end
+- __teliva_timestamp: original
+  render_delimiter:
+    >function render_delimiter(window, s, pos, cursor)
+    >  local newpos = pos
+    >  for i=1,string.len(s) do
+    >    if newpos == cursor and i ~= 1 then
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addch(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  return newpos
+    >end
+- __teliva_timestamp: original
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addstr(s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addstr(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addstr(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end
 - __teliva_timestamp: original
   update:
     >function update(window)
@@ -201,62 +317,6 @@
     >    prose = prose:insert(string.char(key), cursor-1)
     >    cursor = cursor+1
     >  end
-    >end
-- __teliva_timestamp: original
-  init_colors:
-    >function init_colors()
-    >  for i=0,7 do
-    >    curses.init_pair(i, i, -1)
-    >  end
-    >  curses.init_pair(8, 7, 0)
-    >  curses.init_pair(9, 7, 1)
-    >  curses.init_pair(10, 7, 2)
-    >  curses.init_pair(11, 7, 3)
-    >  curses.init_pair(12, 7, 4)
-    >  curses.init_pair(13, 7, 5)
-    >  curses.init_pair(14, 7, 6)
-    >  curses.init_pair(15, -1, 15)
-    >end
-- __teliva_timestamp: original
-  main:
-    >function main()
-    >  init_colors()
-    >
-    >  while true do
-    >    render(window)
-    >    update(window)
-    >  end
-    >end
-- __teliva_timestamp: original
-  prose:
-    >prose = ''
-- __teliva_timestamp: original
-  cursor:
-    >cursor = 1
-- __teliva_timestamp: original
-  render_delimiter:
-    >function render_delimiter(window, s, pos, cursor)
-    >  local newpos = pos
-    >  for i=1,string.len(s) do
-    >    if newpos == cursor and i ~= 1 then
-    >      if s[i] == '\n' then
-    >        -- newline at cursor = render extra space in reverse video before jumping to new line
-    >        window:attron(curses.A_REVERSE)
-    >        window:addch(' ')
-    >        window:attroff(curses.A_REVERSE)
-    >        window:addch(s[i])
-    >      else
-    >        -- most characters at cursor = render in reverse video
-    >        window:attron(curses.A_REVERSE)
-    >        window:addch(s[i])
-    >        window:attroff(curses.A_REVERSE)
-    >      end
-    >    else
-    >      window:addch(s[i])
-    >    end
-    >    newpos = newpos+1
-    >  end
-    >  return newpos
     >end
 - __teliva_timestamp: original
   cursor_down:
@@ -323,89 +383,6 @@
     >  check_eq(cursor_down('abc\ndef', 6), 6, 'cursor_down: bottom line mid char')
     >  check_eq(cursor_down('abc\ndef', 7), 7, 'cursor_down: bottom line final char')
     >  check_eq(cursor_down('abc\n\ndef', 2), 5, 'cursor_down: to shorter line')
-    >end
-- __teliva_timestamp: original
-  skip_past_newline:
-    >function skip_past_newline(s, idx)
-    >  local result = idx
-    >  while true do
-    >    if result >= string.len(s) then
-    >      return idx
-    >    end
-    >    if s[result] == '\n' then
-    >      return result+1
-    >    end
-    >    result = result+1
-    >  end
-    >end
-- __teliva_timestamp: original
-  col_within_line:
-    >function col_within_line(s, idx)
-    >  if idx <= 1 then
-    >    return idx
-    >  end
-    >  idx = idx-1
-    >  local result = 1
-    >  while idx >= 1 do
-    >    if s[idx] == '\n' then break end
-    >    idx = idx-1
-    >    result=result+1
-    >  end
-    >  return result
-    >end
-    >
-    >function test_col_within_line()
-    >  check_eq(col_within_line('',         4), 4, 'col_within_line("")')
-    >  check_eq(col_within_line('abc\ndef', 1), 1, 'col_within_line(..., 1)')
-    >  check_eq(col_within_line('abc\ndef', 3), 3, 'col_within_line(..., -1)')
-    >  check_eq(col_within_line('abc\ndef', 4), 4, 'col_within_line(..., newline)')
-    >  check_eq(col_within_line('abc\ndef', 5), 1, 'col_within_line(..., after newline)')
-    >end
-- __teliva_timestamp: original
-  skip_to_start_of_previous_line:
-    >function skip_to_start_of_previous_line(s, idx)
-    >  local result = idx
-    >  -- skip to newline
-    >  if idx == 1 then return 1 end
-    >  result = result-1  -- just in case we start out on a newline
-    >  while true do
-    >    if result <= 1 then
-    >      return idx
-    >    end
-    >    if s[result] == '\n' then
-    >      result = result-1
-    >      break
-    >    end
-    >    result = result-1
-    >  end
-    >  -- dbg(window, 'skip: '..tostring(result))
-    >  while true do
-    >    if result <= 1 then
-    >      return result
-    >    end
-    >    if s[result] == '\n' then
-    >      return result+1
-    >    end
-    >    result = result-1
-    >  end
-    >end
-    >
-    >function test_skip_to_start_of_previous_line()
-    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 1), 1, 'start of previous line: first line, first char')
-    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 2), 2, 'start of previous line: first line, mid char')
-    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 3), 3, 'start of previous line: first line, final char')
-    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 4), 4, 'start of previous line: first line, newline')
-    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 5), 1, 'start of previous line: second line, first char')
-    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 6), 1, 'start of previous line: second line, mid char')
-    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 7), 1, 'start of previous line: second line, final char')
-    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 8), 1, 'start of previous line: second line, newline')
-    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 9), 5, 'start of previous line: final line, first char')
-    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 10), 5, 'start of previous line: final line, mid char')
-    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 11), 5, 'start of previous line: final line, final char')
-    >  check_eq(skip_to_start_of_previous_line('abc\ndef\nghi', 12), 5, 'start of previous line: end of file')
-    >
-    >  check_eq(skip_to_start_of_previous_line('abc\n\nghi', 7), 5, 'start of previous line: to empty line')
-    >  check_eq(skip_to_start_of_previous_line('abc\nd\nghi', 8), 5, 'start of previous line: to shorter line')
     >end
 - __teliva_timestamp: original
   cursor_up:
@@ -523,77 +500,4 @@
     >  check_eq(cursor_up('abcdefg\nhij', 10, 5), 7, 'cursor_up to wrapping line: mid char')
     >  check_eq(cursor_up('abcdefg\nhij', 11, 5), 8, 'cursor_up to wrapping line: final char')
     >  check_eq(cursor_up('abcdefg\nhij', 12, 5), 8, 'cursor_up to wrapping line: to shorter line')
-    >end
-- __teliva_timestamp: original
-  render:
-    >function render(window)
-    >  window:clear()
-    >  debugy = 5
-    >  local toots = split(prose, '\n\n===\n\n')
-    >  pos = 1
-    >  debugy = 5
-    >  for i, toot in ipairs(toots) do
-    >    if i > 1 then
-    >      pos = render_delimiter(window, '\n\n===\n\n', pos, cursor)
-    >    end
-    >    pos = render_text(window, toot, pos, cursor)
-    >    print('')
-    >    window:attron(curses.A_BOLD)
-    >    window:addstr(string.len(toot))
-    >    window:attroff(curses.A_BOLD)
-    >  end
-    >  curses.refresh()
-    >end
-- __teliva_timestamp: original
-  render_text:
-    >-- https://gankra.github.io/blah/text-hates-you
-    >-- https://lord.io/text-editing-hates-you-too
-    >
-    >-- manual tests:
-    >--   cursor on some character
-    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
-    >--   cursor at end of each line
-    >--   render digits
-    >
-    >-- positions serve two purposes:
-    >--   character to index into prose
-    >--   cursor-printing
-    >
-    >-- sequence of stories
-    >--   focus on rendering a single piece of text, first get that rock-solid
-    >--   split prose into toots, manage transitions between toots in response to cursor movements
-    >--   cursor movement: left/right vs up/down
-    >
-    >-- what is the ideal representation?
-    >--   prose + cursor has issues in multi-toot context. when to display cursor?
-    >function render_text(window, s, pos, cursor)
-    >  local newpos = pos
-    >--?   dbg(window, '--')
-    >  for i=1,string.len(s) do
-    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
-    >    if newpos == cursor then
-    >--?       dbg(window, 'cursor: '..tostring(cursor))
-    >      if s[i] == '\n' then
-    >        -- newline at cursor = render extra space in reverse video before jumping to new line
-    >        window:attron(curses.A_REVERSE)
-    >        window:addch(' ')
-    >        window:attroff(curses.A_REVERSE)
-    >        window:addstr(s[i])
-    >      else
-    >        -- most characters at cursor = render in reverse video
-    >        window:attron(curses.A_REVERSE)
-    >        window:addstr(s[i])
-    >        window:attroff(curses.A_REVERSE)
-    >      end
-    >    else
-    >      window:addstr(s[i])
-    >    end
-    >    newpos = newpos+1
-    >  end
-    >  if newpos == cursor then
-    >    window:attron(curses.A_REVERSE)
-    >    window:addch(' ')
-    >    window:attroff(curses.A_REVERSE)
-    >  end
-    >  return newpos
     >end

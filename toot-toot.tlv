@@ -409,19 +409,66 @@
     >end
 - __teliva_timestamp: original
   cursor_up:
-    >function cursor_up(s, idx)
-    >  if idx <= 1 then return idx end
-    >  -- check column within current line, then go to start of previous line, then count off columns there
-    >  local colidx = col_within_line(s, idx)
-    >  local newidx = skip_to_start_of_previous_line(s, idx)
-    >  if newidx == idx then return idx end
-    >  if s[newidx] == '\n' then return newidx end
-    >  for i=2,colidx do  -- we're already starting at col 1
-    >    if newidx >= string.len(s) then break end
-    >    if s[newidx] == '\n' then break end
-    >    newidx = newidx+1
+    >function cursor_up(s, old_idx)
+    >  local max = string.len(s)
+    >  local i = 1
+    >  -- compute oldcol, the screen column of old_idx
+    >  local oldcol = 0
+    >  local col = 0
+    >  while true do
+    >    if i > max then
+    >      -- abnormal old_idx
+    >      return old_idx
+    >    end
+    >    if i == old_idx then
+    >      oldcol = col
+    >      break
+    >    end
+    >    if s[i] == '\n' then
+    >      col = 0
+    >    else
+    >      col = col+1
+    >    end
+    >    i = i+1
     >  end
-    >  return newidx
+    >  -- find previous newline
+    >  i = i-col-1
+    >  -- scan back to previous line
+    >  if s[i] == '\n' then
+    >    i = i-1
+    >  end
+    >  curses.addstr('c:'..col)
+    >  while true do
+    >    curses.addstr('|'..i)
+    >    if i < 1 then
+    >      -- current line is at top
+    >      break
+    >    end
+    >    if s[i] == '\n' then
+    >      break
+    >    end
+    >    i = i-1
+    >  end
+    >  -- compute index at same column on next line
+    >  -- i is at a newline
+    >  curses.addstr('/'..i)
+    >  i = i+1
+    >  col = 0
+    >  while true do
+    >    if i > max then
+    >      -- next line is at bottom and is too short; position at end of it
+    >      return i
+    >    end
+    >    if s[i] == '\n' then
+    >      -- next line is too short; position at end of it
+    >      return i
+    >    end
+    >    if col == oldcol then
+    >      return i
+    >    end
+    >    col = col+1
+    >    i = i+1
+    >  end
     >end
     >
     >function test_cursor_up()

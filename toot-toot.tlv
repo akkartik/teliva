@@ -556,3 +556,211 @@
     >  end
     >  return newpos
     >end
+- cursor_up:
+    >function cursor_up(s, old_idx, width)
+    >  local max = string.len(s)
+    >  local i = 1
+    >  -- compute oldcol, the screen column of old_idx
+    >  local oldcol = 0
+    >  local col = 0
+    >  curses.addstr('^')
+    >  while true do
+    >    curses.addstr('|'..i)
+    >    if i > max or i == old_idx then
+    >      oldcol = col
+    >      break
+    >    end
+    >    if s[i] == '\n' then
+    >      col = 0
+    >    else
+    >      col = col+1
+    >      if col == width then
+    >        col = 0
+    >      end
+    >    end
+    >    i = i+1
+    >  end
+    >  -- find previous newline
+    >  i = i-col-1
+    >  -- scan back to previous line
+    >  if s[i] == '\n' then
+    >    i = i-1
+    >  end
+    >  curses.addstr('c:'..col)
+    >  while true do
+    >    curses.addstr('>'..i)
+    >    if i < 1 then
+    >      -- current line is at top
+    >      break
+    >    end
+    >    if s[i] == '\n' then
+    >      break
+    >    end
+    >    i = i-1
+    >  end
+    >  -- compute index at same column on next line
+    >  -- i is at a newline
+    >  curses.addstr('/'..i)
+    >  i = i+1
+    >  col = 0
+    >  while true do
+    >    curses.addstr('>>'..i)
+    >    if i > max then
+    >      -- next line is at bottom and is too short; position at end of it
+    >      return i
+    >    end
+    >    if s[i] == '\n' then
+    >      -- next line is too short; position at end of it
+    >      return i
+    >    end
+    >    if col == oldcol then
+    >      return i
+    >    end
+    >    col = col+1
+    >    i = i+1
+    >  end
+    >end
+    >
+    >function test_cursor_up()
+    >  -- tests without line-wrap
+    >  check_eq(cursor_up('abc\ndef', 1, 5), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2, 5), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3, 5), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4, 5), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5, 5), 1, 'cursor_up: non-top line first char')
+    >  check_eq(cursor_up('abc\ndef', 6, 5), 2, 'cursor_up: non-top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 7, 5), 3, 'cursor_up: non-top line final char')
+    >  check_eq(cursor_up('abc\ndef\n', 8, 5), 4, 'cursor_up: non-top line end')
+    >  check_eq(cursor_up('ab\ndef\n', 7, 5), 3, 'cursor_up: to shorter line')
+    >
+    >  -- tests with line-wrap
+    >  --   |abcde|  <-- wrap, no newline
+    >  --   |fgh  |
+    >  check_eq(cursor_up('abcdefgh', 6, 5), 1, 'cursor_up in wrapping line: first char')
+    >  check_eq(cursor_up('abcdefgh', 7, 5), 2, 'cursor_up in wrapping line: mid char')
+    >  check_eq(cursor_up('abcdefgh', 8, 5), 3, 'cursor_up in wrapping line: final char')
+    >  check_eq(cursor_up('abcdefgh', 9, 5), 4, 'cursor_up in wrapping line: wrapped line end')
+    >
+    >  -- mixing lines with and without wrap
+    >  --   |abcde|  <-- wrap, no newline
+    >  --   |fg   |
+    >  --   |hij  |
+    >  check_eq(cursor_up('abcdefg\nhij', 9, 5), 6, 'cursor_up to wrapping line: first char')
+    >  check_eq(cursor_up('abcdefg\nhij', 10, 5), 7, 'cursor_up to wrapping line: mid char')
+    >  check_eq(cursor_up('abcdefg\nhij', 11, 5), 8, 'cursor_up to wrapping line: final char')
+    >  check_eq(cursor_up('abcdefg\nhij', 12, 5), 8, 'cursor_up to wrapping line: to shorter line')
+    >end
+  __teliva_timestamp:
+    >Thu Dec 23 07:24:20 2021
+- cursor_up:
+    >function cursor_up(s, old_idx, width)
+    >  local max = string.len(s)
+    >  local i = 1
+    >  -- compute oldcol, the screen column of old_idx
+    >  local oldcol = 0
+    >  local col = 0
+    >  local previous_newline = 0
+    >  curses.addstr('^')
+    >  while true do
+    >    curses.addstr('|'..i)
+    >    if i > max or i == old_idx then
+    >      oldcol = col
+    >      break
+    >    end
+    >    if s[i] == '\n' then
+    >      col = 0
+    >      previous_newline = i
+    >    else
+    >      col = col+1
+    >      if col == width then
+    >        col = 0
+    >      end
+    >    end
+    >    i = i+1
+    >  end
+    >  -- find previous newline
+    >  i = i-col-1
+    >--?   curses.addstr('w'..old_idx..'-'..previous_newline)
+    >  if old_idx - previous_newline > width then
+    >    -- we're in a wrapped line
+    >    return old_idx - width
+    >  end
+    >  -- scan back to previous line
+    >  if s[i] == '\n' then
+    >    i = i-1
+    >  end
+    >  curses.addstr('c:'..col)
+    >  while true do
+    >    curses.addstr('>'..i)
+    >    if i < 1 then
+    >      -- current line is at top
+    >      break
+    >    end
+    >    if s[i] == '\n' then
+    >      break
+    >    end
+    >    i = i-1
+    >  end
+    >  -- compute index at same column on next line
+    >  -- i is at a newline
+    >  curses.addstr('/'..i)
+    >  i = i+1
+    >  col = 0
+    >  while true do
+    >    curses.addstr('>>'..i)
+    >    if i > max then
+    >      -- next line is at bottom and is too short; position at end of it
+    >      return i
+    >    end
+    >    if s[i] == '\n' then
+    >      -- next line is too short; position at end of it
+    >      return i
+    >    end
+    >    if col == oldcol then
+    >      return i
+    >    end
+    >    col = col+1
+    >    i = i+1
+    >  end
+    >end
+    >
+    >function test_cursor_up()
+    >  -- lines that don't wrap
+    >  check_eq(cursor_up('abc\ndef', 1, 5), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2, 5), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3, 5), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4, 5), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5, 5), 1, 'cursor_up: non-top line first char')
+    >  check_eq(cursor_up('abc\ndef', 6, 5), 2, 'cursor_up: non-top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 7, 5), 3, 'cursor_up: non-top line final char')
+    >  check_eq(cursor_up('abc\ndef\n', 8, 5), 4, 'cursor_up: non-top line end')
+    >  check_eq(cursor_up('ab\ndef\n', 7, 5), 3, 'cursor_up: to shorter line')
+    >
+    >  -- within a single wrapping line
+    >  --   |abcde|  <-- wrap, no newline
+    >  --   |fgh  |
+    >  check_eq(cursor_up('abcdefgh', 6, 5), 1, 'cursor_up from wrapping line: first char')
+    >  check_eq(cursor_up('abcdefgh', 7, 5), 2, 'cursor_up from wrapping line: mid char')
+    >  check_eq(cursor_up('abcdefgh', 8, 5), 3, 'cursor_up from wrapping line: final char')
+    >  check_eq(cursor_up('abcdefgh', 9, 5), 4, 'cursor_up from wrapping line: wrapped line end')
+    >
+    >  -- within a single very long wrapping line
+    >  --   |abcde|  <-- wrap, no newline
+    >  --   |fghij|  <-- wrap, no newline
+    >  --   |klm  |
+    >  check_eq(cursor_up('abcdefghijklm', 11, 5), 6, 'cursor_up within wrapping line: first char')
+    >  check_eq(cursor_up('abcdefghijklm', 12, 5), 7, 'cursor_up within wrapping line: mid char')
+    >  check_eq(cursor_up('abcdefghijklm', 13, 5), 8, 'cursor_up within wrapping line: final char')
+    >  check_eq(cursor_up('abcdefghijklm', 14, 5), 9, 'cursor_up within wrapping line: wrapped line end')
+    >
+    >  -- from below to (the bottom of) a wrapping line
+    >  --   |abcde|  <-- wrap, no newline
+    >  --   |fg   |
+    >  --   |hij  |
+    >  check_eq(cursor_up('abcdefg\nhij', 9, 5), 6, 'cursor_up to wrapping line: first char')
+    >  check_eq(cursor_up('abcdefg\nhij', 10, 5), 7, 'cursor_up to wrapping line: mid char')
+    >  check_eq(cursor_up('abcdefg\nhij', 11, 5), 8, 'cursor_up to wrapping line: final char')
+    >  check_eq(cursor_up('abcdefg\nhij', 12, 5), 8, 'cursor_up to wrapping line: to shorter line')
+    >end
+  __teliva_timestamp:
+    >Thu Dec 23 07:50:58 2021

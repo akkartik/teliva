@@ -335,7 +335,7 @@
     >    end
     >    result = result-1
     >  end
-    >  dbg(window, 'skip: '..tostring(result))
+    >  -- dbg(window, 'skip: '..tostring(result))
     >  while true do
     >    if result <= 1 then
     >      return result

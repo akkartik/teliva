@@ -302,7 +302,7 @@
     >    cursor = cursor_down(prose, cursor, w)
     >  elseif key == curses.KEY_UP then
     >    cursor = cursor_up(prose, cursor, w)
-    >  elseif key == curses.KEY_BACKSPACE then
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
     >    if cursor > 1 then
     >      cursor = cursor-1
     >      prose = prose:remove(cursor)

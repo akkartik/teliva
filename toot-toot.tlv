@@ -409,250 +409,6 @@
     >end
 - __teliva_timestamp: original
   cursor_up:
-    >function cursor_up(s, old_idx)
-    >  local max = string.len(s)
-    >  local i = 1
-    >  -- compute oldcol, the screen column of old_idx
-    >  local oldcol = 0
-    >  local col = 0
-    >  while true do
-    >    if i > max then
-    >      -- abnormal old_idx
-    >      return old_idx
-    >    end
-    >    if i == old_idx then
-    >      oldcol = col
-    >      break
-    >    end
-    >    if s[i] == '\n' then
-    >      col = 0
-    >    else
-    >      col = col+1
-    >    end
-    >    i = i+1
-    >  end
-    >  -- find previous newline
-    >  i = i-col-1
-    >  -- scan back to previous line
-    >  if s[i] == '\n' then
-    >    i = i-1
-    >  end
-    >  curses.addstr('c:'..col)
-    >  while true do
-    >    curses.addstr('|'..i)
-    >    if i < 1 then
-    >      -- current line is at top
-    >      break
-    >    end
-    >    if s[i] == '\n' then
-    >      break
-    >    end
-    >    i = i-1
-    >  end
-    >  -- compute index at same column on next line
-    >  -- i is at a newline
-    >  curses.addstr('/'..i)
-    >  i = i+1
-    >  col = 0
-    >  while true do
-    >    if i > max then
-    >      -- next line is at bottom and is too short; position at end of it
-    >      return i
-    >    end
-    >    if s[i] == '\n' then
-    >      -- next line is too short; position at end of it
-    >      return i
-    >    end
-    >    if col == oldcol then
-    >      return i
-    >    end
-    >    col = col+1
-    >    i = i+1
-    >  end
-    >end
-    >
-    >function test_cursor_up()
-    >  check_eq(cursor_up('abc\ndef', 1), 1, 'cursor_up: top line first char')
-    >  check_eq(cursor_up('abc\ndef', 2), 2, 'cursor_up: top line mid char')
-    >  check_eq(cursor_up('abc\ndef', 3), 3, 'cursor_up: top line final char')
-    >  check_eq(cursor_up('abc\ndef', 4), 4, 'cursor_up: top line end')
-    >  check_eq(cursor_up('abc\ndef', 5), 1, 'cursor_up: non-top line first char')
-    >  check_eq(cursor_up('abc\ndef', 6), 2, 'cursor_up: non-top line mid char')
-    >  check_eq(cursor_up('abc\ndef', 7), 3, 'cursor_up: non-top line final char')
-    >  check_eq(cursor_up('abc\ndef\n', 8), 4, 'cursor_up: non-top line end')
-    >  check_eq(cursor_up('ab\ndef\n', 7), 3, 'cursor_up: to shorter line')
-    >  -- idx that's too high for s not working; let's see if that matters
-    >end
-- __teliva_timestamp: original
-  render:
-    >function render(window)
-    >  window:clear()
-    >  debugy = 5
-    >  local toots = split(prose, '\n\n===\n\n')
-    >  pos = 1
-    >  debugy = 5
-    >  for i, toot in ipairs(toots) do
-    >    if i > 1 then
-    >      pos = render_delimiter(window, '\n\n===\n\n', pos, cursor)
-    >    end
-    >    pos = render_text(window, toot, pos, cursor)
-    >    print('')
-    >    window:attron(curses.A_BOLD)
-    >    window:addstr(string.len(toot))
-    >    window:attroff(curses.A_BOLD)
-    >  end
-    >  curses.refresh()
-    >end
-- __teliva_timestamp: original
-  render_text:
-    >-- https://gankra.github.io/blah/text-hates-you
-    >-- https://lord.io/text-editing-hates-you-too
-    >
-    >-- manual tests:
-    >--   cursor on some character
-    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
-    >--   cursor at end of each line
-    >--   render digits
-    >
-    >-- positions serve two purposes:
-    >--   character to index into prose
-    >--   cursor-printing
-    >
-    >-- sequence of stories
-    >--   focus on rendering a single piece of text, first get that rock-solid
-    >--   split prose into toots, manage transitions between toots in response to cursor movements
-    >--   cursor movement: left/right vs up/down
-    >
-    >-- what is the ideal representation?
-    >--   prose + cursor has issues in multi-toot context. when to display cursor?
-    >function render_text(window, s, pos, cursor)
-    >  local newpos = pos
-    >--?   dbg(window, '--')
-    >  for i=1,string.len(s) do
-    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
-    >    if newpos == cursor then
-    >--?       dbg(window, 'cursor: '..tostring(cursor))
-    >      if s[i] == '\n' then
-    >        -- newline at cursor = render extra space in reverse video before jumping to new line
-    >        window:attron(curses.A_REVERSE)
-    >        window:addch(' ')
-    >        window:attroff(curses.A_REVERSE)
-    >        window:addstr(s[i])
-    >      else
-    >        -- most characters at cursor = render in reverse video
-    >        window:attron(curses.A_REVERSE)
-    >        window:addstr(s[i])
-    >        window:attroff(curses.A_REVERSE)
-    >      end
-    >    else
-    >      window:addstr(s[i])
-    >    end
-    >    newpos = newpos+1
-    >  end
-    >  if newpos == cursor then
-    >    window:attron(curses.A_REVERSE)
-    >    window:addch(' ')
-    >    window:attroff(curses.A_REVERSE)
-    >  end
-    >  return newpos
-    >end
-- cursor_up:
-    >function cursor_up(s, old_idx, width)
-    >  local max = string.len(s)
-    >  local i = 1
-    >  -- compute oldcol, the screen column of old_idx
-    >  local oldcol = 0
-    >  local col = 0
-    >  curses.addstr('^')
-    >  while true do
-    >    curses.addstr('|'..i)
-    >    if i > max or i == old_idx then
-    >      oldcol = col
-    >      break
-    >    end
-    >    if s[i] == '\n' then
-    >      col = 0
-    >    else
-    >      col = col+1
-    >      if col == width then
-    >        col = 0
-    >      end
-    >    end
-    >    i = i+1
-    >  end
-    >  -- find previous newline
-    >  i = i-col-1
-    >  -- scan back to previous line
-    >  if s[i] == '\n' then
-    >    i = i-1
-    >  end
-    >  curses.addstr('c:'..col)
-    >  while true do
-    >    curses.addstr('>'..i)
-    >    if i < 1 then
-    >      -- current line is at top
-    >      break
-    >    end
-    >    if s[i] == '\n' then
-    >      break
-    >    end
-    >    i = i-1
-    >  end
-    >  -- compute index at same column on next line
-    >  -- i is at a newline
-    >  curses.addstr('/'..i)
-    >  i = i+1
-    >  col = 0
-    >  while true do
-    >    curses.addstr('>>'..i)
-    >    if i > max then
-    >      -- next line is at bottom and is too short; position at end of it
-    >      return i
-    >    end
-    >    if s[i] == '\n' then
-    >      -- next line is too short; position at end of it
-    >      return i
-    >    end
-    >    if col == oldcol then
-    >      return i
-    >    end
-    >    col = col+1
-    >    i = i+1
-    >  end
-    >end
-    >
-    >function test_cursor_up()
-    >  -- tests without line-wrap
-    >  check_eq(cursor_up('abc\ndef', 1, 5), 1, 'cursor_up: top line first char')
-    >  check_eq(cursor_up('abc\ndef', 2, 5), 2, 'cursor_up: top line mid char')
-    >  check_eq(cursor_up('abc\ndef', 3, 5), 3, 'cursor_up: top line final char')
-    >  check_eq(cursor_up('abc\ndef', 4, 5), 4, 'cursor_up: top line end')
-    >  check_eq(cursor_up('abc\ndef', 5, 5), 1, 'cursor_up: non-top line first char')
-    >  check_eq(cursor_up('abc\ndef', 6, 5), 2, 'cursor_up: non-top line mid char')
-    >  check_eq(cursor_up('abc\ndef', 7, 5), 3, 'cursor_up: non-top line final char')
-    >  check_eq(cursor_up('abc\ndef\n', 8, 5), 4, 'cursor_up: non-top line end')
-    >  check_eq(cursor_up('ab\ndef\n', 7, 5), 3, 'cursor_up: to shorter line')
-    >
-    >  -- tests with line-wrap
-    >  --   |abcde|  <-- wrap, no newline
-    >  --   |fgh  |
-    >  check_eq(cursor_up('abcdefgh', 6, 5), 1, 'cursor_up in wrapping line: first char')
-    >  check_eq(cursor_up('abcdefgh', 7, 5), 2, 'cursor_up in wrapping line: mid char')
-    >  check_eq(cursor_up('abcdefgh', 8, 5), 3, 'cursor_up in wrapping line: final char')
-    >  check_eq(cursor_up('abcdefgh', 9, 5), 4, 'cursor_up in wrapping line: wrapped line end')
-    >
-    >  -- mixing lines with and without wrap
-    >  --   |abcde|  <-- wrap, no newline
-    >  --   |fg   |
-    >  --   |hij  |
-    >  check_eq(cursor_up('abcdefg\nhij', 9, 5), 6, 'cursor_up to wrapping line: first char')
-    >  check_eq(cursor_up('abcdefg\nhij', 10, 5), 7, 'cursor_up to wrapping line: mid char')
-    >  check_eq(cursor_up('abcdefg\nhij', 11, 5), 8, 'cursor_up to wrapping line: final char')
-    >  check_eq(cursor_up('abcdefg\nhij', 12, 5), 8, 'cursor_up to wrapping line: to shorter line')
-    >end
-  __teliva_timestamp:
-    >Thu Dec 23 07:24:20 2021
-- cursor_up:
     >function cursor_up(s, old_idx, width)
     >  local max = string.len(s)
     >  local i = 1
@@ -768,5 +524,76 @@
     >  check_eq(cursor_up('abcdefg\nhij', 11, 5), 8, 'cursor_up to wrapping line: final char')
     >  check_eq(cursor_up('abcdefg\nhij', 12, 5), 8, 'cursor_up to wrapping line: to shorter line')
     >end
-  __teliva_timestamp:
-    >Thu Dec 23 07:50:58 2021
+- __teliva_timestamp: original
+  render:
+    >function render(window)
+    >  window:clear()
+    >  debugy = 5
+    >  local toots = split(prose, '\n\n===\n\n')
+    >  pos = 1
+    >  debugy = 5
+    >  for i, toot in ipairs(toots) do
+    >    if i > 1 then
+    >      pos = render_delimiter(window, '\n\n===\n\n', pos, cursor)
+    >    end
+    >    pos = render_text(window, toot, pos, cursor)
+    >    print('')
+    >    window:attron(curses.A_BOLD)
+    >    window:addstr(string.len(toot))
+    >    window:attroff(curses.A_BOLD)
+    >  end
+    >  curses.refresh()
+    >end
+- __teliva_timestamp: original
+  render_text:
+    >-- https://gankra.github.io/blah/text-hates-you
+    >-- https://lord.io/text-editing-hates-you-too
+    >
+    >-- manual tests:
+    >--   cursor on some character
+    >--   cursor on (within) '\n\n===\n\n' delimiter (delimiter is hardcoded; things may break if you change it)
+    >--   cursor at end of each line
+    >--   render digits
+    >
+    >-- positions serve two purposes:
+    >--   character to index into prose
+    >--   cursor-printing
+    >
+    >-- sequence of stories
+    >--   focus on rendering a single piece of text, first get that rock-solid
+    >--   split prose into toots, manage transitions between toots in response to cursor movements
+    >--   cursor movement: left/right vs up/down
+    >
+    >-- what is the ideal representation?
+    >--   prose + cursor has issues in multi-toot context. when to display cursor?
+    >function render_text(window, s, pos, cursor)
+    >  local newpos = pos
+    >--?   dbg(window, '--')
+    >  for i=1,string.len(s) do
+    >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
+    >    if newpos == cursor then
+    >--?       dbg(window, 'cursor: '..tostring(cursor))
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >        window:addstr(s[i])
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addstr(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      window:addstr(s[i])
+    >    end
+    >    newpos = newpos+1
+    >  end
+    >  if newpos == cursor then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  end
+    >  return newpos
+    >end

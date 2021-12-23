@@ -347,11 +347,18 @@
     >  while true do
     >    if i > max then
     >      -- current line is at bottom
+    >      if col >= width then
+    >        return i
+    >      end
     >      return old_idx
     >    end
     >    if s[i] == '\n' then
     >      break
     >    end
+    >    if i - old_idx >= width then
+    >      return i
+    >    end
+    >    col = col+1
     >    i = i+1
     >  end
     >  -- compute index at same column on next line
@@ -376,14 +383,30 @@
     >end
     >
     >function test_cursor_down()
-    >  check_eq(cursor_down('abc\ndef', 1), 5, 'cursor_down: non-bottom line first char')
-    >  check_eq(cursor_down('abc\ndef', 2), 6, 'cursor_down: non-bottom line mid char')
-    >  check_eq(cursor_down('abc\ndef', 3), 7, 'cursor_down: non-bottom line final char')
-    >  check_eq(cursor_down('abc\ndef', 4), 8, 'cursor_down: non-bottom line end')
-    >  check_eq(cursor_down('abc\ndef', 5), 5, 'cursor_down: bottom line first char')
-    >  check_eq(cursor_down('abc\ndef', 6), 6, 'cursor_down: bottom line mid char')
-    >  check_eq(cursor_down('abc\ndef', 7), 7, 'cursor_down: bottom line final char')
-    >  check_eq(cursor_down('abc\n\ndef', 2), 5, 'cursor_down: to shorter line')
+    >  -- lines that don't wrap
+    >  check_eq(cursor_down('abc\ndef', 1, 5), 5, 'cursor_down: non-bottom line first char')
+    >  check_eq(cursor_down('abc\ndef', 2, 5), 6, 'cursor_down: non-bottom line mid char')
+    >  check_eq(cursor_down('abc\ndef', 3, 5), 7, 'cursor_down: non-bottom line final char')
+    >  check_eq(cursor_down('abc\ndef', 4, 5), 8, 'cursor_down: non-bottom line end')
+    >  check_eq(cursor_down('abc\ndef', 5, 5), 5, 'cursor_down: bottom line first char')
+    >  check_eq(cursor_down('abc\ndef', 6, 5), 6, 'cursor_down: bottom line mid char')
+    >  check_eq(cursor_down('abc\ndef', 7, 5), 7, 'cursor_down: bottom line final char')
+    >  check_eq(cursor_down('abc\n\ndef', 2, 5), 5, 'cursor_down: to shorter line')
+    >
+    >  -- within a single wrapping line
+    >  --   |abcde|  <-- wrap, no newline
+    >  --   |fgh  |
+    >  check_eq(cursor_down('abcdefgh', 1, 5), 6, 'cursor_down from wrapping line: first char')
+    >  check_eq(cursor_down('abcdefgh', 2, 5), 7, 'cursor_down from wrapping line: mid char')
+    >  check_eq(cursor_down('abcdefgh', 5, 5), 9, 'cursor_down from wrapping line: to shorter line')
+    >
+    >  -- within a single very long wrapping line
+    >  --   |abcde|  <-- wrap, no newline
+    >  --   |fghij|  <-- wrap, no newline
+    >  --   |klm  |
+    >  check_eq(cursor_down('abcdefghijklm', 1, 5), 6, 'cursor_down within wrapping line: first char')
+    >  check_eq(cursor_down('abcdefghijklm', 2, 5), 7, 'cursor_down within wrapping line: mid char')
+    >  check_eq(cursor_down('abcdefghijklm', 5, 5), 10, 'cursor_down within wrapping line: final char')
     >end
 - __teliva_timestamp: original
   cursor_up:

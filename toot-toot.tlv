@@ -264,18 +264,14 @@
     >  local colidx = 0
     >  local old_colidx = -1
     >  for i=1,string.len(s) do
-    >    curses.addstr('|'..i..','..colidx)
     >    if i == old_idx then
-    >      print('col:', colidx)
     >      old_colidx = colidx
     >    elseif colidx == old_colidx then  -- next line
-    >      print('->', i)
     >      return i
     >    end
     >    -- loop update
     >    if s[i] == '\n' then
     >      if old_colidx ~= -1 and old_colidx > colidx then
-    >        print('=>', i)
     >        return i
     >      end
     >      colidx = 0
@@ -284,10 +280,8 @@
     >    end
     >  end
     >  if old_colidx == colidx then
-    >    print('->', string.len(s)+1)
     >    return string.len(s)+1
     >  else
-    >    print('|>', old_idx)
     >    return old_idx
     >  end
     >end

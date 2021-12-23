@@ -659,7 +659,7 @@
     >  -- compute oldcol, the screen column of old_idx
     >  local oldcol = 0
     >  local col = 0
-    >  local previous_newline = 0
+    >  local newline_before_current_line = 0
     >  curses.addstr('^')
     >  while true do
     >    curses.addstr('|'..i)
@@ -669,7 +669,7 @@
     >    end
     >    if s[i] == '\n' then
     >      col = 0
-    >      previous_newline = i
+    >      newline_before_current_line = i
     >    else
     >      col = col+1
     >      if col == width then
@@ -680,12 +680,12 @@
     >  end
     >  -- find previous newline
     >  i = i-col-1
-    >--?   curses.addstr('w'..old_idx..'-'..previous_newline)
-    >  if old_idx - previous_newline > width then
+    >--?   curses.addstr('w'..old_idx..'-'..newline_before_current_line)
+    >  if old_idx - newline_before_current_line > width then
     >    -- we're in a wrapped line
     >    return old_idx - width
     >  end
-    >  -- scan back to previous line
+    >  -- scan back to start of previous line
     >  if s[i] == '\n' then
     >    i = i-1
     >  end
@@ -701,10 +701,16 @@
     >    end
     >    i = i-1
     >  end
-    >  -- compute index at same column on next line
     >  -- i is at a newline
     >  curses.addstr('/'..i)
     >  i = i+1
+    >  -- skip whole screen lines within previous line
+    >  curses.addstr('x'..old_idx..'-'..i)
+    >  while newline_before_current_line - i > width do
+    >    i = i + width
+    >    curses.addstr('p'..i)
+    >  end
+    >  -- compute index at same column on previous screen line
     >  col = 0
     >  while true do
     >    curses.addstr('>>'..i)

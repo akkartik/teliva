@@ -289,6 +289,7 @@
   update:
     >function update(window)
     >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
     >  if key == curses.KEY_LEFT then
     >    if cursor > 1 then
     >      cursor = cursor-1
@@ -298,9 +299,9 @@
     >      cursor = cursor+1
     >    end
     >  elseif key == curses.KEY_DOWN then
-    >    cursor = cursor_down(prose, cursor)
+    >    cursor = cursor_down(prose, cursor, w)
     >  elseif key == curses.KEY_UP then
-    >    cursor = cursor_up(prose, cursor)
+    >    cursor = cursor_up(prose, cursor, w)
     >  elseif key == curses.KEY_BACKSPACE then
     >    if cursor > 1 then
     >      cursor = cursor-1
@@ -320,7 +321,7 @@
     >end
 - __teliva_timestamp: original
   cursor_down:
-    >function cursor_down(s, old_idx)
+    >function cursor_down(s, old_idx, width)
     >  local max = string.len(s)
     >  local i = 1
     >  -- compute oldcol, the screen column of old_idx

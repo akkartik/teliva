@@ -394,9 +394,7 @@
     >  local oldcol = 0
     >  local col = 0
     >  local newline_before_current_line = 0
-    >  curses.addstr('^')
     >  while true do
-    >    curses.addstr('|'..i)
     >    if i > max or i == old_idx then
     >      oldcol = col
     >      break
@@ -414,7 +412,6 @@
     >  end
     >  -- find previous newline
     >  i = i-col-1
-    >--?   curses.addstr('w'..old_idx..'-'..newline_before_current_line)
     >  if old_idx - newline_before_current_line > width then
     >    -- we're in a wrapped line
     >    return old_idx - width
@@ -423,9 +420,7 @@
     >  if s[i] == '\n' then
     >    i = i-1
     >  end
-    >  curses.addstr('c:'..col)
     >  while true do
-    >    curses.addstr('>'..i)
     >    if i < 1 then
     >      -- current line is at top
     >      break
@@ -436,18 +431,14 @@
     >    i = i-1
     >  end
     >  -- i is at a newline
-    >  curses.addstr('/'..i)
     >  i = i+1
     >  -- skip whole screen lines within previous line
-    >  curses.addstr('x'..old_idx..'-'..i)
     >  while newline_before_current_line - i > width do
     >    i = i + width
-    >    curses.addstr('p'..i)
     >  end
     >  -- compute index at same column on previous screen line
     >  col = 0
     >  while true do
-    >    curses.addstr('>>'..i)
     >    if i > max then
     >      -- next line is at bottom and is too short; position at end of it
     >      return i

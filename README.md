@@ -139,7 +139,8 @@ a say in its future direction.
 
 ## Known issues
 
-* Colors are currently hardcoded. To tweak them, look for calls to
+* Colors are currently hardcoded. You get a light background even if your
+  terminal started out dark. To tweak colors, look for calls to
   `assume_default_colors()` and `init_pair()`, either in .tlv files for a
   specific app, or in the C sources for the standard code browser/editor.
 

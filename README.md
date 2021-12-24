@@ -173,6 +173,13 @@ Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
 
   [video](https://merveilles.town/@akkartik/107319684018301051)
 
+* A browser for the [Gemini protocol](https://gemini.circumlunar.space).
+  ```
+  src/teliva gemini.tlv
+  ```
+
+  [video](https://merveilles.town/@akkartik/107489728557201145)
+
 ## Feedback
 
 [Most appreciated.](http://akkartik.name/contact)

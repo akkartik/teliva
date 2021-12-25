@@ -8,6 +8,15 @@ doesn't invoke any OS syscalls.
 ## Top down
 
 Things to secure:
+* screen? Keep apps from drawing over standard Teliva UI elements.
+  * Teliva currently doesn't stop apps from overwriting the menu, if they're
+    clever. However, it always redraws its UI elements before accepting any
+    input from the keyboard.
+
+* code? There are currently no protections against .tlv files clobbering
+  existing definitions. I'm hoping that disallowing native code keeps this
+  safe. Apps can only affect themselves.
+
 * files opened (for read/write) on file system
   * `io_open`
   * `io_lines`

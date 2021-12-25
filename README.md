@@ -132,6 +132,11 @@ libraries. However, a few things are different from conventional Lua:
   effectively:
   - `os.execute`
   - `io.popen`
+* Some functions are disabled because they don't seem to make sense in an
+  ncurses environment. This includes the Lua notions of default files, which
+  start out as stdin/stdout.
+  - `io.input`, `io.read`
+  - `io.output`, `io.write`, `io.flush`
 * Some functions in lcurses have [additional smarts](https://github.com/lcurses/lcurses/blob/master/lib/curses.lua).
   Teliva is [consistent with the underlying ncurses](https://github.com/akkartik/teliva/blob/main/src/lcurses/curses.lua).
 

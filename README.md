@@ -51,6 +51,51 @@ OS and package manager of choice:
 So far I've tested Teliva on Linux, Mac OS X and OpenBSD; it should also work
 on other flavors of BSD, WSL on Windows, etc. with only minor modifications.
 
+## What else can it do?
+
+Anything! Some more sample apps to try out:
+
+* Conway's Game of Life, as an example of an animated local app.
+  ```
+  src/teliva life.tlv
+  ```
+
+  [video](https://merveilles.town/@akkartik/107277755421024772)
+
+* A viewer for [LiChess TV](https://lichess.org/tv), as an example of
+  animation and accessing a remote API over a network.
+  ```
+  src/teliva chesstv.tlv
+  ```
+
+  [video](https://merveilles.town/@akkartik/107319684018301051)
+
+* A browser for the [Gemini protocol](https://gemini.circumlunar.space).
+  ```
+  src/teliva gemini.tlv
+  ```
+
+  [video](https://merveilles.town/@akkartik/107489728557201145)
+
+These are just a start. The sky is the limit.
+
+## So, just a programming language, then?
+
+There's one big difference with other programming languages: Teliva apps are
+sandboxed like a browser. Most languages assume the fiction that the person
+running a program trusts all the code in the program. This assumption hasn't
+been valid since a decade after the Unix big bang, if then. Teliva takes on
+the reality that apps can get complex and use code written by strangers. In
+response, Teliva tries to always summarize for you what the program you're
+running is trying to do, and to ask you before a random app tries to do
+something sensitive. Permissions you grant a Teliva app will be _flexible_ and
+_easy to understand_. Browsers and mobile apps today tend to make you choose
+between those two properties.
+
+Sandboxing is still in progress. It isn't yet safe to run untrusted Teliva
+apps you download from the internet. (Fortunately you're unlikely to run into
+any such apps.)
+
 ## Isn't this just an IDE?
 
 There's one big difference: these apps are not intended to be runnable outside
@@ -165,30 +210,6 @@ a say in its future direction.
 ## What's with the name?
 
 Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
-
-## Other apps to try out
-
-* Conway's Game of Life, as an example of an animated local app.
-  ```
-  src/teliva life.tlv
-  ```
-
-  [video](https://merveilles.town/@akkartik/107277755421024772)
-
-* A viewer for [LiChess TV](https://lichess.org/tv), as an example of
-  animation and accessing a remote API over a network.
-  ```
-  src/teliva chesstv.tlv
-  ```
-
-  [video](https://merveilles.town/@akkartik/107319684018301051)
-
-* A browser for the [Gemini protocol](https://gemini.circumlunar.space).
-  ```
-  src/teliva gemini.tlv
-  ```
-
-  [video](https://merveilles.town/@akkartik/107489728557201145)
 
 ## Feedback
 

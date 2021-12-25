@@ -41,7 +41,9 @@ Difficulty levels
   3. Seems unlikely to be doable.
 
 UX:
-  * easily visualize how secure a configuration is.
+  * distinguish what Teliva can do, what the app can do, and Teliva's ability
+    to police the app.
+  * easily visualize Teliva's ability to police an app.
     - maybe show a lock in halves; left half = file system, right half =
       network. One half unlocked = orange. Both unlocked = red.
 

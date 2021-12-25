@@ -20,8 +20,8 @@ Things to secure:
 ## Bottom up
 
 * `includes`: all `#include`s throughout the codebase. I assume that C the
-  language itself can't have any side effects that impact other programs on
-  the computer.
+  language itself can't invoke any syscalls without at least triggering
+  warnings from the compiler.
   ```
   cd src
   grep '#include' * */* > ../sandboxing/includes

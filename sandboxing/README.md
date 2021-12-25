@@ -33,7 +33,7 @@ Scenarios:
       allows an app to do anything. Educate people to separate apps that read
       sensitive data from apps that access remote servers.
     - (2) solution: map phases within an app to distinct permission sets
-  * (3) app wants access to system() or exec()
+  * (3) app wants access to system() or exec() or popen()
 
 Difficulty levels
   1. I have some sense of how to enforce this.

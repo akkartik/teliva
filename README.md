@@ -131,6 +131,7 @@ libraries. However, a few things are different from conventional Lua:
 * Some functions are disabled because I don't know how to sandbox them
   effectively:
   - `os.execute`
+  - `io.popen`
 * Some functions in lcurses have [additional smarts](https://github.com/lcurses/lcurses/blob/master/lib/curses.lua).
   Teliva is [consistent with the underlying ncurses](https://github.com/akkartik/teliva/blob/main/src/lcurses/curses.lua).
 

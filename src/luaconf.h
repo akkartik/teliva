@@ -621,34 +621,6 @@ extern int mkstemp(char *);
 
 
 /*
-@@ lua_popen spawns a new process connected to the current one through
-@* the file streams.
-** CHANGE it if you have a way to implement it in your system.
-*/
-#if defined(LUA_USE_POPEN)
-
-/* we have newer libraries even though the dialect is C99 */
-#include <stdio.h>
-extern FILE *popen(const char *, const char *);
-extern int pclose(FILE *);
-
-#define lua_popen(L,c,m)	((void)L, fflush(NULL), popen(c,m))
-#define lua_pclose(L,file)	((void)L, (pclose(file) != -1))
-
-#elif defined(LUA_WIN)
-
-#define lua_popen(L,c,m)	((void)L, _popen(c,m))
-#define lua_pclose(L,file)	((void)L, (_pclose(file) != -1))
-
-#else
-
-#define lua_popen(L,c,m)	((void)((void)c, m),  \
-		luaL_error(L, LUA_QL("popen") " not supported"), (FILE*)0)
-#define lua_pclose(L,file)		((void)((void)L, file), 0)
-
-#endif
-
-/*
 @@ LUA_DL_* define which dynamic-library system Lua should use.
 ** CHANGE here if Lua has problems choosing the appropriate
 ** dynamic-library system for your platform (either Windows' DLL, Mac's

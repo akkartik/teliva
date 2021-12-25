@@ -1,6 +1,35 @@
 #ifndef __TELIVA_H__
 #define __TELIVA_H__
 
+/* Each category of primitives below shows a few options from high to low
+ * levels of abstraction.
+ * (Lower levels aren't complete or well-designed, just what code outside
+ * teliva.c needs.) */
+
+/* Integrate with Lua VM */
+extern char** Argv;
+extern int handle_image(lua_State* L, char** argv, int n);
+
+extern int load_editor_buffer_to_current_definition_in_image(lua_State* L);
+extern void save_to_current_definition_and_editor_buffer(lua_State* L, const char* definition);
+extern void save_editor_state(int rowoff, int coloff, int cy, int cx);
+
+/* Standard UI elements */
+extern void render_trusted_teliva_data(lua_State* L);
+
+extern void draw_menu_item(const char* key, const char* name);
+
+extern void draw_string_on_menu(const char* s);
+
+extern int menu_column;
+
+/* Error reporting */
+
+extern const char* Previous_error;
+extern int report_in_developer_mode(lua_State* L, int status);
+
+extern void render_previous_error(void);
+
 // Some names for hotkeys beyond those provided by ncurses.
 
 enum KEY_ACTION {

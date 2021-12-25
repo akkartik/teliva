@@ -184,3 +184,18 @@ void save_tlv(lua_State* L, char* filename) {
   rename(outfilename, filename);
   lua_pop(L, 1);
 }
+
+static const char* special_history_keys[] = {
+  "__teliva_timestamp",
+  "__teliva_undo",
+  "__teliva_note",
+  NULL,
+};
+
+int is_special_history_key(const char* key) {
+  for (const char** curr = special_history_keys; *curr != NULL; ++curr) {
+    if (strcmp(*curr, key) == 0)
+      return 1;
+  }
+  return 0;
+}

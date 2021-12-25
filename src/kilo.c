@@ -656,15 +656,11 @@ writeerr:
 
 /* ============================= Terminal update ============================ */
 
-extern char *Previous_error;
-extern void draw_menu_item(const char* key, const char* name);
-
 static void editorMenu(void) {
     attrset(A_REVERSE);
     for (int x = 0; x < COLS; ++x)
       mvaddch(LINES-1, x, ' ');
     attrset(A_NORMAL);
-    extern int menu_column;
     menu_column = 2;
     draw_menu_item("^e", "run");
     if (Previous_error != NULL) {
@@ -695,13 +691,11 @@ static void editorMenu(void) {
     attrset(A_NORMAL);
 }
 
-extern void draw_string_on_menu (const char* s);
 static void editorFindMenu(void) {
     attrset(A_REVERSE);
     for (int x = 0; x < COLS; ++x)
       mvaddch(LINES-1, x, ' ');
     attrset(A_NORMAL);
-    extern int menu_column;
     menu_column = 2;
     draw_menu_item("^x", "cancel");
     draw_menu_item("Enter", "submit");
@@ -727,7 +721,6 @@ static void editorGoMenu(void) {
     for (int x = 0; x < COLS; ++x)
       mvaddch(LINES-1, x, ' ');
     attrset(A_NORMAL);
-    extern int menu_column;
     menu_column = 2;
     draw_menu_item("^x", "cancel");
     draw_menu_item("Enter", "submit");
@@ -736,7 +729,6 @@ static void editorGoMenu(void) {
     attrset(A_NORMAL);
 }
 
-extern int render_previous_error();
 static void editorRefreshScreen(void (*menu_func)(void)) {
     int y;
     erow *r;
@@ -1031,8 +1023,6 @@ void word_at_cursor(char* out, int capacity) {
 }
 
 /* Jump to some definition. */
-extern void save_to_current_definition_and_editor_buffer(lua_State *L, char *name);
-extern void load_editor_buffer_to_current_definition_in_image(lua_State *L);
 extern char Current_definition[];
 #define CURRENT_DEFINITION_LEN 256
 static void editorGo(lua_State* L) {
@@ -1078,7 +1068,6 @@ static void editorGo(lua_State* L) {
  * is typing stuff on the terminal. */
 static int Quit = 0;
 static int Back_to_big_picture = 0;
-extern void save_editor_state(int rowoff, int coloff, int cy, int cx);
 static void editorProcessKeypress(lua_State* L) {
     int c = getch();
 //?     mvprintw(LINES-3, 60, "key: %d\n", c);

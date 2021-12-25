@@ -9,13 +9,33 @@ doesn't invoke any OS syscalls.
 
 Things to secure:
 * files opened (for read/write) on file system
-* what gets written to files on file system
+
 * destinations opened (for read/write) on network
   * `inet_tryconnect` // `socket_connect`
   * `inet_tryaccept` // `socket_accept`
-* what gets written to network
-  * `socket_send`, `socket_sendto`
-  * `socket_recv`, `socket_recvfrom`
+
+It seems more difficult to control what is written to a file or socket once
+it's opened. For starters let's just focus on the interfaces that convert a
+string path or url to a file descriptor.
+
+Scenarios:
+  * (1) app reads system files
+  * (1) app sends data to a remote server
+  * (2) app can read from a remote server but not write (POST)
+  * app gains access to a remote server for a legitimate purpose, reads
+    sensitive data from the local system file for legitimate purpose. Now
+    there's nothing preventing it from exfiltrating the sensitive data to the
+    remote server.
+    - (2) solution: make it obvious in the UI that granting both permissions
+      allows an app to do anything. Educate people to separate apps that read
+      sensitive data from apps that access remote servers.
+    - (2) solution: map phases within an app to distinct permission sets
+  * (3) app wants access to system() or exec()
+
+Difficulty levels
+  1. I have some sense of how to enforce this.
+  2. Seems vaguely doable.
+  3. Seems unlikely to be doable.
 
 ## Bottom up
 

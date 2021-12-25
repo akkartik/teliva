@@ -191,6 +191,10 @@ with the Teliva experience. If you find Teliva of use, please [introduce yoursel
 to me so that I am aware of your use cases. Anybody who is interested can gain
 a say in its future direction.
 
+## What's with the name?
+
+Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
+
 ## Known issues
 
 * Colors are currently hardcoded. You get a light background even if your
@@ -206,10 +210,6 @@ a say in its future direction.
   the backspace key &ldquo;delete&rdquo;; it should behave like backspace. As
   a consequence the menu sometimes mentions keys that don't work, just to
   encourage people to try options.)
-
-## What's with the name?
-
-Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
 
 ## Feedback
 

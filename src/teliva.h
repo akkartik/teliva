@@ -64,6 +64,9 @@ enum color {
   COLOR_SELECTABLE_BACKGROUND = 250,
   COLOR_ERROR_FOREGROUND = COLOR_BACKGROUND,
   COLOR_ERROR_BACKGROUND = 124,               /* deep red */
+  COLOR_WARN = 172,                           /* orange */
+  COLOR_SAFE = 28,                            /* green */
+  COLOR_RISK = 196,                           /* red */
   COLOR_LUA_COMMENT = 27,                     /* blue */
   COLOR_LUA_KEYWORD = 172,                    /* orange */
   COLOR_LUA_CONSTANT = 31,                    /* cyan */
@@ -81,6 +84,9 @@ enum color {
   COLOR_SELECTABLE_BACKGROUND = 250,
   COLOR_ERROR_FOREGROUND = COLOR_FOREGROUND,
   COLOR_ERROR_BACKGROUND = 124,               /* deep red */
+  COLOR_WARN = 172,                           /* orange */
+  COLOR_SAFE = 46,                            /* green */
+  COLOR_RISK = 196,                           /* red */
   COLOR_LUA_COMMENT = 39,                     /* blue */
   COLOR_LUA_KEYWORD = 172,                    /* orange */
   COLOR_LUA_CONSTANT = 37,                    /* cyan */
@@ -98,6 +104,9 @@ enum color {
   COLOR_SELECTABLE_BACKGROUND = 31,
   COLOR_ERROR_FOREGROUND = 250,
   COLOR_ERROR_BACKGROUND = 124,               /* deep red */
+  COLOR_WARN = 130,                           /* orange */
+  COLOR_SAFE = 28,                            /* green */
+  COLOR_RISK = 196,                           /* red */
   COLOR_LUA_COMMENT = 45,                     /* light blue */
   COLOR_LUA_KEYWORD = 172,                    /* orange */
   COLOR_LUA_CONSTANT = 37,                    /* cyan */
@@ -115,6 +124,9 @@ enum color_pair {
   COLOR_PAIR_LUA_KEYWORD = 5,
   COLOR_PAIR_LUA_CONSTANT = 6,
   COLOR_PAIR_MATCH = 7,
+  COLOR_PAIR_SAFE = 251,  /* reserved for teliva; apps shouldn't use it */
+  COLOR_PAIR_WARN = 252,  /* reserved for teliva; apps shouldn't use it */
+  COLOR_PAIR_RISK = 253,  /* reserved for teliva; apps shouldn't use it */
   COLOR_PAIR_MENU = 254,  /* reserved for teliva; apps shouldn't use it */
   COLOR_PAIR_ERROR = 255,  /* reserved for teliva; apps shouldn't use it */
 };

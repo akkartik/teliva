@@ -53,14 +53,31 @@ static void draw_menu(lua_State* L) {
       lua_pop(L, 3);
     }
   }
-
   lua_pop(L, 1);
+
+  /* render app permissions on the right */
+  attrset(A_NORMAL);
+  mvaddstr(LINES-1, COLS-12, "");
+  attron(COLOR_PAIR(COLOR_PAIR_RISK));
+  addstr("file ");
+  attron(A_REVERSE);
+  addstr(" ");
+  attroff(COLOR_PAIR(COLOR_PAIR_RISK));
+  attron(COLOR_PAIR(COLOR_PAIR_RISK));
+  addstr(" ");
+  attroff(A_REVERSE);
+  addstr(" net");
+  attroff(COLOR_PAIR(COLOR_PAIR_RISK));
+
   attrset(A_NORMAL);
 }
 
 void render_trusted_teliva_data(lua_State* L) {
   init_pair(COLOR_PAIR_ERROR, COLOR_ERROR_FOREGROUND, COLOR_ERROR_BACKGROUND);
   init_pair(COLOR_PAIR_MENU, COLOR_FOREGROUND, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_SAFE, COLOR_SAFE, COLOR_FOREGROUND);
+  init_pair(COLOR_PAIR_WARN, COLOR_WARN, COLOR_FOREGROUND);
+  init_pair(COLOR_PAIR_RISK, COLOR_RISK, COLOR_FOREGROUND);
   draw_menu(L);
 }
 

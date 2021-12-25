@@ -99,8 +99,8 @@ any such apps.)
 ## Isn't this just an IDE?
 
 There's one big difference: these apps are not intended to be runnable outside
-of the Teliva environment. Editing the sources will always be a core feature
-that's front and center in the UI.
+of the Teliva environment. Editing the sources and visualizing permissions
+granted will always be core features that are front and center in the UI.
 
 A second, more subtle difference: it's primarily an environment for _running_
 apps, and only secondarily for editing them. Starting up the environment puts

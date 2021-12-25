@@ -50,7 +50,7 @@ static void teliva_load_multiline_string(lua_State* L, FILE* in, char* line, int
 }
 
 /* leave a single table on stack containing the next top-level definition from the file */
-static void teliva_load_definition(lua_State* L, FILE* in) {
+void teliva_load_definition(lua_State* L, FILE* in) {
   lua_newtable(L);
   int def_idx = lua_gettop(L);
   char line[1024] = {'\0'};

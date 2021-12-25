@@ -427,11 +427,12 @@ void save_editor_state (int rowoff, int coloff, int cy, int cx) {
   }
   FILE *out = fdopen(outfd, "w");
   assert(out != NULL);
-  fprintf(out, "__teliva_editor_state = {\n");
-  fprintf(out, "  image = \"%s\", definition = \"%s\",\n", Image_name, Current_definition);
-  fprintf(out, "  rowoff = %d, coloff = %d,\n", rowoff, coloff);
-  fprintf(out, "  cy = %d, cx = %d,\n", cy, cx);
-  fprintf(out, "}\n");
+  fprintf(out, "- image: %s\n", Image_name);
+  fprintf(out, "  definition: %s\n", Current_definition);
+  fprintf(out, "  rowoff: %d\n", rowoff);
+  fprintf(out, "  coloff: %d\n", coloff);
+  fprintf(out, "  cy: %d\n", cy);
+  fprintf(out, "  cx: %d\n", cx);
   fclose(out);
   rename(outfilename, "teliva_editor_state");
 }
@@ -1072,19 +1073,21 @@ restart:
 
 /* return true if:
  *  - editor_state exists, and
- *  - editor_state is applicable to the current image */
+ *  - editor_state is applicable to the current image
+ * Implicitly loads current editor state. */
+void teliva_load_definition (lua_State *L, FILE *in);
 int editor_view_in_progress (lua_State *L) {
-  int status;
-  status = luaL_loadfile(L, "teliva_editor_state");
-  if (status != 0) return 0;
-  status = docall(L, 0, 0);
-  if (status != 0) return 0;
-  lua_getglobal(L, "__teliva_editor_state");
-  int editor_state_index = lua_gettop(L);
-  lua_getfield(L, editor_state_index, "image");
-  const char *image_name = lua_tostring(L, -1);
-  const int result = (strcmp(image_name, Image_name) == 0);
-  lua_settop(L, editor_state_index);
+  FILE *in = fopen("teliva_editor_state", "r");
+  if (in == NULL) return 0;
+  int oldtop = lua_gettop(L);
+  teliva_load_definition(L, in);
+  int t = lua_gettop(L);
+  lua_getfield(L, t, "image");
+  const char *image_name  = lua_tostring(L, -1);
+  int result = (strcmp(image_name, Image_name) == 0);
+  lua_pop(L, 1);  /* image value */
+  lua_setglobal(L, "__teliva_editor_state");
+  assert(lua_gettop(L) == oldtop);
   return result;
 }
 

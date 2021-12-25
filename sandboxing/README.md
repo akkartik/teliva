@@ -9,6 +9,8 @@ doesn't invoke any OS syscalls.
 
 Things to secure:
 * files opened (for read/write) on file system
+  * `io_open`
+  * `io_lines`
 
 * destinations opened (for read/write) on network
   * `inet_tryconnect` // `socket_connect`

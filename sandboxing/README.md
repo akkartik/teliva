@@ -21,6 +21,9 @@ string path or url to a file descriptor.
 Scenarios:
   * (1) app reads system files
   * (1) app sends data to a remote server
+  * (1) app should _never_ be allowed to open Teliva's system files:
+      - `teliva_editor_state`
+      - app-specific sandboxing policies
   * (2) app can read from a remote server but not write (POST)
   * app gains access to a remote server for a legitimate purpose, reads
     sensitive data from the local system file for legitimate purpose. Now
@@ -36,6 +39,11 @@ Difficulty levels
   1. I have some sense of how to enforce this.
   2. Seems vaguely doable.
   3. Seems unlikely to be doable.
+
+UX:
+  * easily visualize how secure a configuration is.
+    - maybe show a lock in halves; left half = file system, right half =
+      network. One half unlocked = orange. Both unlocked = red.
 
 ## Bottom up
 

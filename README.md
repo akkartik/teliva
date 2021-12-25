@@ -126,8 +126,11 @@ behave unexpectedly under Teliva.
   serializing/deserializing to JSON (module `json`).
 
 The modules mentioned above are always available, just like standard Lua 5.1
-libraries. They're available in their entirety with one exception:
+libraries. However, a few things are different from conventional Lua:
 
+* Some functions are disabled because I don't know how to sandbox them
+  effectively:
+  - `os.execute`
 * Some functions in lcurses have [additional smarts](https://github.com/lcurses/lcurses/blob/master/lib/curses.lua).
   Teliva is [consistent with the underlying ncurses](https://github.com/akkartik/teliva/blob/main/src/lcurses/curses.lua).
 

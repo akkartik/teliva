@@ -35,12 +35,6 @@ static int os_pushresult (lua_State *L, int i, const char *filename) {
 }
 
 
-static int os_execute (lua_State *L) {
-  lua_pushinteger(L, system(luaL_optstring(L, 1, NULL)));
-  return 1;
-}
-
-
 static int os_remove (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
   return os_pushresult(L, remove(filename) == 0, filename);
@@ -221,7 +215,7 @@ static const luaL_Reg syslib[] = {
   {"clock",     os_clock},
   {"date",      os_date},
   {"difftime",  os_difftime},
-  {"execute",   os_execute},
+  /* no execute without sandboxing it */
   {"exit",      os_exit},
   {"getenv",    os_getenv},
   {"remove",    os_remove},

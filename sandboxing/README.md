@@ -44,6 +44,10 @@ Scenarios:
       allows an app to do anything. Educate people to separate apps that read
       sensitive data from apps that access remote servers.
     - (2) solution: map phases within an app to distinct permission sets
+  * app A legitimately needs to read sensitive data. It saves a copy to file
+    X. app B seems to legitimately needs to access the network, but also
+    asks to read file X. If the owner forgets who wrote file X and what it
+    contains, sensitive data could be exfiltrated.
   * (3) app wants access to system() or exec() or popen()
 
 Difficulty levels

@@ -129,7 +129,7 @@ them in Teliva and let people use regular Lua. Or other platforms!
 
 - Teliva initializes the ncurses library by default, so apps should assume
   they have access to a (color, UTF-8) text-mode window for printing text to,
-  and a keyboard for reading unbuffered keystrokes from.
+  and a keyboard for reading keystrokes from.
 
 - Teliva doesn't use files for source code, so the `require` keyword no longer
   makes sense. You get some libraries preloaded (see below). Beyond those,

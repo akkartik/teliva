@@ -315,11 +315,11 @@
     >function update(window)
     >  local key = curses.getch()
     >  local screen_rows, screen_cols = window:getmaxyx()
-    >  if key == 258 then  -- down arrow
+    >  if key == curses.KEY_DOWN then
     >    next_link()
-    >  elseif key == 259 then  -- up arrow
+    >  elseif key == curses.KEY_UP then
     >    previous_link()
-    >  elseif key == 260 then  -- left arrow
+    >  elseif key == curses.KEY_LEFT then
     >    if #state.history > 1 then
     >      table.remove(state.history)
     >      gemini_get(table.remove(state.history))

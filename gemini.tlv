@@ -469,16 +469,20 @@
     >    options = 'all',
     >  }
     >  local conn = socket.tcp()
-    >  conn:connect(parsed_url.host, parsed_url.port or 1965)
+    >  local conn2, err = conn:connect(parsed_url.host, parsed_url.port or 1965)
+    >  clear(state.lines)
+    >  state.highlight_index = 0  -- highlighted link not computed yet
+    >  if conn2 == nil then
+    >    table.insert(state.lines, err)
+    >    return
+    >  end
     >  conn, err = ssl.wrap(conn, params)
     >  if conn == nil then
-    >      io.write(err)
-    >      os.exit(1)
+    >    table.insert(state.lines, err)
+    >    return
     >  end
     >  conn:dohandshake()
     >  conn:send(url .. "\r\n")
-    >  clear(state.lines)
-    >  state.highlight_index = 0  -- highlighted link not computed yet
     >  local line, err = conn:receive()
     >  if line == nil then
     >    table.insert(state.lines, err)

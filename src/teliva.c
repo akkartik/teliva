@@ -125,7 +125,6 @@ void render_previous_error(void) {
 }
 
 extern char* strdup(const char* s);
-extern void developer_mode(lua_State* L);
 int report_in_developer_mode(lua_State* L, int status) {
   if (status && !lua_isnil(L, -1)) {
     Previous_error = strdup(lua_tostring(L, -1));  /* memory leak */

@@ -142,6 +142,8 @@ enum color_pair {
 extern char** Argv;
 extern int handle_image(lua_State* L, char** argv, int n);
 
+extern void developer_mode(lua_State* L);
+
 extern int load_editor_buffer_to_current_definition_in_image(lua_State* L);
 extern void save_to_current_definition_and_editor_buffer(lua_State* L, const char* definition);
 extern void save_editor_state(int rowoff, int coloff, int cy, int cx);

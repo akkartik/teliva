@@ -309,7 +309,6 @@ Refresh the window terminal display from the virtual screen.
 @see curses.doupdate
 @see noutrefresh
 */
-extern void render_trusted_teliva_data (lua_State *L);
 static int
 Wrefresh(lua_State *L)
 {
@@ -1302,7 +1301,6 @@ Read a character from the window input.
 @see curses.echo
 @see keypad
 */
-extern void developer_mode (lua_State *L, const char *status_message);
 static int
 Wgetch(lua_State *L)
 {
@@ -1322,7 +1320,7 @@ Wgetch(lua_State *L)
 		exit(0);
 	}
 	if (c == CTRL_E)
-		developer_mode(L, /*status message*/ "");
+		developer_mode(L);
 	/* handle other standard menu hotkeys here */
 
 	return pushintresult(c);

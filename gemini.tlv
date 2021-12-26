@@ -348,7 +348,7 @@
   init_colors:
     >function init_colors()
     >  for i=0,7 do
-    >    curses.init_pair(i, i, -1)
+    >    curses.init_pair(i, i, 8)
     >  end
     >  curses.init_pair(8, 7, 0)
     >  curses.init_pair(9, 7, 1)
@@ -357,7 +357,7 @@
     >  curses.init_pair(12, 7, 4)
     >  curses.init_pair(13, 7, 5)
     >  curses.init_pair(14, 7, 6)
-    >  curses.init_pair(15, -1, 15)
+    >  curses.init_pair(15, 8, 15)
     >end
 - __teliva_timestamp: original
   main:

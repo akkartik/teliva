@@ -151,6 +151,7 @@ enum color_pair {
 
 /* Integrate with Lua VM */
 extern char** Argv;
+extern char* Previous_message;
 extern int handle_image(lua_State* L, char** argv, int n);
 extern void developer_mode(lua_State* L);
 extern void permissions_mode(lua_State* L);

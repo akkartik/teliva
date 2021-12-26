@@ -14,9 +14,9 @@
 #define LUA_LIB
 
 #include "lua.h"
-
 #include "lauxlib.h"
 #include "lualib.h"
+#include "teliva.h"
 
 
 
@@ -128,11 +128,17 @@ static int io_tostring (lua_State *L) {
 }
 
 
+static char iolib_errbuf[1024] = {0};
 static int io_open (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
   const char *mode = luaL_optstring(L, 2, "r");
   FILE **pf = newfile(L);
-  *pf = fopen(filename, mode);
+  if (file_operations_allowed)
+    *pf = fopen(filename, mode);
+  else {
+    snprintf(iolib_errbuf, 1024, "app tried to open file '%s'; adjust its permissions (ctrl-p) if that is expected", filename);
+    Previous_message = iolib_errbuf;
+  }
   return (*pf == NULL) ? pushresult(L, 0, filename) : 1;
 }
 
@@ -164,7 +170,12 @@ static int f_lines (lua_State *L) {
 static int io_lines (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
   FILE **pf = newfile(L);
-  *pf = fopen(filename, "r");
+  if (file_operations_allowed)
+    *pf = fopen(filename, "r");
+  else {
+    snprintf(iolib_errbuf, 1024, "app tried to open file '%s'; adjust its permissions (ctrl-p) if that is expected", filename);
+    Previous_message = iolib_errbuf;
+  }
   if (*pf == NULL)
     fileerror(L, 1, filename);
   aux_lines(L, lua_gettop(L), 1);

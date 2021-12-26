@@ -32,6 +32,7 @@ void draw_menu_item(const char* key, const char* name) {
 }
 
 static void render_permissions(lua_State* L);
+char* Previous_message;
 static void draw_menu(lua_State* L) {
   attron(A_BOLD|A_REVERSE);
   color_set(COLOR_PAIR_MENU, NULL);
@@ -42,20 +43,28 @@ static void draw_menu(lua_State* L) {
   draw_menu_item("^e", "edit");
   draw_menu_item("^p", "perms");
 
-  /* render any app-specific items */
-  lua_getglobal(L, "menu");
-  int table = lua_gettop(L);
-  if (lua_istable(L, -1)) {
-    for (int i = 1; i <= luaL_getn(L, table); ++i) {
-      lua_rawgeti(L, table, i);
-      int menu_item = lua_gettop(L);
-      lua_rawgeti(L, menu_item, 1);  /* key */
-      lua_rawgeti(L, menu_item, 2);  /* value */
-      draw_menu_item(lua_tostring(L, -2), lua_tostring(L, -1));
-      lua_pop(L, 3);
+  /* if app ran successfully, render any app-specific items */
+  if (Previous_message == NULL) {
+    lua_getglobal(L, "menu");
+    int table = lua_gettop(L);
+    if (lua_istable(L, -1)) {
+      for (int i = 1; i <= luaL_getn(L, table); ++i) {
+        lua_rawgeti(L, table, i);
+        int menu_item = lua_gettop(L);
+        lua_rawgeti(L, menu_item, 1);  /* key */
+        lua_rawgeti(L, menu_item, 2);  /* value */
+        draw_menu_item(lua_tostring(L, -2), lua_tostring(L, -1));
+        lua_pop(L, 3);
+      }
     }
+    lua_pop(L, 1);
   }
-  lua_pop(L, 1);
+  else {
+    /* otherwise render the flash message */
+    attron(COLOR_PAIR(COLOR_PAIR_ERROR));
+    addstr(Previous_message);
+    attroff(COLOR_PAIR(COLOR_PAIR_ERROR));
+  }
 
   /* render app permissions on the right */
   render_permissions(L);

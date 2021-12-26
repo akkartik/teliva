@@ -1021,30 +1021,6 @@ static void clear_call_graph(lua_State* L) {
   assert(lua_gettop(L) == oldtop);
 }
 
-char* Image_name = NULL;
-extern void set_args (lua_State *L, char **argv, int n);
-extern void load_tlv(lua_State* L, char* filename);
-int handle_image(lua_State* L, char** argv, int n) {
-  int status;
-  set_args(L, argv, n);
-  /* parse and load file contents (teliva_program array) */
-  Image_name = argv[n];
-  load_tlv(L, Image_name);
-//?   save_tlv(L, Image_name);  // manual test; should always return identical result, modulo key order
-//?   exit(1);
-  status = load_definitions(L);
-  if (status != 0) return 0;
-  status = run_tests(L);
-  if (status != 0) return report_in_developer_mode(L, status);
-  /* clear callgraph stats from running tests */
-  clear_call_graph(L);
-  /* call main() */
-  lua_getglobal(L, "main");
-  status = docall(L, 0, 1);
-  if (status != 0) return report_in_developer_mode(L, status);
-  return 0;
-}
-
 int file_operations_allowed = false;
 int net_operations_allowed = false;
 
@@ -1157,4 +1133,28 @@ void permissions_mode(lua_State* L) {
   cleanup_curses();
   execv(Argv[0], Argv);
   /* never returns */
+}
+
+char* Image_name = NULL;
+extern void set_args (lua_State *L, char **argv, int n);
+extern void load_tlv(lua_State* L, char* filename);
+int handle_image(lua_State* L, char** argv, int n) {
+  int status;
+  set_args(L, argv, n);
+  /* parse and load file contents (teliva_program array) */
+  Image_name = argv[n];
+  load_tlv(L, Image_name);
+//?   save_tlv(L, Image_name);  // manual test; should always return identical result, modulo key order
+//?   exit(1);
+  status = load_definitions(L);
+  if (status != 0) return 0;
+  status = run_tests(L);
+  if (status != 0) return report_in_developer_mode(L, status);
+  /* clear callgraph stats from running tests */
+  clear_call_graph(L);
+  /* call main() */
+  lua_getglobal(L, "main");
+  status = docall(L, 0, 1);
+  if (status != 0) return report_in_developer_mode(L, status);
+  return 0;
 }

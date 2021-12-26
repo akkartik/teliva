@@ -65,7 +65,7 @@ enum color {
   COLOR_ERROR_FOREGROUND = COLOR_BACKGROUND,
   COLOR_ERROR_BACKGROUND = 124,               /* deep red */
   COLOR_WARN = 172,                           /* orange */
-  COLOR_SAFE = 28,                            /* green */
+  COLOR_SAFE = 46,                            /* green */
   COLOR_RISK = 196,                           /* red */
   COLOR_LUA_COMMENT = 27,                     /* blue */
   COLOR_LUA_KEYWORD = 172,                    /* orange */
@@ -85,7 +85,7 @@ enum color {
   COLOR_ERROR_FOREGROUND = COLOR_FOREGROUND,
   COLOR_ERROR_BACKGROUND = 124,               /* deep red */
   COLOR_WARN = 172,                           /* orange */
-  COLOR_SAFE = 46,                            /* green */
+  COLOR_SAFE = 28,                            /* green */
   COLOR_RISK = 196,                           /* red */
   COLOR_LUA_COMMENT = 39,                     /* blue */
   COLOR_LUA_KEYWORD = 172,                    /* orange */

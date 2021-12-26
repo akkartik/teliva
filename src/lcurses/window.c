@@ -1321,6 +1321,8 @@ Wgetch(lua_State *L)
 	}
 	if (c == CTRL_E)
 		developer_mode(L);
+	if (c == CTRL_P)
+		permissions_mode(L);
 	/* handle other standard menu hotkeys here */
 
 	return pushintresult(c);

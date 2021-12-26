@@ -20,6 +20,8 @@ enum KEY_ACTION {
   ENTER = 10,
   CTRL_K = 11,
   CTRL_L = 12,
+  CTRL_N = 14,
+  CTRL_P = 16,
   CTRL_Q = 17,
   CTRL_R = 18,
   CTRL_S = 19,
@@ -52,7 +54,7 @@ enum KEY_ACTION {
  * for a map of available colors. */
 
 /* Toggle between a few color schemes */
-#define COLOR_SCHEME 0
+#define COLOR_SCHEME 2
 #if COLOR_SCHEME == 0
 /* Light color scheme. */
 enum color {
@@ -64,9 +66,12 @@ enum color {
   COLOR_SELECTABLE_BACKGROUND = 250,
   COLOR_ERROR_FOREGROUND = COLOR_BACKGROUND,
   COLOR_ERROR_BACKGROUND = 124,               /* deep red */
-  COLOR_WARN = 172,                           /* orange */
-  COLOR_SAFE = 46,                            /* green */
-  COLOR_RISK = 196,                           /* red */
+  COLOR_SAFE_NORMAL = 28,                     /* green */
+  COLOR_SAFE_REVERSE = 46,                    /* green */
+  COLOR_WARN_NORMAL = 130,                    /* orange */
+  COLOR_WARN_REVERSE = 172,                   /* orange */
+  COLOR_RISK_NORMAL = 196,                    /* red */
+  COLOR_RISK_REVERSE = 196,                   /* red */
   COLOR_LUA_COMMENT = 27,                     /* blue */
   COLOR_LUA_KEYWORD = 172,                    /* orange */
   COLOR_LUA_CONSTANT = 31,                    /* cyan */
@@ -84,9 +89,12 @@ enum color {
   COLOR_SELECTABLE_BACKGROUND = 250,
   COLOR_ERROR_FOREGROUND = COLOR_FOREGROUND,
   COLOR_ERROR_BACKGROUND = 124,               /* deep red */
-  COLOR_WARN = 172,                           /* orange */
-  COLOR_SAFE = 28,                            /* green */
-  COLOR_RISK = 196,                           /* red */
+  COLOR_SAFE_NORMAL = 46,                     /* green */
+  COLOR_SAFE_REVERSE = 28,                    /* green */
+  COLOR_WARN_NORMAL = 172,                    /* orange */
+  COLOR_WARN_REVERSE = 130,                   /* orange */
+  COLOR_RISK_NORMAL = 196,                    /* red */
+  COLOR_RISK_REVERSE = 196,                   /* red */
   COLOR_LUA_COMMENT = 39,                     /* blue */
   COLOR_LUA_KEYWORD = 172,                    /* orange */
   COLOR_LUA_CONSTANT = 37,                    /* cyan */
@@ -104,9 +112,12 @@ enum color {
   COLOR_SELECTABLE_BACKGROUND = 31,
   COLOR_ERROR_FOREGROUND = 250,
   COLOR_ERROR_BACKGROUND = 124,               /* deep red */
-  COLOR_WARN = 130,                           /* orange */
-  COLOR_SAFE = 28,                            /* green */
-  COLOR_RISK = 196,                           /* red */
+  COLOR_SAFE_NORMAL = 46,                     /* green */
+  COLOR_SAFE_REVERSE = 28,                    /* green */
+  COLOR_WARN_NORMAL = 172,                    /* orange */
+  COLOR_WARN_REVERSE = 130,                   /* orange */
+  COLOR_RISK_NORMAL = 201,                    /* red */
+  COLOR_RISK_REVERSE = 196,                   /* red */
   COLOR_LUA_COMMENT = 45,                     /* light blue */
   COLOR_LUA_KEYWORD = 172,                    /* orange */
   COLOR_LUA_CONSTANT = 37,                    /* cyan */
@@ -141,8 +152,10 @@ enum color_pair {
 /* Integrate with Lua VM */
 extern char** Argv;
 extern int handle_image(lua_State* L, char** argv, int n);
-
 extern void developer_mode(lua_State* L);
+extern void permissions_mode(lua_State* L);
+extern int file_operations_allowed;
+extern int net_operations_allowed;
 
 extern int load_editor_buffer_to_current_definition_in_image(lua_State* L);
 extern void save_to_current_definition_and_editor_buffer(lua_State* L, const char* definition);

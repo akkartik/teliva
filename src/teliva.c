@@ -66,24 +66,31 @@ static void draw_menu(lua_State* L) {
 static void render_permissions(lua_State* L) {
   attrset(A_NORMAL);
   mvaddstr(LINES-1, COLS-12, "");
-  attron(COLOR_PAIR(COLOR_PAIR_RISK));
+  int file_colors = file_operations_allowed ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
+  int net_colors = net_operations_allowed ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
+  if (file_operations_allowed && net_operations_allowed) {
+    file_colors = net_colors = COLOR_PAIR_RISK;
+  }
+
+  attron(COLOR_PAIR(file_colors));
   addstr("file ");
   attron(A_REVERSE);
   addstr(" ");
-  attroff(COLOR_PAIR(COLOR_PAIR_RISK));
-  attron(COLOR_PAIR(COLOR_PAIR_RISK));
+  attroff(COLOR_PAIR(file_colors));
+
+  attron(COLOR_PAIR(net_colors));
   addstr(" ");
   attroff(A_REVERSE);
   addstr(" net");
-  attroff(COLOR_PAIR(COLOR_PAIR_RISK));
+  attroff(COLOR_PAIR(net_colors));
 }
 
 void render_trusted_teliva_data(lua_State* L) {
   init_pair(COLOR_PAIR_ERROR, COLOR_ERROR_FOREGROUND, COLOR_ERROR_BACKGROUND);
   init_pair(COLOR_PAIR_MENU, COLOR_FOREGROUND, COLOR_BACKGROUND);
-  init_pair(COLOR_PAIR_SAFE, COLOR_SAFE, COLOR_FOREGROUND);
-  init_pair(COLOR_PAIR_WARN, COLOR_WARN, COLOR_FOREGROUND);
-  init_pair(COLOR_PAIR_RISK, COLOR_RISK, COLOR_FOREGROUND);
+  init_pair(COLOR_PAIR_SAFE, COLOR_SAFE_REVERSE, COLOR_FOREGROUND);
+  init_pair(COLOR_PAIR_WARN, COLOR_WARN_REVERSE, COLOR_FOREGROUND);
+  init_pair(COLOR_PAIR_RISK, COLOR_RISK_REVERSE, COLOR_FOREGROUND);
   draw_menu(L);
 }
 
@@ -1005,7 +1012,6 @@ static void clear_call_graph(lua_State* L) {
   assert(lua_gettop(L) == oldtop);
 }
 
-
 char* Image_name = NULL;
 extern void set_args (lua_State *L, char **argv, int n);
 extern void load_tlv(lua_State* L, char* filename);
@@ -1028,4 +1034,118 @@ int handle_image(lua_State* L, char** argv, int n) {
   status = docall(L, 0, 1);
   if (status != 0) return report_in_developer_mode(L, status);
   return 0;
+}
+
+int file_operations_allowed = false;
+int net_operations_allowed = false;
+
+static void permissions_menu() {
+  attrset(A_REVERSE);
+  for (int x = 0; x < COLS; ++x)
+    mvaddch(LINES-1, x, ' ');
+  attrset(A_NORMAL);
+  menu_column = 2;
+  draw_menu_item("^x", "go back");
+  draw_menu_item("^f", "toggle file permissions");
+  draw_menu_item("^n", "toggle network permissions");
+  attrset(A_NORMAL);
+}
+
+static void render_permissions_screen(lua_State* L) {
+  clear();
+  attrset(A_BOLD);
+  mvaddstr(1, 0, "Permissions");
+  attrset(A_NORMAL);
+  int file_colors = file_operations_allowed ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
+  int net_colors = net_operations_allowed ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
+  if (file_operations_allowed && net_operations_allowed) {
+    file_colors = net_colors = COLOR_PAIR_RISK;
+  }
+
+  attron(COLOR_PAIR(file_colors));
+  mvaddstr(3, 5, "File operations");
+  attron(A_REVERSE);
+  switch (file_colors) {
+    case COLOR_PAIR_SAFE:
+      mvaddstr(3, 30, " forbidden (safe)              ");
+      break;
+    case COLOR_PAIR_WARN:
+      mvaddstr(3, 30, " allowed (more risky)          ");
+      break;
+    case COLOR_PAIR_RISK:
+      mvaddstr(3, 30, "                               ");
+      break;
+    default:
+      abort();
+  }
+  attroff(A_REVERSE);
+  attroff(COLOR_PAIR(file_colors));
+
+  attron(COLOR_PAIR(net_colors));
+  mvaddstr(5, 5, "Network operations");
+  attron(A_REVERSE);
+  switch (net_colors) {
+    case COLOR_PAIR_SAFE:
+      mvaddstr(5, 30, " forbidden (safe)              ");
+      break;
+    case COLOR_PAIR_WARN:
+      mvaddstr(5, 30, " allowed (more risky)          ");
+      break;
+    case COLOR_PAIR_RISK:
+      mvaddstr(5, 30, "                               ");
+      break;
+    default:
+      abort();
+  }
+  attroff(A_REVERSE);
+  attroff(COLOR_PAIR(net_colors));
+
+  if (file_operations_allowed && net_operations_allowed) {
+    attron(COLOR_PAIR(COLOR_PAIR_RISK));
+    mvaddstr(8, 5, "When both file and network operations are permitted, Teliva can't tell if this app does something sketchy.");
+    mvaddstr(9, 5, "You're relying either on your understanding of its code, or your trust of its author(s).");
+    attroff(COLOR_PAIR(COLOR_PAIR_RISK));
+  }
+  permissions_menu();
+  refresh();
+}
+
+static void permissions_view(lua_State* L) {
+  while (true) {
+    render_permissions_screen(L);
+    int c = getch();
+    switch (c) {
+      case CTRL_X:
+        return;
+      case CTRL_F:
+        file_operations_allowed = !file_operations_allowed;
+        break;
+      case CTRL_N:
+        net_operations_allowed = !net_operations_allowed;
+        break;
+    }
+  }
+}
+
+void permissions_mode(lua_State* L) {
+  assume_default_colors(COLOR_FOREGROUND, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_NORMAL, COLOR_FOREGROUND, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_SELECTABLE, COLOR_SELECTABLE_FOREGROUND, COLOR_SELECTABLE_BACKGROUND);
+  init_pair(COLOR_PAIR_FADE, COLOR_FADE, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_MENU_ALTERNATE, COLOR_MENU_ALTERNATE, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_LUA_COMMENT, COLOR_LUA_COMMENT, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_LUA_KEYWORD, COLOR_LUA_KEYWORD, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_LUA_CONSTANT, COLOR_LUA_CONSTANT, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_MATCH, COLOR_MATCH_FOREGROUND, COLOR_MATCH_BACKGROUND);
+  init_pair(COLOR_PAIR_ERROR, COLOR_ERROR_FOREGROUND, COLOR_ERROR_BACKGROUND);
+  /* permissions colors slightly different than in the menu */
+  init_pair(COLOR_PAIR_SAFE, COLOR_SAFE_NORMAL, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_WARN, COLOR_WARN_NORMAL, COLOR_BACKGROUND);
+  init_pair(COLOR_PAIR_RISK, COLOR_RISK_NORMAL, COLOR_BACKGROUND);
+  nodelay(stdscr, 0);  /* always make getch() block in developer mode */
+  curs_set(1);  /* always display cursor in developer mode */
+  permissions_view(L);
+  cleanup_curses();
+  execv(Argv[0], Argv);
+  /* never returns */
 }

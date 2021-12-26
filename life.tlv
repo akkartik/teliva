@@ -174,9 +174,8 @@
 - __teliva_timestamp: original
   load_file:
     >function load_file(window, filename)
-    >  io.input(filename)
     >  local line_index = lines
-    >  for line in io.lines() do
+    >  for line in io.lines(filename) do
     >    if line:sub(1,1) ~= '!' then  -- comment; plaintext files can't have whitespace before comments
     >      local col_index = cols
     >      for c in line:gmatch(".") do

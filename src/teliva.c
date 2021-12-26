@@ -31,6 +31,7 @@ void draw_menu_item(const char* key, const char* name) {
   draw_string_on_menu(name);
 }
 
+static void render_permissions(lua_State* L);
 static void draw_menu(lua_State* L) {
   attron(A_BOLD|A_REVERSE);
   color_set(COLOR_PAIR_MENU, NULL);
@@ -39,6 +40,7 @@ static void draw_menu(lua_State* L) {
   menu_column = 2;
   draw_menu_item("^x", "exit");
   draw_menu_item("^e", "edit");
+  draw_menu_item("^p", "perms");
 
   /* render any app-specific items */
   lua_getglobal(L, "menu");
@@ -56,6 +58,12 @@ static void draw_menu(lua_State* L) {
   lua_pop(L, 1);
 
   /* render app permissions on the right */
+  render_permissions(L);
+
+  attrset(A_NORMAL);
+}
+
+static void render_permissions(lua_State* L) {
   attrset(A_NORMAL);
   mvaddstr(LINES-1, COLS-12, "");
   attron(COLOR_PAIR(COLOR_PAIR_RISK));
@@ -68,8 +76,6 @@ static void draw_menu(lua_State* L) {
   attroff(A_REVERSE);
   addstr(" net");
   attroff(COLOR_PAIR(COLOR_PAIR_RISK));
-
-  attrset(A_NORMAL);
 }
 
 void render_trusted_teliva_data(lua_State* L) {

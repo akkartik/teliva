@@ -7,6 +7,7 @@
 * the I/O call fail in the first place.
 \*=========================================================================*/
 #include "luasocket.h"
+#include "../teliva.h"
 
 #include "socket.h"
 #include "pierror.h"
@@ -91,7 +92,7 @@ int socket_close(void) {
 }
 
 /*-------------------------------------------------------------------------*\
-* Close and inutilize socket
+* Close and initialize socket
 \*-------------------------------------------------------------------------*/
 void socket_destroy(p_socket ps) {
     if (*ps != SOCKET_INVALID) {
@@ -131,6 +132,10 @@ int socket_create(p_socket ps, int domain, int type, int protocol) {
 \*-------------------------------------------------------------------------*/
 int socket_bind(p_socket ps, SA *addr, socklen_t len) {
     int err = IO_DONE;
+    if (!net_operations_allowed) {
+      Previous_message = "app tried to start a server; adjust its permissions (ctrl-p) if that is expected";
+      return IO_CLOSED;
+    }
     socket_setblocking(ps);
     if (bind(*ps, addr, len) < 0) err = errno;
     socket_setnonblocking(ps);
@@ -160,6 +165,10 @@ int socket_connect(p_socket ps, SA *addr, socklen_t len, p_timeout tm) {
     int err;
     /* avoid calling on closed sockets */
     if (*ps == SOCKET_INVALID) return IO_CLOSED;
+    if (!net_operations_allowed) {
+      Previous_message = "app tried to connect to a remote server; adjust its permissions (ctrl-p) if that is expected";
+      return IO_CLOSED;
+    }
     /* call connect until done or failed without being interrupted */
     do if (connect(*ps, addr, len) == 0) return IO_DONE;
     while ((err = errno) == EINTR);

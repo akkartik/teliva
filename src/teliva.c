@@ -1112,6 +1112,89 @@ static void permissions_view(lua_State* L) {
   }
 }
 
+static const char* user_configuration_filename() {
+  const char* home = getenv("HOME");
+  if (home == NULL) {
+    endwin();
+    fprintf(stderr, "$HOME is not set; unclear where to save permissions.\n");
+    abort();
+  }
+  static char config_filename[1024] = {0};
+  memset(config_filename, '\0', 1024);
+  const char* config_home = getenv("XDG_CONFIG_HOME");
+  if (config_home == NULL)
+    snprintf(config_filename, 1024, "%s/.teliva", home);
+  else
+    snprintf(config_filename, 1024, "%s/.teliva", config_home);
+  return config_filename;
+}
+
+static void save_permissions_to_user_configuration(lua_State* L) {
+  const char* rcfilename = user_configuration_filename();
+  FILE* in = fopen(rcfilename, "r");  /* can be NULL when rcfile doesn't exist */
+  char outfilename[] = "telivarc_XXXXXX";
+  int outfd = mkstemp(outfilename);
+  if (outfd == -1) {
+    endwin();
+    perror("error in creating temporary file");
+    abort();
+  }
+  FILE* out = fdopen(outfd, "w");
+  assert(out != NULL);
+  /* read entries from rcfilename and write them to outfilename. If image name
+   * matches the current Image_name, ignore. */
+  int oldtop = lua_gettop(L);
+  while (in && !feof(in)) {
+    teliva_load_definition(L, in);
+    if (lua_isnil(L, -1)) break;
+    lua_getfield(L, -1, "image_name");
+    const char* image_name = lua_tostring(L, -1);
+    if (strcmp(image_name, Image_name) != 0) {
+      fprintf(out, "- image_name: %s\n", image_name);
+      lua_getfield(L, -2, "file_operations_allowed");
+      fprintf(out, "  file_operations_allowed: %s\n", lua_tostring(L, -1));
+      lua_pop(L, 1);  /* file_operations_allowed */
+      lua_getfield(L, -2, "net_operations_allowed");
+      fprintf(out, "  net_operations_allowed: %s\n", lua_tostring(L, -1));
+      lua_pop(L, 1);  /* net_operations_allowed */
+    }
+    lua_pop(L, 1);  /* image_name */
+  }
+  lua_settop(L, oldtop);
+  fprintf(out, "- image_name: %s\n", Image_name);
+  fprintf(out, "  file_operations_allowed: %d\n", file_operations_allowed);
+  fprintf(out, "  net_operations_allowed: %d\n", net_operations_allowed);
+  fclose(out);
+  if (in) fclose(in);
+  rename(outfilename, rcfilename);
+}
+
+static void load_permissions_from_user_configuration(lua_State* L) {
+  const char* rcfilename = user_configuration_filename();
+  FILE* in = fopen(rcfilename, "r");
+  if (in == NULL) return;
+  /* read entries from rcfilename and look for a match with the current
+   * Image_name. */
+  int oldtop = lua_gettop(L);
+  while (!feof(in)) {
+    teliva_load_definition(L, in);
+    if (lua_isnil(L, -1)) break;
+    lua_getfield(L, -1, "image_name");
+    const char* image_name = lua_tostring(L, -1);
+    if (strcmp(image_name, Image_name) == 0) {
+      lua_getfield(L, -2, "file_operations_allowed");
+      file_operations_allowed = lua_tointeger(L, -1);
+      lua_pop(L, 1);  /* file_operations_allowed */
+      lua_getfield(L, -2, "net_operations_allowed");
+      net_operations_allowed = lua_tointeger(L, -1);
+      lua_pop(L, 1);  /* net_operations_allowed */
+    }
+    lua_pop(L, 1);  /* image_name */
+  }
+  lua_settop(L, oldtop);
+  fclose(in);
+}
+
 void permissions_mode(lua_State* L) {
   assume_default_colors(COLOR_FOREGROUND, COLOR_BACKGROUND);
   init_pair(COLOR_PAIR_NORMAL, COLOR_FOREGROUND, COLOR_BACKGROUND);
@@ -1130,6 +1213,7 @@ void permissions_mode(lua_State* L) {
   nodelay(stdscr, 0);  /* always make getch() block in developer mode */
   curs_set(1);  /* always display cursor in developer mode */
   permissions_view(L);
+  save_permissions_to_user_configuration(L);
   cleanup_curses();
   execv(Argv[0], Argv);
   /* never returns */
@@ -1152,6 +1236,8 @@ int handle_image(lua_State* L, char** argv, int n) {
   if (status != 0) return report_in_developer_mode(L, status);
   /* clear callgraph stats from running tests */
   clear_call_graph(L);
+  /* initialize permissions */
+  load_permissions_from_user_configuration(L);
   /* call main() */
   lua_getglobal(L, "main");
   status = docall(L, 0, 1);

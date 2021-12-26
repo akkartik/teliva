@@ -62,7 +62,9 @@ static void draw_menu(lua_State* L) {
   else {
     /* otherwise render the flash message */
     attron(COLOR_PAIR(COLOR_PAIR_ERROR));
+    addstr(" ");
     addstr(Previous_message);
+    addstr(" ");
     attroff(COLOR_PAIR(COLOR_PAIR_ERROR));
   }
 

@@ -54,7 +54,7 @@ enum KEY_ACTION {
  * for a map of available colors. */
 
 /* Toggle between a few color schemes */
-#define COLOR_SCHEME 2
+#define COLOR_SCHEME 0
 #if COLOR_SCHEME == 0
 /* Light color scheme. */
 enum color {

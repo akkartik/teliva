@@ -36,6 +36,11 @@ Scenarios:
       - `teliva_editor_state`
       - app-specific sandboxing policies
   * (2) app can read from a remote server but not write (POST)
+  * (1) app permissions are saved across restart
+  * (1) permissions the owner grants to one app are not automatically granted
+    to another
+  * (2) downloading a second app with identical name doesn't receive its
+    predecessors permissions
   * app gains access to a remote server for a legitimate purpose, reads
     sensitive data from the local system file for legitimate purpose. Now
     there's nothing preventing it from exfiltrating the sensitive data to the

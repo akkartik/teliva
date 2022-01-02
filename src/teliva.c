@@ -1041,7 +1041,8 @@ static void permissions_menu() {
 static void render_permissions_screen(lua_State* L) {
   clear();
   attrset(A_BOLD);
-  mvaddstr(1, 0, "Permissions");
+  mvaddstr(1, 20, "😈 When can apps perform...? 😈");
+//?   mvaddstr(1, 30, "😈 ⛧  When can apps perform...? ⛧ 😈");  // most fonts don't have pentagrams
   attrset(A_NORMAL);
   int file_colors = file_operations_allowed ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
   int net_colors = net_operations_allowed ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
@@ -1054,10 +1055,10 @@ static void render_permissions_screen(lua_State* L) {
   attron(A_REVERSE);
   switch (file_colors) {
     case COLOR_PAIR_SAFE:
-      mvaddstr(3, 30, " forbidden (safe)              ");
+      mvaddstr(3, 30, " never                         ");
       break;
     case COLOR_PAIR_WARN:
-      mvaddstr(3, 30, " allowed (more risky)          ");
+      mvaddstr(3, 30, " always                        ");
       break;
     case COLOR_PAIR_RISK:
       mvaddstr(3, 30, "                               ");
@@ -1073,10 +1074,10 @@ static void render_permissions_screen(lua_State* L) {
   attron(A_REVERSE);
   switch (net_colors) {
     case COLOR_PAIR_SAFE:
-      mvaddstr(5, 30, " forbidden (safe)              ");
+      mvaddstr(5, 30, " never                         ");
       break;
     case COLOR_PAIR_WARN:
-      mvaddstr(5, 30, " allowed (more risky)          ");
+      mvaddstr(5, 30, " always                        ");
       break;
     case COLOR_PAIR_RISK:
       mvaddstr(5, 30, "                               ");
@@ -1089,8 +1090,8 @@ static void render_permissions_screen(lua_State* L) {
 
   if (file_operations_allowed && net_operations_allowed) {
     attron(COLOR_PAIR(COLOR_PAIR_RISK));
-    mvaddstr(8, 5, "When both file and network operations are permitted, Teliva can't tell if this app does something sketchy.");
-    mvaddstr(9, 5, "You're relying either on your understanding of its code, or your trust of its author(s).");
+    mvaddstr(8, 5, "⚠️  Teliva can't protect you if this app does something sketchy. Consider choosing stronger conditions. ⚠️");
+//?     mvaddstr(8, 5, "🦮 ⚖ 🙈 Teliva can't tell how much it's protecting you. Consider simplifying the conditions.");
     attroff(COLOR_PAIR(COLOR_PAIR_RISK));
   }
   permissions_menu();

@@ -77,9 +77,9 @@ static void draw_menu(lua_State* L) {
 static void render_permissions(lua_State* L) {
   attrset(A_NORMAL);
   mvaddstr(LINES-1, COLS-12, "");
-  int file_colors = file_operations_allowed ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
-  int net_colors = net_operations_allowed ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
-  if (file_operations_allowed && net_operations_allowed) {
+  int file_colors = file_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
+  int net_colors = net_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
+  if (file_operations_permitted && net_operations_permitted) {
     file_colors = net_colors = COLOR_PAIR_RISK;
   }
 
@@ -1023,8 +1023,8 @@ static void clear_call_graph(lua_State* L) {
   assert(lua_gettop(L) == oldtop);
 }
 
-int file_operations_allowed = false;
-int net_operations_allowed = false;
+int file_operations_permitted = false;
+int net_operations_permitted = false;
 
 static void permissions_menu() {
   attrset(A_REVERSE);
@@ -1044,9 +1044,9 @@ static void render_permissions_screen(lua_State* L) {
   mvaddstr(1, 20, "😈 When can apps perform...? 😈");
 //?   mvaddstr(1, 30, "😈 ⛧  When can apps perform...? ⛧ 😈");  // most fonts don't have pentagrams
   attrset(A_NORMAL);
-  int file_colors = file_operations_allowed ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
-  int net_colors = net_operations_allowed ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
-  if (file_operations_allowed && net_operations_allowed) {
+  int file_colors = file_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
+  int net_colors = net_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
+  if (file_operations_permitted && net_operations_permitted) {
     file_colors = net_colors = COLOR_PAIR_RISK;
   }
 
@@ -1088,7 +1088,7 @@ static void render_permissions_screen(lua_State* L) {
   attroff(A_REVERSE);
   attroff(COLOR_PAIR(net_colors));
 
-  if (file_operations_allowed && net_operations_allowed) {
+  if (file_operations_permitted && net_operations_permitted) {
     attron(COLOR_PAIR(COLOR_PAIR_RISK));
     mvaddstr(8, 5, "⚠️  Teliva can't protect you if this app does something sketchy. Consider choosing stronger conditions. ⚠️");
 //?     mvaddstr(8, 5, "🦮 ⚖ 🙈 Teliva can't tell how much it's protecting you. Consider simplifying the conditions.");
@@ -1106,10 +1106,10 @@ static void permissions_view(lua_State* L) {
       case CTRL_X:
         return;
       case CTRL_F:
-        file_operations_allowed = !file_operations_allowed;
+        file_operations_permitted = !file_operations_permitted;
         break;
       case CTRL_N:
-        net_operations_allowed = !net_operations_allowed;
+        net_operations_permitted = !net_operations_permitted;
         break;
     }
   }
@@ -1154,19 +1154,19 @@ static void save_permissions_to_user_configuration(lua_State* L) {
     const char* image_name = lua_tostring(L, -1);
     if (strcmp(image_name, Image_name) != 0) {
       fprintf(out, "- image_name: %s\n", image_name);
-      lua_getfield(L, -2, "file_operations_allowed");
-      fprintf(out, "  file_operations_allowed: %s\n", lua_tostring(L, -1));
-      lua_pop(L, 1);  /* file_operations_allowed */
-      lua_getfield(L, -2, "net_operations_allowed");
-      fprintf(out, "  net_operations_allowed: %s\n", lua_tostring(L, -1));
-      lua_pop(L, 1);  /* net_operations_allowed */
+      lua_getfield(L, -2, "file_operations_permitted");
+      fprintf(out, "  file_operations_permitted: %s\n", lua_tostring(L, -1));
+      lua_pop(L, 1);  /* file_operations_permitted */
+      lua_getfield(L, -2, "net_operations_permitted");
+      fprintf(out, "  net_operations_permitted: %s\n", lua_tostring(L, -1));
+      lua_pop(L, 1);  /* net_operations_permitted */
     }
     lua_pop(L, 1);  /* image_name */
   }
   lua_settop(L, oldtop);
   fprintf(out, "- image_name: %s\n", Image_name);
-  fprintf(out, "  file_operations_allowed: %d\n", file_operations_allowed);
-  fprintf(out, "  net_operations_allowed: %d\n", net_operations_allowed);
+  fprintf(out, "  file_operations_permitted: %d\n", file_operations_permitted);
+  fprintf(out, "  net_operations_permitted: %d\n", net_operations_permitted);
   fclose(out);
   if (in) fclose(in);
   rename(outfilename, rcfilename);
@@ -1185,12 +1185,12 @@ static void load_permissions_from_user_configuration(lua_State* L) {
     lua_getfield(L, -1, "image_name");
     const char* image_name = lua_tostring(L, -1);
     if (strcmp(image_name, Image_name) == 0) {
-      lua_getfield(L, -2, "file_operations_allowed");
-      file_operations_allowed = lua_tointeger(L, -1);
-      lua_pop(L, 1);  /* file_operations_allowed */
-      lua_getfield(L, -2, "net_operations_allowed");
-      net_operations_allowed = lua_tointeger(L, -1);
-      lua_pop(L, 1);  /* net_operations_allowed */
+      lua_getfield(L, -2, "file_operations_permitted");
+      file_operations_permitted = lua_tointeger(L, -1);
+      lua_pop(L, 1);  /* file_operations_permitted */
+      lua_getfield(L, -2, "net_operations_permitted");
+      net_operations_permitted = lua_tointeger(L, -1);
+      lua_pop(L, 1);  /* net_operations_permitted */
     }
     lua_pop(L, 1);  /* image_name */
   }

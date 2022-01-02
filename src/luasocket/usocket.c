@@ -132,7 +132,7 @@ int socket_create(p_socket ps, int domain, int type, int protocol) {
 \*-------------------------------------------------------------------------*/
 int socket_bind(p_socket ps, SA *addr, socklen_t len) {
     int err = IO_DONE;
-    if (!net_operations_allowed) {
+    if (!net_operations_permitted) {
       Previous_message = "app tried to start a server; adjust its permissions (ctrl-p) if that is expected";
       return IO_CLOSED;
     }
@@ -165,7 +165,7 @@ int socket_connect(p_socket ps, SA *addr, socklen_t len, p_timeout tm) {
     int err;
     /* avoid calling on closed sockets */
     if (*ps == SOCKET_INVALID) return IO_CLOSED;
-    if (!net_operations_allowed) {
+    if (!net_operations_permitted) {
       Previous_message = "app tried to connect to a remote server; adjust its permissions (ctrl-p) if that is expected";
       return IO_CLOSED;
     }

@@ -209,7 +209,7 @@ static int pmain (lua_State *L) {
   globalL = L;
   if (argv[0] && argv[0][0]) progname = argv[0];
   lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
-  luaL_openlibs(L);  /* open libraries */
+  luaL_openlibs(L);
   status = dorequire(L, "src/lcurses/curses.lua", "curses");
   if (status != 0) return 0;
   status = dorequire(L, "src/luasocket/socket.lua", "socket");

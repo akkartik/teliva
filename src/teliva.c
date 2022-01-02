@@ -1041,8 +1041,8 @@ static void permissions_menu() {
 static void render_permissions_screen(lua_State* L) {
   clear();
   attrset(A_BOLD);
-  mvaddstr(1, 20, "😈 When can apps perform...? 😈");
-//?   mvaddstr(1, 30, "😈 ⛧  When can apps perform...? ⛧ 😈");  // most fonts don't have pentagrams
+  mvaddstr(1, 5, "Permissions: What sensitive operations this app is allowed to perform");
+  mvaddstr(2, 5, "🚧 Be very careful granting permissions 🚧");
   attrset(A_NORMAL);
   int file_colors = file_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
   int net_colors = net_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
@@ -1090,7 +1090,8 @@ static void render_permissions_screen(lua_State* L) {
 
   if (file_operations_permitted && net_operations_permitted) {
     attron(COLOR_PAIR(COLOR_PAIR_RISK));
-    mvaddstr(8, 5, "⚠️  Teliva can't protect you if this app does something sketchy. Consider choosing stronger conditions. ⚠️");
+    // idea: include pentagram emoji. But it isn't widely supported yet on Linux.
+    mvaddstr(5, 5, "😈 ⚠️  Teliva can't protect you if this app does something sketchy. Consider choosing stronger conditions. ⚠️  😈");
 //?     mvaddstr(8, 5, "🦮 ⚖ 🙈 Teliva can't tell how much it's protecting you. Consider simplifying the conditions.");
     attroff(COLOR_PAIR(COLOR_PAIR_RISK));
   }

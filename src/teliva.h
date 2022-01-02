@@ -68,8 +68,8 @@ enum color {
   COLOR_ERROR_BACKGROUND = 124,               /* deep red */
   COLOR_SAFE_NORMAL = 28,                     /* green */
   COLOR_SAFE_REVERSE = 46,                    /* green */
-  COLOR_WARN_NORMAL = 130,                    /* orange */
-  COLOR_WARN_REVERSE = 172,                   /* orange */
+  COLOR_WARN_NORMAL = 208,                    /* orange */
+  COLOR_WARN_REVERSE = 208,                   /* orange */
   COLOR_RISK_NORMAL = 196,                    /* red */
   COLOR_RISK_REVERSE = 196,                   /* red */
   COLOR_LUA_COMMENT = 27,                     /* blue */
@@ -91,7 +91,7 @@ enum color {
   COLOR_ERROR_BACKGROUND = 124,               /* deep red */
   COLOR_SAFE_NORMAL = 46,                     /* green */
   COLOR_SAFE_REVERSE = 28,                    /* green */
-  COLOR_WARN_NORMAL = 172,                    /* orange */
+  COLOR_WARN_NORMAL = 208,                    /* orange */
   COLOR_WARN_REVERSE = 130,                   /* orange */
   COLOR_RISK_NORMAL = 196,                    /* red */
   COLOR_RISK_REVERSE = 196,                   /* red */
@@ -114,7 +114,7 @@ enum color {
   COLOR_ERROR_BACKGROUND = 124,               /* deep red */
   COLOR_SAFE_NORMAL = 46,                     /* green */
   COLOR_SAFE_REVERSE = 28,                    /* green */
-  COLOR_WARN_NORMAL = 172,                    /* orange */
+  COLOR_WARN_NORMAL = 208,                    /* orange */
   COLOR_WARN_REVERSE = 130,                   /* orange */
   COLOR_RISK_NORMAL = 201,                    /* red */
   COLOR_RISK_REVERSE = 196,                   /* red */

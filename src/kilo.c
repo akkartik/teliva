@@ -88,10 +88,13 @@ typedef struct hlcolor {
 } hlcolor;
 
 #define LINE_NUMBER_SPACE 4
+#define MENU_SPACE 1
+#define CALLERS_SPACE 2
 
 struct editorConfig {
-    int cx,cy;  /* Cursor x and y position in characters */
+    int cx,cy;  /* Cursor x and y position in characters relative to top-left of viewport */
     int startcol, cols;  /* viewport column bounds */
+    int startrow, endrow;  /* viewport row bounds */
     int rowoff;     /* Offset of row displayed. */
     int coloff;     /* Offset of column displayed. */
     int numrows;    /* Number of rows */
@@ -527,7 +530,7 @@ static void editorInsertNewline(void) {
         editorUpdateRow(row);
     }
 fixcursor:
-    if (E.cy == LINES-1-1) {
+    if (E.startrow + E.cy == E.endrow-1) {
         E.rowoff++;
     } else {
         E.cy++;
@@ -738,8 +741,8 @@ static void editorRefreshScreen(void (*menu_func)(void)) {
     attrset(A_NORMAL);
     /* Draw all line numbers first so they don't mess up curses state later
      * when rendering lines. */
-    for (y = 0; y < LINES-1; y++) {
-        int filerow = E.rowoff+y;
+    for (y = E.startrow; y < E.endrow; y++) {
+        int filerow = E.rowoff+y-E.startrow;
 
         if (filerow >= E.numrows) {
             continue;
@@ -749,8 +752,8 @@ static void editorRefreshScreen(void (*menu_func)(void)) {
         printw("%3d ", filerow+1);  // %3d = LINE_NUMBER_SPACE-1
         attroff(COLOR_PAIR(COLOR_PAIR_FADE));
     }
-    for (y = 0; y < LINES-1; y++) {
-        int filerow = E.rowoff+y;
+    for (y = E.startrow; y < E.endrow; y++) {
+        int filerow = E.rowoff+y-E.startrow;
 
         if (filerow >= E.numrows) {
             continue;
@@ -810,7 +813,7 @@ static void editorRefreshScreen(void (*menu_func)(void)) {
             cx++;
         }
     }
-    mvaddstr(E.cy, cx+LINE_NUMBER_SPACE, "");
+    mvaddstr(E.cy+E.startrow, cx+LINE_NUMBER_SPACE, "");
     curs_set(1);
 }
 
@@ -956,7 +959,7 @@ static void editorMoveCursor(int key) {
         } else if (row && filecol == row->size) {
             E.cx = 0;
             E.coloff = 0;
-            if (E.cy == LINES-1-1) {
+            if (E.startrow + E.cy == E.endrow-1) {
                 E.rowoff++;
             } else {
                 E.cy += 1;
@@ -972,7 +975,7 @@ static void editorMoveCursor(int key) {
         break;
     case KEY_DOWN:
         if (filerow < E.numrows) {
-            if (E.cy == LINES-1-1) {
+            if (E.startrow + E.cy == E.endrow-1) {
                 E.rowoff++;
             } else {
                 E.cy += 1;
@@ -1040,7 +1043,7 @@ static void editorGo(lua_State* L) {
 
     while(1) {
         editorRefreshScreen(editorGoMenu);
-        mvprintw(LINES-2, 0, "Go to: %s", query);
+        mvprintw(E.endrow-1, 0, "Go to: %s", query);
 
         int c = getch();
         if (c == KEY_BACKSPACE || c == DELETE || c == CTRL_H) {
@@ -1101,10 +1104,10 @@ static void editorProcessKeypress2(int c) {
     case KEY_PPAGE:
         if (c == KEY_PPAGE && E.cy != 0)
             E.cy = 0;
-        else if (c == KEY_NPAGE && E.cy != LINES-1-1)
-            E.cy = LINES-1-1;
+        else if (c == KEY_NPAGE && E.startrow + E.cy != E.endrow-1)
+            E.cy = E.endrow-1-E.startrow;
         {
-            int times = LINES-1;
+            int times = E.endrow-E.startrow;
             while(times--)
                 editorMoveCursor(c == KEY_PPAGE ? KEY_UP : KEY_DOWN);
         }
@@ -1202,6 +1205,8 @@ int edit(lua_State* L, char* filename) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;
         E.cols = COLS-LINE_NUMBER_SPACE;
+        E.startrow = CALLERS_SPACE;
+        E.endrow = LINES-MENU_SPACE;
         editorRefreshScreen(editorMenu);
         editorProcessKeypress(L);
     }
@@ -1251,6 +1256,8 @@ void editNonCode(char* filename) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;
         E.cols = COLS-LINE_NUMBER_SPACE;
+        E.startrow = CALLERS_SPACE;
+        E.endrow = LINES-MENU_SPACE;
         editorRefreshScreen(editorNonCodeMenu);
         int c = getch();
         editorProcessKeypress2(c);
@@ -1271,6 +1278,8 @@ int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int c
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;
         E.cols = COLS-LINE_NUMBER_SPACE;
+        E.startrow = CALLERS_SPACE;
+        E.endrow = LINES-MENU_SPACE;
         editorRefreshScreen(editorMenu);
         editorProcessKeypress(L);
     }
@@ -1284,6 +1293,8 @@ int resumeEdit(lua_State* L) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;
         E.cols = COLS-LINE_NUMBER_SPACE;
+        E.startrow = CALLERS_SPACE;
+        E.endrow = LINES-MENU_SPACE;
         editorRefreshScreen(editorMenu);
         editorProcessKeypress(L);
     }
@@ -1297,6 +1308,8 @@ void resumeNonCodeEdit() {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;
         E.cols = COLS-LINE_NUMBER_SPACE;
+        E.startrow = CALLERS_SPACE;
+        E.endrow = LINES-MENU_SPACE;
         editorRefreshScreen(editorMenu);
         int c = getch();
         editorProcessKeypress2(c);

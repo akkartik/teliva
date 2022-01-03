@@ -91,7 +91,7 @@ typedef struct hlcolor {
 
 struct editorConfig {
     int cx,cy;  /* Cursor x and y position in characters */
-    int cols;  /* viewport width */
+    int startcol, cols;  /* viewport column bounds */
     int rowoff;     /* Offset of row displayed. */
     int coloff;     /* Offset of column displayed. */
     int numrows;    /* Number of rows */
@@ -746,7 +746,7 @@ static void editorRefreshScreen(void (*menu_func)(void)) {
         }
         mvaddstr(y, 0, "");
         attron(COLOR_PAIR(COLOR_PAIR_FADE));
-        printw("%3d ", filerow+1);  // LINE_NUMBER_SPACE-1
+        printw("%3d ", filerow+1);  // %3d = LINE_NUMBER_SPACE-1
         attroff(COLOR_PAIR(COLOR_PAIR_FADE));
     }
     for (y = 0; y < LINES-1; y++) {
@@ -759,7 +759,7 @@ static void editorRefreshScreen(void (*menu_func)(void)) {
         r = &E.row[filerow];
 
         int len = r->rsize - E.coloff;
-        mvaddstr(y, LINE_NUMBER_SPACE, "");
+        mvaddstr(y, E.startcol, "");
         if (len > 0) {
             if (len > E.cols) len = E.cols;
             char *c = r->render+E.coloff;
@@ -1199,7 +1199,9 @@ int edit(lua_State* L, char* filename) {
     initEditor();
     editorOpen(filename);
     while(!Quit) {
-        E.cols = COLS-LINE_NUMBER_SPACE;  /* update on resize */
+        /* update on resize */
+        E.startcol = LINE_NUMBER_SPACE;
+        E.cols = COLS-LINE_NUMBER_SPACE;
         editorRefreshScreen(editorMenu);
         editorProcessKeypress(L);
     }
@@ -1246,7 +1248,9 @@ void editNonCode(char* filename) {
     initEditor();
     editorOpen(filename);
     while(!Quit) {
-        E.cols = COLS-LINE_NUMBER_SPACE;  /* update on resize */
+        /* update on resize */
+        E.startcol = LINE_NUMBER_SPACE;
+        E.cols = COLS-LINE_NUMBER_SPACE;
         editorRefreshScreen(editorNonCodeMenu);
         int c = getch();
         editorProcessKeypress2(c);
@@ -1264,7 +1268,9 @@ int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int c
     E.cx = cx;
     editorOpen(filename);
     while(!Quit) {
-        E.cols = COLS-LINE_NUMBER_SPACE;  /* update on resize */
+        /* update on resize */
+        E.startcol = LINE_NUMBER_SPACE;
+        E.cols = COLS-LINE_NUMBER_SPACE;
         editorRefreshScreen(editorMenu);
         editorProcessKeypress(L);
     }
@@ -1275,7 +1281,9 @@ int resumeEdit(lua_State* L) {
     Quit = 0;
     Back_to_big_picture = 0;
     while(!Quit) {
-        E.cols = COLS-LINE_NUMBER_SPACE;  /* update on resize */
+        /* update on resize */
+        E.startcol = LINE_NUMBER_SPACE;
+        E.cols = COLS-LINE_NUMBER_SPACE;
         editorRefreshScreen(editorMenu);
         editorProcessKeypress(L);
     }
@@ -1286,7 +1294,9 @@ void resumeNonCodeEdit() {
     Quit = 0;
     Back_to_big_picture = 0;
     while(!Quit) {
-        E.cols = COLS-LINE_NUMBER_SPACE;  /* update on resize */
+        /* update on resize */
+        E.startcol = LINE_NUMBER_SPACE;
+        E.cols = COLS-LINE_NUMBER_SPACE;
         editorRefreshScreen(editorMenu);
         int c = getch();
         editorProcessKeypress2(c);

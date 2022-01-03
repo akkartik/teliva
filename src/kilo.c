@@ -994,12 +994,12 @@ static void editorMoveCursor(int key) {
     }
 }
 
-int identifier_char(char c) {
+static int identifier_char(char c) {
     /* keep sync'd with llex */
     return isalnum(c) || c == '_';
 }
 
-void word_at_cursor(char* out, int capacity) {
+static void word_at_cursor(char* out, int capacity) {
     erow* row = &E.row[E.rowoff + E.cy];
     int cidx = E.coloff + E.cx;
     int len = 0;
@@ -1207,7 +1207,7 @@ int edit(lua_State* L, char* filename) {
 }
 
 /* return true if user chose to back into the big picture view */
-int edit_from(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx) {
+int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx) {
     Quit = 0;
     Back_to_big_picture = 0;
     initEditor();

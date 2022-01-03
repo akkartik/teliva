@@ -477,7 +477,7 @@ int editor_view_in_progress(lua_State* L) {
 
 extern int load_editor_buffer_to_current_definition_in_image(lua_State* L);
 extern int resumeEdit(lua_State* L);
-extern int edit_from(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx);
+extern int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx);
 int restore_editor_view(lua_State* L) {
   lua_getglobal(L, "__teliva_editor_state");
   int editor_state_index = lua_gettop(L);
@@ -493,7 +493,7 @@ int restore_editor_view(lua_State* L) {
   lua_getfield(L, editor_state_index, "cx");
   int cx = lua_tointeger(L, -1);
   lua_settop(L, editor_state_index);
-  int back_to_big_picture = edit_from(L, "teliva_editor_buffer", rowoff, coloff, cy, cx);
+  int back_to_big_picture = editFrom(L, "teliva_editor_buffer", rowoff, coloff, cy, cx);
   // error handling
   int oldtop = lua_gettop(L);
   while (1) {
@@ -508,7 +508,7 @@ int restore_editor_view(lua_State* L) {
   }
   if (lua_gettop(L) != oldtop) {
     endwin();
-    printf("edit_from: memory leak %d -> %d\n", oldtop, lua_gettop(L));
+    printf("editFrom: memory leak %d -> %d\n", oldtop, lua_gettop(L));
     exit(1);
   }
   return back_to_big_picture;

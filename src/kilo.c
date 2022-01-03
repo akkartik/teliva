@@ -1206,6 +1206,53 @@ int edit(lua_State* L, char* filename) {
     return Back_to_big_picture;
 }
 
+static void editorNonCodeMenu(void) {
+    attrset(A_REVERSE);
+    for (int x = 0; x < COLS; ++x)
+      mvaddch(LINES-1, x, ' ');
+    attrset(A_NORMAL);
+    menu_column = 2;
+    draw_menu_item("^e", "back");
+    if (Previous_error != NULL) {
+      attron(A_BOLD);
+      draw_menu_item("^c", "abort");
+      attroff(A_BOLD);
+    }
+    draw_menu_item("^f", "find");
+    draw_menu_item("^h", "backspace");
+    draw_menu_item("^l", "end of line");
+    /* draw_menu_item("^/|^-|^_", "(un)comment line"); */
+    attroff(A_REVERSE);
+    mvaddstr(LINES-1, menu_column, " ^/");
+    attron(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+    addstr("|");
+    attroff(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+    addstr("^-");
+    attron(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+    addstr("|");
+    attroff(COLOR_PAIR(COLOR_PAIR_MENU_ALTERNATE));
+    addstr("^_ ");
+    menu_column += 10;
+    attron(A_REVERSE);
+    mvaddstr(LINES-1, menu_column, " (un)comment line ");
+    menu_column += 18;
+    attrset(A_NORMAL);
+}
+
+/* return true if user chose to back into the big picture view */
+void editNonCode(char* filename) {
+    Quit = 0;
+    Back_to_big_picture = 0;
+    initEditor();
+    editorOpen(filename);
+    while(!Quit) {
+        E.cols = COLS-LINE_NUMBER_SPACE;  /* update on resize */
+        editorRefreshScreen(editorNonCodeMenu);
+        int c = getch();
+        editorProcessKeypress2(c);
+    }
+}
+
 /* return true if user chose to back into the big picture view */
 int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx) {
     Quit = 0;

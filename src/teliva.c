@@ -875,6 +875,7 @@ static void load_note_from_editor_buffer(lua_State* L, int cursor) {
   lua_pop(L, 2);  /* table at cursor, teliva_program */
 }
 
+extern int editNonCode(char* filename);
 static void recent_changes_view(lua_State* L) {
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
@@ -904,8 +905,7 @@ static void recent_changes_view(lua_State* L) {
       case CTRL_E:
         save_note_to_editor_buffer(L, cursor);
         /* big picture hotkey unnecessarily available here */
-        /* TODO: go hotkey is misleading. edits will not be persisted until you return to recent changes */
-        edit(L, "teliva_editor_buffer");
+        editNonCode("teliva_editor_buffer");
         load_note_from_editor_buffer(L, cursor);
         save_tlv(L, Image_name);
         break;

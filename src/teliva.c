@@ -257,7 +257,7 @@ void draw_highlighted_definition_name(const char* definition_name) {
 /* return true if submitted */
 static int edit_current_definition(lua_State* L);
 static void recent_changes_view(lua_State* L);
-static void events_view();
+static const char* events_view();
 void big_picture_view(lua_State* L) {
   /* Without any intervening edits, big_picture_view always stably renders
    * definitions in exactly the same spatial order, both in levels from top to
@@ -475,7 +475,12 @@ restart:
       if (back_to_big_picture) goto restart;
       return;
     } else if (c == CTRL_E) {
-      events_view();
+      const char* definition = events_view();
+      if (definition) {
+        save_to_current_definition_and_editor_buffer(L, definition);
+        int back_to_big_picture = edit_current_definition(L);
+        if (back_to_big_picture) goto restart;
+      }
       return;
     } else if (isprint(c)) {
       if (qlen < CURRENT_DEFINITION_LEN) {
@@ -1399,10 +1404,11 @@ static void events_menu() {
   attrset(A_NORMAL);
   menu_column = 2;
   draw_menu_item("^x", "go back");
+  draw_menu_item("Enter", "go to highlight");
   attrset(A_NORMAL);
 }
 
-static void render_events() {
+static void render_events(int cursor) {
   clear();
   attrset(A_BOLD);
   mvaddstr(1, 0, "Recent events");
@@ -1410,20 +1416,34 @@ static void render_events() {
   for (int i = 0, y = 3; i < naudit; ++i, ++y) {
     if (i >= LINES-1) break;
     mvaddstr(y, 2, "");
-    draw_definition_name(audit_event[i].func);
+    if (i == cursor)
+      draw_highlighted_definition_name(audit_event[i].func);
+    else
+      draw_definition_name(audit_event[i].func);
     mvaddstr(y, 16, audit_event[i].line);
   }
   events_menu();
   refresh();
 }
 
-static void events_view() {
+static const char* events_view() {
+  int cursor = 0;
   while (true) {
-    render_events();
+    render_events(cursor);
     int c = getch();
     switch (c) {
       case CTRL_X:
-        return;
+        return NULL;
+      case KEY_UP:
+        if (cursor > 0)
+          --cursor;
+        break;
+      case KEY_DOWN:
+        if (cursor < naudit-1)
+          ++cursor;
+        break;
+      case ENTER:
+        return audit_event[cursor].func;
     }
   }
 }

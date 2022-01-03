@@ -254,6 +254,28 @@ void draw_highlighted_definition_name(const char* definition_name) {
   addstr("  ");
 }
 
+void assign_call_graph_depth_to_name(lua_State* L, int depth, const char* name) {
+  /* Maintain a global table mapping from function name to call-stack depth
+   * at first call to it.
+   *
+   * Won't be perfect; might get confused by shadowing locals. But we can't
+   * be perfect without a bidirectional mapping between interpreter state
+   * and source code. Which would make Lua either a lot less dynamic or a
+   * a lot more like Smalltalk. */
+  // push table
+  luaL_newmetatable(L, "__teliva_call_graph_depth");
+  int cgt = lua_gettop(L);
+  // if key doesn't already exist, set it
+  lua_getfield(L, cgt, name);
+  if (lua_isnil(L, -1)) {
+    lua_pushinteger(L, depth);
+    lua_setfield(L, cgt, name);
+  }
+  // clean up
+  lua_pop(L, 1);  // key
+  lua_pop(L, 1);  // table
+}
+
 /* return true if submitted */
 static int edit_current_definition(lua_State* L);
 static void recent_changes_view(lua_State* L);

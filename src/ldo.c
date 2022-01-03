@@ -283,27 +283,7 @@ void record_depth_of_global_function (lua_State *L, CallInfo *ci) {
     return;
   int g = GETARG_Bx(i);  /* global index */
   lua_assert(ttisstring(&p->k[g]));
-  const char *name = svalue(&p->k[g]);
-  int depth = ci - L->base_ci;
-  /* Maintain a global table mapping from function name to call-stack depth
-   * at first call to it.
-   *
-   * Won't be perfect; might get confused by shadowing locals. But we can't
-   * be perfect without a bidirectional mapping between interpreter state
-   * and source code. Which would make Lua either a lot less dynamic or a
-   * a lot more like Smalltalk. */
-  // push table
-  luaL_newmetatable(L, "__teliva_call_graph_depth");
-  int cgt = lua_gettop(L);
-  // if key doesn't already exist, set it
-  lua_getfield(L, cgt, name);
-  if (lua_isnil(L, -1)) {
-    lua_pushinteger(L, depth);
-    lua_setfield(L, cgt, name);
-  }
-  // clean up
-  lua_pop(L, 1);  // key
-  lua_pop(L, 1);  // table
+  assign_call_graph_depth_to_name(L, ci - L->base_ci, svalue(&p->k[g]));
 }
 
 

@@ -1409,9 +1409,8 @@ static void render_events() {
   attrset(A_NORMAL);
   for (int i = 0, y = 3; i < naudit; ++i, ++y) {
     if (i >= LINES-1) break;
-    attron(A_BOLD);
-    mvaddstr(y, 2, audit_event[i].func);
-    attroff(A_BOLD);
+    mvaddstr(y, 2, "");
+    draw_definition_name(audit_event[i].func);
     mvaddstr(y, 16, audit_event[i].line);
   }
   events_menu();

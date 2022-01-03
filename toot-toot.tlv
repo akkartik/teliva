@@ -312,8 +312,10 @@
     >    cursor = 1
     >  elseif key == 23 then  -- ctrl-w
     >    local out = io.open('toot', 'w')
-    >    out:write(prose, '\n')
-    >    out:close()
+    >    if out ~= nil then
+    >      out:write(prose, '\n')
+    >      out:close()
+    >    end
     >  elseif key == 10 or (key >= 32 and key < 127) then
     >    prose = prose:insert(string.char(key), cursor-1)
     >    cursor = cursor+1

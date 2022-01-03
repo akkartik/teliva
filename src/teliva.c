@@ -51,7 +51,7 @@ static const char* trim(const char* in) {
   return result;
 }
 
-const char* default_file_operations_predicate_body = "return false";
+const char* default_file_operations_predicate_body = "return false\n";
 const char* file_operations_predicate_body;
 int net_operations_permitted = false;
 
@@ -102,7 +102,7 @@ static void render_permissions(lua_State* L) {
   attrset(A_NORMAL);
   mvaddstr(LINES-1, COLS-12, "");
   int file_colors = COLOR_PAIR_SAFE;
-  if (file_operations_predicate_body && strcmp(default_file_operations_predicate_body, trim(file_operations_predicate_body)) != 0)
+  if (file_operations_predicate_body && strcmp("return false", trim(file_operations_predicate_body)) != 0)
     file_colors = COLOR_PAIR_WARN;
   int net_colors = net_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
   if (file_colors == COLOR_PAIR_WARN && net_colors == COLOR_PAIR_WARN) {
@@ -1128,7 +1128,7 @@ static void render_permissions_screen() {
   attroff(COLOR_PAIR(net_colors));
   mvaddstr(y, 30, "(No nuance available for network operations.)");
 
-  int file_operations_safe = strcmp(default_file_operations_predicate_body, trim(file_operations_predicate_body)) == 0;
+  int file_operations_safe = strcmp("return false", trim(file_operations_predicate_body)) == 0;
   int net_operations_safe = (net_operations_permitted == 0);
   int file_operations_unsafe = strcmp("return true", trim(file_operations_predicate_body)) == 0;
   int net_operations_unsafe = (net_operations_permitted != 0);

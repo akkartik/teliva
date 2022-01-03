@@ -1068,10 +1068,7 @@ static void editorGo(lua_State* L) {
  * is typing stuff on the terminal. */
 static int Quit = 0;
 static int Back_to_big_picture = 0;
-static void editorProcessKeypress(lua_State* L) {
-    int c = getch();
-//?     mvprintw(LINES-3, 60, "key: %d\n", c);
-//?     getch();
+static void editorProcessKeypress2(int c) {
     switch(c) {
     case ENTER:
         {
@@ -1091,16 +1088,6 @@ static void editorProcessKeypress(lua_State* L) {
         editorSaveToDisk();
         save_editor_state(E.rowoff, E.coloff, E.cy, E.cx);
         Quit = 1;
-        break;
-    case CTRL_G:
-        /* Go to a different definition. */
-        editorGo(L);
-        break;
-    case CTRL_B:
-        /* Go to big-picture view. */
-        editorSaveToDisk();
-        Quit = 1;
-        Back_to_big_picture = 1;
         break;
     case CTRL_F:
         editorFind();
@@ -1170,6 +1157,26 @@ static void editorProcessKeypress(lua_State* L) {
         if (c >= ' ')
             editorInsertChar(c);
         break;
+    }
+}
+
+static void editorProcessKeypress(lua_State* L) {
+    int c = getch();
+//?     mvprintw(LINES-3, 60, "key: %d\n", c);
+//?     getch();
+    switch(c) {
+    case CTRL_G:
+        /* Go to a different definition. */
+        editorGo(L);
+        break;
+    case CTRL_B:
+        /* Go to big-picture view. */
+        editorSaveToDisk();
+        Quit = 1;
+        Back_to_big_picture = 1;
+        break;
+    default:
+        editorProcessKeypress2(c);
     }
 }
 

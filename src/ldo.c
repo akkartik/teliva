@@ -274,9 +274,6 @@ void record_depth_of_global_function (lua_State *L, CallInfo *ci) {
   int pc = cast(int, ci->savedpc - ci_func(ci)->l.p->code) - 1;
   lua_assert(pc != -1);  // TODO: lua_assert not triggering
   Instruction i = ci_func(ci)->l.p->code[pc];
-//?   endwin();
-//?   printf("AAA: %p %d %d %d\n", L->savedpc, pc, i, GET_OPCODE(i));
-//?   abort();
   if (GET_OPCODE(i) != OP_CALL && GET_OPCODE(i) != OP_TAILCALL &&
       GET_OPCODE(i) != OP_TFORLOOP)
     return;

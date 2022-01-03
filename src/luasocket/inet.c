@@ -4,6 +4,7 @@
 \*=========================================================================*/
 #include "luasocket.h"
 #include "inet.h"
+#include "../teliva.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,6 +63,10 @@ static int inet_gethost(const char *address, struct hostent **hp) {
 \*-------------------------------------------------------------------------*/
 static int inet_global_tohostname(lua_State *L) {
     const char *address = luaL_checkstring(L, 1);
+    static char buffer[1024] = {0};
+    memset(buffer, '\0', 1024);
+    snprintf(buffer, 1020, "socket.tohostname(\"%s\")", address);
+    append_to_audit_log(L, buffer);
     struct hostent *hp = NULL;
     int err = inet_gethost(address, &hp);
     if (err != IO_DONE) {
@@ -82,6 +87,10 @@ static int inet_global_getnameinfo(lua_State *L) {
     struct addrinfo *resolved, *iter;
     const char *host = luaL_optstring(L, 1, NULL);
     const char *serv = luaL_optstring(L, 2, NULL);
+    static char buffer[1024] = {0};
+    memset(buffer, '\0', 1024);
+    snprintf(buffer, 1020, "socket.getnameinfo(\"%s\", \"%s\")", host, serv);
+    append_to_audit_log(L, buffer);
 
     if (!(host || serv))
         luaL_error(L, "host and serv cannot be both nil");
@@ -126,6 +135,10 @@ static int inet_global_toip(lua_State *L)
 {
     const char *address = luaL_checkstring(L, 1);
     struct hostent *hp = NULL;
+    static char buffer[1024] = {0};
+    memset(buffer, '\0', 1024);
+    snprintf(buffer, 1020, "socket.toip(\"%s\")", address);
+    append_to_audit_log(L, buffer);
     int err = inet_gethost(address, &hp);
     if (err != IO_DONE) {
         lua_pushnil(L);

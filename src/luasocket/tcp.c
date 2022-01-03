@@ -9,6 +9,7 @@
 #include "inet.h"
 #include "options.h"
 #include "tcp.h"
+#include "../teliva.h"
 
 #include <string.h>
 
@@ -214,6 +215,7 @@ static int meth_accept(lua_State *L)
     p_tcp server = (p_tcp) auxiliar_checkclass(L, "tcp{server}", 1);
     p_timeout tm = timeout_markstart(&server->tm);
     t_socket sock;
+    append_to_audit_log(L,  "socket.accept()");
     const char *err = inet_tryaccept(&server->sock, server->family, &sock, tm);
     /* if successful, push client socket */
     if (err == NULL) {
@@ -243,6 +245,10 @@ static int meth_bind(lua_State *L) {
     p_tcp tcp = (p_tcp) auxiliar_checkclass(L, "tcp{master}", 1);
     const char *address =  luaL_checkstring(L, 2);
     const char *port = luaL_checkstring(L, 3);
+    static char buffer[1024] = {0};
+    memset(buffer, '\0', 1024);
+    snprintf(buffer, 1020, "socket.bind(\"%s\", %s)", address, port);
+    append_to_audit_log(L, buffer);
     const char *err;
     struct addrinfo bindhints;
     memset(&bindhints, 0, sizeof(bindhints));
@@ -268,6 +274,10 @@ static int meth_connect(lua_State *L) {
     const char *port = luaL_checkstring(L, 3);
     struct addrinfo connecthints;
     const char *err;
+    static char buffer[1024] = {0};
+    memset(buffer, '\0', 1024);
+    snprintf(buffer, 1020, "socket.connect(\"%s\", %s)", address, port);
+    append_to_audit_log(L, buffer);
     memset(&connecthints, 0, sizeof(connecthints));
     connecthints.ai_socktype = SOCK_STREAM;
     /* make sure we try to connect only to the same family */
@@ -320,6 +330,7 @@ static int meth_getfamily(lua_State *L)
 \*-------------------------------------------------------------------------*/
 static int meth_listen(lua_State *L)
 {
+    append_to_audit_log(L,  "socket.listen()");
     p_tcp tcp = (p_tcp) auxiliar_checkclass(L, "tcp{master}", 1);
     int backlog = (int) luaL_optnumber(L, 2, 32);
     int err = socket_listen(&tcp->sock, backlog);
@@ -353,12 +364,14 @@ static int meth_shutdown(lua_State *L)
 \*-------------------------------------------------------------------------*/
 static int meth_getpeername(lua_State *L)
 {
+    append_to_audit_log(L,  "socket.getpeername()");
     p_tcp tcp = (p_tcp) auxiliar_checkgroup(L, "tcp{any}", 1);
     return inet_meth_getpeername(L, &tcp->sock, tcp->family);
 }
 
 static int meth_getsockname(lua_State *L)
 {
+    append_to_audit_log(L,  "socket.getsockname()");
     p_tcp tcp = (p_tcp) auxiliar_checkgroup(L, "tcp{any}", 1);
     return inet_meth_getsockname(L, &tcp->sock, tcp->family);
 }

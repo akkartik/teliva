@@ -114,7 +114,7 @@ void load_tlv(lua_State* L, char* filename) {
   lua_setglobal(L, "teliva_program");
 }
 
-static void emit_multiline_string(FILE* out, const char* value) {
+void emit_multiline_string(FILE* out, const char* value) {
   fprintf(out, "    >");
   for (const char* curr = value; *curr != '\0'; ++curr) {
     if (*curr == '\n' && *(curr+1) != '\0')

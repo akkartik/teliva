@@ -133,7 +133,7 @@ static int io_open (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
   const char *mode = luaL_optstring(L, 2, "r");
   FILE **pf = newfile(L);
-  if (file_operations_permitted)
+  if (file_operation_permitted(filename, mode))
     *pf = fopen(filename, mode);
   else {
     snprintf(iolib_errbuf, 1024, "app tried to open file '%s'; adjust its permissions (ctrl-p) if that is expected", filename);
@@ -170,7 +170,7 @@ static int f_lines (lua_State *L) {
 static int io_lines (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
   FILE **pf = newfile(L);
-  if (file_operations_permitted)
+  if (file_operation_permitted(filename, "r"))
     *pf = fopen(filename, "r");
   else {
     snprintf(iolib_errbuf, 1024, "app tried to open file '%s'; adjust its permissions (ctrl-p) if that is expected", filename);

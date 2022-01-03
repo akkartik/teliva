@@ -8,6 +8,7 @@
 
 #include "lua.h"
 #include "lauxlib.h"
+#include "lualib.h"
 #include "teliva.h"
 #include "tlv.h"
 
@@ -30,6 +31,29 @@ void draw_menu_item(const char* key, const char* name) {
   attron(A_REVERSE);
   draw_string_on_menu(name);
 }
+
+static const char* trim(const char* in) {
+  static char result[1024];
+  int len = strlen(in);
+  assert(len < 1020);
+  const char* str = in;
+  const char* end = in+len-1;
+  while (isspace((unsigned char)*str)) {
+    ++str;
+    --len;
+  }
+  while (isspace((unsigned char)*end)) {
+    --end;
+    --len;
+  }
+  memset(result, '\0', 1024);
+  memcpy(result, str, len);
+  return result;
+}
+
+const char* default_file_operations_predicate = "function file_operation_permitted(filename, mode)\n  return false\nend";
+const char* file_operations_predicate;
+int net_operations_permitted = false;
 
 static void render_permissions(lua_State* L);
 char* Previous_message;
@@ -74,12 +98,16 @@ static void draw_menu(lua_State* L) {
   attrset(A_NORMAL);
 }
 
+/*** Permissions screen */
+
 static void render_permissions(lua_State* L) {
   attrset(A_NORMAL);
   mvaddstr(LINES-1, COLS-12, "");
-  int file_colors = file_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
+  int file_colors = COLOR_PAIR_SAFE;
+  if (file_operations_predicate && strcmp(default_file_operations_predicate, trim(file_operations_predicate)) != 0)
+    file_colors = COLOR_PAIR_WARN;
   int net_colors = net_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
-  if (file_operations_permitted && net_operations_permitted) {
+  if (file_colors == COLOR_PAIR_WARN && net_colors == COLOR_PAIR_WARN) {
     file_colors = net_colors = COLOR_PAIR_RISK;
   }
 
@@ -875,7 +903,7 @@ static void load_note_from_editor_buffer(lua_State* L, int cursor) {
   lua_pop(L, 2);  /* table at cursor, teliva_program */
 }
 
-extern int editNonCode(char* filename);
+extern void editNonCode(char* filename);
 static void recent_changes_view(lua_State* L) {
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
@@ -1023,8 +1051,30 @@ static void clear_call_graph(lua_State* L) {
   assert(lua_gettop(L) == oldtop);
 }
 
-int file_operations_permitted = false;
-int net_operations_permitted = false;
+/* Perform privilege calculations in a whole other isolated context. */
+lua_State* trustedL = NULL;
+
+void initialize_trustedL() {
+  trustedL = luaL_newstate();
+  lua_gc(trustedL, LUA_GCSTOP, 0);  /* stop collector during initialization */
+  luaL_openlibs(trustedL);
+  /* TODO: Should we include ncurses? How to debug policies? */
+  lua_gc(trustedL, LUA_GCRESTART, 0);
+}
+
+int file_operation_permitted(const char* filename, const char* mode) {
+  int oldtop = lua_gettop(trustedL);
+  lua_getglobal(trustedL, "file_operation_permitted");
+  lua_pushstring(trustedL, filename);
+  lua_pushstring(trustedL, mode);
+  if (lua_pcall(trustedL, 2 /*args*/, 1 /*result*/, /*errfunc*/0)) {
+    /* TODO: error handling. Or should we use errfunc above? */
+  }
+  assert(lua_isboolean(trustedL, -1));
+  int should_allow = lua_toboolean(trustedL, -1);
+  lua_settop(trustedL, oldtop);
+  return should_allow;
+}
 
 static void permissions_menu() {
   attrset(A_REVERSE);
@@ -1033,81 +1083,131 @@ static void permissions_menu() {
   attrset(A_NORMAL);
   menu_column = 2;
   draw_menu_item("^x", "go back");
-  draw_menu_item("^f", "toggle file permissions");
+  draw_menu_item("^f", "edit file permissions");
   draw_menu_item("^n", "toggle network permissions");
   attrset(A_NORMAL);
 }
 
-static void render_permissions_screen(lua_State* L) {
+static void render_permissions_screen() {
   clear();
   attrset(A_BOLD);
   mvaddstr(1, 5, "Permissions: What sensitive operations this app is allowed to perform");
   mvaddstr(2, 5, "🚧 Be very careful granting permissions 🚧");
   attrset(A_NORMAL);
-  int file_colors = file_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
+
+  mvaddstr(7, 5, "File operations");
+  int y = render_wrapped_text(7, 30, COLS-5, file_operations_predicate);
+  y += 2;
+
   int net_colors = net_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
-  if (file_operations_permitted && net_operations_permitted) {
-    file_colors = net_colors = COLOR_PAIR_RISK;
-  }
-
-  attron(COLOR_PAIR(file_colors));
-  mvaddstr(3, 5, "File operations");
-  attron(A_REVERSE);
-  switch (file_colors) {
-    case COLOR_PAIR_SAFE:
-      mvaddstr(3, 30, " never                         ");
-      break;
-    case COLOR_PAIR_WARN:
-      mvaddstr(3, 30, " always                        ");
-      break;
-    case COLOR_PAIR_RISK:
-      mvaddstr(3, 30, "                               ");
-      break;
-    default:
-      abort();
-  }
-  attroff(A_REVERSE);
-  attroff(COLOR_PAIR(file_colors));
-
+  mvaddstr(y, 5, "Network operations");
   attron(COLOR_PAIR(net_colors));
-  mvaddstr(5, 5, "Network operations");
   attron(A_REVERSE);
   switch (net_colors) {
     case COLOR_PAIR_SAFE:
-      mvaddstr(5, 30, " never                         ");
+      mvaddstr(y, 30, " never                         ");
       break;
     case COLOR_PAIR_WARN:
-      mvaddstr(5, 30, " always                        ");
+      mvaddstr(y, 30, " always                        ");
       break;
     case COLOR_PAIR_RISK:
-      mvaddstr(5, 30, "                               ");
+      mvaddstr(y, 30, "                               ");
       break;
     default:
       abort();
   }
+  ++y;
   attroff(A_REVERSE);
   attroff(COLOR_PAIR(net_colors));
+  mvaddstr(y, 30, "(No nuance available for network operations.)");
 
-  if (file_operations_permitted && net_operations_permitted) {
+  int file_operations_safe = strcmp(default_file_operations_predicate, trim(file_operations_predicate)) == 0;
+  int net_operations_safe = (net_operations_permitted == 0);
+  int file_operations_unsafe = strcmp("return true", trim(file_operations_predicate)) == 0;
+  int net_operations_unsafe = (net_operations_permitted != 0);
+  if (file_operations_safe && net_operations_safe) {
+    attron(COLOR_PAIR(COLOR_PAIR_SAFE));
+    mvaddstr(5, 5, "This app can't access private data or communicate with other computers.");
+    attroff(COLOR_PAIR(COLOR_PAIR_SAFE));
+  }
+  else if (file_operations_safe || net_operations_safe) {
+    attron(COLOR_PAIR(COLOR_PAIR_WARN));
+    if (net_operations_safe) {
+      mvaddstr(5, 5, "This app can access private data, but they can't leave this computer.");
+    }
+    else {
+      mvaddstr(5, 5, "This app can communicate with other computers, but can't access private data.");
+    }
+    attroff(COLOR_PAIR(COLOR_PAIR_WARN));
+  }
+  else if (file_operations_unsafe && net_operations_unsafe) {
     attron(COLOR_PAIR(COLOR_PAIR_RISK));
     // idea: include pentagram emoji. But it isn't widely supported yet on Linux.
     mvaddstr(5, 5, "😈 ⚠️  Teliva can't protect you if this app does something sketchy. Consider choosing stronger conditions. ⚠️  😈");
-//?     mvaddstr(8, 5, "🦮 ⚖ 🙈 Teliva can't tell how much it's protecting you. Consider simplifying the conditions.");
     attroff(COLOR_PAIR(COLOR_PAIR_RISK));
   }
+  else {
+    attron(COLOR_PAIR(COLOR_PAIR_RISK));
+    mvaddstr(5, 5, "🦮 🙈 Teliva can't tell how much it's protecting you. Consider simplifying the conditions.");
+    attroff(COLOR_PAIR(COLOR_PAIR_RISK));
+  }
+
   permissions_menu();
   refresh();
 }
 
-static void permissions_view(lua_State* L) {
+extern void resumeNonCodeEdit();
+static void edit_file_operations_predicate() {
+  static char file_operations_predicate_buffer[512];
+  /* save to disk */
+  char outfilename[] = "teliva_file_operations_predicate_XXXXXX";
+  int outfd = mkstemp(outfilename);
+  if (outfd == -1) {
+    endwin();
+    perror("edit_file_operations_predicate: error in creating temporary file");
+    abort();
+  }
+  FILE* out = fdopen(outfd, "w");
+  assert(out != NULL);
+  fprintf(out, "%s", file_operations_predicate);
+  fclose(out);
+  rename(outfilename, "teliva_file_operations_predicate");
+  editNonCode("teliva_file_operations_predicate");
+  // error handling
+  assert(trustedL);
+  int oldtop = lua_gettop(trustedL);
+  while (1) {
+    int status;
+    memset(file_operations_predicate_buffer, '\0', 512);
+    FILE* in = fopen("teliva_file_operations_predicate", "r");
+    fread(file_operations_predicate_buffer, 500, 1, in);  /* TODO: error message if file too large */
+    fclose(in);
+    status = luaL_loadbuffer(trustedL, file_operations_predicate_buffer, strlen(file_operations_predicate_buffer), "file_operation_permitted")
+        || docall(trustedL, 0, 1);
+    if (status == 0 || lua_isnil(trustedL, -1))
+      break;
+    Previous_error = lua_tostring(trustedL, -1);
+    if (Previous_error == NULL) Previous_error = "(error object is not a string)";
+    resumeNonCodeEdit();
+    lua_pop(trustedL, 1);
+  }
+  file_operations_predicate = file_operations_predicate_buffer;
+  if (lua_gettop(trustedL) != oldtop) {
+    endwin();
+    printf("edit_file_operations_predicate: memory leak %d -> %d\n", oldtop, lua_gettop(trustedL));
+    exit(1);
+  }
+}
+
+static void permissions_view() {
   while (true) {
-    render_permissions_screen(L);
+    render_permissions_screen();
     int c = getch();
     switch (c) {
       case CTRL_X:
         return;
       case CTRL_F:
-        file_operations_permitted = !file_operations_permitted;
+        edit_file_operations_predicate();
         break;
       case CTRL_N:
         net_operations_permitted = !net_operations_permitted;
@@ -1155,9 +1255,11 @@ static void save_permissions_to_user_configuration(lua_State* L) {
     const char* image_name = lua_tostring(L, -1);
     if (strcmp(image_name, Image_name) != 0) {
       fprintf(out, "- image_name: %s\n", image_name);
-      lua_getfield(L, -2, "file_operations_permitted");
-      fprintf(out, "  file_operations_permitted: %s\n", lua_tostring(L, -1));
-      lua_pop(L, 1);  /* file_operations_permitted */
+      fprintf(out, "  file_operations_predicate:\n");
+      lua_getfield(L, -2, "file_operations_predicate");
+      if (!lua_isnil(L, -1))
+        emit_multiline_string(out, lua_tostring(L, -1));
+      lua_pop(L, 1);  /* file_operations_predicate */
       lua_getfield(L, -2, "net_operations_permitted");
       fprintf(out, "  net_operations_permitted: %s\n", lua_tostring(L, -1));
       lua_pop(L, 1);  /* net_operations_permitted */
@@ -1166,7 +1268,9 @@ static void save_permissions_to_user_configuration(lua_State* L) {
   }
   lua_settop(L, oldtop);
   fprintf(out, "- image_name: %s\n", Image_name);
-  fprintf(out, "  file_operations_permitted: %d\n", file_operations_permitted);
+  fprintf(out, "  file_operations_predicate:\n");
+  assert(file_operations_predicate);
+  emit_multiline_string(out, file_operations_predicate);
   fprintf(out, "  net_operations_permitted: %d\n", net_operations_permitted);
   fclose(out);
   if (in) fclose(in);
@@ -1174,9 +1278,21 @@ static void save_permissions_to_user_configuration(lua_State* L) {
 }
 
 static void load_permissions_from_user_configuration(lua_State* L) {
+  static char file_operations_predicate_buffer[512];
+  initialize_trustedL();
+  file_operations_predicate = default_file_operations_predicate;
+  int status = luaL_loadbuffer(trustedL, file_operations_predicate, strlen(file_operations_predicate), "file_operation_permitted")
+      || docall(trustedL, 0, 1);
+  if (status != 0 && lua_isnil(trustedL, -1)) {
+    endwin();
+    printf("can't load default file operations predicate\n");
+    exit(1);
+  }
   const char* rcfilename = user_configuration_filename();
   FILE* in = fopen(rcfilename, "r");
   if (in == NULL) return;
+  file_operations_predicate = default_file_operations_predicate;
+  assert(file_operations_predicate);
   /* read entries from rcfilename and look for a match with the current
    * Image_name. */
   int oldtop = lua_gettop(L);
@@ -1186,9 +1302,13 @@ static void load_permissions_from_user_configuration(lua_State* L) {
     lua_getfield(L, -1, "image_name");
     const char* image_name = lua_tostring(L, -1);
     if (strcmp(image_name, Image_name) == 0) {
-      lua_getfield(L, -2, "file_operations_permitted");
-      file_operations_permitted = lua_tointeger(L, -1);
-      lua_pop(L, 1);  /* file_operations_permitted */
+      lua_getfield(L, -2, "file_operations_predicate");
+      if (!lua_isnil(L, -1)) {
+        memset(file_operations_predicate_buffer, '\0', 512);
+        strncpy(file_operations_predicate_buffer, lua_tostring(L, -1), 500);
+        file_operations_predicate = file_operations_predicate_buffer;
+      }
+      lua_pop(L, 1);  /* file_operations_predicate */
       lua_getfield(L, -2, "net_operations_permitted");
       net_operations_permitted = lua_tointeger(L, -1);
       lua_pop(L, 1);  /* net_operations_permitted */
@@ -1197,6 +1317,16 @@ static void load_permissions_from_user_configuration(lua_State* L) {
   }
   lua_settop(L, oldtop);
   fclose(in);
+  /* trusted section */
+  assert(file_operations_predicate);
+  status = luaL_loadbuffer(trustedL, file_operations_predicate, strlen(file_operations_predicate), "file_operation_permitted")
+      || docall(trustedL, 0, 1);
+  if (status == 0 || lua_isnil(trustedL, -1))
+    return;
+  /* TODO: more graceful error handling */
+  endwin();
+  printf("error in loading file operations predicate from %s\n", rcfilename);
+  exit(1);
 }
 
 void permissions_mode(lua_State* L) {
@@ -1216,7 +1346,7 @@ void permissions_mode(lua_State* L) {
   init_pair(COLOR_PAIR_RISK, COLOR_RISK_NORMAL, COLOR_BACKGROUND);
   nodelay(stdscr, 0);  /* always make getch() block in developer mode */
   curs_set(1);  /* always display cursor in developer mode */
-  permissions_view(L);
+  permissions_view();
   save_permissions_to_user_configuration(L);
   cleanup_curses();
   execv(Argv[0], Argv);

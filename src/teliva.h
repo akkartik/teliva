@@ -155,7 +155,7 @@ extern char* Previous_message;
 extern int handle_image(lua_State* L, char** argv, int n);
 extern void developer_mode(lua_State* L);
 extern void permissions_mode(lua_State* L);
-extern int file_operations_permitted;
+extern int file_operation_permitted(const char* filename, const char* mode);
 extern int net_operations_permitted;
 
 extern int load_editor_buffer_to_current_definition_in_image(lua_State* L);

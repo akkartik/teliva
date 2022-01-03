@@ -1282,5 +1282,16 @@ int resumeEdit(lua_State* L) {
     return Back_to_big_picture;
 }
 
+void resumeNonCodeEdit() {
+    Quit = 0;
+    Back_to_big_picture = 0;
+    while(!Quit) {
+        E.cols = COLS-LINE_NUMBER_SPACE;  /* update on resize */
+        editorRefreshScreen(editorMenu);
+        int c = getch();
+        editorProcessKeypress2(c);
+    }
+}
+
 /* vim:tabstop=4:shiftwidth=0:expandtab:softtabstop=-1
  */

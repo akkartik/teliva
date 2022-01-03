@@ -132,6 +132,10 @@ static char iolib_errbuf[1024] = {0};
 static int io_open (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
   const char *mode = luaL_optstring(L, 2, "r");
+  static buffer[1024] = {0};
+  memset(buffer, '\0', 1024);
+  snprintf(buffer, 1020, "io.open(\"%s\", \"%s\")", filename, mode);
+  append_to_audit_log(L, buffer);
   FILE **pf = newfile(L);
   if (file_operation_permitted(filename, mode))
     *pf = fopen(filename, mode);

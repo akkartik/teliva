@@ -162,6 +162,8 @@ extern int load_editor_buffer_to_current_definition_in_image(lua_State* L);
 extern void save_to_current_definition_and_editor_buffer(lua_State* L, const char* definition);
 extern void save_editor_state(int rowoff, int coloff, int cy, int cx);
 
+extern void append_to_audit_log(lua_State* L, const char* buffer);
+
 /* Standard UI elements */
 extern void render_trusted_teliva_data(lua_State* L);
 

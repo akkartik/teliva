@@ -98,8 +98,6 @@ static void draw_menu(lua_State* L) {
   attrset(A_NORMAL);
 }
 
-/*** Permissions screen */
-
 static void render_permissions(lua_State* L) {
   attrset(A_NORMAL);
   mvaddstr(LINES-1, COLS-12, "");
@@ -204,6 +202,7 @@ static void big_picture_menu(void) {
   draw_menu_item("^h", "backspace");
   draw_menu_item("^u", "clear");
   draw_menu_item("^r", "recent changes");
+  draw_menu_item("^e", "recent events");
   attrset(A_NORMAL);
 }
 
@@ -258,6 +257,7 @@ void draw_highlighted_definition_name(const char* definition_name) {
 /* return true if submitted */
 static int edit_current_definition(lua_State* L);
 static void recent_changes_view(lua_State* L);
+static void events_view();
 void big_picture_view(lua_State* L) {
   /* Without any intervening edits, big_picture_view always stably renders
    * definitions in exactly the same spatial order, both in levels from top to
@@ -473,6 +473,9 @@ restart:
       save_to_current_definition_and_editor_buffer(L, highlight);
       int back_to_big_picture = edit_current_definition(L);
       if (back_to_big_picture) goto restart;
+      return;
+    } else if (c == CTRL_E) {
+      events_view();
       return;
     } else if (isprint(c)) {
       if (qlen < CURRENT_DEFINITION_LEN) {
@@ -1051,6 +1054,8 @@ static void clear_call_graph(lua_State* L) {
   assert(lua_gettop(L) == oldtop);
 }
 
+/*** Permissions */
+
 /* Perform privilege calculations in a whole other isolated context. */
 lua_State* trustedL = NULL;
 
@@ -1365,6 +1370,66 @@ void permissions_mode(lua_State* L) {
   execv(Argv[0], Argv);
   /* never returns */
 }
+
+/*** (Audit) Events screen */
+
+typedef struct {
+  char* line;
+  char* func;
+} AuditEvent;
+
+AuditEvent audit_event[1024];
+int naudit = 0;
+
+void append_to_audit_log(lua_State* L, const char* buffer) {
+  lua_Debug ar;
+  lua_getstack(L, 1, &ar);
+  lua_getinfo(L, "n", &ar);
+  if (!ar.name) return;
+  audit_event[naudit].line = strdup(buffer);
+  audit_event[naudit].func = strdup(ar.name);
+  ++naudit;
+  assert(naudit < 1024);
+}
+
+static void events_menu() {
+  attrset(A_REVERSE);
+  for (int x = 0; x < COLS; ++x)
+    mvaddch(LINES-1, x, ' ');
+  attrset(A_NORMAL);
+  menu_column = 2;
+  draw_menu_item("^x", "go back");
+  attrset(A_NORMAL);
+}
+
+static void render_events() {
+  clear();
+  attrset(A_BOLD);
+  mvaddstr(1, 0, "Recent events");
+  attrset(A_NORMAL);
+  for (int i = 0, y = 3; i < naudit; ++i, ++y) {
+    if (i >= LINES-1) break;
+    attron(A_BOLD);
+    mvaddstr(y, 2, audit_event[i].func);
+    attroff(A_BOLD);
+    mvaddstr(y, 16, audit_event[i].line);
+  }
+  events_menu();
+  refresh();
+}
+
+static void events_view() {
+  while (true) {
+    render_events();
+    int c = getch();
+    switch (c) {
+      case CTRL_X:
+        return;
+    }
+  }
+}
+
+/*** Main */
 
 char* Image_name = NULL;
 extern void set_args (lua_State *L, char **argv, int n);

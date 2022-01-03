@@ -272,7 +272,7 @@ void assign_call_graph_depth_to_name(lua_State* L, int depth, const char* name) 
     lua_setfield(L, cgt, name);
   }
   // clean up
-  lua_pop(L, 1);  // key
+  lua_pop(L, 1);  // value
   lua_pop(L, 1);  // table
 }
 

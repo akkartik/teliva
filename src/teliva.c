@@ -51,8 +51,8 @@ static const char* trim(const char* in) {
   return result;
 }
 
-const char* default_file_operations_predicate = "function file_operation_permitted(filename, mode)\n  return false\nend";
-const char* file_operations_predicate;
+const char* default_file_operations_predicate_body = "return false";
+const char* file_operations_predicate_body;
 int net_operations_permitted = false;
 
 static void render_permissions(lua_State* L);
@@ -104,7 +104,7 @@ static void render_permissions(lua_State* L) {
   attrset(A_NORMAL);
   mvaddstr(LINES-1, COLS-12, "");
   int file_colors = COLOR_PAIR_SAFE;
-  if (file_operations_predicate && strcmp(default_file_operations_predicate, trim(file_operations_predicate)) != 0)
+  if (file_operations_predicate_body && strcmp(default_file_operations_predicate_body, trim(file_operations_predicate_body)) != 0)
     file_colors = COLOR_PAIR_WARN;
   int net_colors = net_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
   if (file_colors == COLOR_PAIR_WARN && net_colors == COLOR_PAIR_WARN) {
@@ -1096,7 +1096,9 @@ static void render_permissions_screen() {
   attrset(A_NORMAL);
 
   mvaddstr(7, 5, "File operations");
-  int y = render_wrapped_text(7, 30, COLS-5, file_operations_predicate);
+  mvaddstr(7, 30, "function file_operation_permitted(filename, mode)");
+  int y = render_wrapped_text(8, 32, COLS-5, file_operations_predicate_body);
+  mvaddstr(y, 30, "end");
   y += 2;
 
   int net_colors = net_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
@@ -1116,14 +1118,14 @@ static void render_permissions_screen() {
     default:
       abort();
   }
-  ++y;
+  y++;
   attroff(A_REVERSE);
   attroff(COLOR_PAIR(net_colors));
   mvaddstr(y, 30, "(No nuance available for network operations.)");
 
-  int file_operations_safe = strcmp(default_file_operations_predicate, trim(file_operations_predicate)) == 0;
+  int file_operations_safe = strcmp(default_file_operations_predicate_body, trim(file_operations_predicate_body)) == 0;
   int net_operations_safe = (net_operations_permitted == 0);
-  int file_operations_unsafe = strcmp("return true", trim(file_operations_predicate)) == 0;
+  int file_operations_unsafe = strcmp("return true", trim(file_operations_predicate_body)) == 0;
   int net_operations_unsafe = (net_operations_permitted != 0);
   if (file_operations_safe && net_operations_safe) {
     attron(COLOR_PAIR(COLOR_PAIR_SAFE));
@@ -1156,33 +1158,34 @@ static void render_permissions_screen() {
   refresh();
 }
 
+extern void editNonCode2(char* filename);
 extern void resumeNonCodeEdit();
-static void edit_file_operations_predicate() {
-  static char file_operations_predicate_buffer[512];
+static void edit_file_operations_predicate_body() {
+  static char file_operations_predicate_body_buffer[512];
   /* save to disk */
-  char outfilename[] = "teliva_file_operations_predicate_XXXXXX";
+  char outfilename[] = "teliva_file_operations_predicate_body_XXXXXX";
   int outfd = mkstemp(outfilename);
   if (outfd == -1) {
     endwin();
-    perror("edit_file_operations_predicate: error in creating temporary file");
+    perror("edit_file_operations_predicate_body: error in creating temporary file");
     abort();
   }
   FILE* out = fdopen(outfd, "w");
   assert(out != NULL);
-  fprintf(out, "%s", file_operations_predicate);
+  fprintf(out, "%s", file_operations_predicate_body);
   fclose(out);
-  rename(outfilename, "teliva_file_operations_predicate");
-  editNonCode("teliva_file_operations_predicate");
+  rename(outfilename, "teliva_file_operations_predicate_body");
+  editNonCode2("teliva_file_operations_predicate_body");
   // error handling
   assert(trustedL);
   int oldtop = lua_gettop(trustedL);
   while (1) {
     int status;
-    memset(file_operations_predicate_buffer, '\0', 512);
-    FILE* in = fopen("teliva_file_operations_predicate", "r");
-    fread(file_operations_predicate_buffer, 500, 1, in);  /* TODO: error message if file too large */
+    memset(file_operations_predicate_body_buffer, '\0', 512);
+    FILE* in = fopen("teliva_file_operations_predicate_body", "r");
+    fread(file_operations_predicate_body_buffer, 500, 1, in);  /* TODO: error message if file too large */
     fclose(in);
-    status = luaL_loadbuffer(trustedL, file_operations_predicate_buffer, strlen(file_operations_predicate_buffer), "file_operation_permitted")
+    status = luaL_loadbuffer(trustedL, file_operations_predicate_body_buffer, strlen(file_operations_predicate_body_buffer), "file_operation_permitted")
         || docall(trustedL, 0, 1);
     if (status == 0 || lua_isnil(trustedL, -1))
       break;
@@ -1191,10 +1194,10 @@ static void edit_file_operations_predicate() {
     resumeNonCodeEdit();
     lua_pop(trustedL, 1);
   }
-  file_operations_predicate = file_operations_predicate_buffer;
+  file_operations_predicate_body = file_operations_predicate_body_buffer;
   if (lua_gettop(trustedL) != oldtop) {
     endwin();
-    printf("edit_file_operations_predicate: memory leak %d -> %d\n", oldtop, lua_gettop(trustedL));
+    printf("edit_file_operations_predicate_body: memory leak %d -> %d\n", oldtop, lua_gettop(trustedL));
     exit(1);
   }
 }
@@ -1207,7 +1210,7 @@ static void permissions_view() {
       case CTRL_X:
         return;
       case CTRL_F:
-        edit_file_operations_predicate();
+        edit_file_operations_predicate_body();
         break;
       case CTRL_N:
         net_operations_permitted = !net_operations_permitted;
@@ -1255,11 +1258,11 @@ static void save_permissions_to_user_configuration(lua_State* L) {
     const char* image_name = lua_tostring(L, -1);
     if (strcmp(image_name, Image_name) != 0) {
       fprintf(out, "- image_name: %s\n", image_name);
-      fprintf(out, "  file_operations_predicate:\n");
-      lua_getfield(L, -2, "file_operations_predicate");
+      fprintf(out, "  file_operations_predicate_body:\n");
+      lua_getfield(L, -2, "file_operations_predicate_body");
       if (!lua_isnil(L, -1))
         emit_multiline_string(out, lua_tostring(L, -1));
-      lua_pop(L, 1);  /* file_operations_predicate */
+      lua_pop(L, 1);  /* file_operations_predicate_body */
       lua_getfield(L, -2, "net_operations_permitted");
       fprintf(out, "  net_operations_permitted: %s\n", lua_tostring(L, -1));
       lua_pop(L, 1);  /* net_operations_permitted */
@@ -1268,9 +1271,9 @@ static void save_permissions_to_user_configuration(lua_State* L) {
   }
   lua_settop(L, oldtop);
   fprintf(out, "- image_name: %s\n", Image_name);
-  fprintf(out, "  file_operations_predicate:\n");
-  assert(file_operations_predicate);
-  emit_multiline_string(out, file_operations_predicate);
+  fprintf(out, "  file_operations_predicate_body:\n");
+  assert(file_operations_predicate_body);
+  emit_multiline_string(out, file_operations_predicate_body);
   fprintf(out, "  net_operations_permitted: %d\n", net_operations_permitted);
   fclose(out);
   if (in) fclose(in);
@@ -1278,21 +1281,26 @@ static void save_permissions_to_user_configuration(lua_State* L) {
 }
 
 static void load_permissions_from_user_configuration(lua_State* L) {
-  static char file_operations_predicate_buffer[512];
+  static char file_operations_predicate_body_buffer[512];
   initialize_trustedL();
-  file_operations_predicate = default_file_operations_predicate;
-  int status = luaL_loadbuffer(trustedL, file_operations_predicate, strlen(file_operations_predicate), "file_operation_permitted")
+  char file_operations_predicate_buffer[1024];
+  memset(file_operations_predicate_buffer, '\0', 1024);
+  file_operations_predicate_body = default_file_operations_predicate_body;
+  strcpy(file_operations_predicate_buffer, "function file_operation_permitted(filename, mode)\n");
+  strncat(file_operations_predicate_buffer, file_operations_predicate_body, 1020);
+  strncat(file_operations_predicate_buffer, "\nend", 1020);
+  int status = luaL_loadbuffer(trustedL, file_operations_predicate_buffer, strlen(file_operations_predicate_buffer), "file_operation_permitted")
       || docall(trustedL, 0, 1);
   if (status != 0 && lua_isnil(trustedL, -1)) {
     endwin();
-    printf("can't load default file operations predicate\n");
+    printf("can't load default file operations predicate_body\n");
     exit(1);
   }
   const char* rcfilename = user_configuration_filename();
   FILE* in = fopen(rcfilename, "r");
   if (in == NULL) return;
-  file_operations_predicate = default_file_operations_predicate;
-  assert(file_operations_predicate);
+  file_operations_predicate_body = default_file_operations_predicate_body;
+  assert(file_operations_predicate_body);
   /* read entries from rcfilename and look for a match with the current
    * Image_name. */
   int oldtop = lua_gettop(L);
@@ -1302,13 +1310,13 @@ static void load_permissions_from_user_configuration(lua_State* L) {
     lua_getfield(L, -1, "image_name");
     const char* image_name = lua_tostring(L, -1);
     if (strcmp(image_name, Image_name) == 0) {
-      lua_getfield(L, -2, "file_operations_predicate");
+      lua_getfield(L, -2, "file_operations_predicate_body");
       if (!lua_isnil(L, -1)) {
-        memset(file_operations_predicate_buffer, '\0', 512);
-        strncpy(file_operations_predicate_buffer, lua_tostring(L, -1), 500);
-        file_operations_predicate = file_operations_predicate_buffer;
+        memset(file_operations_predicate_body_buffer, '\0', 512);
+        strncpy(file_operations_predicate_body_buffer, lua_tostring(L, -1), 500);
+        file_operations_predicate_body = file_operations_predicate_body_buffer;
       }
-      lua_pop(L, 1);  /* file_operations_predicate */
+      lua_pop(L, 1);  /* file_operations_predicate_body */
       lua_getfield(L, -2, "net_operations_permitted");
       net_operations_permitted = lua_tointeger(L, -1);
       lua_pop(L, 1);  /* net_operations_permitted */
@@ -1318,14 +1326,19 @@ static void load_permissions_from_user_configuration(lua_State* L) {
   lua_settop(L, oldtop);
   fclose(in);
   /* trusted section */
-  assert(file_operations_predicate);
-  status = luaL_loadbuffer(trustedL, file_operations_predicate, strlen(file_operations_predicate), "file_operation_permitted")
+  assert(file_operations_predicate_body);
+  strcpy(file_operations_predicate_buffer, "function file_operation_permitted(filename, mode)\n");
+  strncat(file_operations_predicate_buffer, file_operations_predicate_body, 1020);
+  if (file_operations_predicate_buffer[strlen(file_operations_predicate_buffer)-1] != '\n')
+    strncat(file_operations_predicate_buffer, "\n", 1020);
+  strncat(file_operations_predicate_buffer, "end", 1020);
+  status = luaL_loadbuffer(trustedL, file_operations_predicate_buffer, strlen(file_operations_predicate_buffer), "file_operation_permitted")
       || docall(trustedL, 0, 1);
   if (status == 0 || lua_isnil(trustedL, -1))
     return;
   /* TODO: more graceful error handling */
   endwin();
-  printf("error in loading file operations predicate from %s\n", rcfilename);
+  printf("error in loading file operations predicate_body from %s\n", rcfilename);
   exit(1);
 }
 

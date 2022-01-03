@@ -1246,7 +1246,6 @@ static void editorNonCodeMenu(void) {
     attrset(A_NORMAL);
 }
 
-/* return true if user chose to back into the big picture view */
 void editNonCode(char* filename) {
     Quit = 0;
     Back_to_big_picture = 0;
@@ -1259,6 +1258,28 @@ void editNonCode(char* filename) {
         E.startrow = CALLERS_SPACE;
         E.endrow = LINES-MENU_SPACE;
         editorRefreshScreen(editorNonCodeMenu);
+        int c = getch();
+        editorProcessKeypress2(c);
+    }
+}
+
+void editNonCode2(char* filename) {
+    Quit = 0;
+    Back_to_big_picture = 0;
+    initEditor();
+    E.startcol = LINE_NUMBER_SPACE;
+    E.startrow = 1;  /* space for function header */
+    E.endrow = 10;  /* nudge people to keep function short */
+    editorOpen(filename);
+    while(!Quit) {
+        /* update on resize */
+        E.cols = COLS-LINE_NUMBER_SPACE;
+        editorRefreshScreen(editorNonCodeMenu);
+        int y, x;
+        getyx(stdscr, y, x);
+        mvaddstr(0, 0, "function file_operation_permitted(filename, mode)");
+        mvaddstr(E.startrow + E.numrows - E.rowoff, 0, "end");
+        mvaddstr(y, x, "");
         int c = getch();
         editorProcessKeypress2(c);
     }

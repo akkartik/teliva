@@ -30,7 +30,7 @@
 #include "lundump.h"
 #include "lvm.h"
 #include "lzio.h"
-
+#include "teliva.h"
 
 
 
@@ -283,7 +283,9 @@ void record_metadata_about_function_call (lua_State *L, CallInfo *ci) {
     return;
   int g = GETARG_Bx(i);  /* global index */
   lua_assert(ttisstring(&p->k[g]));
-  assign_call_graph_depth_to_name(L, ci - L->base_ci, svalue(&p->k[g]));
+  const char* function_name = svalue(&p->k[g]);
+  assign_call_graph_depth_to_name(L, ci - L->base_ci, function_name);
+  save_caller(L, function_name);
 }
 
 

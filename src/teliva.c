@@ -276,6 +276,56 @@ void assign_call_graph_depth_to_name(lua_State* L, int depth, const char* name) 
   lua_pop(L, 1);  // table
 }
 
+int array_contains_string(lua_State* L, int array_index, const char* s) {
+  int oldtop = lua_gettop(L);
+  assert(lua_istable(L, array_index));
+  int array_size = luaL_getn(L, array_index);
+  int result = false;
+  for (int i = 1; i <= array_size; ++i) {
+    lua_rawgeti(L, array_index, i);
+    assert(lua_isstring(L, -1));
+    const char* curr = lua_tostring(L, -1);
+    result = result || (strcmp(curr, s) == 0);
+    lua_pop(L, 1);  // current element
+    if (result) break;
+  }
+  assert(oldtop == lua_gettop(L));
+  return result;
+}
+
+void append_string_to_array(lua_State* L, int array_index, const char* s) {
+  assert(lua_istable(L, array_index));
+  int array_size = luaL_getn(L, array_index);
+  int new_index = array_size+1;
+  lua_pushstring(L, s);
+  lua_rawseti(L, array_index, new_index);
+}
+
+void save_caller(lua_State* L, const char* name) {
+  lua_Debug ar;
+  lua_getstack(L, 2, &ar);
+  lua_getinfo(L, "n", &ar);
+  if (!ar.name) return;
+  // push table of caller tables
+  luaL_newmetatable(L, "__teliva_caller");
+  int ct = lua_gettop(L);
+  // if key doesn't already exist, map it to an empty caller table
+  lua_getfield(L, ct, name);
+  if (lua_isnil(L, -1)) {
+    lua_newtable(L);
+    lua_setfield(L, ct, name);
+  }
+  // append the caller's name to the caller table if necessary
+  lua_pop(L, 1);  // old value
+  lua_getfield(L, ct, name);  // new value = caller table
+  int curr_caller_index = lua_gettop(L);
+  lua_pushboolean(L, true);
+  lua_setfield(L, curr_caller_index, ar.name);
+  // clean up
+  lua_pop(L, 1);  // caller table
+  lua_pop(L, 1);  // table of caller tables
+}
+
 /* return true if submitted */
 static int edit_current_definition(lua_State* L);
 static void recent_changes_view(lua_State* L);

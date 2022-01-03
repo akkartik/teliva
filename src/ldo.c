@@ -261,7 +261,7 @@ static StkId tryfuncTM (lua_State *L, StkId func) {
 extern Instruction symbexec (const Proto *pt, int lastpc, int reg);
 extern int luaL_newmetatable (lua_State *L, const char *tname);
 extern void endwin (void);
-void record_depth_of_global_function (lua_State *L, CallInfo *ci) {
+void record_metadata_about_function_call (lua_State *L, CallInfo *ci) {
   if (!isLua(ci))
     return;
   if (ci->tailcalls > 0)
@@ -327,7 +327,7 @@ int luaD_precall (lua_State *L, StkId func, int nresults) {
     for (st = L->top; st < ci->top; st++)
       setnilvalue(st);
     L->top = ci->top;
-    record_depth_of_global_function(L, ci);
+    record_metadata_about_function_call(L, ci);
     if (L->hookmask & LUA_MASKCALL) {
       L->savedpc++;  /* hooks assume 'pc' is already incremented */
       luaD_callhook(L, LUA_HOOKCALL, -1);

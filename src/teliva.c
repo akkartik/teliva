@@ -301,11 +301,16 @@ void append_string_to_array(lua_State* L, int array_index, const char* s) {
   lua_rawseti(L, array_index, new_index);
 }
 
-void save_caller(lua_State* L, const char* name) {
+extern void save_caller_as(lua_State* L, const char* name, const char* caller_name);
+void save_caller(lua_State* L, const char* name, int call_graph_depth) {
   lua_Debug ar;
-  lua_getstack(L, 2, &ar);
+  lua_getstack(L, 1, &ar);
   lua_getinfo(L, "n", &ar);
-  if (!ar.name) return;
+  if (ar.name) save_caller_as(L, name, ar.name);
+  else if (call_graph_depth == 2) save_caller_as(L, name, "main");  // the way Teliva calls `main` messes with debug info
+}
+
+void save_caller_as(lua_State* L, const char* name, const char* caller_name) {
   // push table of caller tables
   luaL_newmetatable(L, "__teliva_caller");
   int ct = lua_gettop(L);
@@ -320,10 +325,26 @@ void save_caller(lua_State* L, const char* name) {
   lua_getfield(L, ct, name);  // new value = caller table
   int curr_caller_index = lua_gettop(L);
   lua_pushboolean(L, true);
-  lua_setfield(L, curr_caller_index, ar.name);
+  lua_setfield(L, curr_caller_index, caller_name);
   // clean up
   lua_pop(L, 1);  // caller table
   lua_pop(L, 1);  // table of caller tables
+}
+
+static void clear_caller(lua_State* L) {
+  int oldtop = lua_gettop(L);
+  luaL_newmetatable(L, "__teliva_caller");
+  int ct = lua_gettop(L);
+  lua_pushnil(L);
+  while (lua_next(L, ct) != 0) {
+    lua_pop(L, 1);  /* old value */
+    lua_pushvalue(L, -1);  /* duplicate key */
+    lua_pushnil(L);  /* new value */
+    lua_settable(L, ct);
+    /* one copy of key left for lua_next */
+  }
+  lua_pop(L, 1);
+  assert(lua_gettop(L) == oldtop);
 }
 
 /* return true if submitted */
@@ -583,6 +604,30 @@ int editor_view_in_progress(lua_State* L) {
   return result;
 }
 
+char Current_definition[CURRENT_DEFINITION_LEN+1] = {0};
+
+void draw_callers_of_current_definition(lua_State* L) {
+  int oldtop = lua_gettop(L);
+  luaL_newmetatable(L, "__teliva_caller");
+  int ct = lua_gettop(L);
+  lua_getfield(L, ct, Current_definition);
+  if (lua_isnil(L, -1)) {
+    lua_pop(L, 2);
+    assert(oldtop == lua_gettop(L));
+    return;
+  }
+  int ctc = lua_gettop(L);
+  attron(COLOR_PAIR(COLOR_PAIR_FADE));
+  mvaddstr(0, 0, "callers: ");
+  attroff(COLOR_PAIR(COLOR_PAIR_FADE));
+  for (lua_pushnil(L); lua_next(L, ctc) != 0; lua_pop(L, 1)) {
+    const char* caller_name = lua_tostring(L, -2);
+    draw_definition_name(caller_name);
+  }
+  lua_pop(L, 2);  // caller table, __teliva_caller
+  assert(oldtop == lua_gettop(L));
+}
+
 extern int load_editor_buffer_to_current_definition_in_image(lua_State* L);
 extern int resumeEdit(lua_State* L);
 extern int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx);
@@ -647,8 +692,6 @@ void developer_mode(lua_State* L) {
   execv(Argv[0], Argv);
   /* never returns */
 }
-
-char Current_definition[CURRENT_DEFINITION_LEN+1] = {0};
 
 extern int mkstemp(char* template);
 extern FILE* fdopen(int fd, const char* mode);
@@ -1539,6 +1582,7 @@ int handle_image(lua_State* L, char** argv, int n) {
   if (status != 0) return report_in_developer_mode(L, status);
   /* clear callgraph stats from running tests */
   clear_call_graph(L);
+  clear_caller(L);
   /* initialize permissions */
   load_permissions_from_user_configuration(L);
   /* call main() */

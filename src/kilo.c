@@ -737,7 +737,8 @@ static void editorRefreshScreen(void (*menu_func)(void)) {
     erow *r;
     int current_color = -1;
     curs_set(0);
-    clear();
+    mvaddstr(E.startrow, 0, "");
+    clrtobot();
     attrset(A_NORMAL);
     /* Draw all line numbers first so they don't mess up curses state later
      * when rendering lines. */
@@ -1053,6 +1054,9 @@ static void editorGo(lua_State* L) {
               save_to_current_definition_and_editor_buffer(L, query);
               clearEditor();
               editorOpen("teliva_editor_buffer");
+              attrset(A_NORMAL);
+              clear();
+              draw_callers_of_current_definition(L);
             }
             return;
         } else if (c == CTRL_U) {
@@ -1201,6 +1205,9 @@ int edit(lua_State* L, char* filename) {
     Back_to_big_picture = 0;
     initEditor();
     editorOpen(filename);
+    attrset(A_NORMAL);
+    clear();
+    draw_callers_of_current_definition(L);
     while(!Quit) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;

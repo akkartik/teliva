@@ -283,9 +283,10 @@ void record_metadata_about_function_call (lua_State *L, CallInfo *ci) {
     return;
   int g = GETARG_Bx(i);  /* global index */
   lua_assert(ttisstring(&p->k[g]));
+  int call_graph_depth = ci - L->base_ci;
   const char* function_name = svalue(&p->k[g]);
-  assign_call_graph_depth_to_name(L, ci - L->base_ci, function_name);
-  save_caller(L, function_name);
+  assign_call_graph_depth_to_name(L, call_graph_depth, function_name);
+  save_caller(L, function_name, call_graph_depth);
 }
 
 

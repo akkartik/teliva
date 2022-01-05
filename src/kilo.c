@@ -665,7 +665,7 @@ static void editorMenu(void) {
       mvaddch(LINES-1, x, ' ');
     attrset(A_NORMAL);
     menu_column = 2;
-    draw_menu_item("^e", "run");
+    draw_menu_item("^x", "run");
     if (Previous_error != NULL) {
       attron(A_BOLD);
       draw_menu_item("^c", "abort");
@@ -1090,7 +1090,7 @@ static void editorProcessKeypress2(int c) {
         if (Previous_error != NULL)
             exit(1);
         break;
-    case CTRL_E:
+    case CTRL_X:
         /* Save and quit. */
         editorSaveToDisk();
         save_editor_state(E.rowoff, E.coloff, E.cy, E.cx);
@@ -1226,7 +1226,7 @@ static void editorNonCodeMenu(void) {
       mvaddch(LINES-1, x, ' ');
     attrset(A_NORMAL);
     menu_column = 2;
-    draw_menu_item("^e", "back");
+    draw_menu_item("^x", "back");
     if (Previous_error != NULL) {
       attron(A_BOLD);
       draw_menu_item("^c", "abort");

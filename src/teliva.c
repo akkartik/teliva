@@ -1235,6 +1235,60 @@ static void permissions_menu() {
   attrset(A_NORMAL);
 }
 
+void characterize_file_operations_predicate() {
+  static const char* test_filenames[] = { "foo", "/foo", "../foo", NULL };
+  static const char* test_modes[] = { "r", "r+", "w", "w+", "a", "a+", NULL };
+  int num_attempts = 0;
+  int num_rejections = 0;
+  int num_errors = 0;
+  for (const char** test_filename = test_filenames; *test_filename; ++test_filename) {
+    for (const char** test_mode = test_modes; *test_mode; ++test_mode) {
+      lua_getglobal(trustedL, "file_operation_permitted");
+      lua_pushstring(trustedL, *test_filename);
+      lua_pushstring(trustedL, *test_mode);
+      if (lua_pcall(trustedL, 2 /*args*/, 1 /*result*/, /*errfunc*/0)) {
+        /* TODO: error handling. Or should we use errfunc above? */
+      }
+      ++num_attempts;
+      if (!lua_isboolean(trustedL, -1)) {
+        ++num_errors;
+      } else {
+        if (!lua_toboolean(trustedL, -1))
+          ++num_rejections;
+      }
+    }
+  }
+
+  if (num_errors > 0) {
+    attron(COLOR_PAIR(COLOR_PAIR_ERROR));
+    addstr(" Throws errors some of the time. You should fix them before moving on. ");
+    attroff(COLOR_PAIR(COLOR_PAIR_ERROR));
+  }
+  else if (strcmp("return false", trim(file_operations_predicate_body)) == 0) {
+    attron(COLOR_PAIR(COLOR_PAIR_SAFE));
+    addstr("● Rejects all file operations.");
+    attroff(COLOR_PAIR(COLOR_PAIR_SAFE));
+  }
+  else if (strcmp("return true", trim(file_operations_predicate_body)) == 0) {
+    attron(COLOR_PAIR(COLOR_PAIR_WARN));
+    addstr("◯ Allows all file operations.");
+    attroff(COLOR_PAIR(COLOR_PAIR_WARN));
+  }
+  else {
+    static const char* statuses[5] = {
+      "◯ Weakly suspected to allow all file operations.",
+      "◔ Weakly suspected to allow most file operations.",
+      "◑ Weakly suspected to allow many file operations.",
+      "◕ Weakly suspected to reject most file operations.",
+      "● Weakly suspected to reject all file operations.",
+    };
+    attron(COLOR_PAIR(COLOR_PAIR_FADE));
+    int frac = (float)num_rejections/num_attempts*4;
+    addstr(statuses[frac]);
+    attroff(COLOR_PAIR(COLOR_PAIR_FADE));
+  }
+}
+
 static void render_permissions_screen() {
   clear();
   attrset(A_BOLD);
@@ -1246,6 +1300,9 @@ static void render_permissions_screen() {
   mvaddstr(7, 30, "function file_operation_permitted(filename, mode)");
   int y = render_wrapped_text(8, 32, COLS-5, file_operations_predicate_body);
   mvaddstr(y, 30, "end");
+  y++;
+  mvaddstr(y, 30, "");
+  characterize_file_operations_predicate();
   y += 2;
 
   int net_colors = net_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
@@ -1292,12 +1349,12 @@ static void render_permissions_screen() {
   else if (file_operations_unsafe && net_operations_unsafe) {
     attron(COLOR_PAIR(COLOR_PAIR_RISK));
     // idea: include pentagram emoji. But it isn't widely supported yet on Linux.
-    mvaddstr(5, 5, "😈 ⚠️  Teliva can't protect you if this app does something sketchy. Consider choosing stronger conditions. ⚠️  😈");
+    mvaddstr(5, 5, "😈 ⚠️  Teliva can't protect you if this app does something sketchy. Consider restricting permissions. ⚠️  😈");
     attroff(COLOR_PAIR(COLOR_PAIR_RISK));
   }
   else {
     attron(COLOR_PAIR(COLOR_PAIR_RISK));
-    mvaddstr(5, 5, "🦮 🙈 Teliva can't tell how much it's protecting you. Consider simplifying the conditions.");
+    mvaddstr(5, 5, "🦮 🙈 Teliva can't tell how much it's protecting you. Consider simplifying permissions.");
     attroff(COLOR_PAIR(COLOR_PAIR_RISK));
   }
 

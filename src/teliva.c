@@ -1305,6 +1305,23 @@ static void render_permissions_screen() {
   refresh();
 }
 
+/* Try running the function to test for errors. If code has an error, leave it
+ * on the stack and return non-zero */
+int validate_file_operations_predicate() {
+  lua_getglobal(trustedL, "file_operation_permitted");
+  lua_pushstring(trustedL, "foo");
+  lua_pushstring(trustedL, "r");
+  if (lua_pcall(trustedL, 2 /*args*/, 1 /*result*/, /*errfunc*/0)) {
+    /* TODO: error handling. Or should we use errfunc above? */
+  }
+  int status = 1;
+  if (lua_isboolean(trustedL, -1)) {
+    lua_pop(trustedL, 1);
+    status = 0;
+  }
+  return status;
+}
+
 static int load_file_operations_predicate(const char* body) {
   char buffer[1024] = {0};
   strcpy(buffer, "function file_operation_permitted(filename, mode)\n");
@@ -1313,11 +1330,12 @@ static int load_file_operations_predicate(const char* body) {
     strncat(buffer, "\n", 1020);
   strncat(buffer, "end\n", 1020);
   return luaL_loadbuffer(trustedL, buffer, strlen(buffer), "file_operation_permitted")
-          || docall(trustedL, 0, 1);
+          || docall(trustedL, 0, 1)
+          || validate_file_operations_predicate();
 }
 
 extern void editNonCode2(char* filename);
-extern void resumeNonCodeEdit();
+extern void resumeNonCodeEdit2();
 static void edit_file_operations_predicate_body() {
   static char file_operations_predicate_body_buffer[512];
   /* save to disk */
@@ -1348,7 +1366,7 @@ static void edit_file_operations_predicate_body() {
       break;
     Previous_error = lua_tostring(trustedL, -1);
     if (Previous_error == NULL) Previous_error = "(error object is not a string)";
-    resumeNonCodeEdit();
+    resumeNonCodeEdit2();
     lua_pop(trustedL, 1);
   }
   file_operations_predicate_body = file_operations_predicate_body_buffer;

@@ -1187,6 +1187,23 @@ void initialize_trustedL() {
   lua_gc(trustedL, LUA_GCRESTART, 0);
 }
 
+static const char* user_configuration_filename() {
+  const char* home = getenv("HOME");
+  if (home == NULL) {
+    endwin();
+    fprintf(stderr, "$HOME is not set; unclear where to save permissions.\n");
+    abort();
+  }
+  static char config_filename[1024] = {0};
+  memset(config_filename, '\0', 1024);
+  const char* config_home = getenv("XDG_CONFIG_HOME");
+  if (config_home == NULL)
+    snprintf(config_filename, 1024, "%s/.teliva", home);
+  else
+    snprintf(config_filename, 1024, "%s/.teliva", config_home);
+  return config_filename;
+}
+
 int file_operation_permitted(const char* filename, const char* mode) {
   int oldtop = lua_gettop(trustedL);
   lua_getglobal(trustedL, "file_operation_permitted");
@@ -1352,23 +1369,6 @@ static void permissions_view() {
         break;
     }
   }
-}
-
-static const char* user_configuration_filename() {
-  const char* home = getenv("HOME");
-  if (home == NULL) {
-    endwin();
-    fprintf(stderr, "$HOME is not set; unclear where to save permissions.\n");
-    abort();
-  }
-  static char config_filename[1024] = {0};
-  memset(config_filename, '\0', 1024);
-  const char* config_home = getenv("XDG_CONFIG_HOME");
-  if (config_home == NULL)
-    snprintf(config_filename, 1024, "%s/.teliva", home);
-  else
-    snprintf(config_filename, 1024, "%s/.teliva", config_home);
-  return config_filename;
 }
 
 static void save_permissions_to_user_configuration(lua_State* L) {

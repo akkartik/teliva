@@ -1287,6 +1287,7 @@ extern void editNonCode2(char* filename);
 extern void resumeNonCodeEdit();
 static void edit_file_operations_predicate_body() {
   static char file_operations_predicate_body_buffer[512];
+  static char file_operations_predicate_buffer[1024];
   /* save to disk */
   char outfilename[] = "teliva_file_operations_predicate_body_XXXXXX";
   int outfd = mkstemp(outfilename);
@@ -1310,7 +1311,13 @@ static void edit_file_operations_predicate_body() {
     FILE* in = fopen("teliva_file_operations_predicate_body", "r");
     fread(file_operations_predicate_body_buffer, 500, 1, in);  /* TODO: error message if file too large */
     fclose(in);
-    status = luaL_loadbuffer(trustedL, file_operations_predicate_body_buffer, strlen(file_operations_predicate_body_buffer), "file_operation_permitted")
+    memset(file_operations_predicate_buffer, '\0', 1024);
+    strcpy(file_operations_predicate_buffer, "function file_operation_permitted(filename, mode)\n");
+    strncat(file_operations_predicate_buffer, file_operations_predicate_body, 1020);
+    if (file_operations_predicate_buffer[strlen(file_operations_predicate_buffer)-1] != '\n')
+      strncat(file_operations_predicate_buffer, "\n", 1020);
+    strncat(file_operations_predicate_buffer, "end", 1020);
+    status = luaL_loadbuffer(trustedL, file_operations_predicate_buffer, strlen(file_operations_predicate_buffer), "file_operation_permitted")
         || docall(trustedL, 0, 1);
     if (status == 0 || lua_isnil(trustedL, -1))
       break;
@@ -1408,7 +1415,7 @@ static void save_permissions_to_user_configuration(lua_State* L) {
 static void load_permissions_from_user_configuration(lua_State* L) {
   static char file_operations_predicate_body_buffer[512];
   initialize_trustedL();
-  char file_operations_predicate_buffer[1024];
+  static char file_operations_predicate_buffer[1024];
   memset(file_operations_predicate_buffer, '\0', 1024);
   file_operations_predicate_body = default_file_operations_predicate_body;
   strcpy(file_operations_predicate_buffer, "function file_operation_permitted(filename, mode)\n");

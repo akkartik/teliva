@@ -1212,7 +1212,12 @@ int file_operation_permitted(const char* filename, const char* mode) {
   if (lua_pcall(trustedL, 2 /*args*/, 1 /*result*/, /*errfunc*/0)) {
     /* TODO: error handling. Or should we use errfunc above? */
   }
-  assert(lua_isboolean(trustedL, -1));
+  if (!lua_isboolean(trustedL, -1)) {
+    endwin();
+    printf("Sorry, there's an error in permissions for this image.\n");
+    printf("Delete '%s' or try editing it by hand.\n", user_configuration_filename());
+    exit(1);
+  }
   int should_allow = lua_toboolean(trustedL, -1);
   lua_settop(trustedL, oldtop);
   return should_allow;

@@ -1044,6 +1044,8 @@ static void editorGo(lua_State* L) {
 
     while(1) {
         editorRefreshScreen(editorGoMenu);
+        mvaddstr(E.endrow-1, 0, "");
+        clrtoeol();
         mvprintw(E.endrow-1, 0, "Go to: %s", query);
 
         int c = getch();

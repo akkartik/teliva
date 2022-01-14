@@ -211,6 +211,20 @@ Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
   a consequence the menu sometimes mentions keys that don't work, just to
   encourage people to try options.)
 
+## Mirrors and Forks
+
+Updates to Teliva can be downloaded from the following mirrors:
+* https://github.com/akkartik/teliva
+* https://repo.or.cz/teliva.git
+* https://codeberg.org/akkartik/teliva
+* https://tildegit.org/akkartik/teliva
+* https://git.tilde.institute/akkartik/teliva
+* https://git.sr.ht/~akkartik/teliva
+* https://pagure.io/teliva
+
+Forks of Teliva are encouraged. If you show me your fork, I'll link to it
+here.
+
 ## Feedback
 
 [Most appreciated.](http://akkartik.name/contact)

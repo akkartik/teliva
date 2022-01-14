@@ -11,9 +11,10 @@
 
 ## What's this, then?
 
-An extremely naïve, [brutalist](https://en.wikipedia.org/wiki/Brutalist_architecture)
-environment for little text-mode [Lua](http://www.lua.org) apps that are easy
-to modify.
+Teliva is the most naive way to make software as easy to change as it is to
+use: an interpreted environment for running shareable little text-mode apps.
+Its language of choice is Lua, excluding all features that can conceivably
+introduce moving parts in running a Lua program.
 
 Here's how you run one of the example apps (the [Tower of Hanoi](https://en.wikipedia.org/wiki/Tower_of_Hanoi)):
 

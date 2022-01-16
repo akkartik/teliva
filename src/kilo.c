@@ -975,7 +975,7 @@ static void editorMoveCursor(int key) {
         }
         break;
     case KEY_DOWN:
-        if (filerow < E.numrows) {
+        if (filerow < E.numrows-1) {
             if (E.startrow + E.cy == E.endrow-1) {
                 E.rowoff++;
             } else {
@@ -1272,6 +1272,8 @@ void editNonCode(char* filename) {
     }
 }
 
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
+
 void editNonCode2(char* filename) {
     Quit = 0;
     Back_to_big_picture = 0;
@@ -1287,7 +1289,7 @@ void editNonCode2(char* filename) {
         int y, x;
         getyx(stdscr, y, x);
         mvaddstr(0, 0, "function file_operation_permitted(filename, mode)");
-        mvaddstr(E.startrow + E.numrows - E.rowoff, 0, "end");
+        mvaddstr(MIN(E.startrow + E.numrows, E.endrow), 0, "end");
         mvaddstr(y, x, "");
         int c = getch();
         editorProcessKeypress2(c);
@@ -1359,7 +1361,7 @@ void resumeNonCodeEdit2() {
         int y, x;
         getyx(stdscr, y, x);
         mvaddstr(0, 0, "function file_operation_permitted(filename, mode)");
-        mvaddstr(E.startrow + E.numrows - E.rowoff, 0, "end");
+        mvaddstr(MIN(E.startrow + E.numrows, E.endrow), 0, "end");
         mvaddstr(y, x, "");
         int c = getch();
         editorProcessKeypress2(c);

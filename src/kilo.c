@@ -1306,6 +1306,9 @@ int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int c
     E.cy = cy;
     E.cx = cx;
     editorOpen(filename);
+    attrset(A_NORMAL);
+    clear();
+    draw_callers_of_current_definition(L);
     while(!Quit) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;
@@ -1321,6 +1324,9 @@ int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int c
 int resumeEdit(lua_State* L) {
     Quit = 0;
     Back_to_big_picture = 0;
+    attrset(A_NORMAL);
+    clear();
+    draw_callers_of_current_definition(L);
     while(!Quit) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;

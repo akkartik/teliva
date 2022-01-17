@@ -1408,6 +1408,7 @@ static void edit_file_operations_predicate_body() {
   fprintf(out, "%s", file_operations_predicate_body);
   fclose(out);
   rename(outfilename, "teliva_file_operations_predicate_body");
+  Previous_error = "";
   editNonCode2("teliva_file_operations_predicate_body");
   // error handling
   assert(trustedL);

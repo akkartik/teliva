@@ -246,6 +246,11 @@
     >  local result = ''
     >  local cursor = 1
     >  local screen_rows, screen_cols = window:getmaxyx()
+    >  menu = {
+    >    {'enter', 'submit'},
+    >    {'ctrl-g', 'cancel'},
+    >    {'ctrl-u', 'clear'},
+    >  }
     >  while true do
     >    window:mvaddstr(screen_rows-1, 9, '')
     >    window:clrtoeol()
@@ -278,7 +283,7 @@
     >      cursor = 1
     >    elseif key == 10 then  -- enter
     >      return result
-    >    elseif key == 24 then  -- ctrl-x
+    >    elseif key == 7 then  -- ctrl-g
     >      return nil
     >    end
     >  end
@@ -336,7 +341,9 @@
     >    window:clrtoeol()
     >    window:mvaddstr(screen_rows-1, 5, 'go: ')
     >    curses.curs_set(2)
+    >    local old_menu = menu
     >    local new_url = edit_line(window)
+    >    menu = old_menu
     >    if new_url then
     >      state.url = new_url
     >      gemini_get(new_url)

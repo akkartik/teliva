@@ -20,7 +20,7 @@ MYLIBS=
 
 # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
 
-PLATS= aix ansi bsd freebsd generic linux macosx mingw posix solaris
+PLATS= aix ansi freebsd generic linux macosx mingw netbsd openbsd posix solaris
 
 LUA_A=	liblua.a
 CORE_O=	lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \
@@ -84,12 +84,6 @@ aix:
 ansi:
 	$(MAKE) all MYCFLAGS=-DLUA_ANSI
 
-bsd:
-	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
-	$(MAKE) -C luasocket freebsd
-	$(MAKE) -C luasec bsd
-	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lncurses"
-
 freebsd:
 	$(MAKE) all MYCFLAGS="-DLUA_USE_LINUX" MYLIBS="-Wl,-E"
 
@@ -114,6 +108,18 @@ mingw:
 	$(MAKE) "LUA_A=lua51.dll" "LUA_T=lua.exe" \
 	"AR=$(CC) -shared -o" "RANLIB=strip --strip-unneeded" \
 	"MYCFLAGS=-DLUA_BUILD_AS_DLL" "MYLIBS=" "MYLDFLAGS=-s" lua.exe
+
+openbsd:
+	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
+	$(MAKE) -C luasocket freebsd
+	$(MAKE) -C luasec bsd
+	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lncurses"
+
+netbsd:
+	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
+	$(MAKE) -C luasocket freebsd
+	$(MAKE) -C luasec bsd
+	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lncurses"
 
 posix:
 	$(MAKE) all MYCFLAGS=-DLUA_USE_POSIX

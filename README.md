@@ -21,7 +21,7 @@ Here's how you run one of the example apps (the [Tower of Hanoi](https://en.wiki
 ```sh
 git clone https://github.com/akkartik/teliva
 cd teliva
-make linux  # replace with 'macosx' or 'bsd' depending on your OS
+make linux  # replace with 'macosx', etc. depending on your OS
 src/teliva hanoi.tlv
 ```
 

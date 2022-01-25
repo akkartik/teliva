@@ -212,6 +212,9 @@ Teliva is the Tamil root for &lsquo;clear&rsquo;. Very much aspirational.
   a consequence the menu sometimes mentions keys that don't work, just to
   encourage people to try options.)
 
+* chesstv.tlv doesn't yet work on OpenBSD for some reason I haven't
+  investigated yet.
+
 ## Mirrors and Forks
 
 Updates to Teliva can be downloaded from the following mirrors:

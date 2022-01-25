@@ -12,7 +12,7 @@
 #
 #   make PLAT=linux DEBUG=DEBUG
 
-# PLAT: linux macosx win32 win64 mingw
+# PLAT: bsd linux macosx win32 win64 mingw
 # platform to build for
 PLAT?=linux
 
@@ -77,15 +77,15 @@ SOCKET_linux=usocket.o
 
 #------
 # Compiler and linker settings
-# for FreeBSD
-SO_freebsd=so
-O_freebsd=o
-CC_freebsd=gcc
-DEF_freebsd=-DLUASOCKET_$(DEBUG) -DUNIX_HAS_SUN_LEN
-CFLAGS_freebsd=-g -O2 -Wall -Wshadow -Wextra -Wimplicit $(DEF)
-LDFLAGS_freebsd=-O -shared -fpic -o
-LD_freebsd=gcc
-SOCKET_freebsd=usocket.o
+# for BSD
+SO_bsd=so
+O_bsd=o
+CC_bsd=gcc
+DEF_bsd=-DLUASOCKET_$(DEBUG) -DUNIX_HAS_SUN_LEN
+CFLAGS_bsd=-g -O2 -Wall -Wshadow -Wextra -Wimplicit $(DEF)
+LDFLAGS_bsd=-O -shared -fpic -o
+LD_bsd=gcc
+SOCKET_bsd=usocket.o
 
 #------
 # Compiler and linker settings
@@ -256,8 +256,8 @@ TO_TOP_LDIR= \
 default: $(PLAT)
 
 
-freebsd:
-	$(MAKE) all-unix PLAT=freebsd
+bsd:
+	$(MAKE) all-unix PLAT=bsd
 
 macosx:
 	$(MAKE) all-unix PLAT=macosx

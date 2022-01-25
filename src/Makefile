@@ -111,13 +111,13 @@ mingw:
 
 openbsd:
 	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
-	$(MAKE) -C luasocket freebsd
+	$(MAKE) -C luasocket bsd
 	$(MAKE) -C luasec bsd
 	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lncurses"
 
 netbsd:
 	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
-	$(MAKE) -C luasocket freebsd
+	$(MAKE) -C luasocket bsd
 	$(MAKE) -C luasec bsd
 	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lncurses"
 

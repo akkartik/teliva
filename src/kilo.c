@@ -37,7 +37,11 @@
 #endif
 
 #include <assert.h>
+#ifdef __NetBSD__
+#include <curses.h>
+#else
 #include <ncurses.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>

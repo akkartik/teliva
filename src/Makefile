@@ -119,7 +119,7 @@ netbsd:
 	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
 	$(MAKE) -C luasocket bsd
 	$(MAKE) -C luasec bsd
-	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lncurses"
+	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lcurses"
 
 posix:
 	$(MAKE) all MYCFLAGS=-DLUA_USE_POSIX

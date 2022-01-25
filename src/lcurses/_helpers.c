@@ -21,7 +21,11 @@
 #include <sys/stat.h>
 #include <unistd.h>		/* for _POSIX_VERSION */
 
+#ifdef __NetBSD__
+#include <curses.h>
+#else
 #include <ncurses.h>
+#endif
 #include <term.h>
 
 #include "../lua.h"

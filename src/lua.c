@@ -6,7 +6,11 @@
 
 
 #include <locale.h>
+#ifdef __NetBSD__
+#include <curses.h>
+#else
 #include <ncurses.h>
+#endif
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>

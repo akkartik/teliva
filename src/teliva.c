@@ -1,6 +1,10 @@
 #include <assert.h>
 #include <ctype.h>
+#ifdef __NetBSD__
+#include <curses.h>
+#else
 #include <ncurses.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>

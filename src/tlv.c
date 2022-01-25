@@ -1,5 +1,9 @@
 #include <assert.h>
+#ifdef __NetBSD__
+#include <curses.h>
+#else
 #include <ncurses.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

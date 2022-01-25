@@ -1302,6 +1302,7 @@ Wgetch(lua_State *L)
 	render_trusted_teliva_data(L);  /* Apps can draw what they want on screen,
 	                                 * but Teliva's UI is always visible when
 	                                 * asking the user to make a decision. */
+	if (x > COLS-2) x = COLS-2; if (y > LINES-1) y = LINES-1; /* http://gnats.netbsd.org/56664 */
 	mvaddstr(y, x, "");
 	int c = wgetch(w);
 

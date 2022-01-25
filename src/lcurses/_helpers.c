@@ -24,12 +24,6 @@
 #include <ncurses.h>
 #include <term.h>
 
-/* NetBSD's default curses implementation is not quite complete.  This
-   disables those missing functions unless linked to ncurses instead. */
-#if defined NCURSES_VERSION || !defined __NetBSD__
-#  define LCURSES_POSIX_COMPLIANT 1
-#endif
-
 #include "../lua.h"
 #include "../lualib.h"
 #include "../lauxlib.h"

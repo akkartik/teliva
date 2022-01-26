@@ -790,6 +790,13 @@ static void read_editor_buffer(char* out, int capacity) {
 
 static void update_definition(lua_State* L, const char* name, char* new_contents) {
   int oldtop = lua_gettop(L);
+  /* if contents are unmodified, return */
+  if (look_up_definition(L, name)) {
+    const char* old_contents = lua_tostring(L, -1);
+    bool contents_unmodified = (strcmp(old_contents, new_contents) == 0);
+    lua_settop(L, oldtop);
+    if (contents_unmodified) return;
+  }
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
   /* create a new table containing a single binding */

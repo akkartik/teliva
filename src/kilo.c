@@ -1040,7 +1040,7 @@ static void editorGo(lua_State* L) {
     if (strlen(Current_definition) > 0) {
       /* We're currently editing a definition. Save it. */
       editorSaveToDisk();
-      load_editor_buffer_to_current_definition_in_image(L);
+      load_editor_buffer_to_current_definition_in_image_and_reload(L);
     }
 
     word_at_cursor(query, CURRENT_DEFINITION_LEN);

@@ -632,6 +632,10 @@ void draw_callers_of_current_definition(lua_State* L) {
   assert(oldtop == lua_gettop(L));
 }
 
+static int starts_with(const char* s, const char* pre) {
+  return strncmp(pre, s, strlen(pre)) == 0;
+}
+
 extern int load_editor_buffer_to_current_definition_in_image(lua_State* L);
 extern int resumeEdit(lua_State* L);
 extern int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx);
@@ -651,6 +655,7 @@ int restore_editor_view(lua_State* L) {
   int cx = lua_tointeger(L, -1);
   lua_settop(L, editor_state_index);
   int back_to_big_picture = editFrom(L, "teliva_editor_buffer", rowoff, coloff, cy, cx);
+  if (starts_with(Current_definition, "doc:")) return back_to_big_picture;
   // error handling
   int oldtop = lua_gettop(L);
   while (1) {
@@ -820,6 +825,7 @@ extern int load_editor_buffer_to_current_definition_in_image(lua_State* L) {
 extern int edit(lua_State* L, char* filename);
 static int edit_current_definition(lua_State* L) {
   int back_to_big_picture = edit(L, "teliva_editor_buffer");
+  if (starts_with(Current_definition, "doc:")) return back_to_big_picture;
   // error handling
   int oldtop = lua_gettop(L);
   while (1) {

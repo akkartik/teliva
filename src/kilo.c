@@ -1096,17 +1096,17 @@ static void editorGo(lua_State* L) {
             if (qlen != 0) query[--qlen] = '\0';
         } else if (c == CTRL_X || c == ENTER) {
             if (c == ENTER) {
-              save_to_current_definition_and_editor_buffer(L, query);
-              clearEditor();
-              editorOpen("teliva_editor_buffer");
-              attrset(A_NORMAL);
-              clear();
-              draw_callers_of_current_definition(L);
+                save_to_current_definition_and_editor_buffer(L, query);
+                clearEditor();
+                editorOpen("teliva_editor_buffer");
+                attrset(A_NORMAL);
+                clear();
+                draw_callers_of_current_definition(L);
             }
             return;
         } else if (c == CTRL_U) {
-          qlen = 0;
-          query[qlen] = '\0';
+            qlen = 0;
+            query[qlen] = '\0';
         } else if (isprint(c)) {
             if (qlen < CURRENT_DEFINITION_LEN) {
                 query[qlen++] = c;

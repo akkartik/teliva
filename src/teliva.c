@@ -351,6 +351,10 @@ static void clear_caller(lua_State* L) {
   assert(lua_gettop(L) == oldtop);
 }
 
+static int starts_with(const char* s, const char* pre) {
+  return strncmp(pre, s, strlen(pre)) == 0;
+}
+
 /* return true if submitted */
 static int edit_current_definition(lua_State* L);
 static void recent_changes_view(lua_State* L);
@@ -391,6 +395,7 @@ restart:
     for (lua_pushnil(L); lua_next(L, t) != 0; lua_pop(L, 1)) {
       const char* definition_name = lua_tostring(L, -2);
       if (is_special_history_key(definition_name)) continue;
+      if (starts_with(definition_name, "doc:")) continue;
       lua_getglobal(L, definition_name);
       int is_userdata = lua_isuserdata(L, -1);
       int is_function = lua_isfunction(L, -1);
@@ -421,12 +426,40 @@ restart:
     for (lua_pushnil(L); lua_next(L, t) != 0; lua_pop(L, 1)) {
       const char* definition_name = lua_tostring(L, -2);
       if (is_special_history_key(definition_name)) continue;
+      if (starts_with(definition_name, "doc:")) continue;
       lua_getglobal(L, definition_name);
       int is_userdata = lua_isuserdata(L, -1);
       lua_pop(L, 1);
       if (strcmp(definition_name, "menu") == 0
           || is_userdata  // including curses window objects
       ) {
+        if (is_current_definition(L, definition_name, i, history_array, history_array_size)) {
+          if (level == highlight_level && index_within_level == highlight_index_within_level) {
+            draw_highlighted_definition_name(definition_name);
+            strncpy(highlight, definition_name, CURRENT_DEFINITION_LEN);
+          } else {
+            draw_definition_name(definition_name);
+          }
+          ++index_within_level;
+        }
+      }
+    }
+    lua_pop(L, 1);  // history element
+  }
+  level_size[level] = index_within_level;
+  level++;
+
+  // documentation (non-code) buffers
+  y += 2;
+  mvprintw(y, 0, "prose:          ");
+  index_within_level = 0;
+  for (int i = history_array_size; i > 0; --i) {
+    lua_rawgeti(L, history_array, i);
+    int t = lua_gettop(L);
+    for (lua_pushnil(L); lua_next(L, t) != 0; lua_pop(L, 1)) {
+      const char* definition_name = lua_tostring(L, -2);
+      if (is_special_history_key(definition_name)) continue;
+      if (starts_with(definition_name, "doc:")) {
         if (is_current_definition(L, definition_name, i, history_array, history_array_size)) {
           if (level == highlight_level && index_within_level == highlight_index_within_level) {
             draw_highlighted_definition_name(definition_name);
@@ -630,10 +663,6 @@ void draw_callers_of_current_definition(lua_State* L) {
   }
   lua_pop(L, 2);  // caller table, __teliva_caller
   assert(oldtop == lua_gettop(L));
-}
-
-static int starts_with(const char* s, const char* pre) {
-  return strncmp(pre, s, strlen(pre)) == 0;
 }
 
 extern int resumeEdit(lua_State* L);

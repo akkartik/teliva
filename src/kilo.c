@@ -1098,6 +1098,10 @@ static void editorGo(lua_State* L) {
             if (c == ENTER) {
                 save_to_current_definition_and_editor_buffer(L, query);
                 clearEditor();
+                if (starts_with(query, "doc:"))
+                    E.syntax = &ProseSyntax;
+                else
+                    E.syntax = &LuaSyntax;
                 editorOpen("teliva_editor_buffer");
                 attrset(A_NORMAL);
                 clear();
@@ -1244,11 +1248,14 @@ static void initEditor(void) {
 }
 
 /* return true if user chose to back into the big picture view */
-int edit(lua_State* L, char* filename) {
+int edit(lua_State* L, char* filename, char* definition_name) {
     Quit = 0;
     Back_to_big_picture = 0;
     initEditor();
-    E.syntax = &LuaSyntax;
+    if (starts_with(definition_name, "doc:"))
+        E.syntax = &ProseSyntax;
+    else
+        E.syntax = &LuaSyntax;
     editorOpen(filename);
     attrset(A_NORMAL);
     clear();
@@ -1362,11 +1369,14 @@ void editFilePermissions(char* filename) {
 }
 
 /* return true if user chose to back into the big picture view */
-int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx) {
+int editFrom(lua_State* L, char* filename, char* definition_name, int rowoff, int coloff, int cy, int cx) {
     Quit = 0;
     Back_to_big_picture = 0;
     initEditor();
-    E.syntax = &LuaSyntax;
+    if (starts_with(definition_name, "doc:"))
+        E.syntax = &ProseSyntax;
+    else
+        E.syntax = &LuaSyntax;
     E.rowoff = rowoff;
     E.coloff = coloff;
     E.cy = cy;

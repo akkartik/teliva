@@ -622,8 +622,8 @@ restart:
   /* never gets here */
 }
 
+extern int edit(lua_State* L, char* filename, char* definition_name);
 static int look_up_definition (lua_State* L, const char* name);
-extern int editProse(lua_State* L, char* filename);
 void big_picture_view(lua_State* L) {
   int oldtop = lua_gettop(L);
   if (!look_up_definition(L, "doc:main")) {
@@ -633,7 +633,7 @@ void big_picture_view(lua_State* L) {
     FILE* out = fopen("teliva_big_picture", "w");
     fprintf(out, "%s", lua_tostring(L, -1));
     fclose(out);
-    int back_to_big_picture = editProse(L, "teliva_big_picture");
+    int back_to_big_picture = edit(L, "teliva_big_picture", "doc:main");
     if (back_to_big_picture)
       default_big_picture_view(L);
   }
@@ -684,8 +684,7 @@ void draw_callers_of_current_definition(lua_State* L) {
 }
 
 extern int resumeEdit(lua_State* L);
-extern int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx);
-extern int editProseFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx);
+extern int editFrom(lua_State* L, char* filename, char* definition_name, int rowoff, int coloff, int cy, int cx);
 int restore_editor_view(lua_State* L) {
   lua_getglobal(L, "__teliva_editor_state");
   int editor_state_index = lua_gettop(L);
@@ -701,12 +700,11 @@ int restore_editor_view(lua_State* L) {
   lua_getfield(L, editor_state_index, "cx");
   int cx = lua_tointeger(L, -1);
   lua_settop(L, editor_state_index);
+  int back_to_big_picture = editFrom(L, "teliva_editor_buffer", Current_definition, rowoff, coloff, cy, cx);
   if (starts_with(Current_definition, "doc:")) {
-    int back_to_big_picture = editProseFrom(L, "teliva_editor_buffer", rowoff, coloff, cy, cx);
     load_editor_buffer_to_current_definition_in_image(L);
     return back_to_big_picture;
   }
-  int back_to_big_picture = editFrom(L, "teliva_editor_buffer", rowoff, coloff, cy, cx);
   // error handling
   int oldtop = lua_gettop(L);
   while (1) {
@@ -887,14 +885,12 @@ int load_editor_buffer_to_current_definition_in_image_and_reload(lua_State* L) {
 
 /* return true if user chose to back into the big picture view */
 /* But only if there are no errors. Otherwise things can get confusing. */
-extern int edit(lua_State* L, char* filename);
 static int edit_current_definition(lua_State* L) {
+  int back_to_big_picture = edit(L, "teliva_editor_buffer", Current_definition);
   if (starts_with(Current_definition, "doc:")) {
-    int back_to_big_picture = editProse(L, "teliva_editor_buffer");
     load_editor_buffer_to_current_definition_in_image(L);
     return back_to_big_picture;
   }
-  int back_to_big_picture = edit(L, "teliva_editor_buffer");
   // error handling
   int oldtop = lua_gettop(L);
   while (1) {

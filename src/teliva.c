@@ -654,7 +654,10 @@ int restore_editor_view(lua_State* L) {
   int cx = lua_tointeger(L, -1);
   lua_settop(L, editor_state_index);
   int back_to_big_picture = editFrom(L, "teliva_editor_buffer", rowoff, coloff, cy, cx);
-  if (starts_with(Current_definition, "doc:")) return back_to_big_picture;
+  if (starts_with(Current_definition, "doc:")) {
+    load_editor_buffer_to_current_definition_in_image(L);
+    return back_to_big_picture;
+  }
   // error handling
   int oldtop = lua_gettop(L);
   while (1) {
@@ -808,6 +811,13 @@ static void update_definition(lua_State* L, const char* name, char* new_contents
 }
 
 extern void save_tlv(lua_State* L, char* filename);
+void load_editor_buffer_to_current_definition_in_image(lua_State* L) {
+  char new_contents[8192] = {0};
+  read_editor_buffer(new_contents, 8190);
+  update_definition(L, Current_definition, new_contents);
+  save_tlv(L, Image_name);
+}
+
 extern int docall(lua_State* L, int narg, int clear);
 int load_editor_buffer_to_current_definition_in_image_and_reload(lua_State* L) {
   char new_contents[8192] = {0};
@@ -824,7 +834,10 @@ int load_editor_buffer_to_current_definition_in_image_and_reload(lua_State* L) {
 extern int edit(lua_State* L, char* filename);
 static int edit_current_definition(lua_State* L) {
   int back_to_big_picture = edit(L, "teliva_editor_buffer");
-  if (starts_with(Current_definition, "doc:")) return back_to_big_picture;
+  if (starts_with(Current_definition, "doc:")) {
+    load_editor_buffer_to_current_definition_in_image(L);
+    return back_to_big_picture;
+  }
   // error handling
   int oldtop = lua_gettop(L);
   while (1) {
@@ -1109,6 +1122,7 @@ static int load_definitions(lua_State* L) {
         break;
       }
       if (is_special_history_key(key)) continue;
+      if (starts_with(key, "doc:")) continue;
       if (binding_exists(L, key))
         continue;  // most recent binding trumps older ones
       const char* value = lua_tostring(L, -1);

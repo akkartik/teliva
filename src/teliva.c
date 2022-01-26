@@ -359,7 +359,7 @@ static int starts_with(const char* s, const char* pre) {
 static int edit_current_definition(lua_State* L);
 static void recent_changes_view(lua_State* L);
 static const char* events_view();
-void big_picture_view(lua_State* L) {
+void default_big_picture_view(lua_State* L) {
   /* Without any intervening edits, big_picture_view always stably renders
    * definitions in exactly the same spatial order, both in levels from top to
    * bottom and in indexes within each level from left to right. */
@@ -622,6 +622,23 @@ restart:
   /* never gets here */
 }
 
+static int look_up_definition (lua_State* L, const char* name);
+extern int editProse(lua_State* L, char* filename);
+void big_picture_view(lua_State* L) {
+  int oldtop = lua_gettop(L);
+  if (!look_up_definition(L, "doc:bp")) {
+    default_big_picture_view(L);
+  } else {
+    FILE* out = fopen("teliva_big_picture", "w");
+    fprintf(out, "%s", lua_tostring(L, -1));
+    fclose(out);
+    int back_to_big_picture = editProse(L, "teliva_big_picture");
+    if (back_to_big_picture)
+      default_big_picture_view(L);
+  }
+  lua_settop(L, oldtop);
+}
+
 /* return true if:
  *  - editor_state exists, and
  *  - editor_state is applicable to the current image
@@ -870,7 +887,6 @@ int load_editor_buffer_to_current_definition_in_image_and_reload(lua_State* L) {
 /* return true if user chose to back into the big picture view */
 /* But only if there are no errors. Otherwise things can get confusing. */
 extern int edit(lua_State* L, char* filename);
-extern int editProse(lua_State* L, char* filename);
 static int edit_current_definition(lua_State* L) {
   if (starts_with(Current_definition, "doc:")) {
     int back_to_big_picture = editProse(L, "teliva_editor_buffer");

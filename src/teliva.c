@@ -1450,8 +1450,8 @@ static int load_file_operations_predicate(const char* body) {
           || validate_file_operations_predicate();
 }
 
-extern void editNonCode2(char* filename);
-extern void resumeNonCodeEdit2();
+extern void editFilePermissions(char* filename);
+extern void resumeFilePermissionsEdit();
 static void edit_file_operations_predicate_body() {
   static char file_operations_predicate_body_buffer[512];
   /* save to disk */
@@ -1468,7 +1468,7 @@ static void edit_file_operations_predicate_body() {
   fclose(out);
   rename(outfilename, "teliva_file_operations_predicate_body");
   Previous_error = "";
-  editNonCode2("teliva_file_operations_predicate_body");
+  editFilePermissions("teliva_file_operations_predicate_body");
   // error handling
   assert(trustedL);
   int oldtop = lua_gettop(trustedL);
@@ -1483,7 +1483,7 @@ static void edit_file_operations_predicate_body() {
       break;
     Previous_error = lua_tostring(trustedL, -1);
     if (Previous_error == NULL) Previous_error = "(error object is not a string)";
-    resumeNonCodeEdit2();
+    resumeFilePermissionsEdit();
     lua_pop(trustedL, 1);
   }
   file_operations_predicate_body = file_operations_predicate_body_buffer;

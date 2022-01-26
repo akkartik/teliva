@@ -1278,7 +1278,7 @@ void editNonCode(char* filename) {
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
-void editNonCode2(char* filename) {
+void editFilePermissions(char* filename) {
     Quit = 0;
     Back_to_big_picture = 0;
     initEditor();
@@ -1358,7 +1358,7 @@ void resumeNonCodeEdit() {
     }
 }
 
-void resumeNonCodeEdit2() {
+void resumeFilePermissionsEdit() {
     Quit = 0;
     Back_to_big_picture = 0;
     E.startcol = LINE_NUMBER_SPACE;

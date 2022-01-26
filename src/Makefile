@@ -85,7 +85,9 @@ ansi:
 	$(MAKE) all MYCFLAGS=-DLUA_ANSI
 
 freebsd:
-	$(MAKE) all MYCFLAGS="-DLUA_USE_LINUX" MYLIBS="-Wl,-E"
+	$(MAKE) -C luasocket bsd
+	$(MAKE) -C luasec bsd
+	$(MAKE) all MYCFLAGS="-DLUA_USE_LINUX" MYLIBS="-Wl,-E -lncursesw"
 
 generic:
 	$(MAKE) all MYCFLAGS=

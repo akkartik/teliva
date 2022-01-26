@@ -49,8 +49,9 @@ OS and package manager of choice:
 * `sudo apt install libncursesw6-dev openssl`
 * `brew install ncurses openssl`
 
-So far I've tested Teliva on Linux, Mac OS X, OpenBSD and NetBSD; it should work
-on other flavors of BSD, WSL on Windows, etc. with only minor modifications.
+So far I've tested Teliva on Linux, Mac OS X, OpenBSD, NetBSD and FreeBSD; it
+should work on other flavors of BSD, WSL on Windows, etc. with only minor
+modifications.
 
 ## What else can it do?
 

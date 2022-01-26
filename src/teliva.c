@@ -626,7 +626,8 @@ static int look_up_definition (lua_State* L, const char* name);
 extern int editProse(lua_State* L, char* filename);
 void big_picture_view(lua_State* L) {
   int oldtop = lua_gettop(L);
-  if (!look_up_definition(L, "doc:bp")) {
+  if (!look_up_definition(L, "doc:main")) {
+    lua_settop(L, oldtop);
     default_big_picture_view(L);
   } else {
     FILE* out = fopen("teliva_big_picture", "w");

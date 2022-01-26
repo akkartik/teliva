@@ -146,13 +146,11 @@ char *Lua_HL_keywords[] = {
 
 /* Here we define an array of syntax highlights by extensions, keywords,
  * comments delimiters. */
-struct editorSyntax HLDB[] = {
-    {
-        Lua_HL_keywords,
-        "--",  /* line comment */
-        "--[[",  /* multiline comment start */
-        "--]]"  /* multline comment stop */
-    }
+struct editorSyntax LuaSyntax = {
+    Lua_HL_keywords,
+    "--",  /* line comment */
+    "--[[",  /* multiline comment start */
+    "--]]"  /* multline comment stop */
 };
 
 #define HLDB_ENTRIES (sizeof(HLDB)/sizeof(HLDB[0]))
@@ -1202,7 +1200,6 @@ static void initEditor(void) {
     E.row = NULL;
     E.dirty = 0;
     E.filename = NULL;
-    E.syntax = &HLDB[0];
 }
 
 /* return true if user chose to back into the big picture view */
@@ -1210,10 +1207,29 @@ int edit(lua_State* L, char* filename) {
     Quit = 0;
     Back_to_big_picture = 0;
     initEditor();
+    E.syntax = &LuaSyntax;
     editorOpen(filename);
     attrset(A_NORMAL);
     clear();
     draw_callers_of_current_definition(L);
+    while(!Quit) {
+        /* update on resize */
+        E.startcol = LINE_NUMBER_SPACE;
+        E.cols = COLS-LINE_NUMBER_SPACE;
+        E.startrow = CALLERS_SPACE;
+        E.endrow = LINES-MENU_SPACE;
+        editorRefreshScreen(editorMenu);
+        editorProcessKeypress(L);
+    }
+    return Back_to_big_picture;
+}
+
+/* Like editFrom(), but no highlighting, no callers. */
+int editProse(lua_State* L, char* filename) {
+    Quit = 0;
+    Back_to_big_picture = 0;
+    initEditor();
+    editorOpen(filename);
     while(!Quit) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;
@@ -1282,6 +1298,7 @@ void editFilePermissions(char* filename) {
     Quit = 0;
     Back_to_big_picture = 0;
     initEditor();
+    E.syntax = &LuaSyntax;
     E.startcol = LINE_NUMBER_SPACE;
     E.startrow = 1;  /* space for function header */
     E.endrow = 10;  /* nudge people to keep function short */
@@ -1305,6 +1322,7 @@ int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int c
     Quit = 0;
     Back_to_big_picture = 0;
     initEditor();
+    E.syntax = &LuaSyntax;
     E.rowoff = rowoff;
     E.coloff = coloff;
     E.cy = cy;
@@ -1313,6 +1331,28 @@ int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int c
     attrset(A_NORMAL);
     clear();
     draw_callers_of_current_definition(L);
+    while(!Quit) {
+        /* update on resize */
+        E.startcol = LINE_NUMBER_SPACE;
+        E.cols = COLS-LINE_NUMBER_SPACE;
+        E.startrow = CALLERS_SPACE;
+        E.endrow = LINES-MENU_SPACE;
+        editorRefreshScreen(editorMenu);
+        editorProcessKeypress(L);
+    }
+    return Back_to_big_picture;
+}
+
+/* Like editFrom(), but no highlighting, no callers. */
+int editProseFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx) {
+    Quit = 0;
+    Back_to_big_picture = 0;
+    initEditor();
+    E.rowoff = rowoff;
+    E.coloff = coloff;
+    E.cy = cy;
+    E.cx = cx;
+    editorOpen(filename);
     while(!Quit) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;

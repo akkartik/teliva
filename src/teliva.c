@@ -636,7 +636,6 @@ static int starts_with(const char* s, const char* pre) {
   return strncmp(pre, s, strlen(pre)) == 0;
 }
 
-extern int load_editor_buffer_to_current_definition_in_image_and_reload(lua_State* L);
 extern int resumeEdit(lua_State* L);
 extern int editFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, int cx);
 int restore_editor_view(lua_State* L) {
@@ -810,7 +809,7 @@ static void update_definition(lua_State* L, const char* name, char* new_contents
 
 extern void save_tlv(lua_State* L, char* filename);
 extern int docall(lua_State* L, int narg, int clear);
-extern int load_editor_buffer_to_current_definition_in_image_and_reload(lua_State* L) {
+int load_editor_buffer_to_current_definition_in_image_and_reload(lua_State* L) {
   char new_contents[8192] = {0};
   read_editor_buffer(new_contents, 8190);
   update_definition(L, Current_definition, new_contents);

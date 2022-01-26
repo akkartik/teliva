@@ -67,12 +67,16 @@
 #define HL_STRING 6
 #define HL_NUMBER 7
 #define HL_MATCH 8      /* Search match. */
+#define HL_SELECTABLE 9
+#define HL_SELECTABLE_BORDER 10
 
 struct editorSyntax {
     char **keywords;
-    char singleline_comment_start[2];
+    char *singleline_comment_start;
     char *multiline_comment_start;
     char *multiline_comment_end;
+    char *selectable_start;
+    char *selectable_end;
 };
 
 /* This structure represents a single line of the file we are editing. */
@@ -144,13 +148,19 @@ char *Lua_HL_keywords[] = {
     NULL
 };
 
-/* Here we define an array of syntax highlights by extensions, keywords,
- * comments delimiters. */
 struct editorSyntax LuaSyntax = {
     Lua_HL_keywords,
     "--",  /* line comment */
-    "--[[",  /* multiline comment start */
-    "--]]"  /* multline comment stop */
+    "--[[", "--]]",  /* multline comment */
+    NULL, NULL  /* no selectables */
+};
+
+/* Prose */
+struct editorSyntax ProseSyntax = {
+    NULL,  /* no keywords */
+    NULL,  /* no line comment */
+    NULL, NULL,  /* no multiline comment */
+    "[[", "]]"  /* "selectables" */
 };
 
 #define HLDB_ENTRIES (sizeof(HLDB)/sizeof(HLDB[0]))
@@ -182,12 +192,14 @@ static void editorUpdateSyntax(erow *row) {
 
     if (E.syntax == NULL) return; /* No syntax, everything is HL_NORMAL. */
 
-    int i, prev_sep, in_string, in_comment;
+    int i, prev_sep, in_string, in_comment, in_selectable;
     char *p;
     char **keywords = E.syntax->keywords;
     char *scs = E.syntax->singleline_comment_start;
     char *mcs = E.syntax->multiline_comment_start;
     char *mce = E.syntax->multiline_comment_end;
+    char *ss = E.syntax->selectable_start;
+    char *se = E.syntax->selectable_end;
 
     /* Point to the first non-space char. */
     p = row->render;
@@ -199,6 +211,7 @@ static void editorUpdateSyntax(erow *row) {
     prev_sep = 1; /* Tell the parser if 'i' points to start of word. */
     in_string = 0; /* Are we inside "" or '' ? */
     in_comment = 0; /* Are we inside multi-line comment? */
+    in_selectable = 0;  /* Are we inside [[]] in prose? */
 
     /* If the previous line has an open comment, this line starts
      * with an open comment state. */
@@ -207,32 +220,58 @@ static void editorUpdateSyntax(erow *row) {
 
     while(*p) {
         /* Handle multi line comments. */
-        if (in_comment) {
-            row->hl[i] = HL_MLCOMMENT;
-            if (starts_with(p, mce)) {
-                memset(&row->hl[i],HL_MLCOMMENT, strlen(mce));
-                p += strlen(mce); i += strlen(mce);
-                in_comment = 0;
-                prev_sep = 1;
-                continue;
-            } else {
+        if (mcs && mce) {
+            if (in_comment) {
+                row->hl[i] = HL_MLCOMMENT;
+                if (starts_with(p, mce)) {
+                    memset(&row->hl[i],HL_MLCOMMENT, strlen(mce));
+                    p += strlen(mce); i += strlen(mce);
+                    in_comment = 0;
+                    prev_sep = 1;
+                    continue;
+                } else {
+                    prev_sep = 0;
+                    p++; i++;
+                    continue;
+                }
+            } else if (starts_with(p, mcs)) {
+                memset(&row->hl[i],HL_MLCOMMENT, strlen(mcs));
+                p += strlen(mcs); i += strlen(mcs);
+                in_comment = 1;
                 prev_sep = 0;
-                p++; i++;
                 continue;
             }
-        } else if (starts_with(p, mcs)) {
-            memset(&row->hl[i],HL_MLCOMMENT, strlen(mcs));
-            p += strlen(mcs); i += strlen(mcs);
-            in_comment = 1;
-            prev_sep = 0;
-            continue;
         }
 
         /* Handle single-line comments. */
-        if (prev_sep && *p == scs[0] && *(p+1) == scs[1]) {
+        if (scs && prev_sep && starts_with(p, scs)) {
             /* From here to end is a comment */
             memset(row->hl+i,HL_COMMENT,row->rsize-i);
             return;
+        }
+
+        /* Handle selectable widgets */
+        if (ss && se) {
+            if (in_selectable) {
+                if (starts_with(p, se)) {
+                    memset(&row->hl[i],HL_SELECTABLE_BORDER, strlen(se));
+                    p += strlen(se); i += strlen(se);
+                    in_selectable = 0;
+                    prev_sep = 1;
+                    continue;
+                } else {
+                    row->hl[i] = HL_SELECTABLE;
+                    prev_sep = 0;
+                    p++; i++;
+                    continue;
+                }
+            } else if (starts_with(p, ss)) {
+                memset(&row->hl[i],HL_SELECTABLE_BORDER, strlen(ss));
+                p += strlen(ss); i += strlen(ss);
+                in_selectable = 1;
+                prev_sep = 0;
+                continue;
+            }
         }
 
         /* Handle "" and '' */
@@ -275,7 +314,7 @@ static void editorUpdateSyntax(erow *row) {
         }
 
         /* Handle keywords and lib calls */
-        if (prev_sep) {
+        if (keywords && prev_sep) {
             int j;
             int ileft = row->rsize-i;
             for (j = 0; keywords[j]; j++) {
@@ -323,6 +362,8 @@ static int editorSyntaxToColorPair(int hl) {
     case HL_STRING: return COLOR_PAIR_LUA_CONSTANT;
     case HL_NUMBER: return COLOR_PAIR_LUA_CONSTANT;
     case HL_MATCH: return COLOR_PAIR_MATCH;
+    case HL_SELECTABLE: return COLOR_PAIR_SELECTABLE;
+    case HL_SELECTABLE_BORDER: return COLOR_PAIR_FADE;
     default: return COLOR_PAIR_NORMAL;
     }
 }
@@ -1229,7 +1270,10 @@ int editProse(lua_State* L, char* filename) {
     Quit = 0;
     Back_to_big_picture = 0;
     initEditor();
+    E.syntax = &ProseSyntax;
     editorOpen(filename);
+    attrset(A_NORMAL);
+    clear();
     while(!Quit) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;
@@ -1348,11 +1392,14 @@ int editProseFrom(lua_State* L, char* filename, int rowoff, int coloff, int cy, 
     Quit = 0;
     Back_to_big_picture = 0;
     initEditor();
+    E.syntax = &ProseSyntax;
     E.rowoff = rowoff;
     E.coloff = coloff;
     E.cy = cy;
     E.cx = cx;
     editorOpen(filename);
+    attrset(A_NORMAL);
+    clear();
     while(!Quit) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;

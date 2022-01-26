@@ -1042,8 +1042,8 @@ static void editorMoveCursor(int key) {
 }
 
 static int identifier_char(char c) {
-    /* keep sync'd with llex */
-    return isalnum(c) || c == '_';
+    /* keep sync'd with llex, with one exception for prose */
+    return isalnum(c) || c == '_' || c == ':';
 }
 
 static void word_at_cursor(char* out, int capacity) {

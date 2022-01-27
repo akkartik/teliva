@@ -630,10 +630,8 @@ void big_picture_view(lua_State* L) {
     lua_settop(L, oldtop);
     default_big_picture_view(L);
   } else {
-    FILE* out = fopen("teliva_big_picture", "w");
-    fprintf(out, "%s", lua_tostring(L, -1));
-    fclose(out);
-    int back_to_big_picture = edit(L, "teliva_big_picture", "doc:main");
+    save_to_current_definition_and_editor_buffer(L, "doc:main");
+    int back_to_big_picture = edit_current_definition(L);
     if (back_to_big_picture)
       default_big_picture_view(L);
   }

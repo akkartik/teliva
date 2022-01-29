@@ -32,10 +32,6 @@
 
 #define KILO_VERSION "0.0.1"
 
-#ifdef __linux__
-#define _POSIX_C_SOURCE 200809L
-#endif
-
 #include <assert.h>
 #ifdef __NetBSD__
 #include <curses.h>

@@ -128,8 +128,6 @@ void emit_multiline_string(FILE* out, const char* value) {
   }
 }
 
-extern int mkstemp(char *template);
-extern FILE *fdopen(int fd, const char *mode);
 void save_tlv(lua_State* L, char* filename) {
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);

@@ -172,7 +172,6 @@ void render_previous_error(void) {
   attroff(COLOR_PAIR(COLOR_PAIR_ERROR));
 }
 
-extern char* strdup(const char* s);
 int report_in_developer_mode(lua_State* L, int status) {
   if (status && !lua_isnil(L, -1)) {
     Previous_error = strdup(lua_tostring(L, -1));  /* memory leak */
@@ -749,8 +748,6 @@ void developer_mode(lua_State* L) {
   /* never returns */
 }
 
-extern int mkstemp(char* template);
-extern FILE* fdopen(int fd, const char* mode);
 void save_editor_state(int rowoff, int coloff, int cy, int cx) {
   if (strlen(Current_definition) == 0) return;
   char outfilename[] = "teliva_editor_state_XXXXXX";

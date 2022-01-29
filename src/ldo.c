@@ -260,7 +260,6 @@ static StkId tryfuncTM (lua_State *L, StkId func) {
 /* based on getfuncname */
 extern Instruction symbexec (const Proto *pt, int lastpc, int reg);
 extern int luaL_newmetatable (lua_State *L, const char *tname);
-extern void endwin (void);
 void record_metadata_about_function_call (lua_State *L, CallInfo *ci) {
   if (!isLua(ci))
     return;

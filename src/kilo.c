@@ -275,24 +275,26 @@ static void editorUpdateSyntax(erow *row) {
         }
 
         /* Handle "" and '' */
-        if (in_string) {
-            row->hl[i] = HL_STRING;
-            if (*p == '\\' && *(p+1)) {
-                row->hl[i+1] = HL_STRING;
-                p += 2; i += 2;
-                prev_sep = 0;
-                continue;
-            }
-            if (*p == in_string) in_string = 0;
-            p++; i++;
-            continue;
-        } else {
-            if (*p == '"' || *p == '\'') {
-                in_string = *p;
+        if (E.syntax == &LuaSyntax) {  // obscene hack
+            if (in_string) {
                 row->hl[i] = HL_STRING;
+                if (*p == '\\' && *(p+1)) {
+                    row->hl[i+1] = HL_STRING;
+                    p += 2; i += 2;
+                    prev_sep = 0;
+                    continue;
+                }
+                if (*p == in_string) in_string = 0;
                 p++; i++;
-                prev_sep = 0;
                 continue;
+            } else {
+                if (*p == '"' || *p == '\'') {
+                    in_string = *p;
+                    row->hl[i] = HL_STRING;
+                    p++; i++;
+                    prev_sep = 0;
+                    continue;
+                }
             }
         }
 

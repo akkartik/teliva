@@ -158,6 +158,8 @@ behave unexpectedly under Teliva.
 ## What's included?
 
 * [Lua 5.1](https://www.lua.org/manual/5.1)
+* The [Lua File System](https://keplerproject.github.io/luafilesystem) library
+  for portably accessing directories (module `lfs`).
 * The [ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
   building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
 * The [Kilo](https://github.com/antirez/kilo) text editor, modified to use

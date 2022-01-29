@@ -189,7 +189,7 @@ lzio.o: lzio.c lua.h luaconf.h llimits.h lmem.h lstate.h lobject.h ltm.h \
   lzio.h
 print.o: print.c ldebug.h lstate.h lua.h luaconf.h lobject.h llimits.h \
   ltm.h lzio.h lmem.h lopcodes.h lundump.h
-kilo.o: kilo.c teliva.h
-teliva.o: teliva.c teliva.h
+kilo.o: kilo.c lua.h teliva.h
+teliva.o: teliva.c lua.h lauxlib.h lualib.h teliva.h tlv.h
 
 # (end of Makefile)

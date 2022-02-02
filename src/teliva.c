@@ -313,6 +313,17 @@ void save_caller(lua_State* L, const char* name, int call_graph_depth) {
   else if (call_graph_depth == 2) save_caller_as(L, name, "main");  // the way Teliva calls `main` messes with debug info
 }
 
+char* caller(lua_State* L) {
+  static char result[1024] = {0};
+  lua_Debug ar;
+  lua_getstack(L, 1, &ar);
+  lua_getinfo(L, "n", &ar);
+  memset(result, '\0', 1024);
+  if (ar.name)
+    strncpy(result, ar.name, 1020);
+  return result;
+}
+
 void save_caller_as(lua_State* L, const char* name, const char* caller_name) {
   // push table of caller tables
   luaL_newmetatable(L, "__teliva_caller");
@@ -1269,18 +1280,19 @@ static const char* user_configuration_filename() {
   memset(config_filename, '\0', 1024);
   const char* config_home = getenv("XDG_CONFIG_HOME");
   if (config_home == NULL)
-    snprintf(config_filename, 1024, "%s/.teliva", home);
+    snprintf(config_filename, 1020, "%s/.teliva", home);
   else
-    snprintf(config_filename, 1024, "%s/.teliva", config_home);
+    snprintf(config_filename, 1020, "%s/.teliva", config_home);
   return config_filename;
 }
 
-int file_operation_permitted(const char* filename, const char* mode) {
+int file_operation_permitted(const char* caller, const char* filename, const char* mode) {
   int oldtop = lua_gettop(trustedL);
   lua_getglobal(trustedL, "file_operation_permitted");
+  lua_pushstring(trustedL, caller);
   lua_pushstring(trustedL, filename);
   lua_pushstring(trustedL, mode);
-  if (lua_pcall(trustedL, 2 /*args*/, 1 /*result*/, /*errfunc*/0)) {
+  if (lua_pcall(trustedL, 3 /*args*/, 1 /*result*/, /*errfunc*/0)) {
     /* TODO: error handling. Or should we use errfunc above? */
   }
   if (!lua_isboolean(trustedL, -1)) {
@@ -1315,9 +1327,10 @@ void characterize_file_operations_predicate() {
   for (const char** test_filename = test_filenames; *test_filename; ++test_filename) {
     for (const char** test_mode = test_modes; *test_mode; ++test_mode) {
       lua_getglobal(trustedL, "file_operation_permitted");
+      lua_pushstring(trustedL, "___");
       lua_pushstring(trustedL, *test_filename);
       lua_pushstring(trustedL, *test_mode);
-      if (lua_pcall(trustedL, 2 /*args*/, 1 /*result*/, /*errfunc*/0)) {
+      if (lua_pcall(trustedL, 3 /*args*/, 1 /*result*/, /*errfunc*/0)) {
         /* TODO: error handling. Or should we use errfunc above? */
       }
       ++num_attempts;
@@ -1368,7 +1381,7 @@ static void render_permissions_screen() {
   attrset(A_NORMAL);
 
   mvaddstr(7, 5, "File operations");
-  mvaddstr(7, 30, "function file_operation_permitted(filename, mode)");
+  mvaddstr(7, 30, "function file_operation_permitted(caller, filename, mode)");
   int y = render_wrapped_text(8, 32, COLS-5, file_operations_predicate_body);
   mvaddstr(y, 30, "end");
   y++;
@@ -1437,9 +1450,10 @@ static void render_permissions_screen() {
  * on the stack and return non-zero */
 int validate_file_operations_predicate() {
   lua_getglobal(trustedL, "file_operation_permitted");
-  lua_pushstring(trustedL, "foo");
-  lua_pushstring(trustedL, "r");
-  if (lua_pcall(trustedL, 2 /*args*/, 1 /*result*/, /*errfunc*/0)) {
+  lua_pushstring(trustedL, "caller");
+  lua_pushstring(trustedL, "filename");
+  lua_pushstring(trustedL, "r");  /* open mode */
+  if (lua_pcall(trustedL, 3 /*args*/, 1 /*result*/, /*errfunc*/0)) {
     /* TODO: error handling. Or should we use errfunc above? */
   }
   int status = 1;
@@ -1452,7 +1466,7 @@ int validate_file_operations_predicate() {
 
 static int load_file_operations_predicate(const char* body) {
   char buffer[1024] = {0};
-  strcpy(buffer, "function file_operation_permitted(filename, mode)\n");
+  strcpy(buffer, "function file_operation_permitted(caller, filename, mode)\n");
   strncat(buffer, body, 1020);
   if (buffer[strlen(buffer)-1] != '\n')
     strncat(buffer, "\n", 1020);

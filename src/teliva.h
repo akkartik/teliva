@@ -155,7 +155,7 @@ extern char* Previous_message;
 extern int handle_image(lua_State* L, char** argv, int n);
 extern void developer_mode(lua_State* L);
 extern void permissions_mode(lua_State* L);
-extern int file_operation_permitted(const char* filename, const char* mode);
+extern int file_operation_permitted(const char* caller, const char* filename, const char* mode);
 extern int net_operations_permitted;
 
 extern void load_editor_buffer_to_current_definition_in_image(lua_State* L);
@@ -164,6 +164,7 @@ extern void save_to_current_definition_and_editor_buffer(lua_State* L, const cha
 extern void save_editor_state(int rowoff, int coloff, int cy, int cx);
 
 extern void assign_call_graph_depth_to_name(lua_State* L, int depth, const char* name);
+extern char* caller(lua_State* L);
 extern void save_caller(lua_State* L, const char* name, int call_graph_depth);
 extern void draw_callers_of_current_definition(lua_State* L);
 extern void append_to_audit_log(lua_State* L, const char* buffer);

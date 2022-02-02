@@ -178,6 +178,8 @@ extern void draw_string_on_menu(const char* s);
 
 extern int menu_column;
 
+extern const char* character_name(char c);
+
 /* Error reporting */
 
 extern const char* Previous_error;

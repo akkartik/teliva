@@ -102,6 +102,13 @@ static void draw_menu(lua_State* L) {
   attrset(A_NORMAL);
 }
 
+const char* character_name(char c) {
+  if (c == '\n') return "ENTER";
+  if (c == '\t') return "TAB";
+  if (c == ' ') return "SPACE";
+  return "UNKNOWN";
+}
+
 static void render_permissions(lua_State* L) {
   attrset(A_NORMAL);
   mvaddstr(LINES-1, COLS-12, "");

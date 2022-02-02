@@ -36,6 +36,8 @@
 @classmod curses.window
 */
 
+#include <ctype.h>
+
 #include "../teliva.h"
 #include "_helpers.c"
 #include "chstr.c"
@@ -1305,6 +1307,13 @@ Wgetch(lua_State *L)
 	if (x > COLS-2) x = COLS-2; if (y > LINES-1) y = LINES-1; /* http://gnats.netbsd.org/56664 */
 	mvaddstr(y, x, "");
 	int c = wgetch(w);
+	static char buffer[1024] = {0};
+	memset(buffer, '\0', 1024);
+	if (isspace(c))
+		snprintf(buffer, 1020, "getch() => %s", character_name(c));
+	else
+		snprintf(buffer, 1020, "getch() => %c", c);
+	append_to_audit_log(L, buffer);
 
 	if (c == ERR)
 		return 0;

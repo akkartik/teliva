@@ -176,7 +176,7 @@ static int io_lines (lua_State *L) {
   FILE **pf = newfile(L);
   static char buffer[1024] = {0};
   memset(buffer, '\0', 1024);
-  snprintf(buffer, 1020, "io.lines(\"%s\", \"r\")", filename);
+  snprintf(buffer, 1020, "io.lines(\"%s\")", filename);
   append_to_audit_log(L, buffer);
   if (file_operation_permitted(caller(L), filename, "r"))
     *pf = fopen(filename, "r");

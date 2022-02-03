@@ -264,74 +264,6 @@ static int luaB_ipairs (lua_State *L) {
 }
 
 
-static int load_aux (lua_State *L, int status) {
-  if (status == 0)  /* OK? */
-    return 1;
-  else {
-    lua_pushnil(L);
-    lua_insert(L, -2);  /* put before error message */
-    return 2;  /* return nil plus error message */
-  }
-}
-
-
-static int luaB_loadstring (lua_State *L) {
-  size_t l;
-  const char *s = luaL_checklstring(L, 1, &l);
-  const char *chunkname = luaL_optstring(L, 2, s);
-  return load_aux(L, luaL_loadbuffer(L, s, l, chunkname));
-}
-
-
-static int luaB_loadfile (lua_State *L) {
-  const char *fname = luaL_optstring(L, 1, NULL);
-  return load_aux(L, luaL_loadfile(L, fname));
-}
-
-
-/*
-** Reader for generic `load' function: `lua_load' uses the
-** stack for internal stuff, so the reader cannot change the
-** stack top. Instead, it keeps its resulting string in a
-** reserved slot inside the stack.
-*/
-static const char *generic_reader (lua_State *L, void *ud, size_t *size) {
-  (void)ud;  /* to avoid warnings */
-  luaL_checkstack(L, 2, "too many nested functions");
-  lua_pushvalue(L, 1);  /* get function */
-  lua_call(L, 0, 1);  /* call it */
-  if (lua_isnil(L, -1)) {
-    *size = 0;
-    return NULL;
-  }
-  else if (lua_isstring(L, -1)) {
-    lua_replace(L, 3);  /* save string in a reserved stack slot */
-    return lua_tolstring(L, 3, size);
-  }
-  else luaL_error(L, "reader function must return a string");
-  return NULL;  /* to avoid warnings */
-}
-
-
-static int luaB_load (lua_State *L) {
-  int status;
-  const char *cname = luaL_optstring(L, 2, "=(load)");
-  luaL_checktype(L, 1, LUA_TFUNCTION);
-  lua_settop(L, 3);  /* function, eventual name, plus one reserved slot */
-  status = lua_load(L, generic_reader, NULL, cname);
-  return load_aux(L, status);
-}
-
-
-static int luaB_dofile (lua_State *L) {
-  const char *fname = luaL_optstring(L, 1, NULL);
-  int n = lua_gettop(L);
-  if (luaL_loadfile(L, fname) != 0) lua_error(L);
-  lua_call(L, 0, LUA_MULTRET);
-  return lua_gettop(L) - n;
-}
-
-
 static int luaB_assert (lua_State *L) {
   luaL_checkany(L, 1);
   if (!lua_toboolean(L, 1))
@@ -369,28 +301,6 @@ static int luaB_select (lua_State *L) {
     luaL_argcheck(L, 1 <= i, 1, "index out of range");
     return n - i;
   }
-}
-
-
-static int luaB_pcall (lua_State *L) {
-  int status;
-  luaL_checkany(L, 1);
-  status = lua_pcall(L, lua_gettop(L) - 1, LUA_MULTRET, 0);
-  lua_pushboolean(L, (status == 0));
-  lua_insert(L, 1);
-  return lua_gettop(L);  /* return status + all results */
-}
-
-
-static int luaB_xpcall (lua_State *L) {
-  int status;
-  luaL_checkany(L, 2);
-  lua_settop(L, 2);
-  lua_insert(L, 1);  /* put error function under function to be called */
-  status = lua_pcall(L, 0, LUA_MULTRET, 1);
-  lua_pushboolean(L, (status == 0));
-  lua_replace(L, 1);
-  return lua_gettop(L);  /* return status + all results */
 }
 
 
@@ -448,16 +358,11 @@ static int luaB_newproxy (lua_State *L) {
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"collectgarbage", luaB_collectgarbage},
-  {"dofile", luaB_dofile},
   {"error", luaB_error},
   {"gcinfo", luaB_gcinfo},
   {"getfenv", luaB_getfenv},
   {"getmetatable", luaB_getmetatable},
-  {"loadfile", luaB_loadfile},
-  {"load", luaB_load},
-  {"loadstring", luaB_loadstring},
   {"next", luaB_next},
-  {"pcall", luaB_pcall},
   {"print", luaB_print},
   {"rawequal", luaB_rawequal},
   {"rawget", luaB_rawget},
@@ -469,7 +374,6 @@ static const luaL_Reg base_funcs[] = {
   {"tostring", luaB_tostring},
   {"type", luaB_type},
   {"unpack", luaB_unpack},
-  {"xpcall", luaB_xpcall},
   {NULL, NULL}
 };
 

@@ -38,12 +38,6 @@ static int pushresult (lua_State *L, int i, const char *filename) {
 }
 
 
-static void fileerror (lua_State *L, int arg, const char *filename) {
-  lua_pushfstring(L, "%s: %s", filename, strerror(errno));
-  luaL_argerror(L, arg, lua_tostring(L, -1));
-}
-
-
 #define tofilep(L)	((FILE **)luaL_checkudata(L, 1, LUA_FILEHANDLE))
 
 
@@ -167,26 +161,6 @@ static void aux_lines (lua_State *L, int idx, int toclose) {
 static int f_lines (lua_State *L) {
   tofile(L);  /* check that it's a valid file handle */
   aux_lines(L, 1, 0);
-  return 1;
-}
-
-
-static int io_lines (lua_State *L) {
-  const char *filename = luaL_checkstring(L, 1);
-  FILE **pf = newfile(L);
-  static char buffer[1024] = {0};
-  memset(buffer, '\0', 1024);
-  snprintf(buffer, 1020, "io.lines(\"%s\")", filename);
-  append_to_audit_log(L, buffer);
-  if (file_operation_permitted(caller(L), filename, "r"))
-    *pf = fopen(filename, "r");
-  else {
-    snprintf(iolib_errbuf, 1024, "app tried to open file '%s'; adjust its permissions (ctrl-p) if that is expected", filename);
-    Previous_message = iolib_errbuf;
-  }
-  if (*pf == NULL)
-    fileerror(L, 1, filename);
-  aux_lines(L, lua_gettop(L), 1);
   return 1;
 }
 
@@ -393,7 +367,7 @@ static const luaL_Reg iolib[] = {
   {"close", io_close},
   /* no 'flush' since Teliva is ncurses-based */
   /* no 'input' since Teliva is ncurses-based */
-  {"lines", io_lines},
+  /* no 'io.lines'; it can confusingly fail without showing sandboxing errors */
   {"open", io_open},
   /* no 'output' since Teliva is ncurses-based */
   /* no 'popen' without sandboxing it */

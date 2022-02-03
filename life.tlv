@@ -161,21 +161,12 @@
     >    end
     >end
 - __teliva_timestamp: original
-  file_exists:
-    >function file_exists(filename)
-    >  local f = io.open(filename, "r")
-    >  if f ~= nil then
-    >    io.close(f)
-    >    return true
-    >  else
-    >    return false
-    >  end
-    >end
-- __teliva_timestamp: original
   load_file:
     >function load_file(window, filename)
+    >  local infile = io.open(filename, 'r')
+    >  if infile == nil then return end
     >  local line_index = lines
-    >  for line in io.lines(filename) do
+    >  for line in infile:lines() do
     >    if line:sub(1,1) ~= '!' then  -- comment; plaintext files can't have whitespace before comments
     >      local col_index = cols
     >      for c in line:gmatch(".") do
@@ -286,7 +277,7 @@
     >    grid[8][5] = 1
     >    grid[7][4] = 1
     >    grid[6][3] = 1
-    >  elseif file_exists(arg[1]) then
+    >  else
     >    -- Load a file in the standard "plaintext" format: https://www.conwaylife.com/wiki/Plaintext
     >    --
     >    -- Each pattern page at https://www.conwaylife.com/wiki provides its

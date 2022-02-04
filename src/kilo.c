@@ -147,7 +147,7 @@ char *Lua_HL_keywords[] = {
 struct editorSyntax LuaSyntax = {
     Lua_HL_keywords,
     "--",  /* line comment */
-    "--[[", "--]]",  /* multline comment */
+    "--[[", "--]]",  /* multiline comment */
     NULL, NULL  /* no selectables */
 };
 
@@ -432,8 +432,7 @@ static void editorFreeRow(erow *row) {
     free(row->hl);
 }
 
-/* Remove the row at the specified position, shifting the remaining on the
- * top. */
+/* Remove the row at the specified position, shifting the remaining up. */
 static void editorDelRow(int at) {
     erow *row;
 

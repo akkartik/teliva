@@ -36,6 +36,9 @@
 #include <string.h>
 #include <unistd.h>
 
+extern size_t strlcpy(char * dst, const char * src, size_t size);
+extern size_t strlcat(char * dst, const char * src, size_t size);
+
 /*
  * Find the real name of path, by removing all ".", ".." and symlink
  * components.  Returns (resolved) on success, or (NULL) on failure,

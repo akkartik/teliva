@@ -139,7 +139,10 @@ void render_trusted_teliva_data(lua_State* L) {
   init_pair(COLOR_PAIR_SAFE, COLOR_SAFE_REVERSE, COLOR_FOREGROUND);
   init_pair(COLOR_PAIR_WARN, COLOR_WARN_REVERSE, COLOR_FOREGROUND);
   init_pair(COLOR_PAIR_RISK, COLOR_RISK_REVERSE, COLOR_FOREGROUND);
+  int y, x;
+  getyx(stdscr, y, x);
   draw_menu(L);
+  mvaddstr(y, x, "");
 }
 
 /*** Error reporting */

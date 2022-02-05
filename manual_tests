@@ -27,3 +27,11 @@ program draws over menu -> getch -> Teliva menu is still visible
 
 TODO protect sensitive teliva files (teliva_edit_buffer, etc.)
   should we protect .c sources?
+
+assumptions:
+  listing files in a directory is not worth sandboxing
+    since reading their contents is sandboxed
+    and since UNIX permissions protect system directories
+
+  rmdir() is not worth sandboxing, since it only succeeds on empty directories
+  no need to sandbox unlink() since it's not exposed

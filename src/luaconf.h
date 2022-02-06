@@ -268,13 +268,6 @@
 #undef LUA_COMPAT_GETN
 
 /*
-@@ LUA_COMPAT_LOADLIB controls compatibility about global loadlib.
-** CHANGE it to undefined as soon as you do not need a global 'loadlib'
-** function (the function is still available as 'package.loadlib').
-*/
-#undef LUA_COMPAT_LOADLIB
-
-/*
 @@ LUA_COMPAT_VARARG controls compatibility with old vararg feature.
 ** CHANGE it to undefined as soon as your programs use only '...' to
 ** access vararg parameters (instead of the old 'arg' table).

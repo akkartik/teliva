@@ -306,22 +306,6 @@ static int ll_loadfunc (lua_State *L, const char *path, const char *sym) {
 }
 
 
-static int ll_loadlib (lua_State *L) {
-  const char *path = luaL_checkstring(L, 1);
-  const char *init = luaL_checkstring(L, 2);
-  int stat = ll_loadfunc(L, path, init);
-  if (stat == 0)  /* no errors? */
-    return 1;  /* return the loaded function */
-  else {  /* error; error message is on stack top */
-    lua_pushnil(L);
-    lua_insert(L, -2);
-    lua_pushstring(L, (stat == ERRLIB) ?  LIB_FAIL : "init");
-    return 3;  /* return nil, error message, and where */
-  }
-}
-
-
-
 /*
 ** {======================================================
 ** 'require' function
@@ -569,19 +553,6 @@ static int ll_module (lua_State *L) {
 }
 
 
-static int ll_seeall (lua_State *L) {
-  luaL_checktype(L, 1, LUA_TTABLE);
-  if (!lua_getmetatable(L, 1)) {
-    lua_createtable(L, 0, 1); /* create new metatable */
-    lua_pushvalue(L, -1);
-    lua_setmetatable(L, 1);
-  }
-  lua_pushvalue(L, LUA_GLOBALSINDEX);
-  lua_setfield(L, -2, "__index");  /* mt.__index = _G */
-  return 0;
-}
-
-
 /* }====================================================== */
 
 
@@ -606,13 +577,6 @@ static void setpath (lua_State *L, const char *fieldname, const char *envname,
 }
 
 
-static const luaL_Reg pk_funcs[] = {
-  {"loadlib", ll_loadlib},
-  {"seeall", ll_seeall},
-  {NULL, NULL}
-};
-
-
 static const luaL_Reg ll_funcs[] = {
   {"module", ll_module},
   {"require", ll_require},
@@ -630,8 +594,6 @@ LUALIB_API int luaopen_package (lua_State *L) {
   luaL_newmetatable(L, "_LOADLIB");
   lua_pushcfunction(L, gctm);
   lua_setfield(L, -2, "__gc");
-  /* create `package' table */
-  luaL_register(L, LUA_LOADLIBNAME, pk_funcs);
 #if defined(LUA_COMPAT_LOADLIB) 
   lua_getfield(L, -1, "loadlib");
   lua_setfield(L, LUA_GLOBALSINDEX, "loadlib");

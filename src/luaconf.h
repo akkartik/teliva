@@ -33,17 +33,6 @@
 #define LUA_WIN
 #endif
 
-#if defined(LUA_USE_LINUX)
-#define LUA_USE_POSIX
-#define LUA_USE_DLOPEN		/* needs an extra library: -ldl */
-#endif
-
-#if defined(LUA_USE_MACOSX)
-#define LUA_USE_POSIX
-#define LUA_DL_DYLD		/* does not need extra library */
-#endif
-
-
 
 /*
 @@ LUA_USE_POSIX includes all functionallity listed as X/Open System

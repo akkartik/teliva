@@ -20,7 +20,7 @@ MYLIBS=
 
 # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
 
-PLATS= aix ansi freebsd generic linux macosx mingw netbsd openbsd posix solaris
+PLATS= aix ansi freebsd generic linux macosx netbsd openbsd posix solaris
 
 LUA_A=	liblua.a
 CORE_O=	lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \
@@ -105,11 +105,6 @@ macosx:
 	$(MAKE) all MYCFLAGS="-Wpedantic -DLUA_USE_LINUX" MYLIBS="-L/usr/local/opt/openssl@3/lib -lncurses"
 # use this on Mac OS X 10.3-
 #	$(MAKE) all MYCFLAGS=-DLUA_USE_MACOSX
-
-mingw:
-	$(MAKE) "LUA_A=lua51.dll" "LUA_T=lua.exe" \
-	"AR=$(CC) -shared -o" "RANLIB=strip --strip-unneeded" \
-	"MYCFLAGS=-DLUA_BUILD_AS_DLL" "MYLIBS=" "MYLDFLAGS=-s" lua.exe
 
 openbsd:
 	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"

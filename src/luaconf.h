@@ -34,17 +34,10 @@
 #endif
 
 
-/*
-@@ LUA_USE_POSIX includes all functionallity listed as X/Open System
-@* Interfaces Extension (XSI).
-** CHANGE it (define it) if your system is XSI compatible.
-*/
-#if defined(LUA_USE_POSIX)
 #define LUA_USE_MKSTEMP
 #define LUA_USE_ISATTY
 #define LUA_USE_POPEN
 #define LUA_USE_ULONGJMP
-#endif
 
 
 /*

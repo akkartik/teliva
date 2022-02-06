@@ -20,7 +20,7 @@ MYLIBS=
 
 # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
 
-PLATS= aix ansi freebsd generic linux macosx netbsd openbsd posix solaris
+PLATS= freebsd linux macosx netbsd openbsd
 
 LUA_A=	liblua.a
 CORE_O=	lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \
@@ -78,19 +78,10 @@ none:
 	@echo "Please choose a platform:"
 	@echo "   $(PLATS)"
 
-aix:
-	$(MAKE) all CC="xlc" CFLAGS="-O2 -DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-ldl" MYLDFLAGS="-brtl -bexpall"
-
-ansi:
-	$(MAKE) all MYCFLAGS=-DLUA_ANSI
-
 freebsd:
 	$(MAKE) -C luasocket bsd
 	$(MAKE) -C luasec bsd
 	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lncursesw"
-
-generic:
-	$(MAKE) all MYCFLAGS=
 
 linux:
 	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
@@ -117,12 +108,6 @@ netbsd:
 	$(MAKE) -C luasocket bsd
 	$(MAKE) -C luasec bsd
 	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lcurses"
-
-posix:
-	$(MAKE) all MYCFLAGS=-DLUA_USE_POSIX
-
-solaris:
-	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-ldl"
 
 # list targets that do not create files (but not all makes understand .PHONY)
 .PHONY: all $(PLATS) default o a clean depend echo none

@@ -81,33 +81,33 @@ none:
 freebsd:
 	$(MAKE) -C luasocket bsd
 	$(MAKE) -C luasec bsd
-	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lncursesw"
+	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX" MYLIBS="-Wl,-E -lncursesw"
 
 linux:
 	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
 	$(MAKE) -C luasocket linux
 	$(MAKE) -C luasec linux
-	$(MAKE) all MYCFLAGS="-Wpedantic -DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -ldl -lncursesw"
+	$(MAKE) all MYCFLAGS="-Wpedantic -DLUA_USE_POSIX" MYLIBS="-Wl,-E -lncursesw"
 
 macosx:
 	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
 	$(MAKE) -C luasocket macosx
 	$(MAKE) -C luasec macosx
-	$(MAKE) all MYCFLAGS="-Wpedantic -DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-L/usr/local/opt/openssl@3/lib -lncurses"
+	$(MAKE) all MYCFLAGS="-Wpedantic -DLUA_USE_POSIX" MYLIBS="-L/usr/local/opt/openssl@3/lib -lncurses"
 # use this on Mac OS X 10.3-
-#	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_DL_DYLD"
+#	$(MAKE) all MYCFLAGS=-DLUA_USE_POSIX
 
 openbsd:
 	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
 	$(MAKE) -C luasocket bsd
 	$(MAKE) -C luasec bsd
-	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lncurses"
+	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX" MYLIBS="-Wl,-E -lncurses"
 
 netbsd:
 	$(MAKE) -C lcurses CC="$(CC)" CFLAGS="$(CFLAGS)"
 	$(MAKE) -C luasocket bsd
 	$(MAKE) -C luasec bsd
-	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX -DLUA_USE_DLOPEN" MYLIBS="-Wl,-E -lcurses"
+	$(MAKE) all MYCFLAGS="-DLUA_USE_POSIX" MYLIBS="-Wl,-E -lcurses"
 
 # list targets that do not create files (but not all makes understand .PHONY)
 .PHONY: all $(PLATS) default o a clean depend echo none

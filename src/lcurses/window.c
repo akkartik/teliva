@@ -1321,7 +1321,7 @@ Wgetch(lua_State *L)
 		unlink("teliva_editor_state");
 		exit(0);
 	}
-	if (c == CTRL_E)
+	if (c == CTRL_U)
 		developer_mode(L);
 	if (c == CTRL_P)
 		permissions_mode(L);

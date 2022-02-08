@@ -68,8 +68,6 @@ static void draw_menu(lua_State* L) {
     mvaddch(LINES-1, x, ' ');
   menu_column = 2;
   draw_menu_item("^x", "exit");
-  draw_menu_item("^e", "edit");
-  draw_menu_item("^p", "perms");
 
   /* if app ran successfully, render any app-specific items */
   if (Previous_message == NULL) {
@@ -96,7 +94,13 @@ static void draw_menu(lua_State* L) {
     attroff(COLOR_PAIR(COLOR_PAIR_ERROR));
   }
 
-  /* render app permissions on the right */
+  /* render stuff common to all apps on the right */
+  menu_column = COLS-37;
+  draw_menu_item("^u", "edit app");
+  draw_menu_item("^p", "perms");
+
+  attrset(A_NORMAL);
+  mvaddstr(LINES-1, COLS-12, "");
   render_permissions(L);
 
   attrset(A_NORMAL);
@@ -110,8 +114,6 @@ const char* character_name(char c) {
 }
 
 static void render_permissions(lua_State* L) {
-  attrset(A_NORMAL);
-  mvaddstr(LINES-1, COLS-12, "");
   int file_colors = COLOR_PAIR_SAFE;
   if (file_operations_predicate_body && strcmp("return false", trim(file_operations_predicate_body)) != 0)
     file_colors = COLOR_PAIR_WARN;

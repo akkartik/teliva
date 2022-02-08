@@ -179,8 +179,9 @@ libraries. However, a few things are different from conventional Lua:
 
 * Some functions are disabled because I don't know how to sandbox them
   effectively:
-  - `os.execute`
-  - `io.popen`
+  - `os.execute`, `os.getenv`, `io.popen`
+  - `io.lines` (not a security issue; just difficult to distinguish missing
+    files from sandboxing issues)
 * Some functions are disabled because they don't seem to make sense in an
   ncurses environment. This includes the Lua notions of default files, which
   start out as stdin/stdout.

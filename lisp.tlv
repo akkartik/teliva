@@ -189,7 +189,8 @@
     >  curses.init_pair(14, 7, 6)
     >  curses.init_pair(15, -1, 15)
     >end
-- main:
+- __teliva_timestamp: original
+  main:
     >function main()
     >  init_colors()
     >
@@ -198,179 +199,7 @@
     >    update(window)
     >  end
     >end
-  __teliva_timestamp: original
-- doc:main:
-    >foo bar
-  __teliva_timestamp:
-    >Thu Jan 27 00:36:56 2022
-- doc:main:
-    >foo bar baz
-  __teliva_timestamp:
-    >Thu Jan 27 00:39:33 2022
-- doc:main:
-    >John McCarthy's Lisp -- without the metacircularity
-    >
-    >If you know Lua, this version might be easier to understand.
-    >
-    >Words highlighted like [[this]] are suggestions for places to jump to using ctrl-g (see the menu below).
-    >You can always jump 
-  __teliva_timestamp:
-    >Thu Jan 27 00:47:51 2022
-- doc:main:
-    >John McCarthy's Lisp -- without the metacircularity
-    >
-    >If you know Lua, this version might be easier to understand.
-    >
-    >Words highlighted like [[this]] are suggestions for places to jump to using ctrl-g (see the menu below).
-    >You can always jump back here using ctrl-b (for 'big picture').
-  __teliva_timestamp:
-    >Thu Jan 27 00:55:11 2022
-- doc:main:
-    >John McCarthy's Lisp -- without the metacircularity
-    >If you know Lua, this version might be easier to understand.
-    >
-    >Words highlighted like [[this]] are suggestions for places to jump to using ctrl-g (see the menu below).
-    >You can always jump back here using ctrl-b (for 'big picture').
-    >
-    >
-  __teliva_timestamp:
-    >Thu Jan 27 00:55:19 2022
-- doc:main:
-    >John McCarthy's Lisp -- without the metacircularity
-    >If you know Lua, this version might be easier to understand.
-    >
-    >Words highlighted like [[this]] are suggestions for places to jump to using ctrl-g (see the menu below).
-    >You can always jump back here using ctrl-b (for 'big picture').
-    >
-    >Lisp is a programming language that manipulates objects of a few different types.
-    >There are a few _atomic_ types, and one type that can combine them.
-  __teliva_timestamp:
-    >Thu Jan 27 00:56:25 2022
-- doc:main:
-    >John McCarthy's Lisp -- without the metacircularity
-    >If you know Lua, this version might be easier to understand.
-    >
-    >Words highlighted like [[this]] are suggestions for places to jump to using ctrl-g (see the menu below).
-    >You can always jump back here using ctrl-b (for 'big picture').
-    >
-    >Lisp is a programming language that manipulates objects of a few different types.
-    >There are a few _atomic_ types, and one type that can combine them.
-    >The atomic types are what you would expect: numbers, characters, strings, symbols (variables).
-    >You can add others.
-  __teliva_timestamp:
-    >Thu Jan 27 00:58:06 2022
-- doc:main:
-    >John McCarthy's Lisp -- without the metacircularity
-    >If you know Lua, this version might be easier to understand.
-    >
-    >Words highlighted like [[this]] are suggestions for places to jump to using ctrl-g (see the menu below).
-    >You can always jump back here using ctrl-b (for 'big picture').
-    >
-    >Lisp is a programming language that manipulates objects of a few different types.
-    >There are a few _atomic_ types, and one type that can combine them.
-    >The atomic types are what you would expect: numbers, characters, strings, symbols (variables). You can add others.
-    >
-    >The way to combine them is the [[cons]] table which has just two keys: a [[car]] and a [[cdr]].
-  __teliva_timestamp:
-    >Thu Jan 27 00:58:46 2022
-- doc:main:
-    >John McCarthy's Lisp -- without the metacircularity
-    >If you know Lua, this version might be easier to understand.
-    >
-    >Words highlighted like [[this]] are suggestions for places to jump to using ctrl-g (see the menu below).
-    >You can always jump back here using ctrl-b (for 'big picture').
-    >
-    >Lisp is a programming language that manipulates objects of a few different types.
-    >There are a few _atomic_ types, and one type that can combine them.
-    >The atomic types are what you would expect: numbers, characters, strings, symbols (variables). You can add others.
-    >
-    >The way to combine them is the [[cons]] table which has just two keys: a [[car]] and a [[cdr]].
-    >
-    >We'll now build an interpreter that can run programs constructed out of cons tables.
-    >
-    >One thing we'll need for an interpreter is a symbol table (env) that maps symbols to values (objects).
-    >We'll just use a Lua table for this purpose, but with one tweak: a _next_ pointer that allows us to combine tables together.
-    >See [[lookup]] now to get a sense for how we'll use envs.
-  __teliva_timestamp:
-    >Thu Jan 27 01:01:56 2022
-- doc:main:
-    >John McCarthy's Lisp -- without the metacircularity
-    >If you know Lua, this version might be easier to understand.
-    >
-    >Words highlighted like [[this]] are suggestions for places to jump to using ctrl-g (see the menu below).
-    >You can always jump back here using ctrl-b (for 'big picture').
-    >
-    >Lisp is a programming language that manipulates objects of a few different types.
-    >There are a few _atomic_ types, and one type that can combine them.
-    >The atomic types are what you would expect: numbers, characters, strings, symbols (variables). You can add others.
-    >
-    >The way to combine them is the [[cons]] table which has just two keys: a [[car]] and a [[cdr]].
-    >
-    >We'll now build an interpreter that can run programs constructed out of cons tables.
-    >
-    >One thing we'll need for an interpreter is a symbol table (env) that maps symbols to values (objects).
-    >We'll just use a Lua table for this purpose, but with one tweak: a _next_ pointer that allows us to combine tables together.
-    >See [[lookup]] now to get a sense for how we'll use envs.
-    >
-    >Lisp programs are just cons tables and atoms nested to arbitrary depths, constructing trees. A Lisp interpreter 
-  __teliva_timestamp:
-    >Thu Jan 27 01:03:45 2022
-- doc:main:
-    >John McCarthy's Lisp -- without the metacircularity
-    >If you know Lua, this version might be easier to understand.
-    >
-    >Words highlighted like [[this]] are suggestions for places to jump to using ctrl-g (see the menu below).
-    >You can always jump back here using ctrl-b (for 'big picture').
-    >
-    >Lisp is a programming language that manipulates objects of a few different types.
-    >There are a few _atomic_ types, and one type that can combine them.
-    >The atomic types are what you would expect: numbers, characters, strings, symbols (variables). You can add others.
-    >
-    >The way to combine them is the [[cons]] table which has just two keys: a [[car]] and a [[cdr]]. Both can hold objects, either atoms or other cons tables.
-    >
-    >We'll now build an interpreter that can run programs constructed out of cons tables.
-    >
-    >One thing we'll need for an interpreter is a symbol table (env) that maps symbols to values (objects).
-    >We'll just use a Lua table for this purpose, but with one tweak: a _next_ pointer that allows us to combine tables together.
-    >See [[lookup]] now to get a sense for how we'll use envs.
-    >
-    >Lisp programs are just cons tables and atoms nested to arbitrary depths, constructing trees. A Lisp interpreter walks the tree of code,
-    >performing computations. The tree-walker interpreter [[eval]] is recursive, since trees are self-similar structures.
-  __teliva_timestamp:
-    >Thu Jan 27 01:07:24 2022
-- doc:main:
-    >John McCarthy's Lisp -- without the metacircularity
-    >If you know Lua, this version might be easier to understand.
-    >
-    >Words highlighted like [[this]] are suggestions for places to jump to using ctrl-g (see the menu below).
-    >You can always jump back here using ctrl-b (for 'big picture').
-    >
-    >Lisp is a programming language that manipulates objects of a few different types.
-    >There are a few _atomic_ types, and one type that can combine them.
-    >The atomic types are what you would expect: numbers, characters, strings, symbols (variables). You can add others.
-    >
-    >The way to combine them is the [[cons]] table which has just two keys: a [[car]] and a [[cdr]]. Both can hold objects, either atoms or other cons tables.
-    >
-    >We'll now build an interpreter that can run programs constructed out of cons tables.
-    >
-    >One thing we'll need for an interpreter is a symbol table (env) that maps symbols to values (objects).
-    >We'll just use a Lua table for this purpose, but with one tweak: a _next_ pointer that allows us to combine tables together.
-    >See [[lookup]] now to get a sense for how we'll use envs.
-    >
-    >Lisp programs are just cons tables and atoms nested to arbitrary depths, constructing trees. A Lisp interpreter walks the tree of code,
-    >performing computations. Since cons tables can point to other cons tables, the tree-walker interpreter [[eval]] is recursive.
-    >As the interpreter gets complex, we'll extract parts of it into their own helper functions: [[eval_unary]], [[eval_binary]], [[eval_if]], and so on.
-    >The helper functions contain recursive calls to [[eval]], so that [[eval]] becomes indirectly recursive, and [[eval]] together with its helpers
-    >is mutually recursive. I sometimes find it helpful to think of them all as just one big function.
-    >
-    >All these mutually recursive functions take the same arguments: a current expression 'x' and the symbol table 'env'.
-    >But really, most of the interpreter is just walking the tree of expressions. Only two functions care about the internals of 'env':
-    >  - [[lookup]] which reads within env as we saw before
-    >  - [[bind_env]] which creates a new _scope_ of symbols for each new function call.
-  __teliva_timestamp:
-    >Thu Jan 27 01:16:25 2022
-- __teliva_timestamp:
-    >Thu Jan 27 01:17:25 2022
+- __teliva_timestamp: original
   eval:
     >function eval(x, env)
     >  function symeq(x, s)
@@ -396,20 +225,17 @@
     >    return eval_label(x, env)
     >  end
     >end
-- __teliva_timestamp:
-    >Thu Jan 27 01:17:25 2022
+- __teliva_timestamp: original
   eval_unary:
     >function eval_unary(x, env)
     >  return unary_functions[x.car.sym](eval(x.cdr.car, env))
     >end
-- __teliva_timestamp:
-    >Thu Jan 27 01:17:25 2022
+- __teliva_timestamp: original
   eval_binary:
     >function eval_binary(x, env)
     >  return binary_functions[x.car.sym](eval(x.cdr.car, env))
     >end
-- __teliva_timestamp:
-    >Thu Jan 27 01:17:25 2022
+- __teliva_timestamp: original
   unary_functions:
     >-- format: lisp name = lua function that implements it
     >unary_functions = {
@@ -417,23 +243,20 @@
     >  car=car,
     >  cdr=cdr,
     >}
-- __teliva_timestamp:
-    >Thu Jan 27 01:17:25 2022
+- __teliva_timestamp: original
   binary_functions:
     >-- format: lisp name = lua function that implements it
     >binary_functions = {
     >  cons=cons,
     >  iso=iso,
     >}
-- __teliva_timestamp:
-    >Thu Jan 27 01:17:25 2022
+- __teliva_timestamp: original
   lookup:
     >function lookup(env, s)
     >  if env[s] then return env[s] end
     >  if env.next then return lookup(env.next, s) end
     >end
-- __teliva_timestamp:
-    >Thu Jan 27 01:17:25 2022
+- __teliva_timestamp: original
   eval_if:
     >function eval_if(x, env)
     >  -- syntax: (if check b1 b2)
@@ -446,8 +269,7 @@
     >    return eval(b2, env)
     >  end
     >end
-- __teliva_timestamp:
-    >Thu Jan 27 01:17:25 2022
+- __teliva_timestamp: original
   eval_fn:
     >function eval_fn(x, env)
     >  -- syntax: ((fn params body*) args*)
@@ -458,8 +280,7 @@
     >  return eval_exprs(body,
     >                    bind_env(params, args, env))
     >end
-- __teliva_timestamp:
-    >Thu Jan 27 01:17:25 2022
+- __teliva_timestamp: original
   bind_env:
     >function bind_env(params, args, env)
     >  if params == nil then return env end
@@ -472,8 +293,7 @@
     >  end
     >  return result
     >end
-- __teliva_timestamp:
-    >Thu Jan 27 01:17:25 2022
+- __teliva_timestamp: original
   eval_exprs:
     >function eval_exprs(xs, env)
     >  local result = nil
@@ -483,8 +303,8 @@
     >  end
     >  return result
     >end
-- __teliva_timestamp:
-    >Thu Jan 27 01:17:25 2022
+- __teliva_timestamp: original
+  eval_label:
     >function eval_label(x, env)
     >  -- syntax: ((label f (fn params body*)) args*)
     >  local callee = x.car
@@ -494,122 +314,22 @@
     >  return eval({car=fn, cdr=args},
     >              bind_env({f}, {callee}, env))
     >end
-- __teliva_timestamp:
-    >Thu Jan 27 01:24:51 2022
+- __teliva_timestamp: original
   atom:
     >function atom(x)
     >  return x == nil or x.num or x.char or x.str or x.sym
-    >end  
-- car:
+    >end
+- __teliva_timestamp: original
+  car:
     >function car(x) return x.car end
-  __teliva_timestamp:
-    >Thu Jan 27 01:25:03 2022
-- cdr:
+- __teliva_timestamp: original
+  cdr:
     >function cdr(x) return x.cdr end
-  __teliva_timestamp:
-    >Thu Jan 27 01:25:10 2022
-- __teliva_timestamp:
-    >Thu Jan 27 01:25:21 2022
+- __teliva_timestamp: original
   cons:
     >function cons(x, y) return {car=x, cdr=y} end
-- __teliva_timestamp:
-    >Thu Jan 27 01:25:21 2022
-  iso:
-    >function iso(x, y)
-    >  if x == nil then return y == nil end
-    >  local done={}
-    >  if done[x] then return done[x] == y end
-    >  done[x] = y
-    >  if atom(x) then
-    >    if not atom(y) then return nil end
-    >    for k, v in pairs(x) do
-    >      if y[k] ~= v then return nil end
-    >    end
-    >    return true
-    >  end
-    >  for k, v in pairs(x) do
-    >    if not iso(y[k], v) then return nil end
-    >  end
-    >  for k, v in pairs(y) do
-    >    if not iso(x[k], v) then return nil end
-    >  end
-    >  return true
-    >end
-- doc:main:
-    >John McCarthy's Lisp -- without the metacircularity
-    >If you know Lua, this version might be easier to understand.
-    >
-    >Words highlighted like [[this]] are suggestions for places to jump to using ctrl-g (see the menu below).
-    >You can always jump back here using ctrl-b (for 'big picture').
-    >
-    >Lisp is a programming language that manipulates objects of a few different types.
-    >There are a few _atomic_ types, and one type that can combine them.
-    >The atomic types are what you would expect: numbers, characters, strings, symbols (variables). You can add others.
-    >
-    >The way to combine them is the [[cons]] table which has just two keys: a [[car]] and a [[cdr]]. Both can hold objects, either atoms or other cons tables.
-    >
-    >We'll now build an interpreter that can run programs constructed out of cons tables.
-    >
-    >One thing we'll need for an interpreter is a symbol table (env) that maps symbols to values (objects).
-    >We'll just use a Lua table for this purpose, but with one tweak: a _next_ pointer that allows us to combine tables together.
-    >See [[lookup]] now to get a sense for how we'll use envs.
-    >
-    >Lisp programs are just cons tables and atoms nested to arbitrary depths, constructing trees. A Lisp interpreter walks the tree of code,
-    >performing computations. Since cons tables can point to other cons tables, the tree-walker interpreter [[eval]] is recursive.
-    >As the interpreter gets complex, we'll extract parts of it into their own helper functions: [[eval_unary]], [[eval_binary]], [[eval_if]], and so on.
-    >The helper functions contain recursive calls to [[eval]], so that [[eval]] becomes indirectly recursive, and [[eval]] together with its helpers
-    >is mutually recursive. I sometimes find it helpful to think of them all as just one big function.
-    >
-    >All these mutually recursive functions take the same arguments: a current expression 'x' and the symbol table 'env'.
-    >But really, most of the interpreter is just walking the tree of expressions. Only two functions care about the internals of 'env':
-    >  - [[lookup]] which reads within env as we saw before
-    >  - [[bind_env]] which creates a new _scope_ of symbols for each new function call.
-    >  
-    >Here's a reference list of eval helpers: [[eval_unary]], [[eval_binary]], [[eval_if]], [[eval_fn]], [[eval_exprs]], [[eval_label]]
-    >More complex Lisps with more features will likely add helpers for lumpy bits of the language.
-    >
-  __teliva_timestamp:
-    >Thu Jan 27 01:29:01 2022
-- doc:main:
-    >John McCarthy's Lisp -- without the metacircularity
-    >If you know Lua, this version might be easier to understand.
-    >
-    >Words highlighted like [[this]] are suggestions for places to jump to using ctrl-g (see the menu below).
-    >You can always jump back here using ctrl-b (for 'big picture').
-    >
-    >Lisp is a programming language that manipulates objects of a few different types.
-    >There are a few _atomic_ types, and one type that can combine them.
-    >The atomic types are what you would expect: numbers, characters, strings, symbols (variables). You can add others.
-    >
-    >The way to combine them is the [[cons]] table which has just two keys: a [[car]] and a [[cdr]]. Both can hold objects, either atoms or other cons tables.
-    >
-    >We'll now build an interpreter that can run programs constructed out of cons tables.
-    >
-    >One thing we'll need for an interpreter is a symbol table (env) that maps symbols to values (objects).
-    >We'll just use a Lua table for this purpose, but with one tweak: a _next_ pointer that allows us to combine tables together.
-    >See [[lookup]] now to get a sense for how we'll use envs.
-    >
-    >Lisp programs are just cons tables and atoms nested to arbitrary depths, constructing trees. A Lisp interpreter walks the tree of code,
-    >performing computations. Since cons tables can point to other cons tables, the tree-walker interpreter [[eval]] is recursive.
-    >As the interpreter gets complex, we'll extract parts of it into their own helper functions: [[eval_unary]], [[eval_binary]], [[eval_if]], and so on.
-    >The helper functions contain recursive calls to [[eval]], so that [[eval]] becomes indirectly recursive, and [[eval]] together with its helpers
-    >is mutually recursive. I sometimes find it helpful to think of them all as just one big function.
-    >
-    >All these mutually recursive functions take the same arguments: a current expression 'x' and the symbol table 'env'.
-    >But really, most of the interpreter is just walking the tree of expressions. Only two functions care about the internals of 'env':
-    >  - [[lookup]] which reads within env as we saw before
-    >  - [[bind_env]] which creates a new _scope_ of symbols for each new function call.
-    >  
-    >Hopefully this quick overview will help you get a sense for this codebase.
-    >
-    >Here's a reference list of eval helpers: [[eval_unary]], [[eval_binary]], [[eval_if]], [[eval_fn]], [[eval_exprs]], [[eval_label]]
-    >More complex Lisps with more features will likely add helpers for lumpy bits of the language.
-    >Here's a list of primitives implemented in Lua: [[atom]], [[car]], [[cdr]], [[cons]], [[iso]] (for 'isomorphic'; comparing trees all the way down to the leaves)
-    >Here's a list of _constructors_ for creating objects of different types: [[num]], [[char]], [[str]], [[sym]] (and of course [[cons]])
-    >I should probably add more primitives for operating on numbers, characters and strings..
-  __teliva_timestamp:
-    >Thu Jan 27 01:34:18 2022
-- doc:main:
+- __teliva_timestamp: original
+  doc:main:
     >John McCarthy's Lisp -- without the metacircularity
     >If you know Lua, this version might be easier to understand.
     >
@@ -639,8 +359,8 @@
     >  - [[lookup]] which reads within env as we saw before
     >  - [[bind_env]] which creates a new _scope_ of symbols for each new function call.
     >More complex Lisps add even more arguments to every. single. helper. Each arg will still only really matter to a couple of functions.
-    >But we still pass them around all over the place.
-    >  
+    >But we still have to pass them around all over the place.
+    >
     >Hopefully this quick overview will help you get a sense for this codebase.
     >
     >Here's a reference list of eval helpers: [[eval_unary]], [[eval_binary]], [[eval_if]], [[eval_fn]], [[eval_exprs]], [[eval_label]]
@@ -648,10 +368,7 @@
     >Here's a list of primitives implemented in Lua: [[atom]], [[car]], [[cdr]], [[cons]], [[iso]] (for 'isomorphic'; comparing trees all the way down to the leaves)
     >Here's a list of _constructors_ for creating objects of different types: [[num]], [[char]], [[str]], [[sym]] (and of course [[cons]])
     >I should probably add more primitives for operating on numbers, characters and strings..
-  __teliva_timestamp:
-    >Thu Jan 27 01:36:44 2022
-- __teliva_timestamp:
-    >Thu Jan 27 01:41:06 2022
+- __teliva_timestamp: original
   iso:
     >function iso(x, y)
     >  if x == nil then return y == nil end

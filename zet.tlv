@@ -160,13 +160,9 @@
   menu:
     >-- To show app-specific hotkeys in the menu bar, add hotkey/command
     >-- arrays of strings to the menu array.
-    >menu = {}
-- __teliva_timestamp: original
-  update:
-    >function update(window)
-    >  local key = curses.getch()
-    >  -- process key here
-    >end
+    >menu = {
+    >  {'^e', 'edit'},
+    >}
 - __teliva_timestamp: original
   init_colors:
     >function init_colors()
@@ -323,6 +319,11 @@
     >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
     >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
     >    end
+    >  --
+    >  elseif key == 5 then  -- ctrl-e
+    >    local old_menu = menu
+    >    editz(window)
+    >    menu = old_menu
     >  end
     >end
 - __teliva_timestamp: original
@@ -388,3 +389,302 @@
     >  indent=2,  -- how children of a zettel are indicated
     >  current_zettel_bg=3,  -- color pair index initialized in init_colors
     >}
+- __teliva_timestamp: original
+  editz:
+    >function editz()
+    >  menu = { {'^e', 'back to browsing'},}
+    >  local top = (render_state.curr_h - 1) * (view_settings.height + view_settings.vmargin)
+    >  local bottom = top + view_settings.height
+    >  local left = (render_state.curr_w - 1) * (view_settings.width + view_settings.hmargin)
+    >  local right = left + view_settings.width
+    >  local cursor = 1
+    >  curses.curs_set(0)
+    >  local quit = false
+    >  while not quit do
+    >    editz_render(window, zettels[current_zettel_id].data, cursor, top, bottom, left, right)
+    >    quit, zettels[current_zettel_id].data, cursor = editz_update(window, zettels[current_zettel_id].data, cursor)
+    >  end
+    >  curses.curs_set(1)
+    >end
+- __teliva_timestamp: original
+  editz_render:
+    >function editz_render(window, s, cursor, top, bottom, left, right)
+    >  window:attrset(curses.color_pair(view_settings.current_zettel_bg))
+    >  for y=top,bottom-1 do
+    >    for x=left,right-1 do
+    >      window:mvaddch(y, x, ' ')
+    >    end
+    >  end
+    >  left = left + 1  -- left padding; TODO: indent
+    >  local y, x = top, left
+    >  window:mvaddstr(y, x, '')
+    >  for i=1,string.len(s) do
+    >    -- render character
+    >    if i == cursor then
+    >      if s[i] == '\n' then
+    >        -- newline at cursor = render extra space in reverse video before jumping to new line
+    >        window:attron(curses.A_REVERSE)
+    >        window:addch(' ')
+    >        window:attroff(curses.A_REVERSE)
+    >      else
+    >        -- most characters at cursor = render in reverse video
+    >        window:attron(curses.A_REVERSE)
+    >        window:addstr(s[i])
+    >        window:attroff(curses.A_REVERSE)
+    >      end
+    >    else
+    >      if s[i] ~= '\n' then
+    >        window:addstr(s[i])
+    >      end
+    >    end
+    >    -- update cursor position
+    >    if s[i] == '\n' then
+    >      x = left
+    >      y = y + 1
+    >      if y >= bottom then return end
+    >      window:mvaddstr(y, x, '')
+    >    else
+    >      x = x + 1
+    >      if x >= right then
+    >        y = y + 1
+    >        if y >= bottom then return end
+    >        x = left
+    >        window:mvaddstr(y, x, '')
+    >      end
+    >    end
+    >  end
+    >  if cursor > string.len(s) then
+    >    window:attron(curses.A_REVERSE)
+    >    window:addch(' ')
+    >    window:attroff(curses.A_REVERSE)
+    >  else
+    >    window:addch(' ')
+    >  end
+    >end
+- __teliva_timestamp: original
+  editz_update:
+    >function editz_update(window, prose, cursor)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end
+- __teliva_timestamp: original
+  cursor_down:
+    >function cursor_down(s, old_idx, width)
+    >  local max = string.len(s)
+    >  local i = 1
+    >  -- compute oldcol, the screen column of old_idx
+    >  local oldcol = 0
+    >  local col = 0
+    >  while true do
+    >    if i > max then
+    >      -- abnormal old_idx
+    >      return old_idx
+    >    end
+    >    if i == old_idx then
+    >      oldcol = col
+    >      break
+    >    end
+    >    if s[i] == '\n' then
+    >      col = 0
+    >    else
+    >      col = col+1
+    >    end
+    >    i = i+1
+    >  end
+    >  -- skip rest of line
+    >  while true do
+    >    if i > max then
+    >      -- current line is at bottom
+    >      if col >= width then
+    >        return i
+    >      end
+    >      return old_idx
+    >    end
+    >    if s[i] == '\n' then
+    >      break
+    >    end
+    >    if i - old_idx >= width then
+    >      return i
+    >    end
+    >    col = col+1
+    >    i = i+1
+    >  end
+    >  -- compute index at same column on next line
+    >  -- i is at a newline
+    >  i = i+1
+    >  col = 0
+    >  while true do
+    >    if i > max then
+    >      -- next line is at bottom and is too short; position at end of it
+    >      return i
+    >    end
+    >    if s[i] == '\n' then
+    >      -- next line is too short; position at end of it
+    >      return i
+    >    end
+    >    if col == oldcol then
+    >      return i
+    >    end
+    >    col = col+1
+    >    i = i+1
+    >  end
+    >end
+    >
+    >function test_cursor_down()
+    >  -- lines that don't wrap
+    >  check_eq(cursor_down('abc\ndef', 1, 5), 5, 'cursor_down: non-bottom line first char')
+    >  check_eq(cursor_down('abc\ndef', 2, 5), 6, 'cursor_down: non-bottom line mid char')
+    >  check_eq(cursor_down('abc\ndef', 3, 5), 7, 'cursor_down: non-bottom line final char')
+    >  check_eq(cursor_down('abc\ndef', 4, 5), 8, 'cursor_down: non-bottom line end')
+    >  check_eq(cursor_down('abc\ndef', 5, 5), 5, 'cursor_down: bottom line first char')
+    >  check_eq(cursor_down('abc\ndef', 6, 5), 6, 'cursor_down: bottom line mid char')
+    >  check_eq(cursor_down('abc\ndef', 7, 5), 7, 'cursor_down: bottom line final char')
+    >  check_eq(cursor_down('abc\n\ndef', 2, 5), 5, 'cursor_down: to shorter line')
+    >
+    >  -- within a single wrapping line
+    >  --   |abcde|  <-- wrap, no newline
+    >  --   |fgh  |
+    >  check_eq(cursor_down('abcdefgh', 1, 5), 6, 'cursor_down from wrapping line: first char')
+    >  check_eq(cursor_down('abcdefgh', 2, 5), 7, 'cursor_down from wrapping line: mid char')
+    >  check_eq(cursor_down('abcdefgh', 5, 5), 9, 'cursor_down from wrapping line: to shorter line')
+    >
+    >  -- within a single very long wrapping line
+    >  --   |abcde|  <-- wrap, no newline
+    >  --   |fghij|  <-- wrap, no newline
+    >  --   |klm  |
+    >  check_eq(cursor_down('abcdefghijklm', 1, 5), 6, 'cursor_down within wrapping line: first char')
+    >  check_eq(cursor_down('abcdefghijklm', 2, 5), 7, 'cursor_down within wrapping line: mid char')
+    >  check_eq(cursor_down('abcdefghijklm', 5, 5), 10, 'cursor_down within wrapping line: final char')
+    >end
+- __teliva_timestamp: original
+  cursor_up:
+    >function cursor_up(s, old_idx, width)
+    >  local max = string.len(s)
+    >  local i = 1
+    >  -- compute oldcol, the screen column of old_idx
+    >  local oldcol = 0
+    >  local col = 0
+    >  local newline_before_current_line = 0
+    >  while true do
+    >    if i > max or i == old_idx then
+    >      oldcol = col
+    >      break
+    >    end
+    >    if s[i] == '\n' then
+    >      col = 0
+    >      newline_before_current_line = i
+    >    else
+    >      col = col+1
+    >      if col == width then
+    >        col = 0
+    >      end
+    >    end
+    >    i = i+1
+    >  end
+    >  -- find previous newline
+    >  i = i-col-1
+    >  if old_idx - newline_before_current_line > width then
+    >    -- we're in a wrapped line
+    >    return old_idx - width
+    >  end
+    >  -- scan back to start of previous line
+    >  if s[i] == '\n' then
+    >    i = i-1
+    >  end
+    >  while true do
+    >    if i < 1 then
+    >      -- current line is at top
+    >      break
+    >    end
+    >    if s[i] == '\n' then
+    >      break
+    >    end
+    >    i = i-1
+    >  end
+    >  -- i is at a newline
+    >  i = i+1
+    >  -- skip whole screen lines within previous line
+    >  while newline_before_current_line - i > width do
+    >    i = i + width
+    >  end
+    >  -- compute index at same column on previous screen line
+    >  col = 0
+    >  while true do
+    >    if i > max then
+    >      -- next line is at bottom and is too short; position at end of it
+    >      return i
+    >    end
+    >    if s[i] == '\n' then
+    >      -- next line is too short; position at end of it
+    >      return i
+    >    end
+    >    if col == oldcol then
+    >      return i
+    >    end
+    >    col = col+1
+    >    i = i+1
+    >  end
+    >end
+    >
+    >function test_cursor_up()
+    >  -- lines that don't wrap
+    >  check_eq(cursor_up('abc\ndef', 1, 5), 1, 'cursor_up: top line first char')
+    >  check_eq(cursor_up('abc\ndef', 2, 5), 2, 'cursor_up: top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 3, 5), 3, 'cursor_up: top line final char')
+    >  check_eq(cursor_up('abc\ndef', 4, 5), 4, 'cursor_up: top line end')
+    >  check_eq(cursor_up('abc\ndef', 5, 5), 1, 'cursor_up: non-top line first char')
+    >  check_eq(cursor_up('abc\ndef', 6, 5), 2, 'cursor_up: non-top line mid char')
+    >  check_eq(cursor_up('abc\ndef', 7, 5), 3, 'cursor_up: non-top line final char')
+    >  check_eq(cursor_up('abc\ndef\n', 8, 5), 4, 'cursor_up: non-top line end')
+    >  check_eq(cursor_up('ab\ndef\n', 7, 5), 3, 'cursor_up: to shorter line')
+    >
+    >  -- within a single wrapping line
+    >  --   |abcde|  <-- wrap, no newline
+    >  --   |fgh  |
+    >  check_eq(cursor_up('abcdefgh', 6, 5), 1, 'cursor_up from wrapping line: first char')
+    >  check_eq(cursor_up('abcdefgh', 7, 5), 2, 'cursor_up from wrapping line: mid char')
+    >  check_eq(cursor_up('abcdefgh', 8, 5), 3, 'cursor_up from wrapping line: final char')
+    >  check_eq(cursor_up('abcdefgh', 9, 5), 4, 'cursor_up from wrapping line: wrapped line end')
+    >
+    >  -- within a single very long wrapping line
+    >  --   |abcde|  <-- wrap, no newline
+    >  --   |fghij|  <-- wrap, no newline
+    >  --   |klm  |
+    >  check_eq(cursor_up('abcdefghijklm', 11, 5), 6, 'cursor_up within wrapping line: first char')
+    >  check_eq(cursor_up('abcdefghijklm', 12, 5), 7, 'cursor_up within wrapping line: mid char')
+    >  check_eq(cursor_up('abcdefghijklm', 13, 5), 8, 'cursor_up within wrapping line: final char')
+    >  check_eq(cursor_up('abcdefghijklm', 14, 5), 9, 'cursor_up within wrapping line: wrapped line end')
+    >
+    >  -- from below to (the bottom of) a wrapping line
+    >  --   |abcde|  <-- wrap, no newline
+    >  --   |fg   |
+    >  --   |hij  |
+    >  check_eq(cursor_up('abcdefg\nhij', 9, 5), 6, 'cursor_up to wrapping line: first char')
+    >  check_eq(cursor_up('abcdefg\nhij', 10, 5), 7, 'cursor_up to wrapping line: mid char')
+    >  check_eq(cursor_up('abcdefg\nhij', 11, 5), 8, 'cursor_up to wrapping line: final char')
+    >  check_eq(cursor_up('abcdefg\nhij', 12, 5), 8, 'cursor_up to wrapping line: to shorter line')
+    >end

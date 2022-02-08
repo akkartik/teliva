@@ -248,8 +248,8 @@
     >  local screen_rows, screen_cols = window:getmaxyx()
     >  menu = {
     >    {'enter', 'submit'},
-    >    {'ctrl-g', 'cancel'},
-    >    {'ctrl-u', 'clear'},
+    >    {'^g', 'cancel'},
+    >    {'^u', 'clear'},
     >  }
     >  while true do
     >    window:mvaddstr(screen_rows-1, 9, '')

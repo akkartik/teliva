@@ -28,6 +28,8 @@ program draws over menu -> getch -> Teliva menu is still visible
 TODO protect sensitive teliva files (teliva_edit_buffer, etc.)
   should we protect .c sources?
 
+TODO protect against DoS attack filling up disk
+
 assumptions:
   listing files in a directory is not worth sandboxing
     since reading their contents is sandboxed

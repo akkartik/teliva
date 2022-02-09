@@ -34,7 +34,6 @@
     >  window:attroff(curses.A_BOLD)
     >  curses.refresh()
     >end
-  __teliva_note: foo
 - __teliva_timestamp: original
   menu:
     >menu = {

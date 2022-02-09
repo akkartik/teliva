@@ -187,7 +187,8 @@
     >  curses.init_pair(14, 7, 6)
     >  curses.init_pair(15, -1, 15)
     >end
-- main:
+- __teliva_timestamp: original
+  main:
     >function main()
     >  init_colors()
     >
@@ -196,4 +197,3 @@
     >    update(window)
     >  end
     >end
-  __teliva_timestamp: original

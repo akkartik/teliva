@@ -128,6 +128,30 @@ void emit_multiline_string(FILE* out, const char* value) {
   }
 }
 
+static const char* special_history_keys[] = {
+  "__teliva_timestamp",
+  "__teliva_note",
+  "__teliva_undo",
+  NULL,
+};
+
+/* save key and its value at top of stack to out
+ * no stack side effects */
+static void save_tlv_key(lua_State* L, const char* key, FILE* out) {
+  if (strcmp(key, "__teliva_undo") == 0) {
+    fprintf(out, "%s: %ld\n", key, lua_tointeger(L, -1));
+    return;
+  }
+  const char* value = lua_tostring(L, -1);
+  if (strchr(value, ' ') || strchr(value, '\n')) {
+    fprintf(out, "%s:\n", key);
+    emit_multiline_string(out, value);
+  }
+  else {
+    fprintf(out, "%s: %s\n", key, value);
+  }
+}
+
 void save_tlv(lua_State* L, char* filename) {
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
@@ -162,23 +186,24 @@ void save_tlv(lua_State* L, char* filename) {
     lua_rawgeti(L, history_array, i);
     int table = lua_gettop(L);
     int first = 1;
+    // standardize order of special keys
+    for (int k = 0;  special_history_keys[k];  ++k) {
+      lua_getfield(L, table, special_history_keys[k]);
+      if (!lua_isnil(L, -1)) {
+        if (first) fprintf(out, "- ");
+        else fprintf(out, "  ");
+        first = 0;
+        save_tlv_key(L, special_history_keys[k], out);
+      }
+      lua_pop(L, 1);
+    }
     for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
+      if (is_special_history_key(lua_tostring(L, -2)))
+        continue;
       if (first) fprintf(out, "- ");
       else fprintf(out, "  ");
       first = 0;
-      const char* key = lua_tostring(L, -2);
-      if (strcmp(key, "__teliva_undo") == 0) {
-        fprintf(out, "%s: %ld\n", key, lua_tointeger(L, -1));
-        continue;
-      }
-      const char* value = lua_tostring(L, -1);
-      if (strchr(value, ' ') || strchr(value, '\n')) {
-        fprintf(out, "%s:\n", key);
-        emit_multiline_string(out, value);
-      }
-      else {
-        fprintf(out, "%s: %s\n", key, value);
-      }
+      save_tlv_key(L, lua_tostring(L, -2), out);
     }
     lua_pop(L, 1);
   }
@@ -186,13 +211,6 @@ void save_tlv(lua_State* L, char* filename) {
   rename(outfilename, filename);
   lua_pop(L, 1);
 }
-
-static const char* special_history_keys[] = {
-  "__teliva_timestamp",
-  "__teliva_undo",
-  "__teliva_note",
-  NULL,
-};
 
 int is_special_history_key(const char* key) {
   for (const char** curr = special_history_keys; *curr != NULL; ++curr) {

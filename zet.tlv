@@ -695,7 +695,9 @@
     >  check_eq(cursor_up('abcdefg\nhij', 11, 5), 8, 'cursor_up to wrapping line: final char')
     >  check_eq(cursor_up('abcdefg\nhij', 12, 5), 8, 'cursor_up to wrapping line: to shorter line')
     >end
-- render:
+- __teliva_timestamp:
+    >Wed Feb  9 08:15:25 2022
+  render:
     >function render(window)
     >  window:clear()
     >  local lines, cols = window:getmaxyx()
@@ -743,9 +745,9 @@
     >  end
     >  curses.refresh()
     >end
-  __teliva_timestamp:
-    >Wed Feb  9 08:15:25 2022
-- main:
+- __teliva_timestamp:
+    >Wed Feb  9 08:15:35 2022
+  main:
     >function main()
     >  init_colors()
     >  current_zettel_id = zettels.root
@@ -756,14 +758,12 @@
     >    update(window)
     >  end
     >end
-  __teliva_timestamp:
-    >Wed Feb  9 08:15:35 2022
-- __teliva_note:
+- __teliva_timestamp:
+    >Wed Feb  9 08:16:24 2022
+  __teliva_note:
     >get rid of commandline
     >
     >There's a reason vim hides it. Confusing to have two cursors on screen.
-  __teliva_timestamp:
-    >Wed Feb  9 08:16:24 2022
   editz:
     >function editz()
     >  menu = { {'^e', 'back to browsing'},}
@@ -778,7 +778,9 @@
     >    quit, zettels[current_zettel_id].data, cursor = editz_update(window, zettels[current_zettel_id].data, cursor)
     >  end
     >end
-- editz_render:
+- __teliva_timestamp:
+    >Wed Feb  9 08:22:20 2022
+  editz_render:
     >function editz_render(window, s, cursor, top, minbottom, left, right)
     >  local h, w = window:getmaxyx()
     >  local cursor_y, cursor_x, cursor_c = 0, 0, 'c'
@@ -822,8 +824,6 @@
     >  end
     >  window:mvaddstr(cursor_y, cursor_x, cursor_c)
     >end
-  __teliva_timestamp:
-    >Wed Feb  9 08:22:20 2022
 - __teliva_timestamp:
     >Wed Feb  9 08:25:05 2022
   editz:
@@ -842,12 +842,12 @@
     >  end
     >  curses.curs_set(0)
     >end
-- __teliva_note:
+- __teliva_timestamp:
+    >Wed Feb  9 08:28:13 2022
+  __teliva_note:
     >stop simulating the cursor
     >
     >editz_render is now much simpler
-  __teliva_timestamp:
-    >Wed Feb  9 08:28:13 2022
   editz_update:
     >function editz_update(window, prose, cursor)
     >  local key = curses.getch()

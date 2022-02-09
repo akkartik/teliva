@@ -408,15 +408,15 @@
     >end
 - __teliva_timestamp: original
   editz_render:
-    >function editz_render(window, s, cursor, top, bottom, left, right)
+    >function editz_render(window, s, cursor, top, minbottom, left, right)
+    >  local h, w = window:getmaxyx()
     >  window:attrset(curses.color_pair(view_settings.current_zettel_bg))
-    >  for y=top,bottom-1 do
+    >  for y=top,minbottom-1 do
     >    for x=left,right-1 do
     >      window:mvaddch(y, x, ' ')
     >    end
     >  end
-    >  left = left + 1  -- left padding; TODO: indent
-    >  local y, x = top, left
+    >  local y, x = top, left + 1  -- left padding; TODO: indent
     >  window:mvaddstr(y, x, '')
     >  for i=1,string.len(s) do
     >    -- render character
@@ -439,16 +439,21 @@
     >    end
     >    -- update cursor position
     >    if s[i] == '\n' then
+    >      if i == cursor then x = x + 1; end
+    >      for col=x,right-1 do window:addch(' '); end
     >      x = left
     >      y = y + 1
-    >      if y >= bottom then return end
+    >      if y >= h-2 then return end
+    >      window:mvaddstr(y, x, '')
+    >      for col=x,right-1 do window:addch(' '); end
+    >      x = left + 1  -- left padding; TODO: indent
     >      window:mvaddstr(y, x, '')
     >    else
     >      x = x + 1
     >      if x >= right then
     >        y = y + 1
-    >        if y >= bottom then return end
-    >        x = left
+    >        if y >= h-2 then return end
+    >        x = left + 1  -- left padding; TODO: indent
     >        window:mvaddstr(y, x, '')
     >      end
     >    end

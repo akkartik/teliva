@@ -94,9 +94,10 @@ something sensitive. Permissions you grant a Teliva app will be _flexible_ and
 _easy to understand_. Browsers and mobile apps today tend to make you choose
 between those two properties.
 
-Sandboxing is still in progress. It isn't yet safe to run untrusted Teliva
-apps you download from the internet. (Fortunately you're unlikely to run into
-any such apps.)
+The sandboxing experience is still under construction. See [this talk](https://archive.org/details/akkartik-2022-01-16-fosdem)
+(15 minutes) for a rundown of current thinking. It isn't yet safe to run
+untrusted Teliva apps you download from the internet. (Fortunately you're
+unlikely to run into any such apps.)
 
 ## Isn't this just an IDE?
 

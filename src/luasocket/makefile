@@ -27,7 +27,7 @@ MYCFLAGS?=
 MYLDFLAGS?=
 
 # DEBUG: NODEBUG DEBUG
-# debug mode causes luasocket to collect and returns timing information useful
+# debug mode causes luasocket to collect and return timing information useful
 # for testing and debugging luasocket itself
 DEBUG?=NODEBUG
 

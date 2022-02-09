@@ -218,15 +218,15 @@
     >        window:attron(curses.A_REVERSE)
     >        window:addch(' ')
     >        window:attroff(curses.A_REVERSE)
-    >        window:addch(s[i])
+    >        window:addstr(s[i])
     >      else
     >        -- most characters at cursor = render in reverse video
     >        window:attron(curses.A_REVERSE)
-    >        window:addch(s[i])
+    >        window:addstr(s[i])
     >        window:attroff(curses.A_REVERSE)
     >      end
     >    else
-    >      window:addch(s[i])
+    >      window:addstr(s[i])
     >    end
     >    newpos = newpos+1
     >  end

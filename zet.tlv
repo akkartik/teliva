@@ -212,7 +212,7 @@
     >      y = y+1
     >      x = indent+1
     >    else
-    >      window:mvaddch(y+starty, x+startx, c)
+    >      window:mvaddstr(y+starty, x+startx, c)
     >      x = x+1
     >      if x >= startx + view_settings.width then
     >        y = y+1

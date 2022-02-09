@@ -219,7 +219,7 @@
     >        x = indent+1
     >      end
     >    end
-    >    if y >= starty + view_settings.height then
+    >    if y >= view_settings.height then
     >      break
     >    end
     >  end

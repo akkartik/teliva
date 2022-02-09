@@ -586,6 +586,8 @@
     >  check_eq(cursor_down('abcdefghijklm', 5, 5), 10, 'cursor_down within wrapping line: final char')
     >end
 - __teliva_timestamp: original
+  __teliva_note:
+    >initial commit: show/edit zettels
   cursor_up:
     >function cursor_up(s, old_idx, width)
     >  local max = string.len(s)
@@ -692,4 +694,186 @@
     >  check_eq(cursor_up('abcdefg\nhij', 10, 5), 7, 'cursor_up to wrapping line: mid char')
     >  check_eq(cursor_up('abcdefg\nhij', 11, 5), 8, 'cursor_up to wrapping line: final char')
     >  check_eq(cursor_up('abcdefg\nhij', 12, 5), 8, 'cursor_up to wrapping line: to shorter line')
+    >end
+- render:
+    >function render(window)
+    >  window:clear()
+    >  local lines, cols = window:getmaxyx()
+    >  local bg=1
+    >  local y, x = 0, 0 -- units of characters (0-based)
+    >  local w, h = 1, 1 -- units of zettels (1-based)
+    >  -- render zettels depth-first, while tracking relative positions
+    >  local done = {}
+    >  local inprogress = {zettels.root}
+    >  render_state.wh2id = {{}}
+    >  while #inprogress > 0 do
+    >    local currid = table.remove(inprogress)
+    >    if not done[currid] then
+    >      done[currid] = true
+    >      table.insert(render_state.wh2id[w], currid)
+    >      local zettel = zettels[currid]
+    >      if currid == current_zettel_id then
+    >        render_state.curr_w = w
+    >        render_state.curr_h = h
+    >      end
+    >      local currbg = (currid == current_zettel_id) and view_settings.current_zettel_bg or bg
+    >      render_zettel(window, currbg, depth(zettel) * view_settings.indent, y, x, zettel)
+    >      if zettel.next then table.insert(inprogress, zettel.next) end
+    >      if zettel.child then table.insert(inprogress, zettel.child) end
+    >      bg = 3 - bg  -- toggle between color pairs 1 and 2
+    >      y = y + view_settings.height + view_settings.vmargin
+    >      h = h + 1
+    >      if y + view_settings.height > lines then
+    >        y = 0
+    >        h = 1
+    >        x = x + view_settings.width + view_settings.hmargin
+    >        w = w + 1
+    >        if x + view_settings.width > cols then break end
+    >        table.insert(render_state.wh2id, {})
+    >      end
+    >    end
+    >  end
+    >  window:mvaddstr(lines-1, 0, '')
+    >  for i=1,3 do
+    >    window:attrset(curses.color_pair(i%2+1))
+    >    window:addstr('')
+    >    spaces(view_settings.width-string.len(''))
+    >    window:attrset(curses.color_pair(0))
+    >    window:addstr(' ')  -- margin
+    >  end
+    >  curses.refresh()
+    >end
+  __teliva_timestamp:
+    >Wed Feb  9 08:15:25 2022
+- main:
+    >function main()
+    >  init_colors()
+    >  current_zettel_id = zettels.root
+    >
+    >  curses.curs_set(0)
+    >  while true do
+    >    render(window)
+    >    update(window)
+    >  end
+    >end
+  __teliva_timestamp:
+    >Wed Feb  9 08:15:35 2022
+- __teliva_note:
+    >get rid of commandline
+    >
+    >There's a reason vim hides it. Confusing to have two cursors on screen.
+  __teliva_timestamp:
+    >Wed Feb  9 08:16:24 2022
+  editz:
+    >function editz()
+    >  menu = { {'^e', 'back to browsing'},}
+    >  local top = (render_state.curr_h - 1) * (view_settings.height + view_settings.vmargin)
+    >  local bottom = top + view_settings.height
+    >  local left = (render_state.curr_w - 1) * (view_settings.width + view_settings.hmargin)
+    >  local right = left + view_settings.width
+    >  local cursor = 1
+    >  local quit = false
+    >  while not quit do
+    >    editz_render(window, zettels[current_zettel_id].data, cursor, top, bottom, left, right)
+    >    quit, zettels[current_zettel_id].data, cursor = editz_update(window, zettels[current_zettel_id].data, cursor)
+    >  end
+    >end
+- editz_render:
+    >function editz_render(window, s, cursor, top, minbottom, left, right)
+    >  local h, w = window:getmaxyx()
+    >  local cursor_y, cursor_x, cursor_c = 0, 0, 'c'
+    >  window:attrset(curses.color_pair(view_settings.current_zettel_bg))
+    >  for y=top,minbottom-1 do
+    >    for x=left,right-1 do
+    >      window:mvaddch(y, x, ' ')
+    >    end
+    >  end
+    >  local y, x = top, left + 1  -- left padding; TODO: indent
+    >  window:mvaddstr(y, x, '')
+    >  for i=1,string.len(s) do
+    >    if i == cursor then
+    >      cursor_y = y
+    >      cursor_x = x
+    >      cursor_c = s[i]
+    >    end
+    >    if s[i] ~= '\n' then
+    >      window:addstr(s[i])
+    >      x = x + 1
+    >      if x >= right then
+    >        y = y + 1
+    >        if y >= h-2 then return end
+    >        x = left + 1  -- left padding; TODO: indent
+    >        window:mvaddstr(y, x, '')
+    >      end
+    >    else
+    >      for col=x+1,right-1 do window:addch(' '); end
+    >      x = left
+    >      y = y + 1
+    >      if y >= h-2 then return end
+    >      window:mvaddstr(y, x, '')
+    >      for col=x,right-1 do window:addch(' '); end
+    >      x = left + 1  -- left padding; TODO: indent
+    >      window:mvaddstr(y, x, '')
+    >    end
+    >  end
+    >  if cursor_y == 0 and cursor_x == 0 then
+    >    cursor_y = y
+    >    cursor_x = x
+    >  end
+    >  window:mvaddstr(cursor_y, cursor_x, cursor_c)
+    >end
+  __teliva_timestamp:
+    >Wed Feb  9 08:22:20 2022
+- __teliva_timestamp:
+    >Wed Feb  9 08:25:05 2022
+  editz:
+    >function editz()
+    >  menu = { {'^e', 'back to browsing'},}
+    >  local top = (render_state.curr_h - 1) * (view_settings.height + view_settings.vmargin)
+    >  local bottom = top + view_settings.height
+    >  local left = (render_state.curr_w - 1) * (view_settings.width + view_settings.hmargin)
+    >  local right = left + view_settings.width
+    >  local cursor = string.len(zettels[current_zettel_id].data)
+    >  local quit = false
+    >  curses.curs_set(1)
+    >  while not quit do
+    >    editz_render(window, zettels[current_zettel_id].data, cursor, top, bottom, left, right)
+    >    quit, zettels[current_zettel_id].data, cursor = editz_update(window, zettels[current_zettel_id].data, cursor)
+    >  end
+    >  curses.curs_set(0)
+    >end
+- __teliva_note:
+    >stop simulating the cursor
+    >
+    >editz_render is now much simpler
+  __teliva_timestamp:
+    >Wed Feb  9 08:28:13 2022
+  editz_update:
+    >function editz_update(window, prose, cursor)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
     >end

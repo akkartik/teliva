@@ -37,8 +37,8 @@ RANLIB= ranlib
 
 # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
 
-# Convenience platforms targets.
-PLATS= aix ansi freebsd generic linux macosx mingw netbsd openbsd posix solaris
+# Keep this sync'd with src/Makefile
+PLATS= freebsd linux macosx netbsd openbsd
 
 # What to install.
 TO_BIN= lua luac

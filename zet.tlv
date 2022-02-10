@@ -962,21 +962,21 @@
     >  root="id1",
     >  final=4,
     >  id1={
-    >    data="abs\ndef",
+    >    data="this is zettel A\n\nit has some text",
     >    child="id3",
     >    next="id2",
     >  },
     >  id2={
-    >    data="ghi\njklm",
+    >    data="this is a sibling of zettel A at the top level",
     >    prev="id1",
     >  },
     >  id3={
-    >    data="cz",
+    >    data="this is zettel B, a child of A",
     >    parent="id1",
     >    next="id4",
     >  },
     >  id4={
-    >    data="d",
+    >    data="this is another child of zettel A, a sibling of B",
     >    parent="id1",
     >    prev="id3",
     >  }

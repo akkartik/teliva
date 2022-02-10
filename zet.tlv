@@ -781,7 +781,7 @@
   editz_render:
     >function editz_render(window, s, cursor, top, minbottom, left, right)
     >  local h, w = window:getmaxyx()
-    >  local cursor_y, cursor_x, cursor_c = 0, 0, 'c'
+    >  local cursor_y, cursor_x = 0, 0
     >  window:attrset(curses.color_pair(view_settings.current_zettel_bg))
     >  for y=top,minbottom-1 do
     >    for x=left,right-1 do
@@ -794,7 +794,6 @@
     >    if i == cursor then
     >      cursor_y = y
     >      cursor_x = x
-    >      cursor_c = s[i]
     >    end
     >    if s[i] ~= '\n' then
     >      window:addstr(s[i])
@@ -820,7 +819,7 @@
     >    cursor_y = y
     >    cursor_x = x
     >  end
-    >  window:mvaddstr(cursor_y, cursor_x, cursor_c)
+    >  window:mvaddstr(cursor_y, cursor_x, '')
     >end
 - __teliva_timestamp:
     >Wed Feb  9 08:25:05 2022
@@ -832,7 +831,7 @@
     >  local bottom = top + view_settings.height
     >  local left = (render_state.curr_w - 1) * (view_settings.width + view_settings.hmargin)
     >  local right = left + view_settings.width
-    >  local cursor = string.len(zettels[current_zettel_id].data)
+    >  local cursor = string.len(zettels[current_zettel_id].data)+1
     >  local quit = false
     >  curses.curs_set(1)
     >  while not quit do
@@ -872,7 +871,7 @@
     >  elseif key == 5 then  -- ctrl-e
     >    return true, prose, cursor
     >  elseif key == 10 or (key >= 32 and key < 127) then
-    >    prose = prose:insert(string.char(key), cursor)
+    >    prose = prose:insert(string.char(key), cursor-1)
     >    cursor = cursor+1
     >  end
     >  return false, prose, cursor

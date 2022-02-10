@@ -1087,3 +1087,127 @@
     >    editz(window)
     >  end
     >end
+- __teliva_timestamp:
+    >Thu Feb 10 00:01:58 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- graph-based navigation
+    >  if key == string.byte('j') then
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >  elseif key == string.byte('k') then
+    >    if curr.parent then current_zettel_id = curr.parent end
+    >  elseif key == string.byte('h') then
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >  elseif key == string.byte('l') then
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >  -- screen-based navigation
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  --
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    zettels[old].prev = curr.next
+    >    new.prev = current_zettel_id
+    >    assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    zettels[old].next = curr.prev
+    >    new.next = current_zettel_id
+    >    assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >    zettels[old].prev = curr.child
+    >    new.parent = curr
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  end
+    >end
+- __teliva_timestamp:
+    >Thu Feb 10 00:02:35 2022
+  menu:
+    >-- To show app-specific hotkeys in the menu bar, add hotkey/command
+    >-- arrays of strings to the menu array.
+    >menu = {
+    >  {'j', 'child'},
+    >  {'k', 'parent'},
+    >  {'l/h', 'next/prev sib'},
+    >  {'e', 'edit'},
+    >  {'a/b', 'insert sib'},
+    >  {'c', 'insert child'},
+    >  {'x/X/y/Y', 'resize'},
+    >}

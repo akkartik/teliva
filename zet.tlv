@@ -321,9 +321,7 @@
     >    end
     >  --
     >  elseif key == 5 then  -- ctrl-e
-    >    local old_menu = menu
     >    editz(window)
-    >    menu = old_menu
     >  end
     >end
 - __teliva_timestamp: original
@@ -828,6 +826,7 @@
     >Wed Feb  9 08:25:05 2022
   editz:
     >function editz()
+    >  local old_menu = menu
     >  menu = { {'^e', 'back to browsing'},}
     >  local top = (render_state.curr_h - 1) * (view_settings.height + view_settings.vmargin)
     >  local bottom = top + view_settings.height
@@ -841,6 +840,7 @@
     >    quit, zettels[current_zettel_id].data, cursor = editz_update(window, zettels[current_zettel_id].data, cursor)
     >  end
     >  curses.curs_set(0)
+    >  menu = old_menu
     >end
 - __teliva_timestamp:
     >Wed Feb  9 08:28:13 2022

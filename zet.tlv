@@ -1418,3 +1418,50 @@
     >    os.rename(filename, 'zet')
     >  end
     >end
+- __teliva_timestamp:
+    >Thu Feb 10 07:43:39 2022
+  zettels:
+    >-- initial state of the zettels
+    >-- if you came here to clear the zettels,
+    >-- delete everything (ctrl-k and ctrl-u will delete a whole line at a time)
+    >-- until it looks like this:
+    >--
+    >--   zettels = {
+    >--     root='id1',
+    >--     final=1,
+    >--     id1={
+    >--       data='',
+    >--     },
+    >--   }
+    >--
+    >-- I don't yet trust any deletion feature I create to not mess up your data.
+    >-- Besides, this is a good excuse to start making this app your own.
+    >
+    >zettels = {
+    >  root='id1',
+    >  final=5,
+    >  id1={
+    >    data='this is zettel A\n\nit has some text',
+    >    child='id3',
+    >    next='id2',
+    >  },
+    >  id2={
+    >    data='this is a sibling of zettel A at the top level',
+    >    prev='id1',
+    >    next='id5',
+    >  },
+    >  id3={
+    >    data='this is zettel B, a child of A',
+    >    parent='id1',
+    >    next='id4',
+    >  },
+    >  id4={
+    >    data='this is another child of zettel A, a sibling of B',
+    >    parent='id1',
+    >    prev='id3',
+    >  },
+    >  id5={
+    >    data="(To clean up these sample zettels, hit ctrl-u and edit 'zettels')\n\nI don't yet trust any deletion feature I create to not mess up your data.\nBesides, this is a good excuse to start making this app your own.)",
+    >    prev='id2',
+    >  },
+    >}

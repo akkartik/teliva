@@ -1342,3 +1342,79 @@
     >    end
     >  end
     >end
+- __teliva_timestamp:
+    >Thu Feb 10 07:27:43 2022
+  write_zettels:
+    >function write_zettels(outfile)
+    >  outfile:write(json.encode(zettels))
+    >  outfile:close()
+    >end
+- __teliva_timestamp:
+    >Thu Feb 10 07:28:30 2022
+  read_zettels:
+    >function read_zettels(infile)
+    >  zettels = json.decode(infile:read('*a'))
+    >  infile:close()
+    >end
+- __teliva_timestamp:
+    >Thu Feb 10 07:30:25 2022
+  __teliva_note:
+    >saving/loading zettels to/from disk
+  main:
+    >function main()
+    >  init_colors()
+    >  curses.curs_set(0)  -- hide cursor except when editing
+    >
+    >  -- read zettels from disk if possible
+    >  local infile = io.open('zet', 'r')
+    >  if infile then
+    >    read_zettels(infile)
+    >  else
+    >    local outfile = io.open('zet', 'w')
+    >    if outfile then
+    >      write_zettels(outfile)
+    >    end
+    >  end
+    >  current_zettel_id = zettels.root
+    >
+    >  while true do
+    >    render(window)
+    >    update(window)
+    >
+    >    -- save zettels, but hold on to previous state on disk
+    >    -- until last possible second
+    >    local filename = os.tmpname()
+    >    local outfile = io.open(filename, 'w')
+    >    write_zettels(outfile)
+    >    os.rename(filename, 'zet')
+    >  end
+    >end
+- __teliva_timestamp:
+    >Thu Feb 10 07:32:46 2022
+  __teliva_note:
+    >stop writing sample zettels to disk
+    >
+    >That was just for ease of testing write_zettels()
+  main:
+    >function main()
+    >  init_colors()
+    >  curses.curs_set(0)  -- hide cursor except when editing
+    >
+    >  local infile = io.open('zet', 'r')
+    >  if infile then
+    >    read_zettels(infile)
+    >  end
+    >  current_zettel_id = zettels.root
+    >
+    >  while true do
+    >    render(window)
+    >    update(window)
+    >
+    >    -- save zettels, but hold on to previous state on disk
+    >    -- until last possible second
+    >    local filename = os.tmpname()
+    >    local outfile = io.open(filename, 'w')
+    >    write_zettels(outfile)
+    >    os.rename(filename, 'zet')
+    >  end
+    >end

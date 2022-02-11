@@ -2287,3 +2287,84 @@
     >    view_settings.first_zettel = current_zettel_id
     >  end
     >end
+- __teliva_timestamp:
+    >Thu Feb 10 21:51:09 2022
+  __teliva_note:
+    >fix regression in editor
+  editz_render:
+    >function editz_render(window, s, cursor, top, minbottom, left, right)
+    >  local h, w = window:getmaxyx()
+    >  local cursor_y, cursor_x = 0, 0
+    >  window:attrset(curses.color_pair(1)) -- 1 is the color combination for the current zettel
+    >  for y=top,minbottom-1 do
+    >    for x=left,right-1 do
+    >      window:mvaddch(y, x, ' ')
+    >    end
+    >  end
+    >  local y, x = top, left + 1  -- left padding; TODO: indent
+    >  window:mvaddstr(y, x, '')
+    >  for i=1,string.len(s) do
+    >    if i == cursor then
+    >      cursor_y = y
+    >      cursor_x = x
+    >    end
+    >    if s[i] ~= '\n' then
+    >      window:addstr(s[i])
+    >      x = x + 1
+    >      if x >= right then
+    >        y = y + 1
+    >        if y >= h-2 then return end
+    >        x = left + 1  -- left padding; TODO: indent
+    >        window:mvaddstr(y, x, '')
+    >      end
+    >    else
+    >      for col=x+1,right-1 do window:addch(' '); end
+    >      x = left
+    >      y = y + 1
+    >      if y >= h-2 then return end
+    >      window:mvaddstr(y, x, '')
+    >      for col=x,right-1 do window:addch(' '); end
+    >      x = left + 1  -- left padding; TODO: indent
+    >      window:mvaddstr(y, x, '')
+    >    end
+    >  end
+    >  if cursor_y == 0 and cursor_x == 0 then
+    >    cursor_y = y
+    >    cursor_x = x
+    >  end
+    >  window:mvaddstr(cursor_y, cursor_x, '')
+    >end
+- __teliva_timestamp:
+    >Fri Feb 11 01:33:31 2022
+  __teliva_note:
+    >support /tmp being on a separate volume
+    >
+    >also better error-checking
+  main:
+    >function main()
+    >  init_colors()
+    >  curses.curs_set(0)  -- hide cursor except when editing
+    >
+    >  local infile = io.open('zet', 'r')
+    >  if infile then
+    >    read_zettels(infile)
+    >  end
+    >  current_zettel_id = zettels.root  -- cursor
+    >  view_settings.first_zettel = zettels.root  -- start rendering here
+    >
+    >  while true do
+    >    render(window)
+    >    update(window)
+    >
+    >    -- save zettels, but hold on to previous state on disk
+    >    -- until last possible second
+    >    local outfile = io.open('teliva_tmp', 'w')
+    >    if outfile then
+    >      write_zettels(outfile)
+    >      local status, message = os.rename('teliva_tmp', 'zet')
+    >      assert(status, message)  -- unceremoniously abort, but we hopefully only lost a little
+    >    end
+    >    -- TODO: what if io.open failed for a non-sandboxing related reason?!
+    >    -- We could silently fail to save.
+    >  end
+    >end

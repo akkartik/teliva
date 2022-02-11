@@ -20,6 +20,7 @@ MYLIBS=
 
 # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
 
+# Keep this sync'd with src/Makefile
 PLATS= freebsd linux macosx netbsd openbsd
 
 LUA_A=	liblua.a

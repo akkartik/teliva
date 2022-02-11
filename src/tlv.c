@@ -11,6 +11,7 @@
 
 #include "lua.h"
 #include "lauxlib.h"
+#include "tlv.h"
 
 /* If you encounter assertion failures in this file and _didn't_ manually edit
  * it, lease report the .tlv file that caused them: http://akkartik.name/contact.

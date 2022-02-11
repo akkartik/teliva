@@ -36,8 +36,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#if !__APPLE__
 extern size_t strlcpy(char * dst, const char * src, size_t size);
 extern size_t strlcat(char * dst, const char * src, size_t size);
+#endif
 
 /*
  * Find the real name of path, by removing all ".", ".." and symlink

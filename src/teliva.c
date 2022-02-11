@@ -333,6 +333,8 @@ char* caller(lua_State* L) {
   memset(result, '\0', 1024);
   if (ar.name)
     strncpy(result, ar.name, 1020);
+  else  /* TODO: distinguish functions called from C */
+    strncpy(result, "main", 1020);
   return result;
 }
 

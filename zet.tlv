@@ -1414,8 +1414,10 @@
     >    -- until last possible second
     >    local filename = os.tmpname()
     >    local outfile = io.open(filename, 'w')
-    >    write_zettels(outfile)
-    >    os.rename(filename, 'zet')
+    >    if outfile then
+    >      write_zettels(outfile)
+    >      os.rename(filename, 'zet')
+    >    end
     >  end
     >end
 - __teliva_timestamp:

@@ -1676,8 +1676,10 @@ typedef struct {
   char* func;
 } AuditEvent;
 
-AuditEvent audit_event[1024];
+#define NAUDIT 8192
+AuditEvent audit_event[NAUDIT];
 int naudit = 0;
+int iaudit = 0;
 
 void append_to_audit_log(lua_State* L, const char* buffer) {
   lua_Debug ar;
@@ -1687,7 +1689,13 @@ void append_to_audit_log(lua_State* L, const char* buffer) {
   audit_event[naudit].line = strdup(buffer);
   audit_event[naudit].func = strdup(ar.name);
   ++naudit;
-  assert(naudit < 1024);
+  if (naudit >= NAUDIT)
+    naudit = 0;
+  if (naudit == iaudit) {
+    ++iaudit;
+    if (iaudit >= NAUDIT)
+      iaudit = 0;
+  }
 }
 
 static void events_menu() {
@@ -1701,19 +1709,33 @@ static void events_menu() {
   attrset(A_NORMAL);
 }
 
+static void render_event(int i, int y, int cursor) {
+  mvaddstr(y, 2, "");
+  if (i == cursor)
+    draw_highlighted_definition_name(audit_event[i].func);
+  else
+    draw_definition_name(audit_event[i].func);
+  mvaddstr(y, 16, audit_event[i].line);
+}
+
 static void render_events(int cursor) {
   clear();
   attrset(A_BOLD);
   mvaddstr(1, 0, "Recent events");
   attrset(A_NORMAL);
-  for (int i = 0, y = 3; i < naudit; ++i, ++y) {
-    if (i >= LINES-1) break;
-    mvaddstr(y, 2, "");
-    if (i == cursor)
-      draw_highlighted_definition_name(audit_event[i].func);
-    else
-      draw_definition_name(audit_event[i].func);
-    mvaddstr(y, 16, audit_event[i].line);
+  if (iaudit == 0) {
+    /* circular buffer might not be full */
+    for (int i = 0, y = 3; i < naudit; ++i, ++y) {
+      if (i >= LINES-1) break;
+      render_event(i, y, cursor);
+    }
+  }
+  else {
+    /* circular buffer guaranteed to be full */
+    for (int i = 0, y = 3; i < NAUDIT; ++i, ++y) {
+      if (i >= LINES-1) break;
+      render_event((iaudit+i)%NAUDIT, y, cursor);
+    }
   }
   events_menu();
   refresh();

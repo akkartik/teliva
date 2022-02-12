@@ -8,7 +8,7 @@
 PLAT= none
 
 CC= gcc
-CFLAGS= -g -O2 -std=c99 -Wall -Wshadow $(MYCFLAGS) -D_DEFAULT_SOURCE
+CFLAGS= -g -O2 -std=c99 -Wall -Wshadow $(MYCFLAGS) -D_DEFAULT_SOURCE -fsanitize=address
 AR= ar rc
 RANLIB= ranlib
 RM= rm -f
@@ -51,7 +51,7 @@ $(LUA_A): $(CORE_O) $(LIB_O)
 	$(RANLIB) $@
 
 $(LUA_T): $(LUA_O) $(LUA_A) lcurses/curses.o luasocket/socket.a luasocket/mime.a luasec/ssl.a
-	$(CC) -o $@ $(MYLDFLAGS) $(LUA_O) $(LUA_A) lcurses/curses.o luasocket/socket.a luasocket/mime.a luasec/ssl.a $(LIBS)
+	$(CC) -o $@ -fsanitize=address -static-libasan $(MYLDFLAGS) $(LUA_O) $(LUA_A) lcurses/curses.o luasocket/socket.a luasocket/mime.a luasec/ssl.a $(LIBS)
 
 clean:
 	$(RM) lcurses/curses.o

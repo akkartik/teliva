@@ -2509,3 +2509,439 @@
     >    view_settings.first_zettel = current_zettel_id
     >  end
     >end
+- __teliva_timestamp:
+    >Sat Feb 12 15:04:22 2022
+  editz:
+    >function editz()
+    >  local old_menu = menu
+    >  menu = {
+    >    {'^e', 'finish edit'},
+    >    {'^g', 'cancel edit'},
+    >  }
+    >  local old_data = string.sub(zettels[current_zettel_id].data, 1)
+    >  local top = (render_state.curr_h - 1) * (view_settings.height + view_settings.vmargin)
+    >  local bottom = top + view_settings.height
+    >  local left = (render_state.curr_w - 1) * (view_settings.width + view_settings.hmargin)
+    >  local right = left + view_settings.width
+    >  local cursor = string.len(zettels[current_zettel_id].data)+1
+    >  local quit = false
+    >  curses.curs_set(1)
+    >  while not quit do
+    >    editz_render(window, zettels[current_zettel_id].data, cursor, top, bottom, left, right)
+    >    quit, zettels[current_zettel_id].data, cursor = editz_update(window, zettels[current_zettel_id].data, cursor, old_data)
+    >  end
+    >  curses.curs_set(0)
+    >  menu = old_menu
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 15:05:20 2022
+  editz_update:
+    >function editz_update(window, prose, cursor, original_prose)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 7 then  -- ctrl-g
+    >    return true, original_prose, cursor
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 15:08:04 2022
+  editz:
+    >function editz()
+    >  local old_menu = menu
+    >  menu = {
+    >    {'^e', 'finish edit'},
+    >    {'^g', 'cancel edit'},
+    >    {'^a', '<<line'},
+    >    {'^b', '<word'},
+    >    {'^f', 'word>'},
+    >    {'^l', 'line>>'},
+    >  }
+    >  local old_data = string.sub(zettels[current_zettel_id].data, 1)
+    >  local top = (render_state.curr_h - 1) * (view_settings.height + view_settings.vmargin)
+    >  local bottom = top + view_settings.height
+    >  local left = (render_state.curr_w - 1) * (view_settings.width + view_settings.hmargin)
+    >  local right = left + view_settings.width
+    >  local cursor = string.len(zettels[current_zettel_id].data)+1
+    >  local quit = false
+    >  curses.curs_set(1)
+    >  while not quit do
+    >    editz_render(window, zettels[current_zettel_id].data, cursor, top, bottom, left, right)
+    >    quit, zettels[current_zettel_id].data, cursor = editz_update(window, zettels[current_zettel_id].data, cursor, old_data)
+    >  end
+    >  curses.curs_set(0)
+    >  menu = old_menu
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 15:08:58 2022
+  editz:
+    >function editz()
+    >  local old_menu = menu
+    >  menu = {
+    >    {'^e', 'finish edit'},
+    >    {'^g', 'cancel edit'},
+    >    {'^a', '<<line'},
+    >    {'^b', '<word'},
+    >    {'^f', 'word>'},
+    >    {'^l', 'line>>'},
+    >    {'^k/^u', 'del <</>>'},
+    >  }
+    >  local old_data = string.sub(zettels[current_zettel_id].data, 1)
+    >  local top = (render_state.curr_h - 1) * (view_settings.height + view_settings.vmargin)
+    >  local bottom = top + view_settings.height
+    >  local left = (render_state.curr_w - 1) * (view_settings.width + view_settings.hmargin)
+    >  local right = left + view_settings.width
+    >  local cursor = string.len(zettels[current_zettel_id].data)+1
+    >  local quit = false
+    >  curses.curs_set(1)
+    >  while not quit do
+    >    editz_render(window, zettels[current_zettel_id].data, cursor, top, bottom, left, right)
+    >    quit, zettels[current_zettel_id].data, cursor = editz_update(window, zettels[current_zettel_id].data, cursor, old_data)
+    >  end
+    >  curses.curs_set(0)
+    >  menu = old_menu
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 15:11:15 2022
+  editz_update:
+    >function editz_update(window, prose, cursor, original_prose)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  -- cursor movement
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 1 then  -- ctrl-a
+    >  elseif key == 12 then  -- ctrl-l
+    >  elseif key == 6 then  -- ctrl-f
+    >  elseif key == 2 then  -- ctrl-b
+    >  -- delete
+    >  elseif key == 11 then  -- ctrl-k
+    >  -- exit
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 7 then  -- ctrl-g
+    >    return true, original_prose, cursor
+    >  -- insert
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 15:11:33 2022
+  editz:
+    >function editz()
+    >  local old_menu = menu
+    >  menu = {
+    >    {'^e', 'finish edit'},
+    >    {'^g', 'cancel edit'},
+    >    {'^a', '<<line'},
+    >    {'^b', '<word'},
+    >    {'^f', 'word>'},
+    >    {'^l', 'line>>'},
+    >    {'^k', 'del to line>>'},
+    >  }
+    >  local old_data = string.sub(zettels[current_zettel_id].data, 1)
+    >  local top = (render_state.curr_h - 1) * (view_settings.height + view_settings.vmargin)
+    >  local bottom = top + view_settings.height
+    >  local left = (render_state.curr_w - 1) * (view_settings.width + view_settings.hmargin)
+    >  local right = left + view_settings.width
+    >  local cursor = string.len(zettels[current_zettel_id].data)+1
+    >  local quit = false
+    >  curses.curs_set(1)
+    >  while not quit do
+    >    editz_render(window, zettels[current_zettel_id].data, cursor, top, bottom, left, right)
+    >    quit, zettels[current_zettel_id].data, cursor = editz_update(window, zettels[current_zettel_id].data, cursor, old_data)
+    >  end
+    >  curses.curs_set(0)
+    >  menu = old_menu
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 15:31:27 2022
+  editz_update:
+    >function editz_update(window, prose, cursor, original_prose)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  -- cursor movement
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 1 then  -- ctrl-a
+    >    while cursor > 1 and prose[cursor] ~= '\n' do
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == 12 then  -- ctrl-l
+    >  elseif key == 6 then  -- ctrl-f
+    >  elseif key == 2 then  -- ctrl-b
+    >  -- delete
+    >  elseif key == 11 then  -- ctrl-k
+    >  -- exit
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 7 then  -- ctrl-g
+    >    return true, original_prose, cursor
+    >  -- insert
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 15:48:35 2022
+  editz_update:
+    >function editz_update(window, prose, cursor, original_prose)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  -- cursor movement
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 1 then  -- ctrl-a
+    >    while cursor > 1 do
+    >      if prose[cursor-1] == '\n' then break end
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == 12 then  -- ctrl-l
+    >  elseif key == 6 then  -- ctrl-f
+    >  elseif key == 2 then  -- ctrl-b
+    >  -- delete
+    >  elseif key == 11 then  -- ctrl-k
+    >  -- exit
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 7 then  -- ctrl-g
+    >    return true, original_prose, cursor
+    >  -- insert
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 15:49:49 2022
+  editz_update:
+    >function editz_update(window, prose, cursor, original_prose)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  -- cursor movement
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 1 then  -- ctrl-a
+    >    while cursor > 1 do
+    >      if prose[cursor-1] == '\n' then break end
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == 12 then  -- ctrl-l
+    >    local max = string.len(prose)
+    >    while cursor <= max and prose[cursor] ~= '\n' do
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == 6 then  -- ctrl-f
+    >  elseif key == 2 then  -- ctrl-b
+    >  -- delete
+    >  elseif key == 11 then  -- ctrl-k
+    >  -- exit
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 7 then  -- ctrl-g
+    >    return true, original_prose, cursor
+    >  -- insert
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 15:53:52 2022
+  editz_update:
+    >function editz_update(window, prose, cursor, original_prose)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  -- cursor movement
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 1 then  -- ctrl-a
+    >    while cursor > 1 do
+    >      if prose[cursor-1] == '\n' then break end
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == 12 then  -- ctrl-l
+    >    local max = string.len(prose)
+    >    while cursor <= max and prose[cursor] ~= '\n' do
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == 6 then  -- ctrl-f
+    >  elseif key == 2 then  -- ctrl-b
+    >  -- delete
+    >  elseif key == 11 then  -- ctrl-k
+    >    while cursor > 1 do
+    >      if prose[cursor-1] == '\n' then break end
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  -- exit
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 7 then  -- ctrl-g
+    >    return true, original_prose, cursor
+    >  -- insert
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 15:55:10 2022
+  __teliva_note:
+    >editor: move to start of line, move/delete to end of line
+  editz_update:
+    >function editz_update(window, prose, cursor, original_prose)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  -- cursor movement
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 1 then  -- ctrl-a
+    >    while cursor > 1 do
+    >      if prose[cursor-1] == '\n' then break end
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == 12 then  -- ctrl-l
+    >    local max = string.len(prose)
+    >    while cursor <= max and prose[cursor] ~= '\n' do
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == 6 then  -- ctrl-f
+    >  elseif key == 2 then  -- ctrl-b
+    >  -- delete
+    >  elseif key == 11 then  -- ctrl-k
+    >    while cursor <= string.len(prose) and prose[cursor] ~= '\n' do
+    >      prose = prose:remove(cursor)
+    >    end
+    >  -- exit
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 7 then  -- ctrl-g
+    >    return true, original_prose, cursor
+    >  -- insert
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end

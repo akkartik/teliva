@@ -260,3 +260,26 @@
     >    return tostring(o)
     >  end
     >end
+- __teliva_timestamp:
+    >Sat Feb 12 18:57:02 2022
+  __teliva_note:
+    >better UX when app isn't permitted to access the network
+  main:
+    >function main()
+    >  init_colors()
+    >  local request = {
+    >    url = "https://lichess.org/api/tv/feed",
+    >    sink = function(chunk, err)
+    >             if chunk then
+    >               curses.clear()
+    >               -- main event loop is here
+    >               render(chunk)
+    >               curses.getch()
+    >             end
+    >             return 1
+    >           end,
+    >  }
+    >  http.request(request)
+    >  -- degenerate event loop just to show errors in sandboxing, etc.
+    >  while true do curses.getch(); end
+    >end

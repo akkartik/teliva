@@ -2945,3 +2945,3450 @@
     >  end
     >  return false, prose, cursor
     >end
+- __teliva_timestamp:
+    >Sat Feb 12 16:50:36 2022
+  editz_update:
+    >function editz_update(window, prose, cursor, original_prose)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  -- cursor movement
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 1 then  -- ctrl-a
+    >    while cursor > 1 do
+    >      if prose[cursor-1] == '\n' then break end
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == 12 then  -- ctrl-l
+    >    local max = string.len(prose)
+    >    while cursor <= max and prose[cursor] ~= '\n' do
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == 6 then  -- ctrl-f
+    >  elseif key == 2 then  -- ctrl-b
+    >    while cursor > 1 do
+    >      -- first skip all alphanumeric letters
+    >      if string.match(prose[cursor], '%w') then
+    >        cursor = cursor-1
+    >      -- then stop at the last non-alphanumeric letter
+    >      elseif string.match(prose[cursor-1], '%w') then
+    >        break
+    >      else
+    >        cursor = cursor-1
+    >      end
+    >    end
+    >  -- delete
+    >  elseif key == 11 then  -- ctrl-k
+    >    while cursor <= string.len(prose) and prose[cursor] ~= '\n' do
+    >      prose = prose:remove(cursor)
+    >    end
+    >  -- exit
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 7 then  -- ctrl-g
+    >    return true, original_prose, cursor
+    >  -- insert
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 16:58:41 2022
+  editz_update:
+    >function editz_update(window, prose, cursor, original_prose)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  -- cursor movement
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 1 then  -- ctrl-a
+    >    -- to start of line
+    >    while cursor > 1 do
+    >      if prose[cursor-1] == '\n' then break end
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == 12 then  -- ctrl-l
+    >    -- to end of line
+    >    local max = string.len(prose)
+    >    while cursor <= max and prose[cursor] ~= '\n' do
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == 6 then  -- ctrl-f
+    >    -- to next word
+    >    local max = string.len(prose)
+    >    while cursor <= max and string.match(prose[cursor], '%w') do
+    >      cursor = cursor+1
+    >    end
+    >    while cursor <= max and string.match(prose[cursor], '%W') do
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == 2 then  -- ctrl-b
+    >    -- to previous word
+    >    while cursor > 1 and string.match(prose[cursor], '%W') do
+    >      cursor = cursor-1
+    >    end
+    >    while cursor > 1 and string.match(prose[cursor], '%w') do
+    >      cursor = cursor-1
+    >    end
+    >    while cursor > 1 and string.match(prose[cursor-1], '%w') do
+    >      cursor = cursor-1
+    >    end
+    >  -- delete
+    >  elseif key == 11 then  -- ctrl-k
+    >    while cursor <= string.len(prose) and prose[cursor] ~= '\n' do
+    >      prose = prose:remove(cursor)
+    >    end
+    >  -- exit
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 7 then  -- ctrl-g
+    >    return true, original_prose, cursor
+    >  -- insert
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 16:59:37 2022
+  editz_update:
+    >function editz_update(window, prose, cursor, original_prose)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  -- cursor movement
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 1 then  -- ctrl-a
+    >    -- to start of line
+    >    while cursor > 1 do
+    >      if prose[cursor-1] == '\n' then break end
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == 12 then  -- ctrl-l
+    >    -- to end of line
+    >    local max = string.len(prose)
+    >    while cursor <= max and prose[cursor] ~= '\n' do
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == 6 then  -- ctrl-f
+    >    -- to next word
+    >    local max = string.len(prose)
+    >    while cursor <= max and string.match(prose[cursor], '%w') do
+    >      cursor = cursor+1
+    >    end
+    >    while cursor <= max and string.match(prose[cursor], '%W') do
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == 2 then  -- ctrl-b
+    >    -- to previous word
+    >    while cursor > 1 and string.match(prose[cursor], '%W') do
+    >      cursor = cursor-1
+    >    end
+    >    while cursor > 1 and string.match(prose[cursor-1], '%w') do
+    >      cursor = cursor-1
+    >    end
+    >  -- delete
+    >  elseif key == 11 then  -- ctrl-k
+    >    while cursor <= string.len(prose) and prose[cursor] ~= '\n' do
+    >      prose = prose:remove(cursor)
+    >    end
+    >  -- exit
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 7 then  -- ctrl-g
+    >    return true, original_prose, cursor
+    >  -- insert
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:00:00 2022
+  editz_update:
+    >function editz_update(window, prose, cursor, original_prose)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  -- cursor movement
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 1 then  -- ctrl-a
+    >    -- to start of line
+    >    while cursor > 1 do
+    >      if prose[cursor-1] == '\n' then break end
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == 12 then  -- ctrl-l
+    >    -- to end of line
+    >    local max = string.len(prose)
+    >    while cursor <= max and prose[cursor] ~= '\n' do
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == 6 then  -- ctrl-f
+    >    -- to next word
+    >    local max = string.len(prose)
+    >    while cursor <= max and string.match(prose[cursor], '%w') do
+    >      cursor = cursor+1
+    >    end
+    >    while cursor <= max and string.match(prose[cursor], '%W') do
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == 2 then  -- ctrl-b
+    >    -- to previous word
+    >    while cursor > 1 and string.match(prose[cursor], '%W') do
+    >      cursor = cursor-1
+    >    end
+    >    while cursor > 1 and string.match(prose[cursor], '%w') do
+    >      cursor = cursor-1
+    >    end
+    >  -- delete
+    >  elseif key == 11 then  -- ctrl-k
+    >    while cursor <= string.len(prose) and prose[cursor] ~= '\n' do
+    >      prose = prose:remove(cursor)
+    >    end
+    >  -- exit
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 7 then  -- ctrl-g
+    >    return true, original_prose, cursor
+    >  -- insert
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:01:45 2022
+  __teliva_note:
+    >editor: word-movement shortcuts
+  editz_update:
+    >function editz_update(window, prose, cursor, original_prose)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  -- cursor movement
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 1 then  -- ctrl-a
+    >    -- to start of line
+    >    while cursor > 1 do
+    >      if prose[cursor-1] == '\n' then break end
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == 12 then  -- ctrl-l
+    >    -- to end of line
+    >    local max = string.len(prose)
+    >    while cursor <= max and prose[cursor] ~= '\n' do
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == 6 then  -- ctrl-f
+    >    -- to next word
+    >    local max = string.len(prose)
+    >    while cursor <= max and string.match(prose[cursor], '%w') do
+    >      cursor = cursor+1
+    >    end
+    >    while cursor <= max and string.match(prose[cursor], '%W') do
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == 2 then  -- ctrl-b
+    >    -- to previous word
+    >    if cursor > string.len(prose) then
+    >      cursor = string.len(prose)
+    >    end
+    >    while cursor > 1 and string.match(prose[cursor], '%W') do
+    >      cursor = cursor-1
+    >    end
+    >    while cursor > 1 and string.match(prose[cursor], '%w') do
+    >      cursor = cursor-1
+    >    end
+    >  -- delete
+    >  elseif key == 11 then  -- ctrl-k
+    >    while cursor <= string.len(prose) and prose[cursor] ~= '\n' do
+    >      prose = prose:remove(cursor)
+    >    end
+    >  -- exit
+    >  elseif key == 5 then  -- ctrl-e
+    >    return true, prose, cursor
+    >  elseif key == 7 then  -- ctrl-g
+    >    return true, original_prose, cursor
+    >  -- insert
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >  return false, prose, cursor
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:12:27 2022
+  editz_render:
+    >function editz_render(window, s, cursor, top, minbottom, left, right)
+    >  local h, w = window:getmaxyx()
+    >  local cursor_y, cursor_x = 0, 0
+    >  window:attrset(curses.color_pair(1)) -- 1 is the color combination for the current zettel
+    >  for y=top,minbottom-1 do
+    >    for x=left,right-1 do
+    >      window:mvaddch(y, x, ' ')
+    >    end
+    >  end
+    >  for x=left,right-1 do
+    >    window:mvaddch(minbottom, x, ' ')
+    >  end
+    >  local y, x = top, left + 1  -- left padding; TODO: indent
+    >  window:mvaddstr(y, x, '')
+    >  for i=1,string.len(s) do
+    >    if i == cursor then
+    >      cursor_y = y
+    >      cursor_x = x
+    >    end
+    >    if s[i] ~= '\n' then
+    >      window:addstr(s[i])
+    >      x = x + 1
+    >      if x >= right then
+    >        y = y + 1
+    >        if y >= h-2 then return end
+    >        x = left + 1  -- left padding; TODO: indent
+    >        window:mvaddstr(y, x, '')
+    >      end
+    >    else
+    >      for col=x+1,right-1 do window:addch(' '); end
+    >      x = left
+    >      y = y + 1
+    >      if y >= h-2 then return end
+    >      window:mvaddstr(y, x, '')
+    >      for col=x,right-1 do window:addch(' '); end
+    >      x = left + 1  -- left padding; TODO: indent
+    >      window:mvaddstr(y, x, '')
+    >    end
+    >  end
+    >  if cursor_y == 0 and cursor_x == 0 then
+    >    cursor_y = y
+    >    cursor_x = x
+    >  end
+    >  window:mvaddstr(cursor_y, cursor_x, '')
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:15:15 2022
+  render_state:
+    >-- some information about what's been drawn on screen
+    >render_state = {
+    >  -- where the current zettel is, in units of zettels
+    >  curr_h = 1,
+    >  curr_w = 1,
+    >  -- what zettel is at each position on screen, in units of zettels
+    >  hw2id = {},
+    >  -- list of zettels currently displayed
+    >  displayed = {},
+    >}
+- __teliva_timestamp:
+    >Sat Feb 12 17:16:20 2022
+  render:
+    >function render(window)
+    >  window:clear()
+    >  local lines, cols = window:getmaxyx()
+    >  local bg=3
+    >  local y, x = 0, 0 -- units of characters (0-based)
+    >  local w, h = 1, 1 -- units of zettels (1-based)
+    >  -- render zettels depth-first, while tracking relative positions
+    >  local done = {}
+    >  local inprogress = {{id=view_settings.first_zettel,depth=0,edge=''}}
+    >  render_state.wh2id = {{}}
+    >  render_state.displayed = {}
+    >  while #inprogress > 0 do
+    >    local curr = table.remove(inprogress)
+    >    if not done[curr.id] then
+    >      done[curr.id] = true
+    >      render_state.displayed[curr.id] = true
+    >      table.insert(render_state.wh2id[w], curr.id)
+    >      local zettel = zettels[curr.id]
+    >      if curr.id == current_zettel_id then
+    >        render_state.curr_w = w
+    >        render_state.curr_h = h
+    >      end
+    >      local currbg = (curr.id == current_zettel_id) and 1 or bg  -- 1 is the color pair for the current zettel
+    >      render_zettel(window, currbg, curr.depth * view_settings.indent, curr.edge, y, x, zettel)
+    >      if zettel.next then table.insert(inprogress, {id=zettel.next, depth=curr.depth, edge='|'}) end
+    >      if zettel.child then table.insert(inprogress, {id=zettel.child, depth=curr.depth+1, edge='\\'}) end
+    >      if zettel.crosslinks then
+    >        for relation, target in pairs(zettel.crosslinks) do
+    >          table.insert(inprogress, {id=target, depth=curr.depth+1, edge=relation})
+    >        end
+    >      end
+    >      bg = 8 - bg  -- toggle between color pairs 3 and 5
+    >      y = y + view_settings.height + view_settings.vmargin
+    >      h = h + 1
+    >      if y + view_settings.height > lines then
+    >        y = 0
+    >        h = 1
+    >        x = x + view_settings.width + view_settings.hmargin
+    >        w = w + 1
+    >        if x + view_settings.width > cols then break end
+    >        table.insert(render_state.wh2id, {})
+    >      end
+    >    end
+    >  end
+    >  window:mvaddstr(lines-1, 0, '')
+    >  bg = 3
+    >  x = 0
+    >  for i=1,3 do
+    >    local zettel = nil
+    >    if i == 1 and stash then
+    >      zettel = zettels[stash]
+    >    end
+    >    render_zettel(window, bg, 0, '', lines-1, x, zettel)
+    >    bg = 8 - bg  -- toggle between color pairs 3 and 5
+    >    x = x + view_settings.width + view_settings.hmargin
+    >  end
+    >  curses.refresh()
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:17:45 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >  elseif key == string.byte('k') then
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >  elseif key == string.byte('h') then
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >  elseif key == string.byte('l') then
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    if not render_state.displayed[current_zettel_id] then
+    >      rend
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:18:34 2022
+  __teliva_note:
+    >scroll as needed when moving along the graph
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:21:48 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:23:33 2022
+  __teliva_note:
+    >editor 'k' shortcut: fall back to next sibling if needed
+    >
+    >Now we should be able to navigate either with j/k or h/l.
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:27:18 2022
+  menu:
+    >-- To show app-specific hotkeys in the menu bar, add hotkey/command
+    >-- arrays of strings to the menu array.
+    >menu = {
+    >  {'a/b/c', 'insert'},
+    >  {'e', 'edit'},
+    >  {'j/k/l/h', 'move'},
+    >  {'<', 'back'},
+    >  {'x/X/y/Y', 'resize'},
+    >  {'s', 'stash'},
+    >  {'t', 'link with stash'},
+    >  {'z', 'scroll'},
+    >}
+- __teliva_timestamp:
+    >Sat Feb 12 17:30:55 2022
+  render_state:
+    >-- some information about what's been drawn on screen
+    >-- not saved between app restarts
+    >render_state = {
+    >  -- where the current zettel is, in units of zettels
+    >  curr_h = 1,
+    >  curr_w = 1,
+    >  -- what zettel is at each position on screen, in units of zettels
+    >  hw2id = {},
+    >  -- list of zettels currently displayed
+    >  displayed = {},
+    >  -- history of screen render state
+    >  history = {},  -- we just need view_settings.first_zettel and current_zettel_id
+    >}
+- __teliva_timestamp:
+    >Sat Feb 12 17:46:09 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      view_settings.first_zettel = render_state.history[-1].first_zettel
+    >      current_zettel_id = render_state.history[-1].current_zettel_id
+    >      render_state.history:remove()
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    render_state.history:insert(view_settings.first_zettel, current_zettel_id)
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:47:08 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      view_settings.first_zettel = render_state.history[-1].first_zettel
+    >      current_zettel_id = render_state.history[-1].current_zettel_id
+    >      render_state.history:remove()
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    render_state.history:insert({first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:48:38 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      view_settings.first_zettel = render_state.history[-1].first_zettel
+    >      current_zettel_id = render_state.history[-1].current_zettel_id
+    >      render_state.history:remove()
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    window:mvaddstr(30, 60, renderstate.history)
+    >    curses.getch()
+    >    render_state.history:insert({first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:48:50 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      view_settings.first_zettel = render_state.history[-1].first_zettel
+    >      current_zettel_id = render_state.history[-1].current_zettel_id
+    >      render_state.history:remove()
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    window:mvaddstr(30, 60, render_state.history)
+    >    curses.getch()
+    >    render_state.history:insert({first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:49:04 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      view_settings.first_zettel = render_state.history[-1].first_zettel
+    >      current_zettel_id = render_state.history[-1].current_zettel_id
+    >      render_state.history:remove()
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    window:mvaddstr(30, 60, '')
+    >    print(render_state.history)
+    >    curses.getch()
+    >    render_state.history:insert({first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:49:34 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      view_settings.first_zettel = render_state.history[-1].first_zettel
+    >      current_zettel_id = render_state.history[-1].current_zettel_id
+    >      render_state.history:remove()
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    window:mvaddstr(30, 60, '')
+    >    print(render_state.history)
+    >    curses.getch()
+    >    local history = render_state.history
+    >    history:insert({first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:50:49 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      view_settings.first_zettel = render_state.history[-1].first_zettel
+    >      current_zettel_id = render_state.history[-1].current_zettel_id
+    >      table.remove(render_state.history)
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    table.insert(render_state.history, {first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:52:42 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      local previous_state = render_state.history[-1]
+    >      curses.mvaddstr(30, 60, '')
+    >      print(previous_state)
+    >      curses.getch()
+    >      view_settings.first_zettel = previous_state.first_zettel
+    >      current_zettel_id = render_state.history[-1].current_zettel_id
+    >      table.remove(render_state.history)
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    table.insert(render_state.history, {first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:54:43 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      curses.mvaddstr(30, 60, '')
+    >      print(#render_state.history)
+    >      local previous_state = render_state.history[-1]
+    >      print(previous_state)
+    >      curses.getch()
+    >      view_settings.first_zettel = previous_state.first_zettel
+    >      current_zettel_id = render_state.history[-1].current_zettel_id
+    >      table.remove(render_state.history)
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    table.insert(render_state.history, {first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:55:42 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      local previous_state = render_state.history[#render_state.history]
+    >      view_settings.first_zettel = previous_state.first_zettel
+    >      current_zettel_id = render_state.history[-1].current_zettel_id
+    >      table.remove(render_state.history)
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    table.insert(render_state.history, {first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:56:13 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      print(render_state.history[1])
+    >      curses.getch()
+    >      local previous_state = render_state.history[#render_state.history]
+    >      view_settings.first_zettel = previous_state.first_zettel
+    >      current_zettel_id = render_state.history[-1].current_zettel_id
+    >      table.remove(render_state.history)
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    table.insert(render_state.history, {first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:56:25 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      curses.mvaddstr(30, 60, '')
+    >      print(render_state.history[1])
+    >      curses.getch()
+    >      local previous_state = render_state.history[#render_state.history]
+    >      view_settings.first_zettel = previous_state.first_zettel
+    >      current_zettel_id = render_state.history[-1].current_zettel_id
+    >      table.remove(render_state.history)
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    table.insert(render_state.history, {first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:57:15 2022
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  local h, w = window:getmaxyx()
+    >  local curr = zettels[current_zettel_id]
+    >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
+    >  -- read from or write to render_state.history
+    >  if key == string.byte('<') then
+    >    -- previous zettel moved to
+    >    -- does NOT undo mutations
+    >    if #render_state.history > 0 then
+    >      local previous_state = render_state.history[#render_state.history]
+    >      view_settings.first_zettel = previous_state.first_zettel
+    >      current_zettel_id = previous_state.cursor
+    >      table.remove(render_state.history)
+    >    end
+    >    return
+    >  end
+    >  if key ~= string.byte('e') then
+    >    table.insert(render_state.history, {first_zettel=view_settings.first_zettel, cursor=current_zettel_id})
+    >  end
+    >  -- move along the graph
+    >  if key == string.byte('j') then
+    >    -- child or next sibling
+    >    if curr.child then
+    >      current_zettel_id = curr.child
+    >    elseif curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('k') then
+    >    -- parent or previous sibling
+    >    if curr.parent then
+    >      current_zettel_id = curr.parent
+    >    elseif curr.prev then
+    >      current_zettel_id = curr.prev
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('h') then
+    >    -- previous sibling or parent
+    >    if curr.prev then
+    >      current_zettel_id = curr.prev
+    >    elseif curr.parent then
+    >      current_zettel_id = curr.parent
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  elseif key == string.byte('l') then
+    >    -- next sibling or next sibling of parent
+    >    if curr.next then
+    >      current_zettel_id = curr.next
+    >    elseif curr.parent and zettels[curr.parent].next then
+    >      current_zettel_id = zettels[curr.parent].next
+    >    end
+    >    -- scroll if necessary
+    >    if not render_state.displayed[current_zettel_id] then
+    >      view_settings.first_zettel = current_zettel_id
+    >    end
+    >  -- move along the screen
+    >  elseif key == curses.KEY_UP then
+    >    if render_state.curr_h > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h - 1]
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    if render_state.wh2id[render_state.curr_w][render_state.curr_h + 1] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w][render_state.curr_h + 1]
+    >    end
+    >  elseif key == curses.KEY_LEFT then
+    >    if render_state.curr_w > 1 then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w - 1][render_state.curr_h]
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if render_state.wh2id[render_state.curr_w + 1] and render_state.wh2id[render_state.curr_w + 1][render_state.curr_h] then
+    >      current_zettel_id = render_state.wh2id[render_state.curr_w + 1][render_state.curr_h]
+    >    end
+    >  -- mutations
+    >  elseif key == string.byte('e') then
+    >    editz(window)
+    >  elseif key == string.byte('a') then
+    >    -- insert sibling after
+    >    local old = curr.next
+    >    curr.next = new_id()
+    >    local new = zettels[curr.next]
+    >    new.data = ''
+    >    new.next = old
+    >    new.prev = current_zettel_id
+    >    if old then
+    >      zettels[old].prev = curr.next
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.next
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('b') then
+    >    -- insert sibling before
+    >    local old = curr.prev
+    >    curr.prev = new_id()
+    >    local new = zettels[curr.prev]
+    >    new.data = ''
+    >    new.prev = old
+    >    new.next = current_zettel_id
+    >    if old then
+    >      zettels[old].next = curr.prev
+    >      assert(curr.parent == zettels[old].parent, 'siblings should have same parent')
+    >    end
+    >    new.parent = curr.parent
+    >    current_zettel_id = curr.prev
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  elseif key == string.byte('c') then
+    >    -- insert child
+    >    local old = curr.child
+    >    curr.child = new_id()
+    >    local new = zettels[curr.child]
+    >    new.data = ''
+    >    new.next = old
+    >    if old then
+    >      assert(zettels[old].prev == nil, "first child shouldn't have a previous sibling")
+    >      zettels[old].prev = curr.child
+    >    end
+    >    new.parent = current_zettel_id
+    >    current_zettel_id = curr.child
+    >    render(window) -- recompute render_state
+    >    editz(window)
+    >  -- cross-links
+    >  elseif key == string.byte('s') then
+    >    -- save zettel to a stash
+    >    stash = current_zettel_id
+    >  elseif key == string.byte('t') then
+    >    -- cross-link a zettel bidirectionally with what's on the stash
+    >    local insert_crosslink =
+    >      function(a, rel, b_id)
+    >        if a.crosslinks == nil then
+    >          a.crosslinks = {}
+    >        end
+    >        a.crosslinks[rel] = b_id
+    >      end
+    >    insert_crosslink(curr, 'a', stash)
+    >    insert_crosslink(zettels[stash], 'a', current_zettel_id)
+    >    stash = nil
+    >  -- view settings
+    >  elseif key == string.byte('x') then
+    >    if view_settings.width > 5 then
+    >      view_settings.width = view_settings.width - 5
+    >    end
+    >  elseif key == string.byte('X') then
+    >    if view_settings.width < w-5 then
+    >      view_settings.width = view_settings.width + 5
+    >    end
+    >  elseif key == string.byte('y') then
+    >    if view_settings.height > 0 then
+    >      view_settings.height = view_settings.height - 1
+    >    end
+    >  elseif key == string.byte('Y') then
+    >    if view_settings.height < h-2 then
+    >      view_settings.height = view_settings.height + 1
+    >    end
+    >  elseif key == string.byte('z') then
+    >    -- scroll to show the current zettel at top of screen
+    >    -- often has the effect of zooming in on its hierarchy
+    >    view_settings.first_zettel = current_zettel_id
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 12 17:58:01 2022
+  __teliva_note:
+    >make cursor movements less risky using a back button '<'
+  render_state:
+    >-- some information about what's been drawn on screen
+    >-- not saved between app restarts
+    >render_state = {
+    >  -- where the current zettel is, in units of zettels
+    >  curr_h = 1,
+    >  curr_w = 1,
+    >  -- what zettel is at each position on screen, in units of zettels
+    >  hw2id = {},
+    >  -- list of zettels currently displayed
+    >  displayed = {},
+    >  -- history of screen render state
+    >  history = {},  -- elems {first_zettel=view_settings.first_zettel, cursor=current_zettel_id}
+    >}

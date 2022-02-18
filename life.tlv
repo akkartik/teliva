@@ -296,3 +296,16 @@
     >    step()
     >  end
     >end
+- __teliva_timestamp:
+    >Thu Feb 17 19:58:19 2022
+  doc:blurb:
+    >Conway's Game of Life
+    >
+    >To get around limitations of text mode we use the braille character set to render 8 cells per character.
+    >
+    >By default it initializes the space with a random state of cells. You can also start it up with .cells files from https://conwaylife.com/wiki, or with a few special names:
+    >  $ src/teliva life.tlv block
+    >  $ src/teliva life.tlv loaf
+    >  $ src/teliva life.tlv blinker
+    >  $ src/teliva life.tlv glider
+    >  $ src/teliva life.tlv pentomino

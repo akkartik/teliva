@@ -508,3 +508,14 @@
     >    table.insert(state.lines, 'invalid response from server: '..line)
     >  end
     >end
+- __teliva_timestamp:
+    >Thu Feb 17 20:04:42 2022
+  doc:blurb:
+    >A bare-bones browser for the Gemini protocol
+    >
+    >https://gemini.circumlunar.space
+    >
+    >A couple of good pages to try it out with:
+    >  $ src/teliva gemini.tlv gemini.circumlunar.space
+    >  $ src/teliva gemini.tlv gemini.conman.org
+    >  $ src/teliva gemini.tlv gemini.susa.net/cgi-bin/links.lua  # shows 20 random links from Gemini space

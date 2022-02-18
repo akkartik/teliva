@@ -383,6 +383,7 @@ static int starts_with(const char* s, const char* pre) {
 static int edit_current_definition(lua_State* L);
 static void recent_changes_view(lua_State* L);
 static const char* events_view();
+static int look_up_definition (lua_State* L, const char* name);
 void default_big_picture_view(lua_State* L) {
   /* Without any intervening edits, big_picture_view always stably renders
    * definitions in exactly the same spatial order, both in levels from top to
@@ -408,6 +409,15 @@ restart:
   mvaddstr(y, 0, "Big picture");
   attrset(A_NORMAL);
   y += 2;
+
+  int found = look_up_definition(L, "doc:blurb");
+  if (found) {
+    assert(lua_isstring(L, -1));
+    y = render_wrapped_text(y, 8, 68, lua_tostring(L, -1));
+    y += 2;
+    lua_pop(L, 1);
+  }
+
   mvaddstr(y, 0, "data:           ");
   // first: data (non-functions) that's not the Teliva menu or curses variables
   if (highlight_level < 0) highlight_level = 0;
@@ -647,7 +657,6 @@ restart:
 }
 
 extern int edit(lua_State* L, char* filename, char* definition_name);
-static int look_up_definition (lua_State* L, const char* name);
 void big_picture_view(lua_State* L) {
   int oldtop = lua_gettop(L);
   if (!look_up_definition(L, "doc:main")) {

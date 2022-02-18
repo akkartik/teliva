@@ -518,3 +518,9 @@
     >  check_eq(cursor_up('abcdefg\nhij', 11, 5), 8, 'cursor_up to wrapping line: final char')
     >  check_eq(cursor_up('abcdefg\nhij', 12, 5), 8, 'cursor_up to wrapping line: to shorter line')
     >end
+- __teliva_timestamp:
+    >Thu Feb 17 19:52:30 2022
+  doc:blurb:
+    >A tiny editor (no scrolling) for composing a series of toots or tweets. Always shows character counts for current state of prose.
+    >
+    >Typing '===' on its own lines, surrounded by empty lines, partitions prose and gives all segments independent character counts. Good for threads (tweetstorms).

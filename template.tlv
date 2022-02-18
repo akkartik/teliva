@@ -199,3 +199,9 @@
     >    update(window)
     >  end
     >end
+- __teliva_timestamp:
+    >Thu Feb 17 20:10:02 2022
+  doc:blurb:
+    >To show a brief description of the app on the 'big picture' screen, put the text in a special buffer called 'doc:blurb'.
+    >
+    >You can also override the default big picture screen entirely by creating a buffer called 'doc:main'.

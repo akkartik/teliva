@@ -6392,3 +6392,16 @@
     >  -- history of screen render state
     >  history = {},  -- elems {first_zettel=view_settings.first_zettel, cursor=current_zettel_id}
     >}
+- __teliva_timestamp:
+    >Thu Feb 17 20:15:14 2022
+  doc:blurb:
+    >A rudimentary Zettelkasten app trying to hew very close to the original analog setup, as described by abramdemski:
+    >
+    >https://www.lesswrong.com/posts/NfdHG6oHBJ8Qxc26s/the-zettelkasten-method-1
+    >
+    >The key attributes of Zettelkasten seem to be:
+    >- notes organized in small fragments called 'cards' that can't hold much text
+    >- a tree-based organization using sibling and child cards, with the ability to insert children and siblings to any card, any time
+    >- ability to cross-link any card to any other, turning the tree into a graph (but still with a strong sense of hierarchy)
+    >
+    >zet.tlv satisfies these properties, but isn't very intuitive or usable yet. Contributions appreciated.

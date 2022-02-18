@@ -120,3 +120,11 @@
     >  local lines, cols = window:getmaxyx()
     >  return cols
     >end
+- __teliva_timestamp:
+    >Thu Feb 17 20:07:06 2022
+  doc:blurb:
+    >Single-player game: the Towers of Hanoi
+    >
+    >Move disks around from one tower A to tower B, under one constraint: a disk can never lie above a smaller disk.
+    >
+    >https://en.wikipedia.org/wiki/Tower_of_Hanoi

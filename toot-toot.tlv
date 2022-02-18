@@ -153,7 +153,7 @@
 - __teliva_timestamp: original
   menu:
     >menu = {
-    >  {'^u', 'clear'},
+    >  {'^k', 'clear'},
     >  {'^w', 'write prose to file "toot" (edit hotkey does NOT save)'},
     >}
 - __teliva_timestamp: original
@@ -307,7 +307,7 @@
     >      cursor = cursor-1
     >      prose = prose:remove(cursor)
     >    end
-    >  elseif key == 21 then  -- ctrl-u
+    >  elseif key == 11 then  -- ctrl-k
     >    prose = ''
     >    cursor = 1
     >  elseif key == 23 then  -- ctrl-w

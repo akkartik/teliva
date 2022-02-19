@@ -112,13 +112,21 @@ low-priority use case, as is lots of specialized support for developing
 complex apps. The sweet spot for Teliva is simple apps that people will want
 to edit after using for a while.
 
-## What's included?
+## Who are we trusting by trusting you?
+
+Teliva is designed to have a shallow, manageable software supply chain. I
+rely on packages distributed by the following reputable brands:
+
+* A well-known Posix OS, either Linux or BSD.
+* A standard C library, usually GNU libc.
+* The [ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
+  building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
+
+Teliva's codebase also includes forks of the following reputable brands:
 
 * [Lua 5.1](https://www.lua.org/manual/5.1)
 * The [Lua File System](https://keplerproject.github.io/luafilesystem) library
   for portably accessing directories (module `lfs`).
-* The [ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
-  building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
 * The [Kilo](https://github.com/antirez/kilo) text editor, modified to use
   ncurses. (Read more about it in this [fantastic walk-through](https://viewsourcecode.org/snaptoken/kilo).)
 * The [lcurses](https://github.com/lcurses/lcurses) binding for ncurses (as
@@ -130,6 +138,12 @@ to edit after using for a while.
   (modules `https` and `ssl`).
 * The [json.lua](https://github.com/rxi/json.lua) library for
   serializing/deserializing to JSON (module `json`).
+
+I only add to this list with great deliberation. Since it includes indirect
+suppliers (suppliers of suppliers), I have an incentive to only include
+suppliers who also have shallow supply chains. Minimizing the size of the
+supply chain should result in more reliable software that requires less
+frequent upgrades.
 
 ## Why Lua?
 

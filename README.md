@@ -152,10 +152,6 @@ them in Teliva and let people use regular Lua. Or other platforms!
 - The function `main` is special. It runs every time an app starts up, if all
   its automated tests pass.
 
-Teliva is not tested much at all yet. This is my first time programming either
-in Lua or within Lua. So bug reports are most appreciated if Lua programs
-behave unexpectedly under Teliva.
-
 ## What's included?
 
 * [Lua 5.1](https://www.lua.org/manual/5.1)

@@ -304,6 +304,28 @@ static int luaB_select (lua_State *L) {
 }
 
 
+static int luaB_pcall (lua_State *L) {
+  int status;
+  luaL_checkany(L, 1);
+  status = lua_pcall(L, lua_gettop(L) - 1, LUA_MULTRET, 0);
+  lua_pushboolean(L, (status == 0));
+  lua_insert(L, 1);
+  return lua_gettop(L);  /* return status + all results */
+}
+
+
+static int luaB_xpcall (lua_State *L) {
+  int status;
+  luaL_checkany(L, 2);
+  lua_settop(L, 2);
+  lua_insert(L, 1);  /* put error function under function to be called */
+  status = lua_pcall(L, 0, LUA_MULTRET, 1);
+  lua_pushboolean(L, (status == 0));
+  lua_replace(L, 1);
+  return lua_gettop(L);  /* return status + all results */
+}
+
+
 static int luaB_tostring (lua_State *L) {
   luaL_checkany(L, 1);
   if (luaL_callmeta(L, 1, "__tostring"))  /* is there a metafield? */
@@ -363,6 +385,7 @@ static const luaL_Reg base_funcs[] = {
   {"getfenv", luaB_getfenv},
   {"getmetatable", luaB_getmetatable},
   {"next", luaB_next},
+  {"pcall", luaB_pcall},
   {"print", luaB_print},
   {"rawequal", luaB_rawequal},
   {"rawget", luaB_rawget},
@@ -374,6 +397,7 @@ static const luaL_Reg base_funcs[] = {
   {"tostring", luaB_tostring},
   {"type", luaB_type},
   {"unpack", luaB_unpack},
+  {"xpcall", luaB_xpcall},
   {NULL, NULL}
 };
 

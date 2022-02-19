@@ -112,6 +112,25 @@ low-priority use case, as is lots of specialized support for developing
 complex apps. The sweet spot for Teliva is simple apps that people will want
 to edit after using for a while.
 
+## What's included?
+
+* [Lua 5.1](https://www.lua.org/manual/5.1)
+* The [Lua File System](https://keplerproject.github.io/luafilesystem) library
+  for portably accessing directories (module `lfs`).
+* The [ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
+  building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
+* The [Kilo](https://github.com/antirez/kilo) text editor, modified to use
+  ncurses. (Read more about it in this [fantastic walk-through](https://viewsourcecode.org/snaptoken/kilo).)
+* The [lcurses](https://github.com/lcurses/lcurses) binding for ncurses (as
+  module `curses`).
+* The [luasocket](https://w3.impa.br/~diego/software/luasocket) library of
+  networking primitives (modules `socket`, `http`, `url`, `headers`, `mime`,
+  `ltn12`).
+* The [luasec](https://github.com/brunoos/luasec) library for HTTPS support
+  (modules `https` and `ssl`).
+* The [json.lua](https://github.com/rxi/json.lua) library for
+  serializing/deserializing to JSON (module `json`).
+
 ## Why Lua?
 
 It's reputedly the fastest interpreted language per line of implementation
@@ -138,11 +157,6 @@ them in Teliva and let people use regular Lua. Or other platforms!
   makes sense. You get some libraries preloaded (see below). Beyond those,
   apps should include all Lua code they want to use.
 
-- I want to provide sandboxed access to system resources (file system,
-  network, etc.) which will likely create incompatibilities with the standard
-  library. I'm disinclined to try to &lsquo;improve&rsquo; on Lua syntax,
-  however. It's not my favorite, but it's good enough.
-
 - To create a well-behaved sandbox, Teliva doesn't support adding libraries
   with C bindings beyond the few it starts up with.
 
@@ -152,27 +166,7 @@ them in Teliva and let people use regular Lua. Or other platforms!
 - The function `main` is special. It runs every time an app starts up, if all
   its automated tests pass.
 
-## What's included?
-
-* [Lua 5.1](https://www.lua.org/manual/5.1)
-* The [Lua File System](https://keplerproject.github.io/luafilesystem) library
-  for portably accessing directories (module `lfs`).
-* The [ncurses](https://tldp.org/HOWTO/NCURSES-Programming-HOWTO) library for
-  building text-mode user interfaces. ([Alternative documentation](https://tldp.org/LDP/lpg-0.4.pdf))
-* The [Kilo](https://github.com/antirez/kilo) text editor, modified to use
-  ncurses. (Read more about it in this [fantastic walk-through](https://viewsourcecode.org/snaptoken/kilo).)
-* The [lcurses](https://github.com/lcurses/lcurses) binding for ncurses (as
-  module `curses`).
-* The [luasocket](https://w3.impa.br/~diego/software/luasocket) library of
-  networking primitives (modules `socket`, `http`, `url`, `headers`, `mime`,
-  `ltn12`).
-* The [luasec](https://github.com/brunoos/luasec) library for HTTPS support
-  (modules `https` and `ssl`).
-* The [json.lua](https://github.com/rxi/json.lua) library for
-  serializing/deserializing to JSON (module `json`).
-
-The modules mentioned above are always available, just like standard Lua 5.1
-libraries. However, a few things are different from conventional Lua:
+Teliva also introduces some incompatibilities to protect computer owners:
 
 * Some functions are disabled because I don't know how to sandbox them
   effectively:

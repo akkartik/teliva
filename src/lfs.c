@@ -1156,8 +1156,8 @@ static void set_info(lua_State * L)
 
 static const struct luaL_Reg fslib[] = {
   { "attributes", file_info },
-  { "chdir", change_dir },
-  { "currentdir", get_dir },
+  /* no 'chdir' without sandboxing it */
+  /* no 'currentdir' without sandboxing it */
   { "dir", dir_iter_factory },
   { "link", make_link },
   { "lock", file_lock },

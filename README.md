@@ -187,6 +187,7 @@ Teliva also introduces some incompatibilities to protect computer owners:
   - `os.execute`, `os.getenv`, `io.popen`
   - `io.lines` (not a security issue; just difficult to distinguish missing
     files from sandboxing issues)
+  - `lfs.chdir`, `lfs.currentdir`
 * Some functions are disabled because they don't seem to make sense in an
   ncurses environment. This includes the Lua notions of default files, which
   start out as stdin/stdout.

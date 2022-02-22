@@ -27,25 +27,6 @@
 /***
  Full-screen Text Terminal Manipulation.
 
- In the underlying curses C library, the following functions:
-
-     getstr()   (and wgetstr(), mvgetstr(), and mvwgetstr())
-     inchstr()  (and winchstr(), mvinchstr(), and mvwinchstr())
-     instr()    (and winstr(), mvinstr(), and mvwinstr())
-
- are subject to buffer overflow attack. This is because you pass in the
- buffer to be filled in, which has to be of finite length. But in this
- Lua module, a buffer is assigned automatically and the function returns
- the string, so there is no security issue. You may still use the alternate
- functions:
-
-     s = stdscr:getnstr()
-     s = stdscr:inchnstr()
-     s = stdscr:innstr()
-
- which take an extra "size of buffer" argument, in order to impose a maximum
- length on the string the user may type in.
-
  Some of the C functions beginning with "no" do not exist in Lua. You should
  use `curses.nl(false)` and `curses.nl(true)` instead of `nonl()` and `nl()`,
  and likewise `curses.echo(false)` and `curses.echo(true)` instead of
@@ -60,12 +41,11 @@
      if c < 256 then c = string.char(c) end
 
  Some Lua functions take a different set of parameters than their C
- counterparts; for example, you should use `str = stdscr.getstr()` and
- `y, x = stdscr.getyx()` instead of `getstr(str)` and `getyx(y, x)`, and
- likewise for `getbegyx` and `getmaxyx` and `getparyx` and `pair_content`.
- The Perl Curses module now uses the C-compatible parameters, so be aware of
- this difference when translating code from Perl into Lua, as well as from C
- into Lua.
+ counterparts; for example, you should use `y, x = stdscr.getyx()` instead of
+ `getstr(str)` and `getyx(y, x)`, and likewise for `getbegyx` and `getmaxyx`
+ and `getparyx` and `pair_content`. The Perl Curses module now uses the
+ C-compatible parameters, so be aware of this difference when translating code
+ from Perl into Lua, as well as from C into Lua.
 
  Many curses functions have variants starting with the prefixes `w-`, `mv-`,
  and/or `wmv-`. These variants differ only in the explicit addition of a

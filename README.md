@@ -193,6 +193,7 @@ Teliva also introduces some incompatibilities to protect computer owners:
   start out as stdin/stdout.
   - `io.input`, `io.read`
   - `io.output`, `io.write`, `io.flush`
+  - `curses.getstr()`, `curses.mvgetstr()`
 * Some functions in lcurses have [additional smarts](https://github.com/lcurses/lcurses/blob/master/lib/curses.lua).
   Teliva is [consistent with the underlying ncurses](https://github.com/akkartik/teliva/blob/main/src/lcurses/curses.lua).
 

@@ -1361,56 +1361,6 @@ Wmvgetch(lua_State *L)
 
 
 /***
-Read characters up to the next newline from the window input.
-@function getstr
-@int[opt] n
-@treturn string string read from input buffer
-@see wgetnstr(3x)
-*/
-static int
-Wgetstr(lua_State *L)
-{
-	WINDOW *w = checkwin(L, 1);
-	int n = optint(L, 2, 0);
-	char buf[LUAL_BUFFERSIZE];
-
-	if (n == 0 || n >= LUAL_BUFFERSIZE)
-		n = LUAL_BUFFERSIZE - 1;
-	if (wgetnstr(w, buf, n) == ERR)
-		return 0;
-
-	return pushstringresult(buf);
-}
-
-
-/***
-Call @{move} then @{getstr}.
-@function mvgetstr
-@int y
-@int x
-@int[opt=-1] n
-@treturn string string read from input buffer
-@see mvwgetnstr(3x)
-*/
-static int
-Wmvgetstr(lua_State *L)
-{
-	WINDOW *w = checkwin(L, 1);
-	int y = checkint(L, 2);
-	int x = checkint(L, 3);
-	int n = optint(L, 4, -1);
-	char buf[LUAL_BUFFERSIZE];
-
-	if (n == 0 || n >= LUAL_BUFFERSIZE)
-		n = LUAL_BUFFERSIZE - 1;
-	if (mvwgetnstr(w, y, x, buf, n) == ERR)
-		return 0;
-
-	return pushstringresult(buf);
-}
-
-
-/***
 Fetch the attributed character at the current cursor position.
 @function winch
 @treturn int attributed character read from input buffer
@@ -1860,7 +1810,7 @@ static const luaL_Reg curses_window_fns[] =
 	LCURSES_FUNC( Wgetch		),
 	LCURSES_FUNC( Wgetmaxyx		),
 	LCURSES_FUNC( Wgetparyx		),
-	LCURSES_FUNC( Wgetstr		),
+	/* no 'getstr' because there's no way to hook standard Teliva hotkeys into it */
 	LCURSES_FUNC( Wgetyx		),
 	LCURSES_FUNC( Whline		),
 	LCURSES_FUNC( Widcok		),
@@ -1881,7 +1831,7 @@ static const luaL_Reg curses_window_fns[] =
 	LCURSES_FUNC( Wmvaddstr		),
 	LCURSES_FUNC( Wmvdelch		),
 	LCURSES_FUNC( Wmvgetch		),
-	LCURSES_FUNC( Wmvgetstr		),
+	/* no 'mvgetstr' because there's no way to hook standard Teliva hotkeys into it */
 	LCURSES_FUNC( Wmvhline		),
 	LCURSES_FUNC( Wmvvline		),
 	LCURSES_FUNC( Wmvwinch		),

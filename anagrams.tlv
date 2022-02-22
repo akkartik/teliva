@@ -210,58 +210,127 @@
   window:
     >window = curses.stdscr()
 - __teliva_timestamp: original
-  render:
-    >function render(window)
-    >  window:clear()
-    >  -- draw stuff to screen here
-    >  window:attron(curses.A_BOLD)
-    >  window:mvaddstr(1, 5, "example app")
-    >  window:attrset(curses.A_NORMAL)
-    >  for i=0,15 do
-    >    window:attrset(curses.color_pair(i))
-    >    window:mvaddstr(3+i, 5, "========================")
-    >  end
-    >  curses.refresh()
-    >end
+  doc:blurb:
+    >Show all anagrams of a given word
 - __teliva_timestamp: original
   menu:
     >-- To show app-specific hotkeys in the menu bar, add hotkey/command
     >-- arrays of strings to the menu array.
-    >menu = {}
+    >menu = {
+    >  {'^h', 'backspace'},
+    >}
 - __teliva_timestamp: original
-  update:
-    >function update(window)
-    >  local key = curses.getch()
-    >  -- process key here
-    >end
+  word:
+    >word = ''
 - __teliva_timestamp: original
-  init_colors:
-    >function init_colors()
-    >  for i=0,7 do
-    >    curses.init_pair(i, i, -1)
-    >  end
-    >  curses.init_pair(8, 7, 0)
-    >  curses.init_pair(9, 7, 1)
-    >  curses.init_pair(10, 7, 2)
-    >  curses.init_pair(11, 7, 3)
-    >  curses.init_pair(12, 7, 4)
-    >  curses.init_pair(13, 7, 5)
-    >  curses.init_pair(14, 7, 6)
-    >  curses.init_pair(15, -1, 15)
-    >end
+  cursor:
+    >cursor = 1
 - __teliva_timestamp: original
   main:
     >function main()
-    >  init_colors()
-    >
     >  while true do
     >    render(window)
     >    update(window)
     >  end
     >end
-- __teliva_timestamp:
-    >Thu Feb 17 20:10:02 2022
-  doc:blurb:
-    >To show a brief description of the app on the 'big picture' screen, put the text in a special buffer called 'doc:blurb'.
+- __teliva_timestamp: original
+  update:
+    >function update(window)
+    >  local key = curses.getch()
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #word then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      word = word:remove(cursor)
+    >    end
+    >  elseif key >= 32 and key < 127 then
+    >    word = word:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >end
+- __teliva_timestamp: original
+  render:
+    >function render(window)
+    >  window:clear()
     >
-    >You can also override the default big picture screen entirely by creating a buffer called 'doc:main'.
+    >  local prompt_str = ' what is your name? '
+    >  curses.attron(curses.A_REVERSE)
+    >  window:mvaddstr(0, 0, prompt_str)
+    >  curses.attroff(curses.A_REVERSE)
+    >  window:addstr(' ')
+    >  curses.attron(curses.A_BOLD)
+    >  window:addstr(word)
+    >  curses.attroff(curses.A_BOLD)
+    >  window:mvaddstr(2, 0, '')
+    >  local results = anagrams(word)
+    >  if #results > 0 then
+    >    window:attron(curses.A_REVERSE)
+    >    print(#results..' anagrams')
+    >    window:attroff(curses.A_REVERSE)
+    >    for i, w in ipairs(results) do
+    >      window:addstr(w)
+    >      window:addstr(' ')
+    >    end
+    >  end
+    >
+    >  window:mvaddstr(0, string.len(prompt_str)+cursor, '')
+    >  curses.refresh()
+    >end
+- __teliva_timestamp:
+    >Mon Feb 21 17:42:28 2022
+  anagrams:
+    >function anagrams(word)
+    >  return gather(sort_string(word))
+    >end
+- __teliva_timestamp:
+    >Mon Feb 21 18:18:07 2022
+  gather:
+    >function gather(s)
+    >  if s == '' then return {} end
+    >  local result = {}
+    >  for i=1, #s do
+    >    if i == 1 or s[i] ~= s[i-1] then
+    >      local foo = combine(s[i], gather(take_out(s, i)))
+    >      append(result, combine(s[i], gather(take_out(s, i))))
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp:
+    >Mon Feb 21 18:06:20 2022
+  take_out:
+    >function take_out(s, i)
+    >  if i < 1 then return string.sub(s, 1) end
+    >  return string.sub(s, 1, i-1) .. string.sub(s, i+1)
+    >end
+    >
+    >function test_take_out()
+    >  check_eq(take_out('', 0), '', 'take_out: empty')
+    >  check_eq(take_out('abc', 0), 'abc', 'take_out: invalid low index')
+    >  check_eq(take_out('abc', 4), 'abc', 'take_out: invalid high index')
+    >  check_eq(take_out('abc', 1), 'bc', 'take_out: first index')
+    >  check_eq(take_out('abc', 3), 'ab', 'take_out: final index')
+    >  check_eq(take_out('abc', 2), 'ac', 'take_out: middle index')
+    >end
+- __teliva_timestamp: original
+  combine:
+    >-- return 'l' with each element prefixed with 'prefix'
+    >function combine(prefix, l)
+    >  if #l == 0 then return {prefix} end
+    >  local result = {}
+    >  for _, elem in ipairs(l) do
+    >    result[#result+1] = prefix..elem
+    >  end
+    >  return result
+    >end
+    >
+    >function test_combine()
+    >  check_eq(combine('abc', {}), {'abc'}, 'test_combine: empty list')
+    >end

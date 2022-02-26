@@ -180,21 +180,22 @@ them in Teliva and let people use regular Lua. Or other platforms!
 - The function `main` is special. It runs every time an app starts up, if all
   its automated tests pass.
 
-Teliva also introduces some incompatibilities to protect computer owners:
-
-* Some functions are disabled because I don't know how to sandbox them
+- Some functions are disabled because I don't know how to sandbox them
   effectively:
   - `os.execute`, `os.getenv`, `io.popen`
   - `io.lines` (not a security issue; just difficult to distinguish missing
     files from sandboxing issues)
   - `lfs.chdir`, `lfs.currentdir`
-* Some functions are disabled because they don't seem to make sense in an
+
+- Some functions are disabled because they don't seem to make sense in an
   ncurses environment. This includes the Lua notions of default files, which
   start out as stdin/stdout.
   - `io.input`, `io.read`
   - `io.output`, `io.write`, `io.flush`
-  - `curses.getstr()`, `curses.mvgetstr()`
-* Some functions in lcurses have [additional smarts](https://github.com/lcurses/lcurses/blob/master/lib/curses.lua).
+  - `curses.getstr()`, `curses.mvgetstr()` (When using these it's easy for the
+    screen to get confusing.)
+
+- Some functions in lcurses have [additional smarts](https://github.com/lcurses/lcurses/blob/master/lib/curses.lua).
   Teliva is [consistent with the underlying ncurses](https://github.com/akkartik/teliva/blob/main/src/lcurses/curses.lua).
 
 [The manual in this repo](doc/manual.html) is up to date; use it rather than

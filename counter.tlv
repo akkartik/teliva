@@ -32,7 +32,7 @@
     >  window:mvaddstr(10, 11, n)
     >  window:attroff(curses.color_pair(6))
     >  window:attroff(curses.A_BOLD)
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp: original
   menu:
@@ -42,7 +42,7 @@
 - __teliva_timestamp: original
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  if key == 10 then
     >    n = n+1
     >  end

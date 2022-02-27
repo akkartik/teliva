@@ -80,7 +80,7 @@
   check_eq:
     >function check_eq(x, expected, msg)
     >  if x == expected then
-    >    curses.addch('.')
+    >    window:addch('.')
     >  else
     >    print('F - '..msg)
     >    print('  expected '..tostring(expected)..' but got '..x)
@@ -159,7 +159,7 @@
     >      print(f, attr.permissions, attr.size, attr.access, attr.modification)
     >    end
     >  end
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp: original
   menu:
@@ -169,7 +169,7 @@
 - __teliva_timestamp: original
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  -- process key here
     >end
 - __teliva_timestamp: original

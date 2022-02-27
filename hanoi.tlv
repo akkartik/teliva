@@ -26,7 +26,7 @@
     >  for i,t in ipairs(tower) do
     >    render_tower(window, line, i*col, i, t)
     >  end
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp: original
   lines:
@@ -103,9 +103,9 @@
   update:
     >function update(window)
     >  window:mvaddstr(lines(window)-2, 5, "tower to remove top disk from? ")
-    >  local from = curses.getch() - 96
+    >  local from = window:getch() - 96
     >  window:mvaddstr(lines(window)-1, 5, "tower to stack it on? ")
-    >  local to = curses.getch() - 96
+    >  local to = window:getch() - 96
     >  make_move(from, to)
     >end
 - __teliva_timestamp: original

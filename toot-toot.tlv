@@ -80,7 +80,7 @@
   check_eq:
     >function check_eq(x, expected, msg)
     >  if x == expected then
-    >    curses.addch('.')
+    >    window:addch('.')
     >  else
     >    print('F - '..msg)
     >    print('  expected '..tostring(expected)..' but got '..x)
@@ -205,7 +205,7 @@
     >    window:addstr(string.len(toot))
     >    window:attroff(curses.A_BOLD)
     >  end
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp: original
   render_delimiter:
@@ -288,7 +288,7 @@
 - __teliva_timestamp: original
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  if key == curses.KEY_LEFT then
     >    if cursor > 1 then

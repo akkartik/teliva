@@ -80,7 +80,7 @@
   check_eq:
     >function check_eq(x, expected, msg)
     >  if eq(x, expected) then
-    >    curses.addch('.')
+    >    window:addch('.')
     >  else
     >    print('F - '..msg)
     >    print('  expected '..str(expected)..' but got '..str(x))
@@ -221,7 +221,7 @@
     >    window:attrset(curses.color_pair(i))
     >    window:mvaddstr(3+i, 5, "========================")
     >  end
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp: original
   menu:
@@ -231,7 +231,7 @@
 - __teliva_timestamp: original
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  -- process key here
     >end
 - __teliva_timestamp: original
@@ -271,7 +271,7 @@
     >  task.spawn(main_task)
     >  task.scheduler()
     >  print('out of scheduler')
-    >  curses.getch()
+    >  window:getch()
     >end
 - __teliva_timestamp:
     >Sat Feb 26 21:50:11 2022
@@ -368,7 +368,7 @@
     >  task.scheduler()
     >  print('key pressed; done')
     >  window:nodelay(false)
-    >  curses.getch()
+    >  window:getch()
     >end
 - __teliva_timestamp:
     >Sat Feb 26 22:09:47 2022
@@ -384,7 +384,7 @@
     >  while true do
     >    window:addstr(primes:recv())
     >    window:addstr(' ')
-    >    local c = curses.getch()
+    >    local c = window:getch()
     >    if c then break end  -- key pressed
     >    local y, x = window:getyx()
     >    if y > h-1 then

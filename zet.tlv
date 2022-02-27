@@ -80,7 +80,7 @@
   check_eq:
     >function check_eq(x, expected, msg)
     >  if x == expected then
-    >    curses.addch('.')
+    >    window:addch('.')
     >  else
     >    print('F - '..msg)
     >    print('  expected '..tostring(expected)..' but got '..x)
@@ -150,7 +150,7 @@
   spaces:
     >function spaces(n)
     >  for i=1,n do
-    >    curses.addch(' ')
+    >    window:addch(' ')
     >  end
     >end
 - __teliva_timestamp: original
@@ -277,7 +277,7 @@
 - __teliva_timestamp: original
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local curr = zettels[current_zettel_id]
     >  -- graph-based navigation
     >  if key == string.byte('j') then
@@ -372,7 +372,7 @@
     >    window:addstr(' ')  -- margin
     >  end
     >  window:mvaddstr(lines-1, 0, '? ')
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp: original
   view_settings:
@@ -467,7 +467,7 @@
 - __teliva_timestamp: original
   editz_update:
     >function editz_update(window, prose, cursor)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  if key == curses.KEY_LEFT then
     >    if cursor > 1 then
@@ -741,7 +741,7 @@
     >    window:attrset(curses.color_pair(0))
     >    window:addstr(' ')  -- margin
     >  end
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp:
     >Wed Feb  9 08:15:35 2022
@@ -849,7 +849,7 @@
     >editz_render is now much simpler
   editz_update:
     >function editz_update(window, prose, cursor)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  if key == curses.KEY_LEFT then
     >    if cursor > 1 then
@@ -893,7 +893,7 @@
     >no need for chords once we drop the commandline
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local curr = zettels[current_zettel_id]
     >  -- graph-based navigation
     >  if key == string.byte('j') then
@@ -998,7 +998,7 @@
     >feels natural to immediately start editing them
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
     >  -- graph-based navigation
@@ -1091,7 +1091,7 @@
     >Thu Feb 10 00:01:58 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -1230,7 +1230,7 @@
     >bugfix: handle missing parent/child/sib
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -1488,7 +1488,7 @@
     >Thu Feb 10 20:32:38 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -1669,7 +1669,7 @@
     >    bg = 3 - bg
     >    x = x + view_settings.width + view_settings.hmargin
     >  end
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp:
     >Thu Feb 10 20:40:08 2022
@@ -1768,7 +1768,7 @@
     >    bg = 3 - bg
     >    x = x + view_settings.width + view_settings.hmargin
     >  end
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp:
     >Thu Feb 10 20:55:19 2022
@@ -1878,7 +1878,7 @@
     >    bg = 8 - bg  -- toggle between color pairs 3 and 5
     >    x = x + view_settings.width + view_settings.hmargin
     >  end
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp:
     >Thu Feb 10 21:02:41 2022
@@ -2008,7 +2008,7 @@
     >    bg = 8 - bg  -- toggle between color pairs 3 and 5
     >    x = x + view_settings.width + view_settings.hmargin
     >  end
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp:
     >Thu Feb 10 21:19:26 2022
@@ -2016,7 +2016,7 @@
     >bugfix: cross-links should be bidirectional
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -2154,7 +2154,7 @@
     >clear stash after linking
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -2374,7 +2374,7 @@
     >bugfix in parent link when inserting child
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -2537,7 +2537,7 @@
     >Sat Feb 12 15:05:20 2022
   editz_update:
     >function editz_update(window, prose, cursor, original_prose)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  if key == curses.KEY_LEFT then
     >    if cursor > 1 then
@@ -2627,7 +2627,7 @@
     >Sat Feb 12 15:11:15 2022
   editz_update:
     >function editz_update(window, prose, cursor, original_prose)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  -- cursor movement
     >  if key == curses.KEY_LEFT then
@@ -2698,7 +2698,7 @@
     >Sat Feb 12 15:31:27 2022
   editz_update:
     >function editz_update(window, prose, cursor, original_prose)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  -- cursor movement
     >  if key == curses.KEY_LEFT then
@@ -2743,7 +2743,7 @@
     >Sat Feb 12 15:48:35 2022
   editz_update:
     >function editz_update(window, prose, cursor, original_prose)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  -- cursor movement
     >  if key == curses.KEY_LEFT then
@@ -2789,7 +2789,7 @@
     >Sat Feb 12 15:49:49 2022
   editz_update:
     >function editz_update(window, prose, cursor, original_prose)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  -- cursor movement
     >  if key == curses.KEY_LEFT then
@@ -2839,7 +2839,7 @@
     >Sat Feb 12 15:53:52 2022
   editz_update:
     >function editz_update(window, prose, cursor, original_prose)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  -- cursor movement
     >  if key == curses.KEY_LEFT then
@@ -2896,7 +2896,7 @@
     >editor: move to start of line, move/delete to end of line
   editz_update:
     >function editz_update(window, prose, cursor, original_prose)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  -- cursor movement
     >  if key == curses.KEY_LEFT then
@@ -2949,7 +2949,7 @@
     >Sat Feb 12 16:50:36 2022
   editz_update:
     >function editz_update(window, prose, cursor, original_prose)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  -- cursor movement
     >  if key == curses.KEY_LEFT then
@@ -3013,7 +3013,7 @@
     >Sat Feb 12 16:58:41 2022
   editz_update:
     >function editz_update(window, prose, cursor, original_prose)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  -- cursor movement
     >  if key == curses.KEY_LEFT then
@@ -3086,7 +3086,7 @@
     >Sat Feb 12 16:59:37 2022
   editz_update:
     >function editz_update(window, prose, cursor, original_prose)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  -- cursor movement
     >  if key == curses.KEY_LEFT then
@@ -3156,7 +3156,7 @@
     >Sat Feb 12 17:00:00 2022
   editz_update:
     >function editz_update(window, prose, cursor, original_prose)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  -- cursor movement
     >  if key == curses.KEY_LEFT then
@@ -3228,7 +3228,7 @@
     >editor: word-movement shortcuts
   editz_update:
     >function editz_update(window, prose, cursor, original_prose)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  -- cursor movement
     >  if key == curses.KEY_LEFT then
@@ -3417,13 +3417,13 @@
     >    bg = 8 - bg  -- toggle between color pairs 3 and 5
     >    x = x + view_settings.width + view_settings.hmargin
     >  end
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp:
     >Sat Feb 12 17:17:45 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -3566,7 +3566,7 @@
     >scroll as needed when moving along the graph
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -3721,7 +3721,7 @@
     >Sat Feb 12 17:21:48 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -3882,7 +3882,7 @@
     >Now we should be able to navigate either with j/k or h/l.
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -4074,7 +4074,7 @@
     >Sat Feb 12 17:46:09 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -4249,7 +4249,7 @@
     >Sat Feb 12 17:47:08 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -4424,7 +4424,7 @@
     >Sat Feb 12 17:48:38 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -4441,7 +4441,7 @@
     >  end
     >  if key ~= string.byte('e') then
     >    window:mvaddstr(30, 60, renderstate.history)
-    >    curses.getch()
+    >    window:getch()
     >    render_state.history:insert({first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
     >  end
     >  -- move along the graph
@@ -4601,7 +4601,7 @@
     >Sat Feb 12 17:48:50 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -4618,7 +4618,7 @@
     >  end
     >  if key ~= string.byte('e') then
     >    window:mvaddstr(30, 60, render_state.history)
-    >    curses.getch()
+    >    window:getch()
     >    render_state.history:insert({first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
     >  end
     >  -- move along the graph
@@ -4778,7 +4778,7 @@
     >Sat Feb 12 17:49:04 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -4796,7 +4796,7 @@
     >  if key ~= string.byte('e') then
     >    window:mvaddstr(30, 60, '')
     >    print(render_state.history)
-    >    curses.getch()
+    >    window:getch()
     >    render_state.history:insert({first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
     >  end
     >  -- move along the graph
@@ -4956,7 +4956,7 @@
     >Sat Feb 12 17:49:34 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -4974,7 +4974,7 @@
     >  if key ~= string.byte('e') then
     >    window:mvaddstr(30, 60, '')
     >    print(render_state.history)
-    >    curses.getch()
+    >    window:getch()
     >    local history = render_state.history
     >    history:insert({first_zettel=view_settings.first_zettel, current_zettel_id=current_zettel_id})
     >  end
@@ -5135,7 +5135,7 @@
     >Sat Feb 12 17:50:49 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -5310,7 +5310,7 @@
     >Sat Feb 12 17:52:42 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -5320,9 +5320,9 @@
     >    -- does NOT undo mutations
     >    if #render_state.history > 0 then
     >      local previous_state = render_state.history[-1]
-    >      curses.mvaddstr(30, 60, '')
+    >      window:mvaddstr(30, 60, '')
     >      print(previous_state)
-    >      curses.getch()
+    >      window:getch()
     >      view_settings.first_zettel = previous_state.first_zettel
     >      current_zettel_id = render_state.history[-1].current_zettel_id
     >      table.remove(render_state.history)
@@ -5489,7 +5489,7 @@
     >Sat Feb 12 17:54:43 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -5498,11 +5498,11 @@
     >    -- previous zettel moved to
     >    -- does NOT undo mutations
     >    if #render_state.history > 0 then
-    >      curses.mvaddstr(30, 60, '')
+    >      window:mvaddstr(30, 60, '')
     >      print(#render_state.history)
     >      local previous_state = render_state.history[-1]
     >      print(previous_state)
-    >      curses.getch()
+    >      window:getch()
     >      view_settings.first_zettel = previous_state.first_zettel
     >      current_zettel_id = render_state.history[-1].current_zettel_id
     >      table.remove(render_state.history)
@@ -5669,7 +5669,7 @@
     >Sat Feb 12 17:55:42 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -5845,7 +5845,7 @@
     >Sat Feb 12 17:56:13 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -5855,7 +5855,7 @@
     >    -- does NOT undo mutations
     >    if #render_state.history > 0 then
     >      print(render_state.history[1])
-    >      curses.getch()
+    >      window:getch()
     >      local previous_state = render_state.history[#render_state.history]
     >      view_settings.first_zettel = previous_state.first_zettel
     >      current_zettel_id = render_state.history[-1].current_zettel_id
@@ -6023,7 +6023,7 @@
     >Sat Feb 12 17:56:25 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))
@@ -6032,9 +6032,9 @@
     >    -- previous zettel moved to
     >    -- does NOT undo mutations
     >    if #render_state.history > 0 then
-    >      curses.mvaddstr(30, 60, '')
+    >      window:mvaddstr(30, 60, '')
     >      print(render_state.history[1])
-    >      curses.getch()
+    >      window:getch()
     >      local previous_state = render_state.history[#render_state.history]
     >      view_settings.first_zettel = previous_state.first_zettel
     >      current_zettel_id = render_state.history[-1].current_zettel_id
@@ -6202,7 +6202,7 @@
     >Sat Feb 12 17:57:15 2022
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local h, w = window:getmaxyx()
     >  local curr = zettels[current_zettel_id]
     >  assert(curr, string.format('cursor fell off the edge of the world: %s', type(current_zettel_id)))

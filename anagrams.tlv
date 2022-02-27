@@ -80,7 +80,7 @@
   check_eq:
     >function check_eq(x, expected, msg)
     >  if eq(x, expected) then
-    >    curses.addch('.')
+    >    window:addch('.')
     >  else
     >    print('F - '..msg)
     >    print('  expected '..str(expected)..' but got '..str(x))
@@ -236,7 +236,7 @@
 - __teliva_timestamp: original
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  if key == curses.KEY_LEFT then
     >    if cursor > 1 then
     >      cursor = cursor-1
@@ -261,13 +261,13 @@
     >  window:clear()
     >
     >  local prompt_str = ' what is your name? '
-    >  curses.attron(curses.A_REVERSE)
+    >  window:attron(curses.A_REVERSE)
     >  window:mvaddstr(0, 0, prompt_str)
-    >  curses.attroff(curses.A_REVERSE)
+    >  window:attroff(curses.A_REVERSE)
     >  window:addstr(' ')
-    >  curses.attron(curses.A_BOLD)
+    >  window:attron(curses.A_BOLD)
     >  window:addstr(word)
-    >  curses.attroff(curses.A_BOLD)
+    >  window:attroff(curses.A_BOLD)
     >  window:mvaddstr(2, 0, '')
     >  local results = anagrams(word)
     >  if #results > 0 then
@@ -281,7 +281,7 @@
     >  end
     >
     >  window:mvaddstr(0, string.len(prompt_str)+cursor, '')
-    >  curses.refresh()
+    >  window:refresh()
     >end
 - __teliva_timestamp:
     >Mon Feb 21 17:42:28 2022

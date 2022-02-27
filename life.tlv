@@ -110,14 +110,14 @@
   render:
     >function render(window)
     >  window:clear()
-    >  curses.attron(curses.color_pair(1))
+    >  window:attron(curses.color_pair(1))
     >  for line=1,lines do
     >    for col=1,cols do
     >      window:addstr(utf8(glyph[grid_char_to_glyph_index(grid_char(line, col))]))
     >    end
     >  end
-    >  curses.attroff(curses.color_pair(1))
-    >  curses.refresh()
+    >  window:attroff(curses.color_pair(1))
+    >  window:refresh()
     >end
 - __teliva_timestamp: original
   state:
@@ -291,7 +291,7 @@
     >  -- main loop
     >  while true do
     >    render(window)
-    >    c = curses.getch()
+    >    c = window:getch()
     >    update(window, c)
     >    step()
     >  end

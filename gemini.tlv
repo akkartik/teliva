@@ -80,7 +80,7 @@
   check_eq:
     >function check_eq(x, expected, msg)
     >  if x == expected then
-    >    curses.addch('.')
+    >    window:addch('.')
     >  else
     >    print('F - '..msg)
     >    print('  expected '..tostring(expected)..' but got '..x)
@@ -208,14 +208,14 @@
     >      if state.highlight_index == 0 or i == state.highlight_index then
     >        -- highlighted link
     >        state.highlight_index = i  -- TODO: ugly state update while rendering, just for first render after gemini_get
-    >        curses.attron(curses.A_REVERSE)
+    >        window:attron(curses.A_REVERSE)
     >        render_link(window, y, line)
-    >        curses.attroff(curses.A_REVERSE)
+    >        window:attroff(curses.A_REVERSE)
     >      else
     >        -- link
-    >        curses.attron(curses.A_BOLD)
+    >        window:attron(curses.A_BOLD)
     >        render_link(window, y, line)
-    >        curses.attroff(curses.A_BOLD)
+    >        window:attroff(curses.A_BOLD)
     >      end
     >    else
     >      -- non-link
@@ -257,7 +257,7 @@
     >    window:mvaddstr(screen_rows-1, 9, result)
     >    window:attron(curses.A_REVERSE)
     >    -- window:refresh()
-    >    local key = curses.getch()
+    >    local key = window:getch()
     >    window:attrset(curses.A_NORMAL)
     >    if key >= 32 and key < 127 then
     >      local screen_rows, screen_cols = window:getmaxyx()
@@ -318,7 +318,7 @@
 - __teliva_timestamp: original
   update:
     >function update(window)
-    >  local key = curses.getch()
+    >  local key = window:getch()
     >  local screen_rows, screen_cols = window:getmaxyx()
     >  if key == curses.KEY_DOWN then
     >    next_link()

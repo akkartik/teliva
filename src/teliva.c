@@ -1256,7 +1256,6 @@ static int run_tests(lua_State* L) {
     addstr("1 failure");
   else
     printw("%d failures", num_failures);
-  getch();
   /* take first failure back to developer mode */
   lua_getglobal(L, "teliva_first_failure");
   assert(!lua_isnil(L, -1));

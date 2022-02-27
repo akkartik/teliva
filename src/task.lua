@@ -383,250 +383,244 @@ _M.NOP       = NOP
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
 -- Tests
---
--- To run:
---    $ lua task.lua
 
 local task = _M
 
-local tests = {
-   counter = function ()
-      local done
-      local function counter(c)
-         local i = 1
-         while true do
-            c:send(i)
-            i = i + 1
-         end
+function test_counter()
+   local done
+   local function counter(c)
+      local i = 1
+      while true do
+         c:send(i)
+         i = i + 1
       end
-      local function main()
-         local c = task.Channel:new()
-         task.spawn(counter, c)
-         assert(c:recv() == 1)
-         assert(c:recv() == 2)
-         assert(c:recv() == 3)
-         assert(c:recv() == 4)
-         assert(c:recv() == 5)
-         done = true
-      end
-      task.spawn(main)
-      task.scheduler()
-      assert(done)
-   end,
-
-   nonblocking_channel = function()
-      local done
-      local function main()
-         local b = task.Channel:new()
-         assert(b:nbsend(1) == false)
-         assert(b:nbrecv() == false)
-
-         local c = task.Channel:new(1)
-         assert(c:nbrecv() == false)
-         assert(c:nbsend(1) == true)
-         assert(c:nbsend(1) == false)
-         local r, v = c:nbrecv()
-         assert(r == true)
-         assert(v == 1)
-         assert(c:nbrecv() == false)
-         done = true
-      end
-      task.spawn(main)
-      task.scheduler()
-      assert(done)
-   end,
-
-   concurrent_send_and_recv = function()
-      local l = {}
-      local function a(c, name)
-         -- Blocking send and recv from the same process
-         local alt = {{c = c, op = task.SEND, p = 1},
-                      {c = c, op = task.RECV}}
-         local i, v = task.chanalt(alt, true)
-         local k = string.format('%s %s', name, i == 1 and "send" or "recv")
-         l[k] = (l[k] or 0) + 1
-      end
-
-      for i = 0, 1000 do
-         -- On Mac OS X in lua 5.1 initializing seed with a
-         -- predictable value makes no sense. For all seeds from 1 to
-         -- 1000 the result of math.random(1,3) is _exactly_ the same!
-         -- So beware, when seeding!
-         -- math.randomseed(i)
-         local c = task.Channel:new()
-         task.spawn(a, c, "a")
-         task.spawn(a, c, "b")
-         task.scheduler()
-      end
-
-      -- Make sure we have randomness, that is: events occur in both
-      -- orders in 1000 runs
-      assert(l['a recv'] > 0)
-      assert(l['a send'] > 0)
-      assert(l['b recv'] > 0)
-      assert(l['b send'] > 0)
-   end,
-
-   channels_from_a_coroutine = function()
-      local done
+   end
+   local function main()
       local c = task.Channel:new()
-      local function a()
-         for i = 1, 100 do
-            c:send(i)
-         end
-      end
-      local function b()
-         assert(c:recv() == 1)
-         assert(c:recv() == 2)
-         assert(c:recv() == 3)
-         assert(c:recv() == 4)
-         assert(c:recv() == 5)
-         done = true
-      end
-      local a_co = coroutine.create(a)
-      local b_co = coroutine.create(b)
-      coroutine.resume(a_co)
-      coroutine.resume(b_co)
-      task.scheduler()
-      assert(done)
-   end,
+      task.spawn(counter, c)
+      assert(c:recv() == 1)
+      assert(c:recv() == 2)
+      assert(c:recv() == 3)
+      assert(c:recv() == 4)
+      assert(c:recv() == 5)
+      done = true
+   end
+   task.spawn(main)
+   task.scheduler()
+   assert(done)
+end
 
-   fibonacci = function()
-      local done
-      local function fib(c)
-         local x, y = 0, 1
-         while true do
-            c:send(x)
-            x, y = y, x + y
-         end
-      end
-      local function main(c)
-         assert(c:recv() == 0)
-         assert(c:recv() == 1)
-         assert(c:recv() == 1)
-         assert(c:recv() == 2)
-         assert(c:recv() == 3)
-         assert(c:recv() == 5)
-         assert(c:recv() == 8)
-         assert(c:recv() == 13)
-         assert(c:recv() == 21)
-         assert(c:recv() == 34)
-         done = true
-      end
+function test_nonblocking_channel()
+   local done
+   local function main()
+      local b = task.Channel:new()
+      assert(b:nbsend(1) == false)
+      assert(b:nbrecv() == false)
 
+      local c = task.Channel:new(1)
+      assert(c:nbrecv() == false)
+      assert(c:nbsend(1) == true)
+      assert(c:nbsend(1) == false)
+      local r, v = c:nbrecv()
+      assert(r == true)
+      assert(v == 1)
+      assert(c:nbrecv() == false)
+      done = true
+   end
+   task.spawn(main)
+   task.scheduler()
+   assert(done)
+end
+
+function test_concurrent_send_and_recv()
+   local l = {}
+   local function a(c, name)
+      -- Blocking send and recv from the same process
+      local alt = {{c = c, op = task.SEND, p = 1},
+                   {c = c, op = task.RECV}}
+      local i, v = task.chanalt(alt, true)
+      local k = string.format('%s %s', name, i == 1 and "send" or "recv")
+      l[k] = (l[k] or 0) + 1
+   end
+
+   for i = 0, 1000 do
+      -- On Mac OS X in lua 5.1 initializing seed with a
+      -- predictable value makes no sense. For all seeds from 1 to
+      -- 1000 the result of math.random(1,3) is _exactly_ the same!
+      -- So beware, when seeding!
+      -- math.randomseed(i)
       local c = task.Channel:new()
-      task.spawn(fib, c)
-      task.spawn(main, c)
+      task.spawn(a, c, "a")
+      task.spawn(a, c, "b")
       task.scheduler()
-      assert(done)
-   end,
+   end
 
-   non_blocking_chanalt = function()
-      local done
-      local function main()
-         local c = task.Channel:new()
-         local alts = {{c = c, op = task.RECV},
-                       {c = c, op = task.NOP},
-                       {c = c, op = task.SEND, p = 1}}
-         assert(task.chanalt(alts, false) == nil)
+   -- Make sure we have randomness, that is: events occur in both
+   -- orders in 1000 runs
+   assert(l['a recv'] > 0)
+   assert(l['a send'] > 0)
+   assert(l['b recv'] > 0)
+   assert(l['b send'] > 0)
+end
 
-         local c = task.Channel:new(1)
-         local alts = {{c = c, op = task.RECV},
-                       {c = c, op = task.NOP},
-                       {c = c, op = task.SEND, p = 1}}
-         assert(task.chanalt(alts, false) == 3)
-         assert(task.chanalt(alts, false) == 1)
+function test_channels_from_a_coroutine()
+   local done
+   local c = task.Channel:new()
+   local function a()
+      for i = 1, 100 do
+         c:send(i)
+      end
+   end
+   local function b()
+      assert(c:recv() == 1)
+      assert(c:recv() == 2)
+      assert(c:recv() == 3)
+      assert(c:recv() == 4)
+      assert(c:recv() == 5)
+      done = true
+   end
+   local a_co = coroutine.create(a)
+   local b_co = coroutine.create(b)
+   coroutine.resume(a_co)
+   coroutine.resume(b_co)
+   task.scheduler()
+   assert(done)
+end
 
-         local alts = {{c = c, op = task.NOP}}
-         assert(task.chanalt(alts, false) == nil)
+function test_fibonacci()
+   local done
+   local function fib(c)
+      local x, y = 0, 1
+      while true do
+         c:send(x)
+         x, y = y, x + y
+      end
+   end
+   local function main(c)
+      assert(c:recv() == 0)
+      assert(c:recv() == 1)
+      assert(c:recv() == 1)
+      assert(c:recv() == 2)
+      assert(c:recv() == 3)
+      assert(c:recv() == 5)
+      assert(c:recv() == 8)
+      assert(c:recv() == 13)
+      assert(c:recv() == 21)
+      assert(c:recv() == 34)
+      done = true
+   end
 
+   local c = task.Channel:new()
+   task.spawn(fib, c)
+   task.spawn(main, c)
+   task.scheduler()
+   assert(done)
+end
+
+function test_non_blocking_chanalt()
+   local done
+   local function main()
+      local c = task.Channel:new()
+      local alts = {{c = c, op = task.RECV},
+                    {c = c, op = task.NOP},
+                    {c = c, op = task.SEND, p = 1}}
+      assert(task.chanalt(alts, false) == nil)
+
+      local c = task.Channel:new(1)
+      local alts = {{c = c, op = task.RECV},
+                    {c = c, op = task.NOP},
+                    {c = c, op = task.SEND, p = 1}}
+      assert(task.chanalt(alts, false) == 3)
+      assert(task.chanalt(alts, false) == 1)
+
+      local alts = {{c = c, op = task.NOP}}
+      assert(task.chanalt(alts, false) == nil)
+
+      done = true
+   end
+   task.spawn(main)
+   task.scheduler()
+   assert(done)
+end
+
+-- Apparently it's not really a Sieve of Eratosthenes:
+--   http://www.cs.hmc.edu/~oneill/papers/Sieve-JFP.pdf
+function test_eratosthenes_sieve()
+   local done
+   local function counter(c)
+      local i = 2
+      while true do
+         c:send(i)
+         i = i + 1
+      end
+   end
+
+   local function filter(p, recv_ch, send_ch)
+      while true do
+         local i = recv_ch:recv()
+         if i % p ~= 0 then
+            send_ch:send(i)
+         end
+      end
+   end
+
+   local function sieve(primes_ch)
+      local c = task.Channel:new()
+      task.spawn(counter, c)
+      while true do
+         local p, newc = c:recv(), task.Channel:new()
+         primes_ch:send(p)
+         task.spawn(filter, p, c, newc)
+         c = newc
+      end
+   end
+
+   local function main()
+      local primes = task.Channel:new()
+      task.spawn(sieve, primes)
+      assert(primes:recv() == 2)
+      assert(primes:recv() == 3)
+      assert(primes:recv() == 5)
+      assert(primes:recv() == 7)
+      assert(primes:recv() == 11)
+      assert(primes:recv() == 13)
+      done = true
+   end
+
+   task.spawn(main)
+   task.scheduler()
+   assert(done)
+end
+
+function test_channel_as_iterator()
+   local done
+   local function counter(c)
+      local i = 2
+      while true do
+         c:send(i)
+         i = i + 1
+      end
+   end
+
+   local function main()
+      local numbers = task.Channel:new()
+      task.spawn(counter, numbers)
+      for _, j in numbers() do
+         if j == 100 then
+            break
+         end
          done = true
       end
+   end
+   if _VERSION == "Lua 5.1" then
+      -- sorry, this test doesn't work in 5.1
+      print('skipping... (5.1 unsupported)')
+      done = true
+   else
       task.spawn(main)
       task.scheduler()
-      assert(done)
-   end,
-
-   -- Apparently it's not really a Sieve of Eratosthenes:
-   --   http://www.cs.hmc.edu/~oneill/papers/Sieve-JFP.pdf
-   eratosthenes_sieve = function()
-      local done
-      local function counter(c)
-         local i = 2
-         while true do
-            c:send(i)
-            i = i + 1
-         end
-      end
-
-      local function filter(p, recv_ch, send_ch)
-         while true do
-            local i = recv_ch:recv()
-            if i % p ~= 0 then
-               send_ch:send(i)
-            end
-         end
-      end
-
-      local function sieve(primes_ch)
-         local c = task.Channel:new()
-         task.spawn(counter, c)
-         while true do
-            local p, newc = c:recv(), task.Channel:new()
-            primes_ch:send(p)
-            task.spawn(filter, p, c, newc)
-            c = newc
-         end
-      end
-
-      local function main()
-         local primes = task.Channel:new()
-         task.spawn(sieve, primes)
-         assert(primes:recv() == 2)
-         assert(primes:recv() == 3)
-         assert(primes:recv() == 5)
-         assert(primes:recv() == 7)
-         assert(primes:recv() == 11)
-         assert(primes:recv() == 13)
-         done = true
-      end
-
-      task.spawn(main)
-      task.scheduler()
-      assert(done)
-   end,
-
-   channel_as_iterator = function()
-      local done
-      local function counter(c)
-         local i = 2
-         while true do
-            c:send(i)
-            i = i + 1
-         end
-      end
-
-      local function main()
-         local numbers = task.Channel:new()
-         task.spawn(counter, numbers)
-         for _, j in numbers() do
-            if j == 100 then
-               break
-            end
-            done = true
-         end
-      end
-      if _VERSION == "Lua 5.1" then
-         -- sorry, this doesn't work in 5.1
-         print('skipping... (5.1 unsupported)')
-         done = true
-      else
-         task.spawn(main)
-         task.scheduler()
-      end
-      assert(done)
-   end,
-
-}
+   end
+   assert(done)
+end
 
 return _M

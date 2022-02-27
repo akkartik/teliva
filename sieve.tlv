@@ -264,3 +264,146 @@
     >To show a brief description of the app on the 'big picture' screen, put the text in a special buffer called 'doc:blurb'.
     >
     >You can also override the default big picture screen entirely by creating a buffer called 'doc:main'.
+- __teliva_timestamp:
+    >Sat Feb 26 21:49:00 2022
+  main:
+    >function main()
+    >  task.spawn(main_task)
+    >  task.scheduler()
+    >  print('out of scheduler')
+    >  curses.getch()
+    >end
+- __teliva_timestamp:
+    >Sat Feb 26 21:50:11 2022
+  main_task:
+    >function main_task()
+    >  local c = task.Channel:new()
+    >  task.spawn(counter, c)
+    >  for i=1,10 do
+    >    print(c:recv())
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 26 21:50:11 2022
+  __teliva_note:
+    >a simple counter
+  counter:
+    >function counter(c)
+    >  local i = 2
+    >  while true do
+    >    c:send(i)
+    >    i = i+1
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 26 21:54:53 2022
+  filter_task:
+    >function filter_task(p, cin, cout)
+    >  while true do
+    >    local i = cin:recv()
+    >    if i%p ~= 0 then
+    >      cout:send(i)
+    >    end
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 26 21:55:46 2022
+  main_task:
+    >function main_task()
+    >  local primes = task.Channel:new()
+    >  task.spawn(sieve, primes)
+    >  for i=1,10 do
+    >    print(primes:recv())
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 26 21:59:37 2022
+  __teliva_note:
+    >filter out multiples of a single number
+  sieve:
+    >function sieve(ch)
+    >  local iota = task.Channel:new()
+    >  task.spawn(counter, iota)
+    >  task.spawn(filter_task, 2, iota, ch)
+    >end
+- __teliva_timestamp:
+    >Sat Feb 26 22:08:07 2022
+  __teliva_note:
+    >implement the complete sieve algorithm
+  sieve:
+    >-- Set up a Sieve of Eratosthenes (https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes)
+    >-- for computing prime numbers by chaining tasks, one per prime.
+    >-- Each task is responsible for filtering out all multiples of its prime.
+    >function sieve(primes_ch)
+    >  local c = task.Channel:new()
+    >  task.spawn(counter, c)
+    >  while true do
+    >    local p, newc = c:recv(), task.Channel:new()
+    >    primes_ch:send(p)
+    >    task.spawn(filter_task, p, c, newc)
+    >    c = newc
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 26 22:09:47 2022
+  main_task:
+    >function main_task(window)
+    >  local primes = task.Channel:new()
+    >  task.spawn(sieve, primes)
+    >  while true do
+    >    window:addstr(primes:recv())
+    >    window:addstr(' ')
+    >    window:refresh()
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 26 22:08:52 2022
+  __teliva_note:
+    >infinite primes
+  main:
+    >function main()
+    >  window:nodelay(true)
+    >  window:clear()
+    >  task.spawn(main_task, window)
+    >  task.scheduler()
+    >  print('key pressed; done')
+    >  window:nodelay(false)
+    >  curses.getch()
+    >end
+- __teliva_timestamp:
+    >Sat Feb 26 22:09:47 2022
+  __teliva_note:
+    >clear screen when it fills up; pause on keypress
+    >
+    >In Teliva getch() implicitly refreshes the screen.
+  main_task:
+    >function main_task(window)
+    >  local primes = task.Channel:new()
+    >  task.spawn(sieve, primes)
+    >  local h, w = window:getmaxyx()
+    >  while true do
+    >    window:addstr(primes:recv())
+    >    window:addstr(' ')
+    >    local c = curses.getch()
+    >    if c then break end  -- key pressed
+    >    local y, x = window:getyx()
+    >    if y > h-1 then
+    >      window:clear()
+    >    end
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Feb 26 22:27:25 2022
+  doc:blurb:
+    >Sieve of Eratosthenes
+    >https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
+    >
+    >A demonstration of tasks and channels, the primitives for (cooperative) concurrency in Teliva.
+    >
+    >We string together a cascade of tasks connected by channels. Every prime number gets a new task that prints the first incoming number, and then filters out multiples of it from the incoming channel.
+    >
+    >This approach has the advantage that we don't need to create an array of n numbers to compute primes less than n.
+    >
+    >However, we still need to create p tasks and p channels if there are p primes less than n. Probably not worth it, given tasks and channels are much larger than numbers. This is just a demo.
+    >
+    >The noticeable periodic pauses are perhaps due to garbage collection.

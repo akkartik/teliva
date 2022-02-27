@@ -234,6 +234,8 @@ static int pmain (lua_State *L) {
   if (status != 0) return 0;
   status = dorequire(L, "src/json.lua", "json");
   if (status != 0) return 0;
+  status = dorequire(L, "src/task.lua", "task");
+  if (status != 0) return 0;
   lua_gc(L, LUA_GCRESTART, 0);
   s->status = handle_luainit(L);
   if (s->status != 0) return 0;

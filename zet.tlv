@@ -884,7 +884,7 @@
     >menu = {
     >  {'j', 'child'},
     >  {'k', 'parent'},
-    >  {'l/h', 'next/prev sib'},
+    >  {'l,h', 'next/prev sib'},
     >  {'e', 'edit'},
     >}
 - __teliva_timestamp:
@@ -950,9 +950,9 @@
     >menu = {
     >  {'j', 'child'},
     >  {'k', 'parent'},
-    >  {'l/h', 'next/prev sib'},
+    >  {'l,h', 'next/prev sib'},
     >  {'e', 'edit'},
-    >  {'a/b', 'insert sib'},
+    >  {'a,b', 'insert sib'},
     >  {'c', 'insert child'},
     >}
 - __teliva_timestamp:
@@ -1205,11 +1205,11 @@
     >menu = {
     >  {'j', 'child'},
     >  {'k', 'parent'},
-    >  {'l/h', 'next/prev sib'},
+    >  {'l,h', 'next/prev sib'},
     >  {'e', 'edit'},
-    >  {'a/b', 'insert sib'},
+    >  {'a,b', 'insert sib'},
     >  {'c', 'insert child'},
-    >  {'x/X/y/Y', 'resize'},
+    >  {'x,X,y,Y', 'resize'},
     >}
 - __teliva_timestamp:
     >Thu Feb 10 06:57:51 2022
@@ -1219,10 +1219,10 @@
     >-- To show app-specific hotkeys in the menu bar, add hotkey/command
     >-- arrays of strings to the menu array.
     >menu = {
-    >  {'a/b/c', 'insert sib/child'},
+    >  {'a,b,c', 'insert sib/child'},
     >  {'e', 'edit'},
-    >  {'j/k/l/h', 'move to child/parent/sib'},
-    >  {'x/X/y/Y', 'resize'},
+    >  {'j,k,l,h', 'move to child/parent/sib'},
+    >  {'x,X,y,Y', 'resize'},
     >}
 - __teliva_timestamp:
     >Thu Feb 10 07:00:46 2022
@@ -1473,10 +1473,10 @@
     >-- To show app-specific hotkeys in the menu bar, add hotkey/command
     >-- arrays of strings to the menu array.
     >menu = {
-    >  {'a/b/c', 'insert'},
+    >  {'a,b,c', 'insert'},
     >  {'e', 'edit'},
-    >  {'j/k/l/h', 'move'},
-    >  {'x/X/y/Y', 'resize'},
+    >  {'j,k,l,h', 'move'},
+    >  {'x,X,y,Y', 'resize'},
     >  {'s', 'stash'},
     >  {'t', 'link with stash'},
     >}
@@ -1915,10 +1915,10 @@
     >-- To show app-specific hotkeys in the menu bar, add hotkey/command
     >-- arrays of strings to the menu array.
     >menu = {
-    >  {'a/b/c', 'insert'},
+    >  {'a,b,c', 'insert'},
     >  {'e', 'edit'},
-    >  {'j/k/l/h', 'move'},
-    >  {'x/X/y/Y', 'resize'},
+    >  {'j,k,l,h', 'move'},
+    >  {'x,X,y,Y', 'resize'},
     >  {'s', 'stash'},
     >  {'t', 'link with stash'},
     >  {'z', 'scroll'},
@@ -3160,11 +3160,11 @@
     >-- To show app-specific hotkeys in the menu bar, add hotkey/command
     >-- arrays of strings to the menu array.
     >menu = {
-    >  {'a/b/c', 'insert'},
+    >  {'a,b,c', 'insert'},
     >  {'e', 'edit'},
-    >  {'j/k/l/h', 'move'},
+    >  {'j,k,l,h', 'move'},
     >  {'<', 'back'},
-    >  {'x/X/y/Y', 'resize'},
+    >  {'x,X,y,Y', 'resize'},
     >  {'s', 'stash'},
     >  {'t', 'link with stash'},
     >  {'z', 'scroll'},

@@ -1285,6 +1285,19 @@ Wwinsdelln(lua_State *L)
 	return pushokresult(winsdelln(w, n));
 }
 
+static int confirm_exit(WINDOW *w) {
+	/* draw a special menu just for this situation */
+	attron(A_BOLD|A_REVERSE);
+	color_set(COLOR_PAIR_MENU, NULL);
+	for (int x = 0; x < COLS; ++x)
+		mvaddch(LINES-1, x, ' ');
+	menu_column = 2;
+	draw_menu_item("^x", "exit");
+	draw_menu_item("anything else", "cancel");
+	attroff(A_BOLD|A_REVERSE);
+	int c = wgetch(w);
+	return (c == CTRL_X);
+}
 
 /***
 Read a character from the window input.
@@ -1318,8 +1331,11 @@ Wgetch(lua_State *L)
 	if (c == ERR)
 		return 0;
 	if (c == CTRL_X) {
-		unlink("teliva_editor_state");
-		exit(0);
+		if (confirm_exit(w)) {
+			unlink("teliva_editor_state");
+			exit(0);
+		}
+		else return pushintresult(0);
 	}
 	if (c == CTRL_U)
 		developer_mode(L);

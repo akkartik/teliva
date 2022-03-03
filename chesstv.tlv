@@ -17,11 +17,11 @@
 # If these constraints are violated, Teliva may unceremoniously crash. Please
 # report bugs at http://akkartik.name/contact
 - __teliva_timestamp: original
-  window:
-    >window = curses.stdscr()
+  Window:
+    >Window = curses.stdscr()
     >-- animation-based app
-    >window:nodelay(true)
-    >lines, cols = window:getmaxyx()
+    >Window:nodelay(true)
+    >lines, cols = Window:getmaxyx()
 - __teliva_timestamp: original
   current_game:
     >current_game = {}
@@ -62,9 +62,9 @@
 - __teliva_timestamp: original
   render_player:
     >function render_player(y, x, player)
-    >  window:mvaddstr(y, x, player.user.name)
-    >  window:addstr(" · ")
-    >  window:addstr(tostring(player.rating))
+    >  Window:mvaddstr(y, x, player.user.name)
+    >  Window:addstr(" · ")
+    >  Window:addstr(tostring(player.rating))
     >end
 - __teliva_timestamp: original
   render_square:
@@ -77,15 +77,15 @@
     >  end
     >  if (rank+file)%2 == 1 then
     >    -- light square
-    >    window:attrset(curses.color_pair(1+hl))
+    >    Window:attrset(curses.color_pair(1+hl))
     >  else
     >    -- dark square
-    >    window:attrset(curses.color_pair(3+hl))
+    >    Window:attrset(curses.color_pair(3+hl))
     >  end
-    >  window:mvaddstr((8 - rank + 1)*3,   file*5, "     ")
-    >  window:mvaddstr((8 - rank + 1)*3+1, file*5, "     ")
-    >  window:mvaddstr((8 - rank + 1)*3+2, file*5, "     ")
-    >  window:attrset(curses.A_NORMAL)
+    >  Window:mvaddstr((8 - rank + 1)*3,   file*5, "     ")
+    >  Window:mvaddstr((8 - rank + 1)*3+1, file*5, "     ")
+    >  Window:mvaddstr((8 - rank + 1)*3+2, file*5, "     ")
+    >  Window:attrset(curses.A_NORMAL)
     >end
 - __teliva_timestamp: original
   render_fen_rank:
@@ -104,22 +104,22 @@
     >      if (rank+file)%2 == 1 then
     >        if x < 'Z' then
     >          -- white piece on light square
-    >          window:attrset(curses.color_pair(1+hl))
+    >          Window:attrset(curses.color_pair(1+hl))
     >        else
     >          -- black piece on light square
-    >          window:attrset(curses.color_pair(2+hl))
+    >          Window:attrset(curses.color_pair(2+hl))
     >        end
     >      else
     >        if x < 'Z' then
     >          -- white piece on dark square
-    >          window:attrset(curses.color_pair(3+hl))
+    >          Window:attrset(curses.color_pair(3+hl))
     >        else
     >          -- black piece on dark square
-    >          window:attrset(curses.color_pair(4+hl))
+    >          Window:attrset(curses.color_pair(4+hl))
     >        end
     >      end
-    >      window:mvaddstr((8 - rank + 1)*3+1, file*5+2, utf8(piece_glyph[x]))
-    >      window:attrset(curses.A_NORMAL)
+    >      Window:mvaddstr((8 - rank + 1)*3+1, file*5+2, utf8(piece_glyph[x]))
+    >      Window:attrset(curses.A_NORMAL)
     >      file = file + 1
     >    end
     >  end
@@ -128,14 +128,14 @@
   render_time:
     >function render_time(y, x, seconds)
     >  if seconds == nil then return end
-    >  window:mvaddstr(y, x, tostring(math.floor(seconds/60)))
-    >  window:addstr(string.format(":%02d", seconds%60))
+    >  Window:mvaddstr(y, x, tostring(math.floor(seconds/60)))
+    >  Window:addstr(string.format(":%02d", seconds%60))
     >end
 - __teliva_timestamp: original
   render_board:
     >function render_board(current_game)
-    >--?   window:mvaddstr(1, 50, dump(current_game.fen))
-    >--?   window:mvaddstr(6, 50, dump(current_game.previously_moved_squares))
+    >--?   Window:mvaddstr(1, 50, dump(current_game.fen))
+    >--?   Window:mvaddstr(6, 50, dump(current_game.previously_moved_squares))
     >  render_player(2, 5, top_player(current_game))
     >  render_time(2, 35, current_game.bc)
     >  for rank=8,1,-1 do
@@ -150,12 +150,12 @@
 - __teliva_timestamp: original
   parse_lm:
     >function parse_lm(move)
-    >--?   window:mvaddstr(4, 50, move)
+    >--?   Window:mvaddstr(4, 50, move)
     >  local file1 = string.byte(move:sub(1, 1)) - 96  -- 'a'-1
     >  local rank1 = string.byte(move:sub(2, 2)) - 48  -- '0'
     >  local file2 = string.byte(move:sub(3, 3)) - 96  -- 'a'-1
     >  local rank2 = string.byte(move:sub(4, 4)) - 48  -- '0'
-    >--?   window:mvaddstr(5, 50, dump({{rank1, file1}, {rank2, file2}}))
+    >--?   Window:mvaddstr(5, 50, dump({{rank1, file1}, {rank2, file2}}))
     >  return {from={rank=rank1, file=file1}, to={rank=rank2, file=file2}}
     >end
 - __teliva_timestamp: original
@@ -172,12 +172,12 @@
     >    current_game.bc = o.d.bc
     >--?     current_game.lm = o.d.lm
     >    current_game.previously_moved_squares = parse_lm(o.d.lm)
-    >--?     window:nodelay(false)
-    >--?     window:mvaddstr(3, 50, "paused")
+    >--?     Window:nodelay(false)
+    >--?     Window:mvaddstr(3, 50, "paused")
     >  end
     >  current_game.fen_rank = split(current_game.fen, "%w+")
     >  render_board(current_game)
-    >  window:refresh()
+    >  Window:refresh()
     >end
 - __teliva_timestamp: original
   init_colors:
@@ -207,9 +207,9 @@
     >    url = "https://lichess.org/api/tv/feed",
     >    sink = function(chunk, err)
     >             if chunk then
-    >               window:clear()
+    >               Window:clear()
     >               render(chunk)
-    >               window:getch()
+    >               Window:getch()
     >             end
     >             return 1
     >           end,
@@ -271,17 +271,17 @@
     >    url = "https://lichess.org/api/tv/feed",
     >    sink = function(chunk, err)
     >             if chunk then
-    >               window:clear()
+    >               Window:clear()
     >               -- main event loop is here
     >               render(chunk)
-    >               window:getch()
+    >               Window:getch()
     >             end
     >             return 1
     >           end,
     >  }
     >  http.request(request)
     >  -- degenerate event loop just to show errors in sandboxing, etc.
-    >  while true do window:getch(); end
+    >  while true do Window:getch(); end
     >end
 - __teliva_timestamp:
     >Thu Feb 17 20:00:23 2022

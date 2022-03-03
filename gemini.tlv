@@ -80,7 +80,7 @@
   check_eq:
     >function check_eq(x, expected, msg)
     >  if x == expected then
-    >    window:addch('.')
+    >    Window:addch('.')
     >  else
     >    print('F - '..msg)
     >    print('  expected '..tostring(expected)..' but got '..x)
@@ -167,8 +167,8 @@
     >  append(target, src)
     >end
 - __teliva_timestamp: original
-  window:
-    >window = curses.stdscr()
+  Window:
+    >Window = curses.stdscr()
 - __teliva_timestamp: original
   render_line:
     >function render_line(window, y, line)
@@ -377,8 +377,8 @@
     >    lines = gemini_get(state.url)
     >  end
     >  while true do
-    >    render(window, lines)
-    >    update(window, lines)
+    >    render(Window, lines)
+    >    update(Window, lines)
     >  end
     >end
 - __teliva_timestamp: original

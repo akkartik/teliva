@@ -80,7 +80,7 @@
   check_eq:
     >function check_eq(x, expected, msg)
     >  if eq(x, expected) then
-    >    window:addch('.')
+    >    Window:addch('.')
     >  else
     >    print('F - '..msg)
     >    print('  expected '..str(expected)..' but got '..str(x))
@@ -207,8 +207,8 @@
     >  end
     >end
 - __teliva_timestamp: original
-  window:
-    >window = curses.stdscr()
+  Window:
+    >Window = curses.stdscr()
 - __teliva_timestamp: original
   doc:blurb:
     >Show all anagrams of a given word
@@ -229,8 +229,8 @@
   main:
     >function main()
     >  while true do
-    >    render(window)
-    >    update(window)
+    >    render(Window)
+    >    update(Window)
     >  end
     >end
 - __teliva_timestamp: original

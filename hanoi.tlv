@@ -40,8 +40,8 @@
     >  return table.remove(array)
     >end
 - __teliva_timestamp: original
-  window:
-    >window = curses.stdscr()
+  Window:
+    >Window = curses.stdscr()
 - __teliva_timestamp: original
   render_tower:
     >function render_tower(window, line, col, tower_index, tower)
@@ -86,8 +86,8 @@
     >  curses.init_pair(15, 0, 250)  -- tower frames
     >
     >  while true do
-    >    render(window)
-    >    update(window)
+    >    render(Window)
+    >    update(Window)
     >  end
     >end
 - __teliva_timestamp: original

@@ -80,7 +80,7 @@
   check_eq:
     >function check_eq(x, expected, msg)
     >  if x == expected then
-    >    window:addch('.')
+    >    Window:addch('.')
     >  else
     >    print('F - '..msg)
     >    print('  expected '..tostring(expected)..' but got '..x)
@@ -150,12 +150,12 @@
   spaces:
     >function spaces(n)
     >  for i=1,n do
-    >    window:addch(' ')
+    >    Window:addch(' ')
     >  end
     >end
 - __teliva_timestamp: original
-  window:
-    >window = curses.stdscr()
+  Window:
+    >Window = curses.stdscr()
 - __teliva_timestamp: original
   menu:
     >-- To show app-specific hotkeys in the menu bar, add hotkey/command
@@ -182,8 +182,8 @@
     >  current_zettel_id = zettels.root
     >
     >  while true do
-    >    render(window)
-    >    update(window)
+    >    render(Window)
+    >    update(Window)
     >  end
     >end
 - __teliva_timestamp: original
@@ -389,7 +389,7 @@
     >}
 - __teliva_timestamp: original
   editz:
-    >function editz()
+    >function editz(window)
     >  menu = { {'^e', 'back to browsing'},}
     >  local top = (render_state.curr_h - 1) * (view_settings.height + view_settings.vmargin)
     >  local bottom = top + view_settings.height
@@ -752,8 +752,8 @@
     >
     >  curses.curs_set(0)
     >  while true do
-    >    render(window)
-    >    update(window)
+    >    render(Window)
+    >    update(Window)
     >  end
     >end
 - __teliva_timestamp:
@@ -763,7 +763,7 @@
     >
     >There's a reason vim hides it. Confusing to have two cursors on screen.
   editz:
-    >function editz()
+    >function editz(window)
     >  menu = { {'^e', 'back to browsing'},}
     >  local top = (render_state.curr_h - 1) * (view_settings.height + view_settings.vmargin)
     >  local bottom = top + view_settings.height
@@ -824,7 +824,7 @@
 - __teliva_timestamp:
     >Wed Feb  9 08:25:05 2022
   editz:
-    >function editz()
+    >function editz(window)
     >  local old_menu = menu
     >  menu = { {'^e', 'back to browsing'},}
     >  local top = (render_state.curr_h - 1) * (view_settings.height + view_settings.vmargin)
@@ -1378,8 +1378,8 @@
     >  current_zettel_id = zettels.root
     >
     >  while true do
-    >    render(window)
-    >    update(window)
+    >    render(Window)
+    >    update(Window)
     >
     >    -- save zettels, but hold on to previous state on disk
     >    -- until last possible second
@@ -1407,8 +1407,8 @@
     >  current_zettel_id = zettels.root
     >
     >  while true do
-    >    render(window)
-    >    update(window)
+    >    render(Window)
+    >    update(Window)
     >
     >    -- save zettels, but hold on to previous state on disk
     >    -- until last possible second
@@ -1938,8 +1938,8 @@
     >  view_settings.first_zettel = zettels.root  -- start rendering here
     >
     >  while true do
-    >    render(window)
-    >    update(window)
+    >    render(Window)
+    >    update(Window)
     >
     >    -- save zettels, but hold on to previous state on disk
     >    -- until last possible second
@@ -2353,8 +2353,8 @@
     >  view_settings.first_zettel = zettels.root  -- start rendering here
     >
     >  while true do
-    >    render(window)
-    >    update(window)
+    >    render(Window)
+    >    update(Window)
     >
     >    -- save zettels, but hold on to previous state on disk
     >    -- until last possible second
@@ -2554,7 +2554,7 @@
 - __teliva_timestamp:
     >Sat Feb 12 15:11:33 2022
   editz:
-    >function editz()
+    >function editz(window)
     >  local old_menu = menu
     >  menu = {
     >    {'^e', 'finish edit'},

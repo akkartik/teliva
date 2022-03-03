@@ -80,7 +80,7 @@
   check_eq:
     >function check_eq(x, expected, msg)
     >  if x == expected then
-    >    window:addch('.')
+    >    Window:addch('.')
     >  else
     >    print('F - '..msg)
     >    print('  expected '..tostring(expected)..' but got '..x)
@@ -147,8 +147,8 @@
     >  return result
     >end
 - __teliva_timestamp: original
-  window:
-    >window = curses.stdscr()
+  Window:
+    >Window = curses.stdscr()
 - __teliva_timestamp: original
   render:
     >function render(window)
@@ -193,7 +193,7 @@
     >  init_colors()
     >
     >  while true do
-    >    render(window)
-    >    update(window)
+    >    render(Window)
+    >    update(Window)
     >  end
     >end

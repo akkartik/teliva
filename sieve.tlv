@@ -80,7 +80,7 @@
   check_eq:
     >function check_eq(x, expected, msg)
     >  if eq(x, expected) then
-    >    window:addch('.')
+    >    Window:addch('.')
     >  else
     >    print('F - '..msg)
     >    print('  expected '..str(expected)..' but got '..str(x))
@@ -207,8 +207,8 @@
     >  end
     >end
 - __teliva_timestamp: original
-  window:
-    >window = curses.stdscr()
+  Window:
+    >Window = curses.stdscr()
 - __teliva_timestamp: original
   render:
     >function render(window)
@@ -255,8 +255,8 @@
     >  init_colors()
     >
     >  while true do
-    >    render(window)
-    >    update(window)
+    >    render(Window)
+    >    update(Window)
     >  end
     >end
 - __teliva_timestamp: original
@@ -271,7 +271,7 @@
     >  task.spawn(main_task)
     >  task.scheduler()
     >  print('out of scheduler')
-    >  window:getch()
+    >  Window:getch()
     >end
 - __teliva_timestamp:
     >Sat Feb 26 21:50:11 2022
@@ -362,13 +362,13 @@
     >infinite primes
   main:
     >function main()
-    >  window:nodelay(true)
-    >  window:clear()
-    >  task.spawn(main_task, window)
+    >  Window:nodelay(true)
+    >  Window:clear()
+    >  task.spawn(main_task, Window)
     >  task.scheduler()
     >  print('key pressed; done')
-    >  window:nodelay(false)
-    >  window:getch()
+    >  Window:nodelay(false)
+    >  Window:getch()
     >end
 - __teliva_timestamp:
     >Sat Feb 26 22:09:47 2022

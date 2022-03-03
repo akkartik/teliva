@@ -17,8 +17,8 @@
 # If these constraints are violated, Teliva may unceremoniously crash. Please
 # report bugs at http://akkartik.name/contact
 - __teliva_timestamp: original
-  window:
-    >window = curses.stdscr()
+  Window:
+    >Window = curses.stdscr()
 - __teliva_timestamp: original
   n:
     >n = 0
@@ -55,8 +55,8 @@
     >  end
     >
     >  while true do
-    >    render(window)
-    >    update(window)
+    >    render(Window)
+    >    update(Window)
     >  end
     >end
 - __teliva_timestamp:

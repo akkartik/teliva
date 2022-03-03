@@ -27,12 +27,12 @@
     >  end
     >end
 - __teliva_timestamp: original
-  window:
-    >window = curses.stdscr()
+  Window:
+    >Window = curses.stdscr()
     >-- animation-based app
-    >window:nodelay(true)
+    >Window:nodelay(true)
     >curses.curs_set(0)
-    >lines, cols = window:getmaxyx()
+    >lines, cols = Window:getmaxyx()
 - __teliva_timestamp: original
   grid_char:
     >-- grab a 4x2 chunk of grid
@@ -285,14 +285,14 @@
     >    --
     >    -- For example, check out the list of Important Patterns at
     >    -- https://www.conwaylife.com/wiki/Category:Patterns_with_Catagolue_frequency_class_0
-    >    load_file(window, arg[1])
+    >    load_file(Window, arg[1])
     >  end
     >
     >  -- main loop
     >  while true do
-    >    render(window)
-    >    c = window:getch()
-    >    update(window, c)
+    >    render(Window)
+    >    c = Window:getch()
+    >    update(Window, c)
     >    step()
     >  end
     >end

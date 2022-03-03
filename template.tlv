@@ -264,3 +264,37 @@
     >To show a brief description of the app on the 'big picture' screen, put the text in a special buffer called 'doc:blurb'.
     >
     >You can also override the default big picture screen entirely by creating a buffer called 'doc:main'.
+- __teliva_timestamp: original
+  window:
+    >-- constructor for fake screen and window
+    >-- call it like this:
+    >--   local w = window{
+    >--     kbd=kbd('abc'),
+    >--     scr=scr{h=5, w=4},
+    >--   }
+    >-- eventually it'll do everything a real ncurses window can
+    >function window(h)
+    >  h.__index = h
+    >  setmetatable(h, h)
+    >  h.__index = function(table, key)
+    >    return rawget(h, key)
+    >  end
+    >  h.getch = function(self)
+    >    return table.remove(h.kbd, 1)
+    >  end
+    >  return h
+    >end
+- __teliva_timestamp: original
+  kbd:
+    >function kbd(keys)
+    >  local result = {}
+    >  for i=1,string.len(keys) do
+    >    table.insert(result, keys[i])
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  scr:
+    >function scr(props)
+    >  return props
+    >end

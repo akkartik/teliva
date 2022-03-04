@@ -1313,7 +1313,7 @@ int file_operation_permitted(const char* caller, const char* filename, const cha
   lua_getglobal(trustedL, "file_operation_permitted");
   lua_pushstring(trustedL, caller);
   lua_pushstring(trustedL, filename);
-  lua_pushstring(trustedL, mode);
+  lua_pushboolean(trustedL, strncmp(mode, "r", /*strlen("r") + 1 for NULL*/ 2) != 0);
   if (lua_pcall(trustedL, 3 /*args*/, 1 /*result*/, /*errfunc*/0)) {
     /* TODO: error handling. Or should we use errfunc above? */
   }
@@ -1403,7 +1403,7 @@ static void render_permissions_screen() {
   attrset(A_NORMAL);
 
   mvaddstr(7, 5, "File operations");
-  mvaddstr(7, 30, "function file_operation_permitted(caller, filename, mode)");
+  mvaddstr(7, 30, "function file_operation_permitted(caller, filename, is_write)");
   int y = render_wrapped_text(8, 32, COLS-5, file_operations_predicate_body);
   mvaddstr(y, 30, "end");
   y++;
@@ -1488,7 +1488,7 @@ int validate_file_operations_predicate() {
 
 static int load_file_operations_predicate(const char* body) {
   char buffer[1024] = {0};
-  strcpy(buffer, "function file_operation_permitted(caller, filename, mode)\n");
+  strcpy(buffer, "function file_operation_permitted(caller, filename, is_write)\n");
   strncat(buffer, body, 1020);
   if (buffer[strlen(buffer)-1] != '\n')
     strncat(buffer, "\n", 1020);

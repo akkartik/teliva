@@ -1357,7 +1357,7 @@ void editFilePermissions(char* filename) {
         editorRefreshScreen(editorNonCodeMenu);
         int y, x;
         getyx(stdscr, y, x);
-        mvaddstr(0, 0, "function file_operation_permitted(caller, filename, mode)");
+        mvaddstr(0, 0, "function file_operation_permitted(caller, filename, is_write)");
         mvaddstr(MIN(E.startrow + E.numrows, E.endrow), 0, "end");
         mvaddstr(y, x, "");
         int c = getch();
@@ -1464,7 +1464,7 @@ void resumeFilePermissionsEdit() {
         editorRefreshScreen(editorNonCodeMenu);
         int y, x;
         getyx(stdscr, y, x);
-        mvaddstr(0, 0, "function file_operation_permitted(caller, filename, mode)");
+        mvaddstr(0, 0, "function file_operation_permitted(caller, filename, is_write)");
         mvaddstr(MIN(E.startrow + E.numrows, E.endrow), 0, "end");
         mvaddstr(y, x, "");
         int c = getch();

@@ -8,7 +8,7 @@
 PLAT= none
 
 CC= gcc
-CFLAGS= -g -O2 -std=c99 -Wall -Wshadow $(MYCFLAGS) -D_DEFAULT_SOURCE
+CFLAGS= -g -O2 -std=c99 -Wall $(MYCFLAGS) -D_DEFAULT_SOURCE
 AR= ar rc
 RANLIB= ranlib
 RM= rm -f

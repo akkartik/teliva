@@ -9,7 +9,7 @@ OBJS= \
  config.o  \
  ec.o
 
-WARN=-Wall -Wshadow
+WARN=-Wall
 
 BSD_CFLAGS=-O2 -fPIC $(WARN) $(DEFS)
 BSD_LDFLAGS=-O -fPIC -shared

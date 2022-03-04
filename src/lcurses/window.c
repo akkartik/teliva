@@ -1339,7 +1339,7 @@ Wgetch(lua_State *L)
 			draw_menu_item("^p", "modify app permissions");
 		draw_menu_item("anything else", "cancel");
 		color_set(COLOR_PAIR_ERROR, NULL);
-		mvaddstr(LINES-1, menu_column+1, " Are you sure? ");
+		mvaddstr(LINES-1, menu_column+1, " Please confirm. App will restart, losing unsaved data. ");
 		color_set(COLOR_PAIR_NORMAL, NULL);
 		attroff(A_BOLD|A_REVERSE);
 

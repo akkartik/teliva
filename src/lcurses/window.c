@@ -1285,20 +1285,6 @@ Wwinsdelln(lua_State *L)
 	return pushokresult(winsdelln(w, n));
 }
 
-static int confirm_exit(WINDOW *w) {
-	/* draw a special menu just for this situation */
-	attron(A_BOLD|A_REVERSE);
-	color_set(COLOR_PAIR_MENU, NULL);
-	for (int x = 0; x < COLS; ++x)
-		mvaddch(LINES-1, x, ' ');
-	menu_column = 2;
-	draw_menu_item("^x", "exit");
-	draw_menu_item("anything else", "cancel");
-	attroff(A_BOLD|A_REVERSE);
-	int c = wgetch(w);
-	return (c == CTRL_X);
-}
-
 /***
 Read a character from the window input.
 @function getch
@@ -1320,6 +1306,8 @@ Wgetch(lua_State *L)
 	if (x > COLS-2) x = COLS-2; if (y > LINES-1) y = LINES-1; /* http://gnats.netbsd.org/56664 */
 	mvaddstr(y, x, "");
 	int c = wgetch(w);
+
+	/* audit log */
 	static char buffer[1024] = {0};
 	memset(buffer, '\0', 1024);
 	if (isspace(c))
@@ -1330,18 +1318,41 @@ Wgetch(lua_State *L)
 
 	if (c == ERR)
 		return 0;
-	if (c == CTRL_X) {
-		if (confirm_exit(w)) {
+
+	/* standard menu hotkeys */
+	if (c == CTRL_X || c == CTRL_U || c == CTRL_P) {
+		/* always confirm; we're going to throw away data past this point */
+
+		/* draw a special menu just for this situation */
+		attron(A_BOLD|A_REVERSE);
+		color_set(COLOR_PAIR_MENU, NULL);
+		for (int x = 0; x < COLS; ++x)
+			mvaddch(LINES-1, x, ' ');
+		menu_column = 2;
+		if (c == CTRL_X)
+			draw_menu_item("^x", "exit");
+		else if (c == CTRL_U)
+			draw_menu_item("^u", "edit app code");
+		else if (c == CTRL_P)
+			draw_menu_item("^p", "modify app permissions");
+		draw_menu_item("anything else", "cancel");
+		color_set(COLOR_PAIR_ERROR, NULL);
+		mvaddstr(LINES-1, menu_column+1, " Are you sure? ");
+		color_set(COLOR_PAIR_NORMAL, NULL);
+		attroff(A_BOLD|A_REVERSE);
+
+		if (wgetch(w) != c)
+			return pushintresult(0);
+
+		if (c == CTRL_X) {
 			unlink("teliva_editor_state");
 			exit(0);
 		}
-		else return pushintresult(0);
+		if (c == CTRL_U)
+			developer_mode(L);
+		if (c == CTRL_P)
+			permissions_mode(L);
 	}
-	if (c == CTRL_U)
-		developer_mode(L);
-	if (c == CTRL_P)
-		permissions_mode(L);
-	/* handle other standard menu hotkeys here */
 
 	return pushintresult(c);
 }

@@ -282,6 +282,32 @@
     >  h.getch = function(self)
     >    return table.remove(h.kbd, 1)
     >  end
+    >  h.addch = function(self, c)
+    >    local scr = self.scr
+    >    if scr.cursy <= scr.h then
+    >      scr[scr.cursy][scr.cursx] = c
+    >      scr.cursx = scr.cursx+1
+    >      if scr.cursx > scr.w then
+    >        scr.cursy = scr.cursy+1
+    >        scr.cursx = 1
+    >      end
+    >    end
+    >  end
+    >  h.addstr = function(self, s)
+    >    for i=1,string.len(s) do
+    >      self:addch(s[i])
+    >    end
+    >  end
+    >  h.mvaddch = function(self, y, x, c)
+    >    self.scr.cursy = y
+    >    self.scr.cursx = x
+    >    self.addch(c)
+    >  end
+    >  h.mvaddstr = function(self, y, x, s)
+    >    self.scr.cursy = y
+    >    self.scr.cursx = x
+    >    self:addstr(s)
+    >  end
     >  return h
     >end
 - __teliva_timestamp: original
@@ -296,5 +322,52 @@
 - __teliva_timestamp: original
   scr:
     >function scr(props)
+    >  props.cursx = 1
+    >  props.cursy = 1
+    >  for y=1,props.h do
+    >    props[y] = {}
+    >    for x=1,props.w do
+    >      props[y][x] = ' '
+    >    end
+    >  end
     >  return props
+    >end
+- __teliva_timestamp:
+    >Thu Mar  3 22:04:15 2022
+  check_screen:
+    >function check_screen(window, contents, message)
+    >  local x, y = 1, 1
+    >  for i=1,string.len(contents) do
+    >    check_eq(contents[i], window.scr[y][x], message..'/'..y..','..x)
+    >    x = x+1
+    >    if x > window.scr.w then
+    >      y = y+1
+    >      x = 1
+    >    end
+    >  end
+    >end
+    >
+    >-- putting it all together, an example test of both keyboard and screen
+    >function test_check_screen()
+    >  local lines = {
+    >    c='123',
+    >    d='234',
+    >    a='345',
+    >    b='456',
+    >  }
+    >  local w = window{
+    >    kbd=kbd('abc'),
+    >    scr=scr{h=3, w=5},
+    >  }
+    >  local y = 1
+    >  while true do
+    >    local c = w:getch()
+    >    if c == nil then break end
+    >    w:mvaddstr(y, 1, lines[c])
+    >    y = y+1
+    >  end
+    >  check_screen(w, '345  '..
+    >                  '456  '..
+    >                  '123  ',
+    >              'test_check_screen')
     >end

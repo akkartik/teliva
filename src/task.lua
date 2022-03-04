@@ -614,7 +614,7 @@ function test_channel_as_iterator()
    end
    if _VERSION == "Lua 5.1" then
       -- sorry, this test doesn't work in 5.1
-      print('skipping... (5.1 unsupported)')
+      print('S')
       done = true
    else
       task.spawn(main)

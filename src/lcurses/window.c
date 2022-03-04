@@ -1320,7 +1320,9 @@ Wgetch(lua_State *L)
 		return 0;
 
 	/* standard menu hotkeys */
-	if (c == CTRL_X || c == CTRL_U || c == CTRL_P) {
+	if (c == CTRL_U && editor_view_in_progress(L))
+		developer_mode(L);
+	else if (c == CTRL_X || c == CTRL_U || c == CTRL_P) {
 		/* always confirm; we're going to throw away data past this point */
 
 		/* draw a special menu just for this situation */

@@ -1343,7 +1343,11 @@ Wgetch(lua_State *L)
 		color_set(COLOR_PAIR_NORMAL, NULL);
 		attroff(A_BOLD|A_REVERSE);
 
-		if (wgetch(w) != c)
+		int secondc;
+		do  /* just in case getch is currently non-blocking (nodelay) */
+			secondc = wgetch(w);
+		while(secondc == ERR);
+		if (c != secondc)
 			return pushintresult(0);
 
 		if (c == CTRL_X) {

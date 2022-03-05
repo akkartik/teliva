@@ -255,65 +255,6 @@ static int pushresult(lua_State * L, int res, const char *info)
 
 
 /*
-** This function changes the working (current) directory
-*/
-static int change_dir(lua_State * L)
-{
-  const char *path = luaL_checkstring(L, 1);
-  if (chdir(path)) {
-    lua_pushnil(L);
-    lua_pushfstring(L, "Unable to change working directory to '%s'\n%s\n",
-                    path, chdir_error);
-    return 2;
-  } else {
-    lua_pushboolean(L, 1);
-    return 1;
-  }
-}
-
-/*
-** This function returns the current directory
-** If unable to get the current directory, it returns nil
-**  and a string describing the error
-*/
-static int get_dir(lua_State * L)
-{
-#ifdef NO_GETCWD
-  lua_pushnil(L);
-  lua_pushstring(L, "Function 'getcwd' not provided by system");
-  return 2;
-#else
-  char *path = NULL;
-  /* Passing (NULL, 0) is not guaranteed to work.
-     Use a temp buffer and size instead. */
-  size_t size = LFS_MAXPATHLEN; /* initial buffer size */
-  int result;
-  while (1) {
-    char *path2 = realloc(path, size);
-    if (!path2) {               /* failed to allocate */
-      result = pusherror(L, "get_dir realloc() failed");
-      break;
-    }
-    path = path2;
-    if (getcwd(path, size) != NULL) {
-      /* success, push the path to the Lua stack */
-      lua_pushstring(L, path);
-      result = 1;
-      break;
-    }
-    if (errno != ERANGE) {      /* unexpected error */
-      result = pusherror(L, "get_dir getcwd() failed");
-      break;
-    }
-    /* ERANGE = insufficient buffer capacity, double size and retry */
-    size *= 2;
-  }
-  free(path);
-  return result;
-#endif
-}
-
-/*
 ** Check if the given element on the stack is a file and returns it.
 */
 static FILE *check_file(lua_State * L, int idx, const char *funcname)

@@ -1361,6 +1361,25 @@ Wgetch(lua_State *L)
 
 
 /***
+Put back a character obtained from @{getch}
+@function ungetch
+@int ch
+@treturn OK or ERR
+@see mvwgetch(3x)
+@see getch
+*/
+static int
+Wungetch(lua_State *L)
+{
+	int ch = checkint(L, 2);
+	int result = ungetch(ch);
+	if (result == ERR)
+		return 0;
+	return pushintresult(result);
+}
+
+
+/***
 Call @{move} then @{getch}
 @function mvgetch
 @int y
@@ -1893,6 +1912,7 @@ static const luaL_Reg curses_window_fns[] =
 	LCURSES_FUNC( Wtimeout		),
 	LCURSES_FUNC( Wtouch		),
 	LCURSES_FUNC( Wtouchline	),
+	LCURSES_FUNC( Wungetch		),
 	LCURSES_FUNC( Wvline		),
 	LCURSES_FUNC( Wwbkgd		),
 	LCURSES_FUNC( Wwbkgdset		),

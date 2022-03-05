@@ -228,6 +228,7 @@
 - __teliva_timestamp: original
   main:
     >function main()
+    >  Window:nodelay(true)
     >  while true do
     >    render(Window)
     >    update(Window)
@@ -236,7 +237,11 @@
 - __teliva_timestamp: original
   update:
     >function update(window)
-    >  local key = window:getch()
+    >  local key
+    >  while true do
+    >    key = window:getch()
+    >    if key then break end
+    >  end
     >  if key == curses.KEY_LEFT then
     >    if cursor > 1 then
     >      cursor = cursor-1
@@ -277,6 +282,11 @@
     >    for i, w in ipairs(results) do
     >      window:addstr(w)
     >      window:addstr(' ')
+    >      local tmp = window:getch()
+    >      if tmp then
+    >        window:ungetch(tmp)
+    >        break
+    >      end
     >    end
     >  end
     >

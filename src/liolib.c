@@ -134,7 +134,7 @@ static int io_open (lua_State *L) {
   if (file_operation_permitted(caller(L), filename, mode))
     *pf = fopen(filename, mode);
   else {
-    snprintf(iolib_errbuf, 1024, "app tried to open file '%s'; adjust its permissions (ctrl-p) if that is expected", filename);
+    snprintf(iolib_errbuf, 1024, "app tried to open file '%s' from caller '%s'; adjust its permissions (ctrl-p) if that is expected", filename, caller(L));
     Previous_message = iolib_errbuf;
   }
   return (*pf == NULL) ? pushresult(L, 0, filename) : 1;

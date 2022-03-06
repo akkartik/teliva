@@ -79,17 +79,48 @@
 - __teliva_timestamp: original
   check_eq:
     >function check_eq(x, expected, msg)
-    >  if x == expected then
+    >  if eq(x, expected) then
     >    Window:addch('.')
     >  else
     >    print('F - '..msg)
-    >    print('  expected '..tostring(expected)..' but got '..x)
+    >    print('  expected '..str(expected)..' but got '..str(x))
     >    teliva_num_test_failures = teliva_num_test_failures + 1
     >    -- overlay first test failure on editors
     >    if teliva_first_failure == nil then
     >      teliva_first_failure = msg
     >    end
     >  end
+    >end
+- __teliva_timestamp: original
+  eq:
+    >function eq(a, b)
+    >  if type(a) ~= type(b) then return false end
+    >  if type(a) == 'table' then
+    >    if #a ~= #b then return false end
+    >    for k, v in pairs(a) do
+    >      if b[k] ~= v then
+    >        return false
+    >      end
+    >      return true
+    >    end
+    >  end
+    >  return a == b
+    >end
+- __teliva_timestamp: original
+  str:
+    >-- smarter tostring
+    >-- slow; used only for debugging
+    >function str(x)
+    >  if type(x) == 'table' then
+    >    local result = ''
+    >    result = result..#x..'{'
+    >    for k, v in pairs(x) do
+    >      result = result..str(k)..'='..str(v)..', '
+    >    end
+    >    result = result..'}'
+    >    return result
+    >  end
+    >  return tostring(x)
     >end
 - __teliva_timestamp: original
   map:
@@ -147,15 +178,17 @@
     >  return result
     >end
 - __teliva_timestamp: original
-  Window:
-    >Window = curses.stdscr()
-    >curses.curs_set(0)  -- we'll simulate our own cursor
-- __teliva_timestamp: original
   menu:
+    >-- To show app-specific hotkeys in the menu bar, add hotkey/command
+    >-- arrays of strings to the menu array.
     >menu = {
     >  {'^k', 'clear'},
     >  {'^w', 'write prose to file "toot" (edit hotkey does NOT save)'},
     >}
+- __teliva_timestamp: original
+  Window:
+    >Window = curses.stdscr()
+    >curses.curs_set(0)  -- we'll simulate our own cursor
 - __teliva_timestamp: original
   main:
     >function main()

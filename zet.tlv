@@ -79,17 +79,48 @@
 - __teliva_timestamp: original
   check_eq:
     >function check_eq(x, expected, msg)
-    >  if x == expected then
+    >  if eq(x, expected) then
     >    Window:addch('.')
     >  else
     >    print('F - '..msg)
-    >    print('  expected '..tostring(expected)..' but got '..x)
+    >    print('  expected '..str(expected)..' but got '..str(x))
     >    teliva_num_test_failures = teliva_num_test_failures + 1
     >    -- overlay first test failure on editors
     >    if teliva_first_failure == nil then
     >      teliva_first_failure = msg
     >    end
     >  end
+    >end
+- __teliva_timestamp: original
+  eq:
+    >function eq(a, b)
+    >  if type(a) ~= type(b) then return false end
+    >  if type(a) == 'table' then
+    >    if #a ~= #b then return false end
+    >    for k, v in pairs(a) do
+    >      if b[k] ~= v then
+    >        return false
+    >      end
+    >      return true
+    >    end
+    >  end
+    >  return a == b
+    >end
+- __teliva_timestamp: original
+  str:
+    >-- smarter tostring
+    >-- slow; used only for debugging
+    >function str(x)
+    >  if type(x) == 'table' then
+    >    local result = ''
+    >    result = result..#x..'{'
+    >    for k, v in pairs(x) do
+    >      result = result..str(k)..'='..str(v)..', '
+    >    end
+    >    result = result..'}'
+    >    return result
+    >  end
+    >  return tostring(x)
     >end
 - __teliva_timestamp: original
   map:
@@ -147,15 +178,47 @@
     >  return result
     >end
 - __teliva_timestamp: original
-  spaces:
-    >function spaces(n)
-    >  for i=1,n do
-    >    Window:addch(' ')
+  sort_letters:
+    >function sort_letters(s)
+    >  tmp = {}
+    >  for i=1,#s do
+    >    table.insert(tmp, s[i])
     >  end
+    >  table.sort(tmp)
+    >  local result = ''
+    >  for _, c in pairs(tmp) do
+    >    result = result..c
+    >  end
+    >  return result
+    >end
+    >
+    >function test_sort_letters(s)
+    >  check_eq(sort_letters(''), '', 'test_sort_letters: empty')
+    >  check_eq(sort_letters('ba'), 'ab', 'test_sort_letters: non-empty')
+    >  check_eq(sort_letters('abba'), 'aabb', 'test_sort_letters: duplicates')
     >end
 - __teliva_timestamp: original
-  Window:
-    >Window = curses.stdscr()
+  count_letters:
+    >function count_letters(s)
+    >  local result = {}
+    >  for i=1,string.len(s) do
+    >    local c = s[i]
+    >    if result[c] == nil then
+    >      result[c] = 1
+    >    else
+    >      result[c] = result[c] + 1
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  append:
+    >-- concatenate list 'elems' into 'l', modifying 'l' in the process
+    >function append(l, elems)
+    >  for i=1,#elems do
+    >    l[#l+1] = elems[i]
+    >  end
+    >end
 - __teliva_timestamp: original
   menu:
     >-- To show app-specific hotkeys in the menu bar, add hotkey/command
@@ -163,6 +226,170 @@
     >menu = {
     >  {'^e', 'edit'},
     >}
+- __teliva_timestamp: original
+  Window:
+    >Window = curses.stdscr()
+- __teliva_timestamp: original
+  window:
+    >-- constructor for fake screen and window
+    >-- call it like this:
+    >--   local w = window{
+    >--     kbd=kbd('abc'),
+    >--     scr=scr{h=5, w=4},
+    >--   }
+    >-- eventually it'll do everything a real ncurses window can
+    >function window(h)
+    >  h.__index = h
+    >  setmetatable(h, h)
+    >  h.__index = function(table, key)
+    >    return rawget(h, key)
+    >  end
+    >  h.getch = function(self)
+    >    return table.remove(h.kbd, 1)
+    >  end
+    >  h.addch = function(self, c)
+    >    local scr = self.scr
+    >    if scr.cursy <= scr.h then
+    >      scr[scr.cursy][scr.cursx] = c
+    >      scr.cursx = scr.cursx+1
+    >      if scr.cursx > scr.w then
+    >        scr.cursy = scr.cursy+1
+    >        scr.cursx = 1
+    >      end
+    >    end
+    >  end
+    >  h.addstr = function(self, s)
+    >    for i=1,string.len(s) do
+    >      self:addch(s[i])
+    >    end
+    >  end
+    >  h.mvaddch = function(self, y, x, c)
+    >    self.scr.cursy = y
+    >    self.scr.cursx = x
+    >    self.addch(c)
+    >  end
+    >  h.mvaddstr = function(self, y, x, s)
+    >    self.scr.cursy = y
+    >    self.scr.cursx = x
+    >    self:addstr(s)
+    >  end
+    >  return h
+    >end
+- __teliva_timestamp: original
+  kbd:
+    >function kbd(keys)
+    >  local result = {}
+    >  for i=1,string.len(keys) do
+    >    table.insert(result, keys[i])
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  scr:
+    >function scr(props)
+    >  props.cursx = 1
+    >  props.cursy = 1
+    >  for y=1,props.h do
+    >    props[y] = {}
+    >    for x=1,props.w do
+    >      props[y][x] = ' '
+    >    end
+    >  end
+    >  return props
+    >end
+- __teliva_timestamp: original
+  check_screen:
+    >function check_screen(window, contents, message)
+    >  local x, y = 1, 1
+    >  for i=1,string.len(contents) do
+    >    check_eq(contents[i], window.scr[y][x], message..'/'..y..','..x)
+    >    x = x+1
+    >    if x > window.scr.w then
+    >      y = y+1
+    >      x = 1
+    >    end
+    >  end
+    >end
+    >
+    >-- putting it all together, an example test of both keyboard and screen
+    >function test_check_screen()
+    >  local lines = {
+    >    c='123',
+    >    d='234',
+    >    a='345',
+    >    b='456',
+    >  }
+    >  local w = window{
+    >    kbd=kbd('abc'),
+    >    scr=scr{h=3, w=5},
+    >  }
+    >  local y = 1
+    >  while true do
+    >    local c = w:getch()
+    >    if c == nil then break end
+    >    w:mvaddstr(y, 1, lines[c])
+    >    y = y+1
+    >  end
+    >  check_screen(w, '345  '..
+    >                  '456  '..
+    >                  '123  ',
+    >              'test_check_screen')
+    >end
+- __teliva_timestamp: original
+  start_reading:
+    >-- primitive for reading files from a file system (or, later, network)
+    >-- returns a channel or nil on error
+    >-- read lines from the channel using :recv()
+    >-- recv() on the channel will indicate end of file.
+    >function start_reading(fs, filename)
+    >  local result = task.Channel:new()
+    >  local infile = io.open(filename)
+    >  if infile == nil then return nil end
+    >  task.spawn(reading_task, infile, result)
+    >  return result
+    >end
+    >
+    >function reading_task(infile, chanout)
+    >  for line in infile:lines() do
+    >    chanout:send(line)
+    >  end
+    >  chanout:send(nil)  -- eof
+    >end
+- __teliva_timestamp: original
+  start_writing:
+    >-- primitive for writing files to a file system (or, later, network)
+    >-- returns a channel or nil on error
+    >-- write to the channel using :send()
+    >-- indicate you're done writing by calling :close()
+    >-- file will not be externally visible until :close()
+    >function start_writing(fs, filename)
+    >  local result = task.Channel:new()
+    >  local initial_filename = os.tmpname()
+    >  local outfile = io.open(initial_filename, 'w')
+    >  if outfile == nil then return nil end
+    >  result.close = function()
+    >    result:send(nil)  -- end of file
+    >    outfile:close()
+    >    os.rename(initial_filename, filename)
+    >  end
+    >  task.spawn(writing_task, outfile, result)
+    >  return result
+    >end
+    >
+    >function writing_task(outfile, chanin)
+    >  while true do
+    >    local line = chanin:recv()
+    >    if line == nil then break end  -- end of file
+    >    outfile:write(line)
+    >  end
+    >end
+- __teliva_timestamp: original
+  spaces:
+    >function spaces(n)
+    >  for i=1,n do
+    >    Window:addch(' ')
+    >  end
+    >end
 - __teliva_timestamp: original
   init_colors:
     >function init_colors()

@@ -62,90 +62,10 @@
     >
     >-- TODO: backport utf-8 support from Lua 5.3
 - __teliva_timestamp: original
-  debugy:
-    >debugy = 5
-- __teliva_timestamp: original
-  dbg:
-    >-- helper for debug by print; overlay debug information towards the right
-    >-- reset debugy every time you refresh screen
-    >function dbg(window, s)
-    >  local oldy = 0
-    >  local oldx = 0
-    >  oldy, oldx = window:getyx()
-    >  window:mvaddstr(debugy, 60, s)
-    >  debugy = debugy+1
-    >  window:mvaddstr(oldy, oldx, '')
-    >end
-- __teliva_timestamp: original
-  check_eq:
-    >function check_eq(x, expected, msg)
-    >  if x == expected then
-    >    Window:addch('.')
-    >  else
-    >    print('F - '..msg)
-    >    print('  expected '..tostring(expected)..' but got '..x)
-    >    teliva_num_test_failures = teliva_num_test_failures + 1
-    >    -- overlay first test failure on editors
-    >    if teliva_first_failure == nil then
-    >      teliva_first_failure = msg
-    >    end
-    >  end
-    >end
-- __teliva_timestamp: original
-  map:
-    >-- only for arrays
-    >function map(l, f)
-    >  result = {}
-    >  for _, x in ipairs(l) do
-    >    table.insert(result, f(x))
-    >  end
-    >  return result
-    >end
-- __teliva_timestamp: original
-  reduce:
-    >-- only for arrays
-    >function reduce(l, f, init)
-    >  result = init
-    >  for _, x in ipairs(l) do
-    >    result = f(result, x)
-    >  end
-    >  return result
-    >end
-- __teliva_timestamp: original
-  filter:
-    >-- only for arrays
-    >function filter(l, f)
-    >  result = {}
-    >  for _, x in ipairs(l) do
-    >    if f(x) then
-    >      table.insert(result, x)
-    >    end
-    >  end
-    >  return result
-    >end
-- __teliva_timestamp: original
-  find_index:
-    >function find_index(arr, x)
-    >  for n, y in ipairs(arr) do
-    >    if x == y then
-    >      return n
-    >    end
-    >  end
-    >end
-- __teliva_timestamp: original
-  trim:
-    >function trim(s)
-    >  return s:gsub('^%s*', ''):gsub('%s*$', '')
-    >end
-- __teliva_timestamp: original
-  split:
-    >function split(s, d)
-    >  result = {}
-    >  for match in (s..d):gmatch("(.-)"..d) do
-    >    table.insert(result, match);
-    >  end
-    >  return result
-    >end
+  menu:
+    >-- To show app-specific hotkeys in the menu bar, add hotkey/command
+    >-- arrays of strings to the menu array.
+    >menu = {}
 - __teliva_timestamp: original
   Window:
     >Window = curses.stdscr()
@@ -161,11 +81,6 @@
     >  end
     >  window:refresh()
     >end
-- __teliva_timestamp: original
-  menu:
-    >-- To show app-specific hotkeys in the menu bar, add hotkey/command
-    >-- arrays of strings to the menu array.
-    >menu = {}
 - __teliva_timestamp: original
   update:
     >function update(window)
@@ -197,3 +112,6 @@
     >    update(Window)
     >  end
     >end
+- __teliva_timestamp: original
+  doc:blurb:
+    >beginnings of a file browser..

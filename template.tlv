@@ -177,8 +177,7 @@
     >  end
     >  return result
     >end
-- __teliva_timestamp:
-    >Mon Feb 21 17:45:04 2022
+- __teliva_timestamp: original
   sort_letters:
     >function sort_letters(s)
     >  tmp = {}
@@ -221,63 +220,13 @@
     >  end
     >end
 - __teliva_timestamp: original
-  Window:
-    >Window = curses.stdscr()
-- __teliva_timestamp: original
-  render:
-    >function render(window)
-    >  window:clear()
-    >  -- draw stuff to screen here
-    >  window:attron(curses.A_BOLD)
-    >  window:mvaddstr(1, 5, "example app")
-    >  window:attrset(curses.A_NORMAL)
-    >  for i=0,15 do
-    >    window:attrset(curses.color_pair(i))
-    >    window:mvaddstr(3+i, 5, "========================")
-    >  end
-    >  window:refresh()
-    >end
-- __teliva_timestamp: original
   menu:
     >-- To show app-specific hotkeys in the menu bar, add hotkey/command
     >-- arrays of strings to the menu array.
     >menu = {}
 - __teliva_timestamp: original
-  update:
-    >function update(window)
-    >  local key = window:getch()
-    >  -- process key here
-    >end
-- __teliva_timestamp: original
-  init_colors:
-    >function init_colors()
-    >  for i=0,7 do
-    >    curses.init_pair(i, i, -1)
-    >  end
-    >  curses.init_pair(8, 7, 0)
-    >  curses.init_pair(9, 7, 1)
-    >  curses.init_pair(10, 7, 2)
-    >  curses.init_pair(11, 7, 3)
-    >  curses.init_pair(12, 7, 4)
-    >  curses.init_pair(13, 7, 5)
-    >  curses.init_pair(14, 7, 6)
-    >  curses.init_pair(15, -1, 15)
-    >end
-- __teliva_timestamp: original
-  main:
-    >function main()
-    >  init_colors()
-    >
-    >  while true do
-    >    render(Window)
-    >    update(Window)
-    >  end
-    >end
-- __teliva_timestamp: original
-  doc:blurb:
-    >To show a brief description of the app on the 'big picture' screen, put the text in a special buffer called 'doc:blurb'.
-    >
-    >You can also override the default big picture screen entirely by creating a buffer called 'doc:main'.
+  Window:
+    >Window = curses.stdscr()
 - __teliva_timestamp: original
   window:
     >-- constructor for fake screen and window
@@ -346,8 +295,7 @@
     >  end
     >  return props
     >end
-- __teliva_timestamp:
-    >Thu Mar  3 22:04:15 2022
+- __teliva_timestamp: original
   check_screen:
     >function check_screen(window, contents, message)
     >  local x, y = 1, 1
@@ -433,3 +381,53 @@
     >    outfile:write(line)
     >  end
     >end
+- __teliva_timestamp: original
+  render:
+    >function render(window)
+    >  window:clear()
+    >  -- draw stuff to screen here
+    >  window:attron(curses.A_BOLD)
+    >  window:mvaddstr(1, 5, "example app")
+    >  window:attrset(curses.A_NORMAL)
+    >  for i=0,15 do
+    >    window:attrset(curses.color_pair(i))
+    >    window:mvaddstr(3+i, 5, "========================")
+    >  end
+    >  window:refresh()
+    >end
+- __teliva_timestamp: original
+  update:
+    >function update(window)
+    >  local key = window:getch()
+    >  -- process key here
+    >end
+- __teliva_timestamp: original
+  init_colors:
+    >function init_colors()
+    >  for i=0,7 do
+    >    curses.init_pair(i, i, -1)
+    >  end
+    >  curses.init_pair(8, 7, 0)
+    >  curses.init_pair(9, 7, 1)
+    >  curses.init_pair(10, 7, 2)
+    >  curses.init_pair(11, 7, 3)
+    >  curses.init_pair(12, 7, 4)
+    >  curses.init_pair(13, 7, 5)
+    >  curses.init_pair(14, 7, 6)
+    >  curses.init_pair(15, -1, 15)
+    >end
+- __teliva_timestamp: original
+  main:
+    >function main()
+    >  init_colors()
+    >
+    >  while true do
+    >    render(Window)
+    >    update(Window)
+    >  end
+    >end
+- __teliva_timestamp: original
+  doc:blurb:
+    >To show a brief description of the app on the 'big picture' screen, put the text in a special buffer called 'doc:blurb'.
+    >
+    >You can also override the default big picture screen entirely by creating a buffer called 'doc:main'.

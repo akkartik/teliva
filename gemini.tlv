@@ -77,21 +77,6 @@
     >  window:mvaddstr(oldy, oldx, '')
     >end
 - __teliva_timestamp: original
-  check_eq:
-    >function check_eq(x, expected, msg)
-    >  if x == expected then
-    >    Window:addch('.')
-    >  else
-    >    print('F - '..msg)
-    >    print('  expected '..tostring(expected)..' but got '..x)
-    >    teliva_num_test_failures = teliva_num_test_failures + 1
-    >    -- overlay first test failure on editors
-    >    if teliva_first_failure == nil then
-    >      teliva_first_failure = msg
-    >    end
-    >  end
-    >end
-- __teliva_timestamp: original
   map:
     >-- only for arrays
     >function map(l, f)
@@ -355,7 +340,7 @@
   init_colors:
     >function init_colors()
     >  for i=0,7 do
-    >    curses.init_pair(i, i, 8)
+    >    curses.init_pair(i, i, -1)
     >  end
     >  curses.init_pair(8, 7, 0)
     >  curses.init_pair(9, 7, 1)
@@ -364,7 +349,7 @@
     >  curses.init_pair(12, 7, 4)
     >  curses.init_pair(13, 7, 5)
     >  curses.init_pair(14, 7, 6)
-    >  curses.init_pair(15, 8, 15)
+    >  curses.init_pair(15, -1, 15)
     >end
 - __teliva_timestamp: original
   main:

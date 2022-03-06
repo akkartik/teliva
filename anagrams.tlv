@@ -62,21 +62,6 @@
     >
     >-- TODO: backport utf-8 support from Lua 5.3
 - __teliva_timestamp: original
-  debugy:
-    >debugy = 5
-- __teliva_timestamp: original
-  dbg:
-    >-- helper for debug by print; overlay debug information towards the right
-    >-- reset debugy every time you refresh screen
-    >function dbg(window, s)
-    >  local oldy = 0
-    >  local oldx = 0
-    >  oldy, oldx = window:getyx()
-    >  window:mvaddstr(debugy, 60, s)
-    >  debugy = debugy+1
-    >  window:mvaddstr(oldy, oldx, '')
-    >end
-- __teliva_timestamp: original
   check_eq:
     >function check_eq(x, expected, msg)
     >  if eq(x, expected) then
@@ -177,8 +162,7 @@
     >  end
     >  return result
     >end
-- __teliva_timestamp:
-    >Mon Feb 21 17:45:04 2022
+- __teliva_timestamp: original
   sort_letters:
     >function sort_letters(s)
     >  tmp = {}
@@ -221,18 +205,18 @@
     >  end
     >end
 - __teliva_timestamp: original
-  Window:
-    >Window = curses.stdscr()
-- __teliva_timestamp: original
-  doc:blurb:
-    >Show all anagrams of a given word
-- __teliva_timestamp: original
   menu:
     >-- To show app-specific hotkeys in the menu bar, add hotkey/command
     >-- arrays of strings to the menu array.
     >menu = {
     >  {'^h', 'backspace'},
     >}
+- __teliva_timestamp: original
+  Window:
+    >Window = curses.stdscr()
+- __teliva_timestamp: original
+  doc:blurb:
+    >Show all anagrams of a given word
 - __teliva_timestamp: original
   word:
     >word = ''

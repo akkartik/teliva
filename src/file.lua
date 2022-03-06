@@ -10,7 +10,7 @@ function start_reading(fs, filename)
   return result
 end
 
-local function reading_task(infile, chanout)
+function reading_task(infile, chanout)
   for line in infile:lines() do
     chanout:send(line)
   end
@@ -36,7 +36,7 @@ function start_writing(fs, filename)
   return result
 end
 
-local function writing_task(outfile, chanin)
+function writing_task(outfile, chanin)
   while true do
     local line = chanin:recv()
     if line == nil then break end  -- end of file

@@ -322,7 +322,6 @@ void save_caller(lua_State* L, const char* name, int call_graph_depth) {
   lua_getstack(L, 1, &ar);
   lua_getinfo(L, "n", &ar);
   if (ar.name) save_caller_as(L, name, ar.name);
-  else if (call_graph_depth == 2) save_caller_as(L, name, "main");  // the way Teliva calls `main` messes with debug info
 }
 
 char* caller(lua_State* L) {
@@ -396,9 +395,6 @@ restart:
   clear();
   luaL_newmetatable(L, "__teliva_call_graph_depth");
   int cgt = lua_gettop(L);
-  // special-case: we don't instrument the call to main, but it's always at depth 1
-  lua_pushinteger(L, 1);
-  lua_setfield(L, cgt, "main");
   // segment definitions by depth
   lua_getglobal(L, "teliva_program");
   int history_array = lua_gettop(L);
@@ -514,7 +510,7 @@ restart:
   y += 2;
   mvprintw(y, 0, "functions: ");
   y++;
-  for (int depth = 1; ; ++depth) {
+  for (int depth = /*ignore call_main*/2; ; ++depth) {
     mvaddstr(y, 0, "                ");
     bool drew_anything = false;
     index_within_level = 0;

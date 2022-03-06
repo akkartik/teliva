@@ -1794,7 +1794,7 @@ int handle_image(lua_State* L, char** argv, int n) {
   /* initialize permissions */
   load_permissions_from_user_configuration(L);
   /* call main() */
-  lua_getglobal(L, "main");
+  lua_getglobal(L, "spawn_main");
   status = docall(L, 0, 1);
   if (status != 0) return report_in_developer_mode(L, status);
   return 0;

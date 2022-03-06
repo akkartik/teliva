@@ -265,18 +265,9 @@
     >
     >You can also override the default big picture screen entirely by creating a buffer called 'doc:main'.
 - __teliva_timestamp:
-    >Sat Feb 26 21:49:00 2022
+    >Sat Feb 26 21:50:11 2022
   main:
     >function main()
-    >  task.spawn(main_task)
-    >  task.scheduler()
-    >  print('out of scheduler')
-    >  Window:getch()
-    >end
-- __teliva_timestamp:
-    >Sat Feb 26 21:50:11 2022
-  main_task:
-    >function main_task()
     >  local c = task.Channel:new()
     >  task.spawn(counter, c)
     >  for i=1,10 do
@@ -308,8 +299,8 @@
     >end
 - __teliva_timestamp:
     >Sat Feb 26 21:55:46 2022
-  main_task:
-    >function main_task()
+  main:
+    >function main()
     >  local primes = task.Channel:new()
     >  task.spawn(sieve, primes)
     >  for i=1,10 do
@@ -346,29 +337,17 @@
     >end
 - __teliva_timestamp:
     >Sat Feb 26 22:09:47 2022
-  main_task:
-    >function main_task(window)
-    >  local primes = task.Channel:new()
-    >  task.spawn(sieve, primes)
-    >  while true do
-    >    window:addstr(primes:recv())
-    >    window:addstr(' ')
-    >    window:refresh()
-    >  end
-    >end
-- __teliva_timestamp:
-    >Sat Feb 26 22:08:52 2022
   __teliva_note:
     >infinite primes
   main:
     >function main()
-    >  Window:nodelay(true)
-    >  Window:clear()
-    >  task.spawn(main_task, Window)
-    >  task.scheduler()
-    >  print('key pressed; done')
-    >  Window:nodelay(false)
-    >  Window:getch()
+    >  local primes = task.Channel:new()
+    >  task.spawn(sieve, primes)
+    >  while true do
+    >    Window:addstr(primes:recv())
+    >    Window:addstr(' ')
+    >    Window:refresh()
+    >  end
     >end
 - __teliva_timestamp:
     >Sat Feb 26 22:09:47 2022
@@ -376,21 +355,26 @@
     >clear screen when it fills up; pause on keypress
     >
     >In Teliva getch() implicitly refreshes the screen.
-  main_task:
-    >function main_task(window)
+  main:
+    >function main()
+    >  Window:nodelay(true)
+    >  Window:clear()
     >  local primes = task.Channel:new()
     >  task.spawn(sieve, primes)
-    >  local h, w = window:getmaxyx()
+    >  local h, w = Window:getmaxyx()
     >  while true do
-    >    window:addstr(primes:recv())
-    >    window:addstr(' ')
-    >    local c = window:getch()
+    >    Window:addstr(primes:recv())
+    >    Window:addstr(' ')
+    >    local c = Window:getch()
     >    if c then break end  -- key pressed
-    >    local y, x = window:getyx()
+    >    local y, x = Window:getyx()
     >    if y > h-1 then
-    >      window:clear()
+    >      Window:clear()
     >    end
     >  end
+    >  print('key pressed; done')
+    >  Window:nodelay(false)
+    >  Window:getch()
     >end
 - __teliva_timestamp:
     >Sat Feb 26 22:27:25 2022

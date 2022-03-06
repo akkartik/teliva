@@ -380,6 +380,17 @@ _M.RECV      = RECV
 _M.SEND      = SEND
 _M.NOP       = NOP
 
+-- Specific to Teliva
+function spawn_main()
+  task.spawn(main)
+  task.scheduler()
+  assert(false, "Teliva's scheduler ran out of work; this shouldn't happen.\n"..
+                "Either a channel is blocked forever or you're reading past\n"..
+                "the end of a file (after recv() returned nil).\n")
+  curses.nodelay(true)
+  curses.getch()
+end
+
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
 -- Tests

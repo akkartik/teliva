@@ -43,3 +43,23 @@ function writing_task(outfile, chanin)
     outfile:write(line)
   end
 end
+
+-- start_reading reads line by line by default
+-- this helper permits character-by-character reading
+function character_by_character(chanin, buffer_size)
+  local chanout = task.Channel:new(buffer_size or 50)
+  task.spawn(character_splitting_task, chanin, chanout)
+  return chanout
+end
+
+function character_splitting_task(chanin, chanout)
+  while true do
+    local line = chanin:recv()
+    if line == nil then break end
+    local linesz = string.len(line)
+    for i=1,linesz do
+      chanout:send(string.sub(line, i, i))
+    end
+  end
+  chanout:send(nil)  -- end of file
+end

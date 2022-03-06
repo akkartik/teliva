@@ -261,6 +261,10 @@ local function altexec(a)
    end
 end
 
+function ischannel(x)
+    return type(x) == "table" and x.__index == _M.Channel
+end
+
 -- The main entry point. Call it `alt` or `select` or just a
 -- multiplexing statement. This is user facing function so make sure
 -- the parameters passed are sane.
@@ -275,7 +279,7 @@ local function chanalt(alt_array, canblock)
       assert(type(a.op) == "number" and
                 (a.op == RECV or a.op == SEND or a.op == NOP),
              "op field must be RECV, SEND or NOP in alt")
-      assert(type(a.c) == "table" and a.c.__index == _M.Channel,
+      assert(ischannel(a.c),
              "pass valid channel to a c field of alt")
       if altcanexec(a) == true then
          table.insert(list_of_canexec_i, i)

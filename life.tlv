@@ -526,11 +526,13 @@
     >end
 - __teliva_timestamp: original
   load_file:
-    >function load_file(window, filename)
-    >  local infile = io.open(filename, 'r')
+    >function load_file(window, fs, filename)
+    >  local infile = start_reading(fs, filename)
     >  if infile == nil then return end
     >  local line_index = lines  -- quarter of the way down in pixels
-    >  for line in infile:lines() do
+    >  while true do
+    >    local line = infile:recv()
+    >    if line == nil then break end
     >    if line:sub(1,1) ~= '!' then  -- comment; plaintext files can't have whitespace before comments
     >      local col_index = cols
     >      for c in line:gmatch(".") do
@@ -649,7 +651,7 @@
     >    --
     >    -- For example, check out the list of Important Patterns at
     >    -- https://www.conwaylife.com/wiki/Category:Patterns_with_Catagolue_frequency_class_0
-    >    load_file(Window, arg[1])
+    >    load_file(Window, nil, arg[1])
     >  end
     >
     >  -- main loop

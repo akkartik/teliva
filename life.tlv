@@ -165,7 +165,7 @@
     >function load_file(window, filename)
     >  local infile = io.open(filename, 'r')
     >  if infile == nil then return end
-    >  local line_index = lines
+    >  local line_index = lines  -- quarter of the way down in pixels
     >  for line in infile:lines() do
     >    if line:sub(1,1) ~= '!' then  -- comment; plaintext files can't have whitespace before comments
     >      local col_index = cols

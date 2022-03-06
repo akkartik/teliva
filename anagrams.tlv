@@ -179,8 +179,8 @@
     >end
 - __teliva_timestamp:
     >Mon Feb 21 17:45:04 2022
-  sort_string:
-    >function sort_string(s)
+  sort_letters:
+    >function sort_letters(s)
     >  tmp = {}
     >  for i=1,#s do
     >    table.insert(tmp, s[i])
@@ -193,10 +193,24 @@
     >  return result
     >end
     >
-    >function test_sort_string(s)
-    >  check_eq(sort_string(''), '', 'test_sort_string: empty')
-    >  check_eq(sort_string('ba'), 'ab', 'test_sort_string: non-empty')
-    >  check_eq(sort_string('abba'), 'aabb', 'test_sort_string: duplicates')
+    >function test_sort_letters(s)
+    >  check_eq(sort_letters(''), '', 'test_sort_letters: empty')
+    >  check_eq(sort_letters('ba'), 'ab', 'test_sort_letters: non-empty')
+    >  check_eq(sort_letters('abba'), 'aabb', 'test_sort_letters: duplicates')
+    >end
+- __teliva_timestamp: original
+  count_letters:
+    >function count_letters(s)
+    >  local result = {}
+    >  for i=1,string.len(s) do
+    >    local c = s[i]
+    >    if result[c] == nil then
+    >      result[c] = 1
+    >    else
+    >      result[c] = result[c] + 1
+    >    end
+    >  end
+    >  return result
     >end
 - __teliva_timestamp: original
   append:
@@ -282,11 +296,6 @@
     >    for i, w in ipairs(results) do
     >      window:addstr(w)
     >      window:addstr(' ')
-    >      local tmp = window:getch()
-    >      if tmp then
-    >        window:ungetch(tmp)
-    >        break
-    >      end
     >    end
     >  end
     >
@@ -297,7 +306,7 @@
     >Mon Feb 21 17:42:28 2022
   anagrams:
     >function anagrams(word)
-    >  return gather(sort_string(word))
+    >  return gather(sort_letters(word))
     >end
 - __teliva_timestamp:
     >Mon Feb 21 18:18:07 2022
@@ -307,7 +316,6 @@
     >  local result = {}
     >  for i=1, #s do
     >    if i == 1 or s[i] ~= s[i-1] then
-    >      local foo = combine(s[i], gather(take_out(s, i)))
     >      append(result, combine(s[i], gather(take_out(s, i))))
     >    end
     >  end
@@ -330,6 +338,8 @@
     >  check_eq(take_out('abc', 2), 'ac', 'take_out: middle index')
     >end
 - __teliva_timestamp: original
+  __teliva_note:
+    >basic version
   combine:
     >-- return 'l' with each element prefixed with 'prefix'
     >function combine(prefix, l)
@@ -343,4 +353,96 @@
     >
     >function test_combine()
     >  check_eq(combine('abc', {}), {'abc'}, 'test_combine: empty list')
+    >end
+- __teliva_timestamp:
+    >Sat Mar  5 15:24:00 2022
+  count_anagrams:
+    >function count_anagrams(s)
+    >  local result = factorial(string.len(s))
+    >  local letter_counts = count_letters(s)
+    >  for k, v in pairs(letter_counts) do
+    >    result = result / factorial(v)
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp:
+    >Sat Mar  5 15:24:34 2022
+  factorial:
+    >function factorial(n)
+    >  local result = 1
+    >  for i=1,n do
+    >    result = result*i
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp:
+    >Sat Mar  5 15:53:23 2022
+  key_pressed:
+    >-- only works when nodelay (non-blocking keyboard)
+    >function key_pressed(window)
+    >  local c = window:getch()
+    >  if c == nil then return false end
+    >  window:ungetch(c)
+    >  return true
+    >end
+- __teliva_timestamp:
+    >Sat Mar  5 15:55:34 2022
+  render:
+    >function render(window)
+    >  window:clear()
+    >
+    >  local prompt_str = ' what is your name? '
+    >  window:attron(curses.A_REVERSE)
+    >  window:mvaddstr(0, 0, prompt_str)
+    >  window:attroff(curses.A_REVERSE)
+    >  window:addstr(' ')
+    >  window:attron(curses.A_BOLD)
+    >  window:addstr(word)
+    >  window:attroff(curses.A_BOLD)
+    >  window:mvaddstr(2, 0, '')
+    >  if #word > 0 then
+    >    local num_anagrams = count_anagrams(word)
+    >    window:attron(curses.A_REVERSE)
+    >    print(num_anagrams..' anagrams')
+    >    window:attroff(curses.A_REVERSE)
+    >    local results = anagrams(word)
+    >    if results == nil then  -- interrupted
+    >      window:addstr('...')
+    >    else
+    >      assert(#results == num_anagrams, "something's wrong; the count is unexpected")
+    >      for i, w in ipairs(results) do
+    >        window:addstr(w)
+    >        window:addstr(' ')
+    >        if key_pressed(window) then
+    >          break
+    >        end
+    >      end
+    >    end
+    >  end
+    >
+    >  window:mvaddstr(0, string.len(prompt_str)+cursor, '')
+    >  window:refresh()
+    >end
+- __teliva_timestamp:
+    >Sat Mar  5 15:56:35 2022
+  __teliva_note:
+    >restart computation when a key is pressed
+  gather:
+    >-- return a list of unique permutations of a sorted string 's'
+    >-- the letters in 's' must be in alphabetical order, so that duplicates are adjacent
+    >-- this function can take a long time for long strings, so we make it interruptible
+    >-- if a key is pressed, it returns nil
+    >-- since it's recursive, we also need to handle recursive calls returning nil
+    >function gather(s)
+    >  if s == '' then return {} end
+    >  local result = {}
+    >  for i=1, #s do
+    >    if i == 1 or s[i] ~= s[i-1] then
+    >      local subresult = gather(take_out(s, i))
+    >      if subresult == nil then return nil end  -- interrupted
+    >      append(result, combine(s[i], subresult))
+    >    end
+    >    if key_pressed(Window) then return nil end  -- interrupted
+    >  end
+    >  return result
     >end

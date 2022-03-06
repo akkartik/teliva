@@ -179,8 +179,8 @@
     >end
 - __teliva_timestamp:
     >Mon Feb 21 17:45:04 2022
-  sort_string:
-    >function sort_string(s)
+  sort_letters:
+    >function sort_letters(s)
     >  tmp = {}
     >  for i=1,#s do
     >    table.insert(tmp, s[i])
@@ -193,10 +193,24 @@
     >  return result
     >end
     >
-    >function test_sort_string(s)
-    >  check_eq(sort_string(''), '', 'test_sort_string: empty')
-    >  check_eq(sort_string('ba'), 'ab', 'test_sort_string: non-empty')
-    >  check_eq(sort_string('abba'), 'aabb', 'test_sort_string: duplicates')
+    >function test_sort_letters(s)
+    >  check_eq(sort_letters(''), '', 'test_sort_letters: empty')
+    >  check_eq(sort_letters('ba'), 'ab', 'test_sort_letters: non-empty')
+    >  check_eq(sort_letters('abba'), 'aabb', 'test_sort_letters: duplicates')
+    >end
+- __teliva_timestamp: original
+  count_letters:
+    >function count_letters(s)
+    >  local result = {}
+    >  for i=1,string.len(s) do
+    >    local c = s[i]
+    >    if result[c] == nil then
+    >      result[c] = 1
+    >    else
+    >      result[c] = result[c] + 1
+    >    end
+    >  end
+    >  return result
     >end
 - __teliva_timestamp: original
   append:

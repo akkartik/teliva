@@ -337,6 +337,17 @@ char* get_caller(lua_State* L) {
   return result;
 }
 
+char* get_caller_of_caller(lua_State* L) {
+  static char result[1024] = {0};
+  lua_Debug ar;
+  lua_getstack(L, 2, &ar);
+  lua_getinfo(L, "n", &ar);
+  memset(result, '\0', 1024);
+  if (ar.name)
+    strncpy(result, ar.name, 1020);
+  return result;
+}
+
 void save_caller_as(lua_State* L, const char* name, const char* caller_name) {
   // push table of caller tables
   luaL_newmetatable(L, "__teliva_caller");

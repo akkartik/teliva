@@ -122,6 +122,11 @@ static int io_tostring (lua_State *L) {
 }
 
 
+static int is_equal(const char *a, const char *b) {
+  return strcmp(a, b) == 0;
+}
+
+
 static char iolib_errbuf[1024] = {0};
 static int io_open (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
@@ -134,6 +139,15 @@ static int io_open (lua_State *L) {
   const char *caller = get_caller(L);
   if (file_operation_permitted(caller, filename, mode))
     *pf = fopen(filename, mode);
+  else if (is_equal(caller, "start_writing") || is_equal(caller, "start_reading")) {
+    caller = get_caller_of_caller(L);
+    if (file_operation_permitted(caller, filename, mode))
+      *pf = fopen(filename, mode);
+    else {
+      snprintf(iolib_errbuf, 1024, "app tried to open file '%s' from caller '%s'; adjust its permissions (ctrl-p) if that is expected", filename, caller);
+      Previous_message = iolib_errbuf;
+    }
+  }
   else {
     snprintf(iolib_errbuf, 1024, "app tried to open file '%s' from caller '%s'; adjust its permissions (ctrl-p) if that is expected", filename, caller);
     Previous_message = iolib_errbuf;

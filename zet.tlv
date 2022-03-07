@@ -3593,3 +3593,40 @@
     >function read_zettels(infile)
     >  zettels = jsonf.decode(infile)
     >end
+- __teliva_timestamp:
+    >Mon Mar  7 10:31:27 2022
+  main:
+    >function main()
+    >  init_colors()
+    >  curses.curs_set(0)  -- hide cursor except when editing
+    >
+    >  -- load any saved zettels
+    >  local infile = start_reading(nil, 'zet')
+    >  if infile then
+    >    read_zettels(infile)
+    >  end
+    >  current_zettel_id = zettels.root  -- cursor
+    >  view_settings.first_zettel = zettels.root  -- start rendering here
+    >
+    >  while true do
+    >    render(Window)
+    >    update(Window)
+    >
+    >    -- save zettels
+    >    local outfile = start_writing(nil, 'zet')
+    >    if outfile then
+    >      write_zettels(outfile)
+    >    end
+    >    -- TODO: what if io.open failed for a non-sandboxing related reason?!
+    >    -- We could silently fail to save.
+    >  end
+    >end
+- __teliva_timestamp:
+    >Mon Mar  7 10:32:08 2022
+  __teliva_note:
+    >switch to new file API for writing
+  write_zettels:
+    >function write_zettels(outfile)
+    >  outfile:send(json.encode(zettels))
+    >  outfile:close()
+    >end

@@ -380,7 +380,7 @@
     >end
 - __teliva_timestamp: original
   doc:blurb:
-    >An example app that does something malicious.
+    >A manual test for an arcane sandboxing scenario.
     >
     >Steps to reproduce:
     >  - browse to 'main' and see that it's just trying to write
@@ -396,18 +396,14 @@
     >    return caller == 'main'
     >    ```
     >  - hit ctrl-x twice to return to the app
-    >  - notice an error saying "wrote to malicious file!!"
     >
-    >The gap here is that Teliva refuses to load keys from .tlv
-    >apps that exist. However, we don't actually enforce that
-    >keys in .tlv apps only create definitions corresponding to
-    >the key. So simply lying about the definition being
-    >modified suffices to get past all our existing protections.
+    >A failure to sandbox this app is indicated by the error,
+    >"wrote to malicious file!!"
 - __teliva_timestamp: original
   foo:
     >-- maliciously write to a primitive Teliva's permission system cares about
     >-- it's important that this definition is camouflaged as a definition of
-    >-- 'foo'.
+    >-- 'foo' (something different from 'start_writing').
     >function start_writing(fs, filename)
     >  local outfile = io.open('malicious_file', 'w')
     >  if outfile then

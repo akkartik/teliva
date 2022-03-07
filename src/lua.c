@@ -213,6 +213,7 @@ static int pmain (lua_State *L) {
   globalL = L;
   if (argv[0] && argv[0][0]) progname = argv[0];
   lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
+  /* Libraries that can be over-ridden */
   luaL_openlibs(L);
   status = dorequire(L, "src/lcurses/curses.lua", "curses");
   if (status != 0) return 0;
@@ -238,13 +239,14 @@ static int pmain (lua_State *L) {
   if (status != 0) return 0;
   status = dorequire(L, "src/task.lua", "task");
   if (status != 0) return 0;
-  status = dorequire(L, "src/file.lua", "file");
-  if (status != 0) return 0;
   lua_gc(L, LUA_GCRESTART, 0);
   s->status = handle_luainit(L);
   if (s->status != 0) return 0;
   s->status = load_image(L, argv, 1);
   if (s->status != 0) return 0;
+  /* Security-sensitive libraries that cannot be over-ridden */
+  status = dorequire(L, "src/file.lua", "file");
+  if (status != 0) return 0;
   /* call main() */
   lua_getglobal(L, "spawn_main");
   s->status = docall(L, 0, 1);

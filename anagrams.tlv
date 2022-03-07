@@ -23,7 +23,7 @@
     >-- index characters using []
     >getmetatable('').__index = function(str,i)
     >  if type(i) == 'number' then
-    >    return string.sub(str,i,i)
+    >    return str:sub(i,i)
     >  else
     >    return string[i]
     >  end
@@ -32,11 +32,11 @@
     >-- ranges using (), selected bytes using {}
     >getmetatable('').__call = function(str,i,j)
     >  if type(i)~='table' then
-    >    return string.sub(str,i,j)
+    >    return str:sub(i,j)
     >  else
     >    local t={}
     >    for k,v in ipairs(i) do
-    >      t[k]=string.sub(str,v,v)
+    >      t[k]=str:sub(v,v)
     >    end
     >    return table.concat(t)
     >  end
@@ -186,7 +186,7 @@
   count_letters:
     >function count_letters(s)
     >  local result = {}
-    >  for i=1,string.len(s) do
+    >  for i=1,s:len() do
     >    local c = s[i]
     >    if result[c] == nil then
     >      result[c] = 1
@@ -309,8 +309,8 @@
     >Mon Feb 21 18:06:20 2022
   take_out:
     >function take_out(s, i)
-    >  if i < 1 then return string.sub(s, 1) end
-    >  return string.sub(s, 1, i-1) .. string.sub(s, i+1)
+    >  if i < 1 then return s:sub(1) end
+    >  return s:sub(1, i-1) .. s:sub(i+1)
     >end
     >
     >function test_take_out()
@@ -342,7 +342,7 @@
     >Sat Mar  5 15:24:00 2022
   count_anagrams:
     >function count_anagrams(s)
-    >  local result = factorial(string.len(s))
+    >  local result = factorial(s:len())
     >  local letter_counts = count_letters(s)
     >  for k, v in pairs(letter_counts) do
     >    result = result / factorial(v)

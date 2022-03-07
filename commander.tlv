@@ -23,7 +23,7 @@
     >-- index characters using []
     >getmetatable('').__index = function(str,i)
     >  if type(i) == 'number' then
-    >    return string.sub(str,i,i)
+    >    return str:sub(i,i)
     >  else
     >    return string[i]
     >  end
@@ -32,13 +32,13 @@
     >-- ranges using (), selected bytes using {}
     >getmetatable('').__call = function(str,i,j)
     >  if type(i)~='table' then
-    >    return string.sub(str,i,j)
+    >    return str:sub(i,j)
     >  else
     >    local t={}
     >    for k,v in ipairs(i) do
-    >      t[k]=string.sub(str,v,v)
+    >      t[k]=str:sub(v,v)
     >    end
-    >    return table.concat(t)
+    >    return t:concat()
     >  end
     >end
     >

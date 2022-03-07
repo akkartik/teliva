@@ -56,9 +56,9 @@ function character_splitting_task(chanin, chanout)
   while true do
     local line = chanin:recv()
     if line == nil then break end
-    local linesz = string.len(line)
+    local linesz = line:len()
     for i=1,linesz do
-      chanout:send(string.sub(line, i, i))
+      chanout:send(line:sub(i, i))
     end
   end
   chanout:send(nil)  -- end of file

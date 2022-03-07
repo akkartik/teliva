@@ -23,7 +23,7 @@
     >-- index characters using []
     >getmetatable('').__index = function(str,i)
     >  if type(i) == 'number' then
-    >    return string.sub(str,i,i)
+    >    return str:sub(i,i)
     >  else
     >    return string[i]
     >  end
@@ -32,11 +32,11 @@
     >-- ranges using (), selected bytes using {}
     >getmetatable('').__call = function(str,i,j)
     >  if type(i)~='table' then
-    >    return string.sub(str,i,j)
+    >    return str:sub(i,j)
     >  else
     >    local t={}
     >    for k,v in ipairs(i) do
-    >      t[k]=string.sub(str,v,v)
+    >      t[k]=str:sub(v,v)
     >    end
     >    return table.concat(t)
     >  end
@@ -201,7 +201,7 @@
   count_letters:
     >function count_letters(s)
     >  local result = {}
-    >  for i=1,string.len(s) do
+    >  for i=1,s:len() do
     >    local c = s[i]
     >    if result[c] == nil then
     >      result[c] = 1
@@ -259,7 +259,7 @@
     >    end
     >  end
     >  h.addstr = function(self, s)
-    >    for i=1,string.len(s) do
+    >    for i=1,s:len() do
     >      self:addch(s[i])
     >    end
     >  end
@@ -279,7 +279,7 @@
   kbd:
     >function kbd(keys)
     >  local result = {}
-    >  for i=1,string.len(keys) do
+    >  for i=1,keys:len() do
     >    table.insert(result, keys[i])
     >  end
     >  return result
@@ -301,7 +301,7 @@
   check_screen:
     >function check_screen(window, contents, message)
     >  local x, y = 1, 1
-    >  for i=1,string.len(contents) do
+    >  for i=1,contents:len() do
     >    check_eq(contents[i], window.scr[y][x], message..'/'..y..','..x)
     >    x = x+1
     >    if x > window.scr.w then
@@ -595,7 +595,7 @@
     >  end
     >  local y, x = top, left + 1  -- left padding; TODO: indent
     >  window:mvaddstr(y, x, '')
-    >  for i=1,string.len(s) do
+    >  for i=1,s:len() do
     >    -- render character
     >    if i == cursor then
     >      if s[i] == '\n' then
@@ -635,7 +635,7 @@
     >      end
     >    end
     >  end
-    >  if cursor > string.len(s) then
+    >  if cursor > s:len() then
     >    window:attron(curses.A_REVERSE)
     >    window:addch(' ')
     >    window:attroff(curses.A_REVERSE)
@@ -676,7 +676,7 @@
 - __teliva_timestamp: original
   cursor_down:
     >function cursor_down(s, old_idx, width)
-    >  local max = string.len(s)
+    >  local max = s:len()
     >  local i = 1
     >  -- compute oldcol, the screen column of old_idx
     >  local oldcol = 0
@@ -767,7 +767,7 @@
     >initial commit: show/edit zettels
   cursor_up:
     >function cursor_up(s, old_idx, width)
-    >  local max = string.len(s)
+    >  local max = s:len()
     >  local i = 1
     >  -- compute oldcol, the screen column of old_idx
     >  local oldcol = 0
@@ -969,7 +969,7 @@
     >  end
     >  local y, x = top, left + 1  -- left padding; TODO: indent
     >  window:mvaddstr(y, x, '')
-    >  for i=1,string.len(s) do
+    >  for i=1,s:len() do
     >    if i == cursor then
     >      cursor_y = y
     >      cursor_x = x
@@ -1010,7 +1010,7 @@
     >  local bottom = top + view_settings.height
     >  local left = (render_state.curr_w - 1) * (view_settings.width + view_settings.hmargin)
     >  local right = left + view_settings.width
-    >  local cursor = string.len(zettels[current_zettel_id].data)+1
+    >  local cursor = zettels[current_zettel_id].data:len()+1
     >  local quit = false
     >  curses.curs_set(1)
     >  while not quit do
@@ -2482,7 +2482,7 @@
     >  end
     >  local y, x = top, left + 1  -- left padding; TODO: indent
     >  window:mvaddstr(y, x, '')
-    >  for i=1,string.len(s) do
+    >  for i=1,s:len() do
     >    if i == cursor then
     >      cursor_y = y
     >      cursor_x = x
@@ -2744,12 +2744,12 @@
     >    {'^l', 'line>>'},
     >    {'^k', 'del to line>>'},
     >  }
-    >  local old_data = string.sub(zettels[current_zettel_id].data, 1)
+    >  local old_data = zettels[current_zettel_id].data:sub(1)
     >  local top = (render_state.curr_h - 1) * (view_settings.height + view_settings.vmargin)
     >  local bottom = top + view_settings.height
     >  local left = (render_state.curr_w - 1) * (view_settings.width + view_settings.hmargin)
     >  local right = left + view_settings.width
-    >  local cursor = string.len(zettels[current_zettel_id].data)+1
+    >  local cursor = zettels[current_zettel_id].data:len()+1
     >  local quit = false
     >  curses.curs_set(1)
     >  while not quit do
@@ -2791,7 +2791,7 @@
     >      cursor = cursor-1
     >    end
     >  elseif key == 12 then  -- ctrl-l
-    >    local max = string.len(prose)
+    >    local max = prose:len()
     >    while cursor <= max and prose[cursor] ~= '\n' do
     >      cursor = cursor+1
     >    end
@@ -2799,7 +2799,7 @@
     >  elseif key == 2 then  -- ctrl-b
     >  -- delete
     >  elseif key == 11 then  -- ctrl-k
-    >    while cursor <= string.len(prose) and prose[cursor] ~= '\n' do
+    >    while cursor <= prose:len() and prose[cursor] ~= '\n' do
     >      prose = prose:remove(cursor)
     >    end
     >  -- exit
@@ -2848,33 +2848,33 @@
     >    end
     >  elseif key == 12 then  -- ctrl-l
     >    -- to end of line
-    >    local max = string.len(prose)
+    >    local max = prose:len()
     >    while cursor <= max and prose[cursor] ~= '\n' do
     >      cursor = cursor+1
     >    end
     >  elseif key == 6 then  -- ctrl-f
     >    -- to next word
-    >    local max = string.len(prose)
-    >    while cursor <= max and string.match(prose[cursor], '%w') do
+    >    local max = prose:len()
+    >    while cursor <= max and prose[cursor]:match('%w') do
     >      cursor = cursor+1
     >    end
-    >    while cursor <= max and string.match(prose[cursor], '%W') do
+    >    while cursor <= max and prose[cursor]:match('%W') do
     >      cursor = cursor+1
     >    end
     >  elseif key == 2 then  -- ctrl-b
     >    -- to previous word
-    >    if cursor > string.len(prose) then
-    >      cursor = string.len(prose)
+    >    if cursor > prose:len() then
+    >      cursor = prose:len()
     >    end
-    >    while cursor > 1 and string.match(prose[cursor], '%W') do
+    >    while cursor > 1 and prose[cursor]:match('%W') do
     >      cursor = cursor-1
     >    end
-    >    while cursor > 1 and string.match(prose[cursor], '%w') do
+    >    while cursor > 1 and prose[cursor]:match('%w') do
     >      cursor = cursor-1
     >    end
     >  -- delete
     >  elseif key == 11 then  -- ctrl-k
-    >    while cursor <= string.len(prose) and prose[cursor] ~= '\n' do
+    >    while cursor <= prose:len() and prose[cursor] ~= '\n' do
     >      prose = prose:remove(cursor)
     >    end
     >  -- exit
@@ -2906,7 +2906,7 @@
     >  end
     >  local y, x = top, left + 1  -- left padding; TODO: indent
     >  window:mvaddstr(y, x, '')
-    >  for i=1,string.len(s) do
+    >  for i=1,s:len() do
     >    if i == cursor then
     >      cursor_y = y
     >      cursor_x = x

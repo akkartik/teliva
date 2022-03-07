@@ -23,7 +23,7 @@
     >-- index characters using []
     >getmetatable('').__index = function(str,i)
     >  if type(i) == 'number' then
-    >    return string.sub(str,i,i)
+    >    return str:sub(i,i)
     >  else
     >    return string[i]
     >  end
@@ -32,11 +32,11 @@
     >-- ranges using (), selected bytes using {}
     >getmetatable('').__call = function(str,i,j)
     >  if type(i)~='table' then
-    >    return string.sub(str,i,j)
+    >    return str:sub(i,j)
     >  else
     >    local t={}
     >    for k,v in ipairs(i) do
-    >      t[k]=string.sub(str,v,v)
+    >      t[k]=str:sub(v,v)
     >    end
     >    return table.concat(t)
     >  end
@@ -158,14 +158,14 @@
   render_line:
     >function render_line(window, y, line)
     >  window:mvaddstr(y, 0, '')
-    >  for i=1,string.len(line) do
+    >  for i=1,line:len() do
     >    window:addstr(line[i])
     >  end
     >end
 - __teliva_timestamp: original
   render_link:
     >function render_link(window, y, line)
-    >  local rendered_line = string.gsub(line, '=>%s*%S*%s*', '')
+    >  local rendered_line = line:gsub('=>%s*%S*%s*', '')
     >  if trim(rendered_line) == '' then
     >    rendered_line = line
     >  end
@@ -189,7 +189,7 @@
     >  y = y+2
     >--?   dbg(window, state.highlight_index)
     >  for i, line in pairs(state.lines) do
-    >    if not state.source and string.find(line, '=> ') == 1 then
+    >    if not state.source and line:find('=> ') == 1 then
     >      if state.highlight_index == 0 or i == state.highlight_index then
     >        -- highlighted link
     >        state.highlight_index = i  -- TODO: ugly state update while rendering, just for first render after gemini_get
@@ -276,7 +276,7 @@
 - __teliva_timestamp: original
   is_link:
     >function is_link(line)
-    >  return string.find(line, '=>%s*%S*%s*') == 1
+    >  return line:find('=>%s*%S*%s*') == 1
     >end
 - __teliva_timestamp: original
   next_link:
@@ -384,11 +384,11 @@
     >    local s, status = tcp:receive()
     >    if s == nil then break end
     >    if s == '' then break end
-    >    local header, value = string.match(s, '(.-): (.*)')
+    >    local header, value = s:match('(.-): (.*)')
     >    if header == nil then
     >      print(s)
     >    else
-    >      headers[string.lower(header)] = value
+    >      headers[header:lower()] = value
     >      print(header, value)
     >    end
     >  end
@@ -398,7 +398,7 @@
     >    local s, status = tcp:receive(bytes_remaining)
     >    if s == nil then break end
     >    body = body .. s
-    >    bytes_remaining = bytes_remaining - string.len(s)
+    >    bytes_remaining = bytes_remaining - s:len()
     >    if bytes_remaining <= 0 then break end
     >  end
     >  return body
@@ -436,7 +436,7 @@
     >      if line == nil then break end
     >      table.insert(state.lines, line)
     >    end
-    >  elseif string.sub(type, 1, 5) == 'text/' then
+    >  elseif type:sub(1, 5) == 'text/' then
     >    while true do
     >      local line, err = conn:receive()
     >      if line == nil then break end
@@ -450,7 +450,7 @@
     >-- https://tildegit.org/solderpunk/gemini-demo-2
     >-- returns an array of lines, containing either the body or just an error
     >function gemini_get(url)
-    >  if string.find(url, "://") == nil then
+    >  if url:find("://") == nil then
     >    url = "gemini://" .. url
     >  end
     >  local parsed_url = socket.url.parse(url)
@@ -480,7 +480,7 @@
     >    table.insert(state.lines, err)
     >    return
     >  end
-    >  local status, meta = string.match(line, "(%S+) (%S+)")
+    >  local status, meta = line:match("(%S+) (%S+)")
     >  if status[1] == '2' then
     >    parse_gemini_body(conn, meta)
     >    state.url = url

@@ -23,7 +23,7 @@
     >-- index characters using []
     >getmetatable('').__index = function(str,i)
     >  if type(i) == 'number' then
-    >    return string.sub(str,i,i)
+    >    return str:sub(i,i)
     >  else
     >    return string[i]
     >  end
@@ -32,11 +32,11 @@
     >-- ranges using (), selected bytes using {}
     >getmetatable('').__call = function(str,i,j)
     >  if type(i)~='table' then
-    >    return string.sub(str,i,j)
+    >    return str:sub(i,j)
     >  else
     >    local t={}
     >    for k,v in ipairs(i) do
-    >      t[k]=string.sub(str,v,v)
+    >      t[k]=str:sub(v,v)
     >    end
     >    return table.concat(t)
     >  end
@@ -202,7 +202,7 @@
   count_letters:
     >function count_letters(s)
     >  local result = {}
-    >  for i=1,string.len(s) do
+    >  for i=1,s:len() do
     >    local c = s[i]
     >    if result[c] == nil then
     >      result[c] = 1
@@ -255,7 +255,7 @@
     >    end
     >  end
     >  h.addstr = function(self, s)
-    >    for i=1,string.len(s) do
+    >    for i=1,s:len() do
     >      self:addch(s[i])
     >    end
     >  end
@@ -275,7 +275,7 @@
   kbd:
     >function kbd(keys)
     >  local result = {}
-    >  for i=1,string.len(keys) do
+    >  for i=1,keys:len() do
     >    table.insert(result, keys[i])
     >  end
     >  return result
@@ -298,7 +298,7 @@
   check_screen:
     >function check_screen(window, contents, message)
     >  local x, y = 1, 1
-    >  for i=1,string.len(contents) do
+    >  for i=1,contents:len() do
     >    check_eq(contents[i], window.scr[y][x], message..'/'..y..','..x)
     >    x = x+1
     >    if x > window.scr.w then
@@ -438,7 +438,7 @@
 - __teliva_timestamp: original
   state:
     >function state(line, col)
-    >  if line < 1 or line > table.getn(grid) or col < 1 or col > table.getn(grid[1]) then
+    >  if line < 1 or line > #grid or col < 1 or col > #grid[1] then
     >    return 0
     >  end
     >  return grid[line][col]
@@ -454,9 +454,9 @@
   step:
     >function step()
     >  local new_grid = {}
-    >  for line=1,table.getn(grid) do
+    >  for line=1,#grid do
     >    new_grid[line] = {}
-    >    for col=1,table.getn(grid[1]) do
+    >    for col=1,#grid[1] do
     >      local n = num_live_neighbors(line, col)
     >      if n == 3 then
     >        new_grid[line][col] = 1

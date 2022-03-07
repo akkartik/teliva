@@ -23,7 +23,7 @@
     >-- index characters using []
     >getmetatable('').__index = function(str,i)
     >  if type(i) == 'number' then
-    >    return string.sub(str,i,i)
+    >    return str:sub(i,i)
     >  else
     >    return string[i]
     >  end
@@ -32,11 +32,11 @@
     >-- ranges using (), selected bytes using {}
     >getmetatable('').__call = function(str,i,j)
     >  if type(i)~='table' then
-    >    return string.sub(str,i,j)
+    >    return str:sub(i,j)
     >  else
     >    local t={}
     >    for k,v in ipairs(i) do
-    >      t[k]=string.sub(str,v,v)
+    >      t[k]=str:sub(v,v)
     >    end
     >    return table.concat(t)
     >  end
@@ -235,7 +235,7 @@
     >    pos = render_text(window, toot, pos, cursor)
     >    print('')
     >    window:attron(curses.A_BOLD)
-    >    window:addstr(string.len(toot))
+    >    window:addstr(toot:len())
     >    window:attroff(curses.A_BOLD)
     >  end
     >  window:refresh()
@@ -244,7 +244,7 @@
   render_delimiter:
     >function render_delimiter(window, s, pos, cursor)
     >  local newpos = pos
-    >  for i=1,string.len(s) do
+    >  for i=1,s:len() do
     >    if newpos == cursor and i ~= 1 then
     >      if s[i] == '\n' then
     >        -- newline at cursor = render extra space in reverse video before jumping to new line
@@ -290,7 +290,7 @@
     >function render_text(window, s, pos, cursor)
     >  local newpos = pos
     >--?   dbg(window, '--')
-    >  for i=1,string.len(s) do
+    >  for i=1,s:len() do
     >--?     dbg(window, tostring(newpos)..' '..tostring(string.byte(s[i])))
     >    if newpos == cursor then
     >--?       dbg(window, 'cursor: '..tostring(cursor))

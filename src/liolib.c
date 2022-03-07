@@ -131,10 +131,11 @@ static int io_open (lua_State *L) {
   snprintf(buffer, 1020, "io.open(\"%s\", \"%s\")", filename, mode);
   append_to_audit_log(L, buffer);
   FILE **pf = newfile(L);
-  if (file_operation_permitted(caller(L), filename, mode))
+  const char *caller = get_caller(L);
+  if (file_operation_permitted(caller, filename, mode))
     *pf = fopen(filename, mode);
   else {
-    snprintf(iolib_errbuf, 1024, "app tried to open file '%s' from caller '%s'; adjust its permissions (ctrl-p) if that is expected", filename, caller(L));
+    snprintf(iolib_errbuf, 1024, "app tried to open file '%s' from caller '%s'; adjust its permissions (ctrl-p) if that is expected", filename, caller);
     Previous_message = iolib_errbuf;
   }
   return (*pf == NULL) ? pushresult(L, 0, filename) : 1;

@@ -324,7 +324,7 @@ void save_caller(lua_State* L, const char* name, int call_graph_depth) {
   if (ar.name) save_caller_as(L, name, ar.name);
 }
 
-char* caller(lua_State* L) {
+char* get_caller(lua_State* L) {
   static char result[1024] = {0};
   lua_Debug ar;
   lua_getstack(L, 1, &ar);

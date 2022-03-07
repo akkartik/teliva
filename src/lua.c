@@ -243,8 +243,12 @@ static int pmain (lua_State *L) {
   lua_gc(L, LUA_GCRESTART, 0);
   s->status = handle_luainit(L);
   if (s->status != 0) return 0;
-  s->status = handle_image(L, argv, 1);
+  s->status = load_image(L, argv, 1);
   if (s->status != 0) return 0;
+  /* call main() */
+  lua_getglobal(L, "spawn_main");
+  s->status = docall(L, 0, 1);
+  if (s->status != 0) return report_in_developer_mode(L, s->status);
   return 0;
 }
 

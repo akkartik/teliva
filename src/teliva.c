@@ -1783,7 +1783,7 @@ static const char* events_view() {
 char* Image_name = NULL;
 extern void set_args (lua_State *L, char **argv, int n);
 extern void load_tlv(lua_State* L, char* filename);
-int handle_image(lua_State* L, char** argv, int n) {
+int load_image(lua_State* L, char** argv, int n) {
   int status;
   set_args(L, argv, n);
   /* parse and load file contents (teliva_program array) */
@@ -1800,9 +1800,5 @@ int handle_image(lua_State* L, char** argv, int n) {
   clear_caller(L);
   /* initialize permissions */
   load_permissions_from_user_configuration(L);
-  /* call main() */
-  lua_getglobal(L, "spawn_main");
-  status = docall(L, 0, 1);
-  if (status != 0) return report_in_developer_mode(L, status);
   return 0;
 }

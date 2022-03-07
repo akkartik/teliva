@@ -25,6 +25,8 @@ running app.. shouldn't grow the call stack either.
 == security/privacy
 program draws over menu -> getch -> Teliva menu is still visible
 
+test/attack.tlv runs without error. See its blurb for details.
+
 TODO protect sensitive teliva files (teliva_edit_buffer, etc.)
   should we protect .c sources?
 

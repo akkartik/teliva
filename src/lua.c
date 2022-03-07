@@ -234,6 +234,8 @@ static int pmain (lua_State *L) {
   if (status != 0) return 0;
   status = dorequire(L, "src/json.lua", "json");
   if (status != 0) return 0;
+  status = dorequire(L, "src/jsonf.lua", "jsonf");
+  if (status != 0) return 0;
   status = dorequire(L, "src/task.lua", "task");
   if (status != 0) return 0;
   status = dorequire(L, "src/file.lua", "file");

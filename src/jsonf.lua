@@ -127,7 +127,7 @@ local function parse_string(infile, firstc)
 
     if x < 32 then
       error("control character in string")
-    elseif c == '\\' then
+    elseif chr == '\\' then
       local c = infile:recv()
       if c == nil then break end
       if c == "u" then
@@ -152,7 +152,7 @@ local function parse_string(infile, firstc)
         if not escape_chars[c] then
           error("invalid escape char '" .. c .. "' in string")
         end
-        table.insert(escape_char_map_inv[c])
+        table.insert(res, escape_char_map_inv[c])
       end
     elseif chr == '"' then
       return table.concat(res), infile:recv()

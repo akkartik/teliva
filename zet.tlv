@@ -3555,3 +3555,41 @@
     >- ability to cross-link any card to any other, turning the tree into a graph (but still with a strong sense of hierarchy)
     >
     >zet.tlv satisfies these properties, but isn't very intuitive or usable yet. Contributions appreciated.
+- __teliva_timestamp:
+    >Mon Mar  7 07:50:32 2022
+  main:
+    >function main()
+    >  init_colors()
+    >  curses.curs_set(0)  -- hide cursor except when editing
+    >
+    >  local infile = start_reading(nil, 'zet')
+    >  if infile then
+    >    read_zettels(infile)
+    >  end
+    >  current_zettel_id = zettels.root  -- cursor
+    >  view_settings.first_zettel = zettels.root  -- start rendering here
+    >
+    >  while true do
+    >    render(Window)
+    >    update(Window)
+    >
+    >    -- save zettels, but hold on to previous state on disk
+    >    -- until last possible second
+    >    local outfile = io.open('teliva_tmp', 'w')
+    >    if outfile then
+    >      write_zettels(outfile)
+    >      local status, message = os.rename('teliva_tmp', 'zet')
+    >      assert(status, message)  -- unceremoniously abort, but we hopefully only lost a little
+    >    end
+    >    -- TODO: what if io.open failed for a non-sandboxing related reason?!
+    >    -- We could silently fail to save.
+    >  end
+    >end
+- __teliva_timestamp:
+    >Mon Mar  7 07:51:06 2022
+  __teliva_note:
+    >switch to new file API for reading
+  read_zettels:
+    >function read_zettels(infile)
+    >  zettels = jsonf.decode(infile)
+    >end

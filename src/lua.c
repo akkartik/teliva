@@ -212,8 +212,9 @@ static int pmain (lua_State *L) {
   int status;
   globalL = L;
   if (argv[0] && argv[0][0]) progname = argv[0];
-  lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
+
   /* Libraries that can be over-ridden */
+  lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
   luaL_openlibs(L);
   status = dorequire(L, "src/lcurses/curses.lua", "curses");
   if (status != 0) return 0;
@@ -240,17 +241,23 @@ static int pmain (lua_State *L) {
   status = dorequire(L, "src/task.lua", "task");
   if (status != 0) return 0;
   lua_gc(L, LUA_GCRESTART, 0);
+
   s->status = handle_luainit(L);
   if (s->status != 0) return 0;
   s->status = load_image(L, argv, 1);
   if (s->status != 0) return 0;
+
   /* Security-sensitive libraries that cannot be over-ridden */
-  status = dorequire(L, "src/file.lua", "file");
+  /* As a rule of thumb, if we ever special-case any Lua function names in C
+   * code, that's a signal it needs to load after the app. */
+  status = dorequire(L, "src/file.lua", "file");  /* special-cased in io_open */
   if (status != 0) return 0;
+
   /* call main() */
   lua_getglobal(L, "spawn_main");
   s->status = docall(L, 0, 1);
   if (s->status != 0) return report_in_developer_mode(L, s->status);
+
   return 0;
 }
 

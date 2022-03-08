@@ -132,7 +132,9 @@ static int io_open (lua_State *L) {
   snprintf(buffer, 1020, "io.open(\"%s\", \"%s\")", filename, mode);
   append_to_audit_log(L, buffer);
   FILE **pf = newfile(L);
-  if (file_operation_permitted(filename, mode))
+  if (file_operation_permitted(filename, mode)
+      /* filenames starting with teliva_tmp_ are always ok */
+      || starts_with(filename, "teliva_tmp_"))
     *pf = fopen(filename, mode);
   else {
     snprintf(iolib_errbuf, 1024, "app tried to open file '%s'; adjust its permissions (ctrl-p) if that is expected", filename);

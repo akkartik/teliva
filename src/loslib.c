@@ -18,6 +18,7 @@
 
 #include "lauxlib.h"
 #include "lualib.h"
+#include "teliva.h"
 
 
 static int os_pushresult (lua_State *L, int i, const char *filename) {
@@ -41,9 +42,23 @@ static int os_remove (lua_State *L) {
 }
 
 
+static char oslib_errbuf[1024] = {0};
 static int os_rename (lua_State *L) {
   const char *fromname = luaL_checkstring(L, 1);
   const char *toname = luaL_checkstring(L, 2);
+  /* A rename is like reading from one file and writing to another file. */
+  if (!file_operation_permitted(fromname, "r")
+      && !starts_with(fromname, "teliva_tmp_")) {
+    snprintf(oslib_errbuf, 1024, "app tried to open file '%s' for reading; adjust its permissions (ctrl-p) if that is expected", fromname);
+    Previous_message = oslib_errbuf;
+    return os_pushresult(L, 0, fromname);
+  }
+  if (!file_operation_permitted(toname, "w")
+      && !starts_with(fromname, "teliva_tmp_")) {
+    snprintf(oslib_errbuf, 1024, "app tried to open file '%s' for writing; adjust its permissions (ctrl-p) if that is expected", toname);
+    Previous_message = oslib_errbuf;
+    return os_pushresult(L, 0, toname);
+  }
   return os_pushresult(L, rename(fromname, toname) == 0, fromname);
 }
 

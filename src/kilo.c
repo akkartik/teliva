@@ -167,10 +167,6 @@ static int is_separator(int c) {
     return c == '\0' || isspace(c) || strchr(",.()+-/*=~%[];",c) != NULL;
 }
 
-static int starts_with(const char* s, const char* prefix) {
-    return strncmp(prefix, s, strlen(prefix)) == 0;
-}
-
 /* Return true if the specified row last char is part of a multi line comment
  * that starts at this row or at one before, and does not end at the end
  * of the row but spawns to the next row. */

@@ -190,4 +190,7 @@ extern int report_in_developer_mode(lua_State* L, int status);
 
 extern void render_previous_error(void);
 
+/* Misc */
+extern int starts_with(const char* s, const char* prefix);
+
 #endif

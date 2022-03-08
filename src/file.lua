@@ -44,7 +44,7 @@ function temporary_filename_in_same_volume(filename)
   -- so that a future rename works
   local i = 1
   while true do
-    temporary_filename = 'teliva_temp_'..filename..'_'..i
+    temporary_filename = 'teliva_tmp_'..filename..'_'..i
     if io.open(temporary_filename) == nil then
       -- file doesn't exist yet; create a placeholder and return it
       local handle = io.open(temporary_filename, 'w')

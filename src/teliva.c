@@ -16,6 +16,10 @@
 #include "teliva.h"
 #include "tlv.h"
 
+int starts_with(const char* s, const char* prefix) {
+  return strncmp(s, prefix, strlen(prefix)) == 0;
+}
+
 /*** Standard UI elements */
 
 int menu_column = 0;
@@ -359,10 +363,6 @@ static void clear_caller(lua_State* L) {
   }
   lua_pop(L, 1);
   assert(lua_gettop(L) == oldtop);
-}
-
-static int starts_with(const char* s, const char* pre) {
-  return strncmp(pre, s, strlen(pre)) == 0;
 }
 
 /* return true if submitted */

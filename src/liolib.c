@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ncurses.h>
 
 #define liolib_c
 #define LUA_LIB
@@ -138,6 +139,8 @@ static int io_open (lua_State *L) {
   FILE **pf = newfile(L);
   const char *caller = get_caller(L);
   if (file_operation_permitted(caller, filename, mode))
+    *pf = fopen(filename, mode);
+  else if (is_equal(caller, "temporary_filename_in_same_volume"))
     *pf = fopen(filename, mode);
   else if (is_equal(caller, "start_writing") || is_equal(caller, "start_reading")) {
     caller = get_caller_of_caller(L);

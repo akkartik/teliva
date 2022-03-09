@@ -77,6 +77,21 @@
     >  window:mvaddstr(oldy, oldx, '')
     >end
 - __teliva_timestamp: original
+  check:
+    >function check(x, msg)
+    >  if x then
+    >    Window:addch('.')
+    >  else
+    >    print('F - '..msg)
+    >    print('  '..str(x)..' is false/nil')
+    >    teliva_num_test_failures = teliva_num_test_failures + 1
+    >    -- overlay first test failure on editors
+    >    if teliva_first_failure == nil then
+    >      teliva_first_failure = msg
+    >    end
+    >  end
+    >end
+- __teliva_timestamp: original
   check_eq:
     >function check_eq(x, expected, msg)
     >  if eq(x, expected) then
@@ -242,13 +257,30 @@
     >  h.__index = function(table, key)
     >    return rawget(h, key)
     >  end
+    >  h.attrset = function(self, x)
+    >    table.insert(self.scr.attrs, x)
+    >  end
+    >  h.attron = function(self, x)
+    >    -- currently same as attrset since Lua 5.1 doesn't have bitwise operators
+    >    -- doesn't support multiple attrs at once
+    >--    local old = self.scr.attrs
+    >--    self.scr.attrs = old|x
+    >    self.scr.attrs = x
+    >  end
+    >  h.attroff = function(self, x)
+    >    -- currently borked since Lua 5.1 doesn't have bitwise operators
+    >    -- doesn't support multiple attrs at once
+    >--    local old = self.scr.attrs
+    >--    self.scr.attrs = old & (~x)
+    >    self.scr.attrs = curses.A_NORMAL
+    >  end
     >  h.getch = function(self)
     >    return table.remove(h.kbd, 1)
     >  end
     >  h.addch = function(self, c)
     >    local scr = self.scr
     >    if scr.cursy <= scr.h then
-    >      scr[scr.cursy][scr.cursx] = c
+    >      scr[scr.cursy][scr.cursx] = {data=c, attrs=scr.attrs}
     >      scr.cursx = scr.cursx+1
     >      if scr.cursx > scr.w then
     >        scr.cursy = scr.cursy+1
@@ -290,7 +322,7 @@
     >  for y=1,props.h do
     >    props[y] = {}
     >    for x=1,props.w do
-    >      props[y][x] = ' '
+    >      props[y][x] = {data=' ', attrs=curses.A_NORMAL}
     >    end
     >  end
     >  return props
@@ -300,7 +332,7 @@
     >function check_screen(window, contents, message)
     >  local x, y = 1, 1
     >  for i=1,contents:len() do
-    >    check_eq(contents[i], window.scr[y][x], message..'/'..y..','..x)
+    >    check_eq(contents[i], window.scr[y][x].data, message..'/'..y..','..x)
     >    x = x+1
     >    if x > window.scr.w then
     >      y = y+1
@@ -332,6 +364,70 @@
     >                  '456  '..
     >                  '123  ',
     >              'test_check_screen')
+    >end
+- __teliva_timestamp: original
+  check_reverse:
+    >function check_reverse(window, contents, message)
+    >  local x, y = 1, 1
+    >  for i=1,contents:len() do
+    >    if contents[i] ~= ' ' then
+    >      -- hacky version while we're without bitwise operators on Lua 5.1
+    >--      check(window.scr[y][x].attrs & curses.A_REVERSE, message..'/'..y..','..x)
+    >      check_eq(window.scr[y][x].attrs, curses.A_REVERSE, message..'/'..y..','..x)
+    >    else
+    >      -- hacky version while we're without bitwise operators on Lua 5.1
+    >--      check(window.scr[y][x].attrs & (~curses.A_REVERSE), message..'/'..y..','..x)
+    >      check(window.scr[y][x].attrs ~= curses.A_REVERSE, message..'/'..y..','..x)
+    >    end
+    >    x = x+1
+    >    if x > window.scr.w then
+    >      y = y+1
+    >      x = 1
+    >    end
+    >  end
+    >end
+- __teliva_timestamp: original
+  check_bold:
+    >function check_bold(window, contents, message)
+    >  local x, y = 1, 1
+    >  for i=1,contents:len() do
+    >    if contents[i] ~= ' ' then
+    >      -- hacky version while we're without bitwise operators on Lua 5.1
+    >--      check(window.scr[y][x].attrs & curses.A_BOLD, message..'/'..y..','..x)
+    >      check_eq(window.scr[y][x].attrs, curses.A_BOLD, message..'/'..y..','..x)
+    >    else
+    >      -- hacky version while we're without bitwise operators on Lua 5.1
+    >--      check(window.scr[y][x].attrs & (~curses.A_BOLD), message..'/'..y..','..x)
+    >      check(window.scr[y][x].attrs ~= curses.A_BOLD, message..'/'..y..','..x)
+    >    end
+    >    x = x+1
+    >    if x > window.scr.w then
+    >      y = y+1
+    >      x = 1
+    >    end
+    >  end
+    >end
+- __teliva_timestamp: original
+  check_color:
+    >-- check which parts of a screen have the given color_pair
+    >function check_color(window, cp, contents, message)
+    >  local x, y = 1, 1
+    >  for i=1,contents:len() do
+    >    if contents[i] ~= ' ' then
+    >      -- hacky version while we're without bitwise operators on Lua 5.1
+    >--      check(window.scr[y][x].attrs & curses.color_pair(cp), message..'/'..y..','..x)
+    >      check_eq(window.scr[y][x].attrs, curses.color_pair(cp), message..'/'..y..','..x)
+    >    else
+    >      -- hacky version while we're without bitwise operators on Lua 5.1
+    >--      check(window.scr[y][x].attrs & (~curses.A_BOLD), message..'/'..y..','..x)
+    >      check(window.scr[y][x].attrs ~= curses.color_pair(cp), message..'/'..y..','..x)
+    >    end
+    >    x = x+1
+    >    if x > window.scr.w then
+    >      y = y+1
+    >      x = 1
+    >    end
+    >  end
     >end
 - __teliva_timestamp: original
   render:

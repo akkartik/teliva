@@ -1230,6 +1230,8 @@ static int run_tests(lua_State* L) {
       lua_pop(L, 1);
       if (first_failure_clear)
         lua_setglobal(L, "teliva_first_failure");
+      else
+        lua_pop(L, 1);
     }
     lua_pushnil(L);  /* just to undo loop update */
   }

@@ -1202,6 +1202,7 @@ static int load_definitions(lua_State* L) {
 
 static int run_tests(lua_State* L) {
   clear();
+  int oldtop = lua_gettop(L);
   lua_pushinteger(L, 0);
   lua_setglobal(L, "teliva_num_test_failures");
   lua_pushnil(L);
@@ -1239,6 +1240,11 @@ static int run_tests(lua_State* L) {
   lua_getglobal(L, "teliva_num_test_failures");
   int num_failures = lua_tointeger(L, -1);
   lua_pop(L, 1);
+  if (lua_gettop(L) != oldtop) {
+    endwin();
+    printf("render_recent_changes: memory leak %d -> %d\n", oldtop, lua_gettop(L));
+    exit(1);
+  }
   if (num_failures == 0) return 0;
   if (num_failures == 1)
     addstr("1 failure");

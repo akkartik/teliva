@@ -3774,9 +3774,8 @@
     >  end
     >end
     >
-    >function test_render_zettel()
+    >function test_render_zettel_single_line_topleft()
     >  local w = window{scr=scr{h=5, w=10}}
-    >  --
     >  render_zettel(w, 34, 1,  -- color 34, indent 1
     >                   '*', 1, 1, -- startx, starty
     >                   {data='abc'})
@@ -3785,7 +3784,7 @@
     >                     '          '..
     >                     '          '..
     >                     '          ',
-    >               'test_render_zettel: single line, top-left')
+    >               'render_zettel: single line zettel from top-left of screen')
     >  -- entire width is used by the single zettel
     >  -- column 1 = margin, column 2 = indent
     >  check_color(w, 34, '##########'..
@@ -3793,29 +3792,66 @@
     >                     '##########'..
     >                     '          '..
     >                     '          ',
-    >              'test_render_zettel: single line, top-left, background')
-    >  --
-    >  w:clear()
+    >              'render_zettel: single line zettel from top-left of screen, background')
+    >end
+    >
+    >function test_render_zettel_from_middle_of_screen()
+    >  local w = window{scr=scr{h=5, w=10}}
     >  render_zettel(w, 34, 1, '*', 3, 4, {data='abc'})  -- startx=3, starty=4
     >  check_screen(w,    '          '..
     >                     '          '..
     >                     '     abc  '..
     >                     '          '..
     >                     '          ',
-    >               'test_render_zettel: specific coord')
+    >               'render_zettel from middle of screen')
     >  check_color(w, 34, '          '..
     >                     '          '..
     >                     '   #######'..
     >                     '   #######'..
     >                     '   #######',
-    >               'test_render_zettel: specific coord, background')
-    >  --
-    >  w:clear()
+    >               'render_zettel from middle of screen, background')
+    >end
+    >
+    >function test_render_zettel_indented_prints_edge_label()
+    >  local w = window{scr=scr{h=5, w=10}}
     >  render_zettel(w, 34, 2, '*', 3, 4, {data='abc'})  -- startx=3, starty=4
     >  check_screen(w,    '          '..
     >                     '          '..
     >                     '    * abc '..
     >                     '          '..
     >                     '          ',
-    >               'test_render_zettel: indent >= 2 prints edge label')
+    >               'render_zettel: indent >= 2 prints edge label')
+    >end
+    >
+    >function test_render_zettel_crops_long_lines()
+    >  local w = window{scr=scr{h=5, w=10}}
+    >  render_zettel(w, 34, 2, '*', 3, 4, {data='abc def'})  -- startx=3, starty=4
+    >  check_screen(w,    '          '..
+    >                     '          '..
+    >                     '    * abc '..
+    >                     '          '..
+    >                     '          ',
+    >               'render_zettel: crops long lines')
+    >end
+    >
+    >function test_render_zettel_multiple_lines()
+    >  local w = window{scr=scr{h=5, w=10}}
+    >  render_zettel(w, 34, 2, '*', 3, 4, {data='abc\ndef'})  -- startx=3, starty=4
+    >  check_screen(w,    '          '..
+    >                     '          '..
+    >                     '    * abc '..
+    >                     '      def '..
+    >                     '          ',
+    >               'render_zettel: multiple lines')
+    >end
+    >
+    >function test_render_zettel_truncates_extra_lines()
+    >  local w = window{scr=scr{h=5, w=10}}
+    >  render_zettel(w, 34, 2, '*', 3, 4, {data='a\nb\nc\nd'})  -- startx=3, starty=4
+    >  check_screen(w,    '          '..
+    >                     '          '..
+    >                     '    * a   '..
+    >                     '      b   '..
+    >                     '      c   ',
+    >               'render_zettel: truncates extra lines')
     >end

@@ -1212,6 +1212,9 @@ static int run_tests(lua_State* L) {
     const char* key = lua_tostring(L, -2);
     if (strncmp("test_", key, strlen("test_")) != 0) continue;
     if (!lua_isfunction(L, -1)) continue;
+    /* uncomment these lines when it's not clear which test is failing */
+//?     addstr(key);
+//?     addstr("|");
     int status = lua_pcall(L, 0, 0, 0);
     if (status) {
       printw("E%d: %s", status, lua_tostring(L, -1));

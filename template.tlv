@@ -258,7 +258,7 @@
     >    return rawget(h, key)
     >  end
     >  h.attrset = function(self, x)
-    >    table.insert(self.scr.attrs, x)
+    >    self.scr.attrs = x
     >  end
     >  h.attron = function(self, x)
     >    -- currently same as attrset since Lua 5.1 doesn't have bitwise operators
@@ -296,12 +296,15 @@
     >  h.mvaddch = function(self, y, x, c)
     >    self.scr.cursy = y
     >    self.scr.cursx = x
-    >    self.addch(c)
+    >    self:addch(c)
     >  end
     >  h.mvaddstr = function(self, y, x, s)
     >    self.scr.cursy = y
     >    self.scr.cursx = x
     >    self:addstr(s)
+    >  end
+    >  h.clear = function(self)
+    >    clear_scr(self.scr)
     >  end
     >  return h
     >end
@@ -319,6 +322,12 @@
     >function scr(props)
     >  props.cursx = 1
     >  props.cursy = 1
+    >  clear_scr(props)
+    >  return props
+    >end
+- __teliva_timestamp: original
+  clear_scr:
+    >function clear_scr(props)
     >  for y=1,props.h do
     >    props[y] = {}
     >    for x=1,props.w do
@@ -332,7 +341,7 @@
     >function check_screen(window, contents, message)
     >  local x, y = 1, 1
     >  for i=1,contents:len() do
-    >    check_eq(contents[i], window.scr[y][x].data, message..'/'..y..','..x)
+    >    check_eq(window.scr[y][x].data, contents[i], message..'/'..y..','..x)
     >    x = x+1
     >    if x > window.scr.w then
     >      y = y+1

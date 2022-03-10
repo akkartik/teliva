@@ -260,7 +260,7 @@
     >    return rawget(h, key)
     >  end
     >  h.attrset = function(self, x)
-    >    table.insert(self.scr.attrs, x)
+    >    self.scr.attrs = x
     >  end
     >  h.attron = function(self, x)
     >    -- currently same as attrset since Lua 5.1 doesn't have bitwise operators
@@ -298,12 +298,15 @@
     >  h.mvaddch = function(self, y, x, c)
     >    self.scr.cursy = y
     >    self.scr.cursx = x
-    >    self.addch(c)
+    >    self:addch(c)
     >  end
     >  h.mvaddstr = function(self, y, x, s)
     >    self.scr.cursy = y
     >    self.scr.cursx = x
     >    self:addstr(s)
+    >  end
+    >  h.clear = function(self)
+    >    clear_scr(self.scr)
     >  end
     >  return h
     >end
@@ -321,6 +324,12 @@
     >function scr(props)
     >  props.cursx = 1
     >  props.cursy = 1
+    >  clear_scr(props)
+    >  return props
+    >end
+- __teliva_timestamp: original
+  clear_scr:
+    >function clear_scr(props)
     >  for y=1,props.h do
     >    props[y] = {}
     >    for x=1,props.w do
@@ -334,7 +343,7 @@
     >function check_screen(window, contents, message)
     >  local x, y = 1, 1
     >  for i=1,contents:len() do
-    >    check_eq(contents[i], window.scr[y][x].data, message..'/'..y..','..x)
+    >    check_eq(window.scr[y][x].data, contents[i], message..'/'..y..','..x)
     >    x = x+1
     >    if x > window.scr.w then
     >      y = y+1
@@ -3725,4 +3734,88 @@
     >function write_zettels(outfile)
     >  outfile:send(json.encode(zettels))
     >  outfile:close()
+    >end
+- __teliva_timestamp:
+    >Thu Mar 10 04:21:28 2022
+  render_zettel:
+    >function render_zettel(window, bg, indent, edge_label, starty, startx, zettel)
+    >  window:attrset(curses.color_pair(bg))
+    >  for y=0,view_settings.height-1 do
+    >    for x=0,view_settings.width-1 do
+    >      window:mvaddch(y+starty, x+startx, ' ')
+    >    end
+    >  end
+    >  if indent >= 2 then  -- need at least 2 spaces to be able to print edge_label
+    >    window:attrset(curses.color_pair(bg+1))  -- go from zettel color to its edge color
+    >    window:mvaddstr(starty, startx+indent-1, edge_label)
+    >    window:attrset(curses.color_pair(bg))
+    >  end
+    >  local y, x = 0, indent+1
+    >  local data = ''
+    >  if zettel then
+    >    data = zettel.data
+    >  end
+    >  for i=1,#data do
+    >    local c = data[i]
+    >    if c == '\n' then
+    >      y = y+1
+    >      x = indent+1
+    >    else
+    >      window:mvaddstr(y+starty, x+startx, c)
+    >      x = x+1
+    >      if x >= startx + view_settings.width then
+    >        y = y+1
+    >        x = indent+1
+    >      end
+    >    end
+    >    if y >= view_settings.height then
+    >      break
+    >    end
+    >  end
+    >end
+    >
+    >function test_render_zettel()
+    >  local w = window{scr=scr{h=5, w=10}}
+    >  --
+    >  render_zettel(w, 34, 1,  -- color 34, indent 1
+    >                   '*', 1, 1, -- startx, starty
+    >                   {data='abc'})
+    >  check_screen(w,    '  abc     '..
+    >                     '          '..
+    >                     '          '..
+    >                     '          '..
+    >                     '          ',
+    >               'test_render_zettel: single line, top-left')
+    >  -- entire width is used by the single zettel
+    >  -- column 1 = margin, column 2 = indent
+    >  check_color(w, 34, '##########'..
+    >                     '##########'..
+    >                     '##########'..
+    >                     '          '..
+    >                     '          ',
+    >              'test_render_zettel: single line, top-left, background')
+    >  --
+    >  w:clear()
+    >  render_zettel(w, 34, 1, '*', 3, 4, {data='abc'})  -- startx=3, starty=4
+    >  check_screen(w,    '          '..
+    >                     '          '..
+    >                     '     abc  '..
+    >                     '          '..
+    >                     '          ',
+    >               'test_render_zettel: specific coord')
+    >  check_color(w, 34, '          '..
+    >                     '          '..
+    >                     '   #######'..
+    >                     '   #######'..
+    >                     '   #######',
+    >               'test_render_zettel: specific coord, background')
+    >  --
+    >  w:clear()
+    >  render_zettel(w, 34, 2, '*', 3, 4, {data='abc'})  -- startx=3, starty=4
+    >  check_screen(w,    '          '..
+    >                     '          '..
+    >                     '    * abc '..
+    >                     '          '..
+    >                     '          ',
+    >               'test_render_zettel: indent >= 2 prints edge label')
     >end

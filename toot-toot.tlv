@@ -227,7 +227,6 @@
     >  debugy = 5
     >  local toots = split(prose, '\n\n===\n\n')
     >  pos = 1
-    >  debugy = 5
     >  for i, toot in ipairs(toots) do
     >    if i > 1 then
     >      pos = render_delimiter(window, '\n\n===\n\n', pos, cursor)
@@ -557,3 +556,112 @@
     >A tiny editor (no scrolling) for composing a series of toots or tweets. Always shows character counts for current state of prose.
     >
     >Typing '===' on its own lines, surrounded by empty lines, partitions prose and gives all segments independent character counts. Good for threads (tweetstorms).
+- __teliva_timestamp:
+    >Fri Mar 11 09:45:27 2022
+  first_toot:
+    >first_toot = 1
+- __teliva_timestamp:
+    >Fri Mar 11 11:47:34 2022
+  update:
+    >function update(window)
+    >  local key = window:getch()
+    >  local h, w = window:getmaxyx()
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 6 then  -- ctrl-f
+    >    first_toot = first_toot+1
+    >  elseif key == 2 then  -- ctrl-b
+    >    if first_toot > 1 then
+    >      first_toot = first_toot-1
+    >    end
+    >  elseif key == 11 then  -- ctrl-k
+    >    prose = ''
+    >    cursor = 1
+    >  elseif key == 23 then  -- ctrl-w
+    >    local out = io.open('toot', 'w')
+    >    if out ~= nil then
+    >      out:write(prose, '\n')
+    >      out:close()
+    >    end
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >end
+- __teliva_timestamp:
+    >Fri Mar 11 11:48:43 2022
+  menu:
+    >-- To show app-specific hotkeys in the menu bar, add hotkey/command
+    >-- arrays of strings to the menu array.
+    >menu = {
+    >  {'^w', 'write to "toot"'},
+    >  {'^f|^b', 'scroll'},
+    >  {'^k', 'clear'},
+    >}
+- __teliva_timestamp:
+    >Sat Mar 12 08:48:44 2022
+  render:
+    >function render(window)
+    >  window:clear()
+    >  debugy = 5
+    >  local toots = split(prose, '\n\n===\n\n')
+    >  pos = 1
+    >  for i, toot in ipairs(toots) do
+    >--?     dbg(window, "render: "..i.." pos "..pos.." cursor "..cursor)
+    >    if i > 1 then
+    >      pos = render_delimiter(window, '\n\n===\n\n', pos, cursor)
+    >--?       dbg(window, "delim: "..pos.." cursor "..cursor)
+    >    end
+    >    if i <= first_toot then
+    >      window:clear()
+    >    end
+    >    pos = render_text(window, toot, pos, cursor)
+    >    print('')
+    >--?     dbg(window, "text: "..pos.." cursor "..cursor)
+    >    window:attron(curses.A_BOLD)
+    >    window:addstr(toot:len())
+    >    window:attroff(curses.A_BOLD)
+    >  end
+    >  window:refresh()
+    >end
+- __teliva_timestamp:
+    >Sat Mar 12 08:57:41 2022
+  doc:blurb:
+    >A tiny editor (no scrolling) for composing a series of toots or tweets.
+    >Always shows character counts for current state of prose.
+    >
+    >Typing '===' on its own lines, surrounded by empty lines, partitions prose and gives all segments independent character counts. Good for threads (tweetstorms).
+- __teliva_timestamp:
+    >Sat Mar 12 08:59:52 2022
+  __teliva_note:
+    >hacky scrolling support
+    >
+    >Since I started out rendering a toot at a time and tracking the position
+    >as I rendered each toot, the easiest way to build this was to scroll a
+    >toot at a time, always render each toot and just decide when to stop
+    >clearing the screen. This way I don't mess with the position computation
+    >logic which is carefully synced between render and cursor_up/cursor_down.
+    >
+    >But there may be a more elegant approach if I was building the current state
+    >from scratch.
+  doc:blurb:
+    >A tiny editor for composing a short series of toots or tweets. Always shows character counts for current state of prose.
+    >
+    >Typing '===' on its own lines, surrounded by empty lines, partitions prose and gives all segments independent character counts. Good for threads (tweetstorms).
+    >
+    >Scrolling support is rudimentary. Keys to scroll are independent of cursor movement, so cursor can move off the screen and confusingly 'get lost'.

@@ -269,24 +269,11 @@ including embedded zeros ('<code>\0</code>') (see <a href="#2.1">&sect;2.1</a>).
 
 
 <p>
-Lua can call (and manipulate) functions written in Lua and
-functions written in C
-(see <a href="#2.5.8">&sect;2.5.8</a>).
-
-
-<p>
-The type <em>userdata</em> is provided to allow arbitrary C&nbsp;data to
-be stored in Lua variables.
-This type corresponds to a block of raw memory
-and has no pre-defined operations in Lua,
-except assignment and identity test.
-However, by using <em>metatables</em>,
-the programmer can define operations for userdata values
-(see <a href="#2.8">&sect;2.8</a>).
-Userdata values cannot be created or modified in Lua,
-only through the C&nbsp;API.
-This guarantees the integrity of data owned by the host program.
-
+<div class='teliva'>The type <em>userdata</em> is opaque to Teliva, and
+used by low-level code to manage details of C&nbsp;data stored in Lua
+variables. Unlike Lua, Teliva doesn't support creating or managing userdata
+since it doesn't permit extension by C libraries. This manual doesn't allude
+to userdata further.</div>
 
 <p>
 The type <em>thread</em> represents independent threads of execution
@@ -322,7 +309,7 @@ Thus tables can also carry <em>methods</em> (see <a href="#2.5.9">&sect;2.5.9</a
 
 
 <p>
-Tables, functions, threads, and (full) userdata values are <em>objects</em>:
+Tables, functions and threads are <em>objects</em>:
 variables do not actually <em>contain</em> these values,
 only <em>references</em> to them.
 Assignment, parameter passing, and function returns
@@ -424,8 +411,6 @@ To get the environment table of a Lua function,
 you call <a href="#pdf-getfenv"><code>getfenv</code></a>.
 To replace it,
 you call <a href="#pdf-setfenv"><code>setfenv</code></a>.
-(You can only manipulate the environment of C&nbsp;functions
-through the debug library; (see <a href="#5.9">&sect;5.9</a>).)
 
 
 <p>
@@ -973,17 +958,17 @@ Equality (<code>==</code>) first compares the type of its operands.
 If the types are different, then the result is <b>false</b>.
 Otherwise, the values of the operands are compared.
 Numbers and strings are compared in the usual way.
-Objects (tables, userdata, threads, and functions)
+Objects (tables, threads, and functions)
 are compared by <em>reference</em>:
 two objects are considered equal only if they are the <em>same</em> object.
 Every time you create a new object
-(a table, userdata, thread, or function),
+(a table, thread, or function),
 this new object is different from any previously existing object.
 
 
 <p>
-You can change the way that Lua compares tables and userdata 
-by using the "eq" metamethod (see <a href="#2.8">&sect;2.8</a>).
+You can change the way that Lua compares tables by using the "eq" metamethod
+(see <a href="#2.8">&sect;2.8</a>).
 
 
 <p>
@@ -1482,13 +1467,10 @@ while all of them share the same <code>x</code>.
 <h2>2.7 - <a name="2.7">Error Handling</a></h2>
 
 <p>
-Because Lua is an embedded extension language,
-all Lua actions start from C&nbsp;code in the host program
-calling a function from the Lua library (see <a href="#lua_pcall"><code>lua_pcall</code></a>).
-Whenever an error occurs during Lua compilation or execution,
-control returns to C,
-which can take appropriate measures
-(such as printing an error message).
+<div class='teliva'>
+Errors returned by Teliva code should display on screen in red. Please report
+crashes or other behavior.
+</div>
 
 
 <p>
@@ -1532,14 +1514,11 @@ through the <a href="#pdf-getmetatable"><code>getmetatable</code></a> function.
 You can replace the metatable of tables
 through the <a href="#pdf-setmetatable"><code>setmetatable</code></a>
 function.
-You cannot change the metatable of other types from Lua
-(except by using the debug library);
-you must use the C&nbsp;API for that.
 
 
 <p>
-Tables and full userdata have individual metatables
-(although multiple tables and userdata can share their metatables).
+Tables have individual metatables
+(although multiple tables can share their metatables).
 Values of all other types share one single metatable per type;
 that is, there is one single metatable for all numbers,
 one for all strings, etc.
@@ -1548,8 +1527,6 @@ one for all strings, etc.
 <p>
 A metatable controls how an object behaves in arithmetic operations,
 order comparisons, concatenation, length operation, and indexing.
-A metatable also can define a function to be called when a userdata
-is garbage collected.
 For each of these operations Lua associates a specific key
 called an <em>event</em>.
 When Lua performs one of these operations over a value,
@@ -1909,44 +1886,23 @@ called when Lua calls a value.
 <h2>2.9 - <a name="2.9">Environments</a></h2>
 
 <p>
-Besides metatables,
-objects of types thread, function, and userdata
-have another table associated with them,
-called their <em>environment</em>.
+Besides metatables, objects of types thread and function
+have another table associated with them, called their
+<em>environment</em>.
 Like metatables, environments are regular tables and
 multiple objects can share the same environment.
 
 
 <p>
 Threads are created sharing the environment of the creating thread.
-Userdata and C&nbsp;functions are created sharing the environment
-of the creating C&nbsp;function.
-Non-nested Lua functions
-(created by <a href="#pdf-loadfile"><code>loadfile</code></a>, <a href="#pdf-loadstring"><code>loadstring</code></a> or <a href="#pdf-load"><code>load</code></a>)
-are created sharing the environment of the creating thread.
 Nested Lua functions are created sharing the environment of
 the creating Lua function.
 
 
 <p>
-Environments associated with userdata have no meaning for Lua.
-It is only a convenience feature for programmers to associate a table to
-a userdata.
-
-
-<p>
 Environments associated with threads are called
 <em>global environments</em>.
-They are used as the default environment for threads and
-non-nested Lua functions created by the thread
-and can be directly accessed by C&nbsp;code (see <a href="#3.3">&sect;3.3</a>).
-
-
-<p>
-The environment associated with a C&nbsp;function can be directly
-accessed by C&nbsp;code (see <a href="#3.3">&sect;3.3</a>).
-It is used as the default environment for other C&nbsp;functions
-and userdata created by the function.
+They are used as the default environment for threads.
 
 
 <p>
@@ -1961,9 +1917,6 @@ You can change the environment of a Lua function or the
 running thread by calling <a href="#pdf-setfenv"><code>setfenv</code></a>.
 You can get the environment of a Lua function or the running thread
 by calling <a href="#pdf-getfenv"><code>getfenv</code></a>.
-To manipulate the environment of other objects
-(userdata, C&nbsp;functions, other threads) you must
-use the C&nbsp;API.
 
 
 
@@ -1981,7 +1934,7 @@ a <em>garbage collector</em> from time to time
 to collect all <em>dead objects</em>
 (that is, objects that are no longer accessible from Lua).
 All memory used by Lua is subject to automatic management:
-tables, userdata, functions, threads, strings, etc.
+tables, functions, threads, strings, etc.
 
 
 <p>
@@ -2016,52 +1969,8 @@ the speed of memory allocation.
 
 
 <p>
-You can change these numbers by calling <a href="#lua_gc"><code>lua_gc</code></a> in C
-or <a href="#pdf-collectgarbage"><code>collectgarbage</code></a> in Lua.
-With these functions you can also control 
-the collector directly (e.g., stop and restart it).
-
-
-
-<h3>2.10.1 - <a name="2.10.1">Garbage-Collection Metamethods</a></h3>
-
-<p>
-Using the C&nbsp;API,
-you can set garbage-collector metamethods for userdata (see <a href="#2.8">&sect;2.8</a>).
-These metamethods are also called <em>finalizers</em>.
-Finalizers allow you to coordinate Lua's garbage collection
-with external resource management
-(such as closing files, network or database connections,
-or freeing your own memory).
-
-
-<p>
-Garbage userdata with a field <code>__gc</code> in their metatables are not
-collected immediately by the garbage collector.
-Instead, Lua puts them in a list.
-After the collection,
-Lua does the equivalent of the following function
-for each userdata in that list:
-
-<pre>
-     function gc_event (udata)
-       local h = metatable(udata).__gc
-       if h then
-         h(udata)
-       end
-     end
-</pre>
-
-<p>
-At the end of each garbage-collection cycle,
-the finalizers for userdata are called in <em>reverse</em>
-order of their creation,
-among those collected in that cycle.
-That is, the first finalizer to be called is the one associated
-with the userdata created last in the program.
-The userdata itself is freed only in the next garbage-collection cycle.
-
-
+<div class='teliva'>Modifying these parameters requires changes to Teliva's C
+souces.</div>
 
 
 
@@ -2219,15 +2128,15 @@ When you run it, it produces the following output:
 
 <h1>3 - <a name="3">C API</a></h1>
 
-Unlike Lua, Teliva isn't intended to be modified at the C level. However,
-forks of Teliva are encouraged.
+<div class='teliva'>Unlike Lua, Teliva isn't intended to be modified at the C
+level. However, forks of Teliva are encouraged.</div>
 
 
 <h1>5 - <a name="5">Standard Libraries</a></h1>
 
 <p>
 The standard Lua libraries provide useful functions
-that are implemented directly through the C&nbsp;API.
+that are implemented directly in C.
 Some of these functions provide essential services to the language
 (e.g., <a href="#pdf-type"><code>type</code></a> and <a href="#pdf-getmetatable"><code>getmetatable</code></a>);
 others provide access to "outside" services (e.g., I/O);
@@ -2237,8 +2146,6 @@ deserve an implementation in C (e.g., <a href="#pdf-table.sort"><code>table.sort
 
 
 <p>
-All libraries are implemented through the official C&nbsp;API
-and are provided as separate C&nbsp;modules.
 Currently, Lua has the following standard libraries:
 
 <ul>
@@ -2263,27 +2170,6 @@ Currently, Lua has the following standard libraries:
 Except for the basic and package libraries,
 each library provides all its functions as fields of a global table
 or as methods of its objects.
-
-
-<p>
-To have access to these libraries,
-the C&nbsp;host program should call the <a href="#luaL_openlibs"><code>luaL_openlibs</code></a> function,
-which opens all standard libraries.
-Alternatively,
-it can open them individually by calling
-<a name="pdf-luaopen_base"><code>luaopen_base</code></a> (for the basic library),
-<a name="pdf-luaopen_package"><code>luaopen_package</code></a> (for the package library),
-<a name="pdf-luaopen_string"><code>luaopen_string</code></a> (for the string library),
-<a name="pdf-luaopen_table"><code>luaopen_table</code></a> (for the table library),
-<a name="pdf-luaopen_math"><code>luaopen_math</code></a> (for the mathematical library),
-<a name="pdf-luaopen_io"><code>luaopen_io</code></a> (for the I/O library),
-<a name="pdf-luaopen_os"><code>luaopen_os</code></a> (for the Operating System library),
-and <a name="pdf-luaopen_debug"><code>luaopen_debug</code></a> (for the debug library).
-These functions are declared in <a name="pdf-lualib.h"><code>lualib.h</code></a>
-and should not be called directly:
-you must call them like any other Lua C&nbsp;function,
-e.g., by using <a href="#lua_call"><code>lua_call</code></a>.
-
 
 
 <h2>5.1 - <a name="5.1">Basic Functions</a></h2>
@@ -2580,7 +2466,7 @@ In this case, <code>setfenv</code> returns no values.
 
 <p>
 Sets the metatable for the given table.
-(You cannot change the metatable of other types from Lua, only from&nbsp;C.)
+(You cannot change the metatable of other types.)
 If <code>metatable</code> is <b>nil</b>,
 removes the metatable of the given table.
 If the original metatable has a <code>"__metatable"</code> field,
@@ -2772,8 +2658,8 @@ In case of error, propagates the error.
 
 <p>
 Suspends the execution of the calling coroutine.
-The coroutine cannot be running a C&nbsp;function,
-a metamethod, or an iterator.
+The coroutine cannot be running a primitive implemented in
+C, a metamethod, or an iterator.
 Any arguments to <code>yield</code> are passed as extra results to <code>resume</code>.
 
 
@@ -4213,6 +4099,7 @@ violate some assumptions about Lua code
 cannot be accessed from outside or
 that userdata metatables cannot be changed by Lua code)
 and therefore can compromise otherwise secure code.
+<div class='teliva'>TODO: what do we need to secure here?</div>
 
 
 <p>

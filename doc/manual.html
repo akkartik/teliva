@@ -2721,20 +2721,6 @@ Note that numerical codes are not necessarily portable across platforms.
 
 
 
-
-<p>
-<hr><h3><a name="pdf-string.dump"><code>string.dump (function)</code></a></h3>
-
-
-<p>
-Returns a string containing a binary representation of the given function,
-so that a later <a href="#pdf-loadstring"><code>loadstring</code></a> on this string returns
-a copy of the function.
-<code>function</code> must be a Lua function without upvalues.
-
-
-
-
 <p>
 <hr><h3><a name="pdf-string.find"><code>string.find (s, pattern [, init [, plain]])</code></a></h3>
 Looks for the first match of
@@ -2902,11 +2888,6 @@ Here are some examples:
      
      x = string.gsub("home = $HOME, user = $USER", "%$(%w+)", os.getenv)
      --&gt; x="home = /home/roberto, user = roberto"
-     
-     x = string.gsub("4+5 = $return 4+5$", "%$(.-)%$", function (s)
-           return loadstring(s)()
-         end)
-     --&gt; x="4+5 = 9"
      
      local t = {name="lua", version="5.1"}
      x = string.gsub("$name-$version.tar.gz", "%$(%w+)", t)

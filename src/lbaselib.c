@@ -380,10 +380,14 @@ static int luaB_newproxy (lua_State *L) {
 static const luaL_Reg base_funcs[] = {
   {"assert", luaB_assert},
   {"collectgarbage", luaB_collectgarbage},
+  /* no 'dofile' without sandboxing it */
   {"error", luaB_error},
   {"gcinfo", luaB_gcinfo},
   {"getfenv", luaB_getfenv},
   {"getmetatable", luaB_getmetatable},
+  /* no 'loadfile' without sandboxing it */
+  /* no 'load' without sandboxing it */
+  /* no 'loadstring' without sandboxing it */
   {"next", luaB_next},
   {"pcall", luaB_pcall},
   {"print", luaB_print},

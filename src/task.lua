@@ -388,15 +388,17 @@ _M.NOP       = NOP
 function spawn_main()
   task.spawn(call_main)
   task.scheduler()
-  assert(false, "Teliva's scheduler ran out of work; this shouldn't happen.\n"..
-                "Either a channel is blocked forever or you're reading past\n"..
-                "the end of a file (after recv() returned nil).\n")
+  assert(false, "Teliva ran out of stuff to do. Possible causes:\n"..
+                "- main() returned. Apps shouldn't let this happen.\n"..
+                "- App is reading past the end of a file (after recv() returned nil)\n"..
+                "- Some channel is blocked forever.\n"..
   curses.nodelay(true)
   curses.getch()
 end
 
 -- This function exists only to make the call to 'main' visible to Teliva.
--- Teliva can't yet recognize the caller of indirect calls.
+-- Teliva can't yet recognize the caller of indirect calls, as happens with
+-- task.spawn.
 function call_main()
   main()
 end

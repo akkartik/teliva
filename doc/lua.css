@@ -81,3 +81,10 @@ input[type=text] {
 	height: 2em ;
 }
 
+.teliva {
+	background-color: #f1a7fe;
+	padding-left: 2px;
+	padding-right: 2px;
+	padding-top: 5px;
+	padding-bottom: 2px;
+}

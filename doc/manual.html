@@ -3590,12 +3590,58 @@ Returns the hyperbolic tangent of <code>x</code>.
 
 
 
-<h2>5.7 - <a name="5.7">Input and Output Facilities</a></h2>
+<h2>5.7 - <a name="5.7">File Input and Output Facilities</a></h2>
+
+<div class='teliva'>
+While Teliva supports the standard Lua primitives for managing files,
+idiomatic Teliva uses some slightly different primitives.
+
+<p>
+<hr><h3><a name="pdf-start_reading"><code>start_reading (fs, filename)</code></a></h3>
+
+<p>
+This function opens a file exclusively for reading, and returns a
+<tt>channel</tt> (NOT a file as regular Lua) or <b>nil</b> on error.
+<tt>recv()</tt> from the channel to read a line at a time from the file.
+
+<p>
+(The <tt>fs</tt> parameter is currently unused. It will be used to pass in
+fake file systems for tests.)
+
+<p>
+<hr><h3><a name="pdf-character_by_character"><code>character_by_character(chanin, chanout)</code></a></h3>
+
+<p>
+This function converts a channel that can <tt>recv()</tt> a line at a time
+from a file into a channel that can <tt>recv()</tt> a character at a time.
+Don't try to mix by-line reads with by-character reads. Once a channel is
+passed into <tt>character_by_character</tt>, calling code should stop trying
+to use it.
+
+
+<p>
+<hr><h3><a name="pdf-start_writing"><code>start_writing(fs, filename)</code></a></h3>
+
+<p>
+This function opens a file exclusively for writing, and returns a
+<tt>channel</tt> (NOT a file as regular Lua) or <b>nil</b> on error.
+<tt>send()</tt> to the channel will write to the file. <tt>close()</tt> on the
+channel will persist the changes and make them externally visible. All writes
+are hidden until <tt>close()</tt>.
+
+<p>
+(The <tt>fs</tt> parameter is currently unused. It will be used to pass in
+fake file systems for tests.)
+
+
+<hr>
+The rest of this section describes Lua's standard primitives for File I/O.
+</div>
 
 
 <p>
 Unless otherwise stated,
-all I/O functions return <b>nil</b> on failure
+all File I/O functions return <b>nil</b> on failure
 (plus an error message as a second result and
 a system-dependent error code as a third result)
 and some value different from <b>nil</b> on success.
@@ -4341,8 +4387,52 @@ to start the traceback
 (default is 1, the function calling <code>traceback</code>).
 
 
+<div class='teliva'>
+<h2>5.10 - <a name="5.10">Curses Window Facilities</a></h2>
 
+Teliva includes curses facilities identical to Lua's <a href='http://lcurses.github.io/lcurses/'>lcurses</a>
+library. As there, the top-level module is called <tt>curses</tt>. All apps
+start with the terminal window initialized using <tt>curses.initscr()</tt>.
+Look at the sample apps for example usage.
 
+</div>
+
+<div class='teliva'>
+<h2>5.11 - <a name="5.11">Networking Facilities</a></h2>
+
+Teliva includes the following well-known Lua libraries for networking:
+
+<li><a href='https://w3.impa.br/~diego/software/luasocket/reference.html'>LuaSocket</a>,
+consisting of modules <tt>socket</tt>, <tt>http</tt>, <tt>url</tt>,
+<tt>headers</tt>, <tt>mime</tt> and <tt>ltn12</tt>.
+
+<li><a href='https://github.com/brunoos/luasec/wiki'>LuaSec</a>,
+consisting of modules <tt>https</tt> and <tt>ssl</tt>.
+
+</div>
+
+<div class='teliva'>
+<h2>5.12 - <a name="5.12">JSON Facilities</a></h2>
+
+Teliva includes the well-known
+<a href='https://github.com/rxi/json.lua'>json.lua</a> library (module
+<tt>json</tt>). It also includes a variant in module <tt>jsonf</tt> that can
+read or write JSON from channels opened by
+<a href='#pdf-start_reading'>start_reading</a>
+and
+<a href='#pdf-start_writing'>start_writing</a>.
+
+</div>
+
+<div class='teliva'>
+<h2>5.13 - <a name="5.13">Tasks and Channels</a></h2>
+
+Teliva includes the well-known
+<a href='https://github.com/majek/lua-channels#readme'>lua-channels</a>
+library in module <tt>task</tt>. It also transparently starts up
+<tt>task.scheduler</tt> for all apps.
+
+</div>
 
 
 

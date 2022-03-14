@@ -3601,7 +3601,7 @@ idiomatic Teliva uses some slightly different primitives.
 
 <p>
 This function opens a file exclusively for reading, and returns a
-<tt>channel</tt> (NOT a file as regular Lua) or <b>nil</b> on error.
+<tt>channel</tt> (NOT a file as in Lua) or <b>nil</b> on error.
 <tt>recv()</tt> from the channel to read a line at a time from the file.
 
 <p>
@@ -3624,7 +3624,7 @@ to use it.
 
 <p>
 This function opens a file exclusively for writing, and returns a
-<tt>channel</tt> (NOT a file as regular Lua) or <b>nil</b> on error.
+<tt>channel</tt> (NOT a file as in Lua) or <b>nil</b> on error.
 <tt>send()</tt> to the channel will write to the file. <tt>close()</tt> on the
 channel will persist the changes and make them externally visible. All writes
 are hidden until <tt>close()</tt>.

@@ -4127,10 +4127,50 @@ permissions disallow it.</em>
 Teliva includes the well-known
 <a href='https://github.com/rxi/json.lua'>json.lua</a> library (module
 <code>json</code>). It also includes a variant in module <code>jsonf</code> that can
-read or write JSON from channels opened by
-<a href='#pdf-start_reading'>start_reading</a>
-and
-<a href='#pdf-start_writing'>start_writing</a>.
+read JSON from channels opened by
+<a href='#pdf-start_reading'>start_reading</a>.
+
+<p>
+<hr><h3><a name="pdf-json.encode"><code>json.encode (value)</code></a></h3>
+
+
+<p>
+Returns a string representing <code>value</code> encoded in JSON.
+
+<pre>
+     json.encode({ 1, 2, 3, { x = 10 } }) -- Returns '[1,2,3,{"x":10}]'
+</pre><p>
+
+
+
+<p>
+<hr><h3><a name="pdf-json.decode"><code>json.decode (str)</code></a></h3>
+
+
+<p>
+Returns a value representing the JSON string <code>str</code>.
+
+<pre>
+     json.decode('[1,2,3,{"x":10}]')      -- Returns { 1, 2, 3, { x = 10 } }
+</pre><p>
+
+
+
+<p>
+<hr><h3><a name="pdf-jsonf.decode"><code>jsonf.decode (chan)</code></a></h3>
+
+
+<p>
+Returns a value representing the JSON string read from channel
+<code>chan</code>.
+
+<pre>
+     local channel = task.Channel:new()
+     channel:send('[1,2,3,{"x":10}]')
+     jsonf.decode(channel)                -- Returns { 1, 2, 3, { x = 10 } }
+</pre><p>
+
+
 
 </div>
 

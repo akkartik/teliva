@@ -198,13 +198,13 @@ them in Teliva and let people use regular Lua. Or other platforms!
 - Some functions in lcurses have [additional smarts](https://github.com/lcurses/lcurses/blob/master/lib/curses.lua).
   Teliva is [consistent with the underlying ncurses](https://github.com/akkartik/teliva/blob/main/src/lcurses/curses.lua).
 
-[The manual in this repo](doc/manual.html) is up to date; use it rather than
-the standard Lua one.
+Look in [the manual](https://akkartik.github.io/teliva/doc/manual.html) for
+more details of what's available.
 
-I expect to delete more capabilities throughout this stack as I discover
-features that don't fit well with the Teliva experience. If you find Teliva of
-use, please [introduce yourself](http://akkartik.name/contact) to me so that I
-am aware of your use cases. Anybody who is interested can gain a say in its
+I may delete more capabilities throughout this stack as I discover features
+that don't fit well with the Teliva experience. If you find Teliva of use,
+please [introduce yourself](http://akkartik.name/contact) to me so that I am
+aware of your use cases. Anybody who is interested can gain a say in its
 future direction.
 
 ## What's with the name?

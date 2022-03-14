@@ -29,7 +29,6 @@ static const luaL_Reg lualibs[] = {
   {LUA_SSLCONTEXTLIBNAME, luaopen_ssl_context},
   {LUA_SSLX509LIBNAME, luaopen_ssl_x509},
   {LUA_SSLCONFIGLIBNAME, luaopen_ssl_config},
-  {LUA_DBLIBNAME, luaopen_debug},
   {NULL, NULL}
 };
 

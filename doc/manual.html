@@ -4097,8 +4097,258 @@ which automatically removes the file when the program ends.
 
 Teliva includes curses facilities identical to Lua's <a href='http://lcurses.github.io/lcurses/'>lcurses</a>
 library. As there, the top-level module is called <code>curses</code>. All apps
-start with the terminal window initialized using <code>curses.initscr()</code>.
-Look at the sample apps for example usage.
+start with the terminal window initialized using
+<a href="#pdf-curses.initscr"><code>curses.initscr</code></a>. Look at the
+sample apps for example usage.
+
+
+<p>
+<hr><h3><a name="pdf-curses.initscr"><code>curses.initscr ()</code></a></h3>
+
+
+<p>
+Initializes the current terminal to stop scrolling and enable moving the
+cursor. You shouldn't need to ever call this from Teliva; it's always called
+for you before an app is loaded.
+
+
+<p>
+<hr><h3><a name="pdf-curses.stdscr"><code>curses.stdscr ()</code></a></h3>
+
+
+<p>
+Returns a <em>window</em> object for the current terminal. Most curses
+operations require a window. Windows are an app's gateway to both print to
+screen and read keys from keyboard. Teliva's template.tlv for new applications
+saves the result in a global called <code>Window</code>, so you should be able
+to avoid calling <code>stdscr</code> directly most of the time.
+
+<p>
+Curses supports multiple and nested windows. They haven't been tried
+yet in the context of Teliva, but they're expected to work. Please report your
+experience if you try them out.
+
+
+<p>
+<hr><h3><a name="pdf-window"><code>window {}</code></a></h3>
+
+
+<p>
+Creates a fake window suitable for passing around in tests. The table passed
+in should have two keys: a <a href='#pdf-kbd'><code>kbd</code></a>
+containing a keyboard, and a <a href='#pdf-scr'><code>scr</code></a>
+containing a screen.
+
+<p>
+This helper is implemented in template.tlv, so new apps should pick it up from
+there.
+
+
+<p>
+<hr><h3><a name="pdf-kbd"><code>kbd (str)</code></a></h3>
+
+
+<p>
+Creates a fake keyboard suitable for passing into
+<a href='#pdf-window'><code>window</code></a> with the characters in
+<code>str</code> already &ldquo;typed in&rdquo;.
+
+
+
+<p>
+This helper is implemented in template.tlv, so new apps should pick it up from
+there.
+
+
+<p>
+<hr><h3><a name="pdf-scr"><code>scr {}</code></a></h3>
+
+
+<p>
+Creates a fake screen suitable for passing into
+<a href='#pdf-window'><code>window</code></a>. The table passed in should
+contain two keys: a height <code>h</code> and a width <code>w</code>.
+
+
+<p>
+This helper is implemented in template.tlv, so new apps should pick it up from
+there.
+
+
+<p>
+<hr><h3><a name="pdf-window:clear"><code>window:clear ()</code></a></h3>
+
+
+<p>
+Clears all prints in <code>window</code>.
+
+
+<p>
+<hr><h3><a name="pdf-window:refresh"><code>window:refresh ()</code></a></h3>
+
+
+<p>
+Flushes all prints to <code>window</code>. Also redraws the Teliva menu.
+
+
+<p>
+<hr><h3><a name="pdf-window:addch"><code>window:addch (c)</code></a></h3>
+
+
+<p>
+Prints character <code>c</code> with
+<a href='https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/attrib.html'>the current attributes</a>
+at the cursor in <code>window</code>. May not be visible until
+<a href="#pdf-window:refresh"><code>window:refresh</code></a> is called.
+
+
+<p>
+<hr><h3><a name="pdf-window:mvaddch"><code>window:mvaddch (y, x, c)</code></a></h3>
+
+
+<p>
+Moves <code>window</code>'s cursor to (<code>x</code>, <code>y</code>) before
+printing character <code>c</code> to it with
+<a href='https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/attrib.html'>the current attributes</a>.
+May not be visible until <a href="#pdf-window:refresh"><code>window:refresh</code></a>
+is called.
+
+
+<p>
+<hr><h3><a name="pdf-window:addstr"><code>window:addstr (str)</code></a></h3>
+
+
+<p>
+Prints string <code>str</code> with
+<a href='https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/attrib.html'>the current attributes</a>
+at the cursor in <code>window</code>. May not be visible until
+<a href="#pdf-window:refresh"><code>window:refresh</code></a> is called.
+
+
+<p>
+<hr><h3><a name="pdf-window:mvaddstr"><code>window:mvaddstr (y, x, str)</code></a></h3>
+
+
+<p>
+Moves <code>window</code>'s cursor to (<code>x</code>, <code>y</code>) before
+printing string <code>str</code> to it with
+<a href='https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/attrib.html'>the current attributes</a>.
+May not be visible until <a href="#pdf-window:refresh"><code>window:refresh</code></a> is called.
+
+
+<p>
+<hr><h3><a name="pdf-window:getmaxyx"><code>window:getmaxyx ()</code></a></h3>
+
+
+<p>
+Returns <code>window</code>'s <code>height</code> and <code>width</code>.
+
+
+<p>
+<hr><h3><a name="pdf-window:getyx"><code>window:getyx ()</code></a></h3>
+
+
+<p>
+Returns <code>window</code>'s cursor coordinates <code>y</code> and
+<code>x</code>.
+
+
+<p>
+<hr><h3><a name="pdf-window:attrset"><code>window:attrset (attr)</code></a></h3>
+
+
+<p>
+Sets <a href='https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/attrib.html'>the current attributes</a>
+for future prints to <code>window</code>. Attributes can be one of:
+
+<ul>
+<li><code>curses.A_NORMAL</code>: disables all other attributes.
+<li><code>curses.A_BOLD</code>
+<li><code>curses.A_REVERSE</code>: swaps foreground and background colors.
+<li><code>curses.color_pair(n)</code> for some integer <code>n</code>: color
+pair <code>n</code> which must have been initialized using
+<a href="#pdf-curses.init_pair"><code>curses.init_pair</code>.
+</ul>
+
+<p>
+Since Lua 5.1 has no bitwise operations, this function currently only supports
+setting a single attribute.
+
+
+<p>
+<hr><h3><a name="pdf-window:attron"><code>window:attron (attr)</code></a></h3>
+
+
+<p>
+Adds the given <a href='https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/attrib.html'>attribute</a>
+to the set of current attributes for future prints to <code>window</code>. For
+the list of available attributes see <a href="#pdf-window:attrset"><code>window:attrset</code></a>.
+
+<p>
+Since Lua 5.1 has no bitwise operations, this function currently only supports
+adding a single attribute at a time.
+
+
+<p>
+<hr><h3><a name="pdf-window:attroff"><code>window:attroff (attr)</code></a></h3>
+
+
+<p>
+Removes the given <a href='https://tldp.org/HOWTO/NCURSES-Programming-HOWTO/attrib.html'>attribute</a>
+from the set of current attributes for future prints to <code>window</code>.
+the list of available attributes see <a href="#pdf-window:attrset"><code>window:attrset</code></a>.
+
+<p>
+Since Lua 5.1 has no bitwise operations, this function currently only supports
+removing a single attribute at a time.
+
+
+<p>
+<hr><h3><a name="pdf-curses.init_pair"><code>curses.init_pair (i, fg, bg)</code></a></h3>
+
+
+<p>
+Initializes color pair <code>i</code> to (<code>foreground</code>, <code>background</code>).
+Now calls to <a href='#pdf-curses.color_pair'>curses.color_pair(i)</code></a> will
+yield the attributes for that color pair.
+
+
+<p>
+<hr><h3><a name="pdf-curses.color_pair"><code>curses.color_pair (i)</code></a></h3>
+
+
+<p>
+Returns attributes for a (<code>foreground</code>, <code>background</code>)
+pair of colors suitable to pass into
+<a href="#pdf-window:attrset"><code>window:attrset</code></a>,
+<a href="#pdf-window:attron"><code>window:attron</code></a> and
+<a href="#pdf-window:attroff"><code>window:attroff</code></a>.
+
+
+<p>
+<hr><h3><a name="pdf-window:getch"><code>window:getch ()</code></a></h3>
+
+
+<p>
+Returns a character from the keyboard. Waits for a key to be pressed by
+default, but this behavior can be changed by calling <a href="#pdf-window:nodelay"><code>window:nodelay(true)</code></a>.
+
+<p>
+<code>window:getch</code> is the only supported way to get input from
+keyboard in Teliva, handling Teliva's menu and so on.
+
+
+<p>
+<hr><h3><a name="pdf-window:nodelay"><code>window:nodelay (on)</code></a></h3>
+
+
+<p>
+Forces <a href="#pdf-window:getch"><code>window:getch()</code></a> to be non-blocking.
+
+
+<hr>
+Besides these, there are other primitives that have never been used in Teliva
+apps, but should still work. Please report if you try them out.
 
 </div>
 
@@ -4128,7 +4378,7 @@ Teliva includes the well-known
 <a href='https://github.com/rxi/json.lua'>json.lua</a> library (module
 <code>json</code>). It also includes a variant in module <code>jsonf</code> that can
 read JSON from channels opened by
-<a href='#pdf-start_reading'>start_reading</a>.
+<a href='#pdf-start_reading'><code>start_reading</code></a>.
 
 <p>
 <hr><h3><a name="pdf-json.encode"><code>json.encode (value)</code></a></h3>
@@ -4180,7 +4430,8 @@ Returns a value representing the JSON string read from channel
 Teliva includes the well-known
 <a href='https://github.com/majek/lua-channels#readme'>lua-channels</a>
 library in module <code>task</code>. It also transparently starts up
-<code>task.scheduler</code> for all apps. See sieve.tlv for a basic example.
+<a href='#pdf-task.scheduler'><code>task.scheduler</code></a> for all apps.
+See sieve.tlv for a basic example.
 
 <p>
 <hr><h3><a name="pdf-task.spawn"><code>task.spawn (fun, [...])</code></a></h3>
@@ -4188,7 +4439,7 @@ library in module <code>task</code>. It also transparently starts up
 
 <p>
 Run <code>fun</code> as a coroutine with given parameters. You should use this
-instead of <code>coroutine.create()</code>.
+instead of <a href="#pdf-coroutine.create"><code>coroutine.create</code></a>.
 
 
 <p>
@@ -4215,7 +4466,8 @@ Create a new channel with given size (which defaults to 0).
 <p>
 Write <code>value</code> to a channel. Blocks the current coroutine if the
 channel is already full. (Channels with size 0 always block if there isn't
-already a coroutine trying to <code>recv()</code> from them.)
+already a coroutine trying to <a href="#pdf-channel:recv"><code>recv</code></a>
+from them.)
 
 
 <p>
@@ -4225,10 +4477,10 @@ already a coroutine trying to <code>recv()</code> from them.)
 <p>
 Read a value from a channel. Blocks the current coroutine if the
 channel is empty and there isn't already a coroutine trying to
-<code>send()</code> to them.
+<a href="#pdf-channel:send"><code>send</code></a> to them.
 
 
-<p>
+<hr>
 Besides these, there are other primitives that have never been used in Teliva
 apps, but should still work. Please report if you try them out.
 

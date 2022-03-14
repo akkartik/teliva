@@ -3684,6 +3684,10 @@ which is needed in some systems to open the file in binary mode.
 This string is exactly what is used in the
 standard&nbsp;C function <code>fopen</code>.
 
+<div class='teliva'>
+<em>This function is sandboxed. It may fail if the computer owner's
+permissions disallow it.</em>
+</div>
 
 
 
@@ -3996,6 +4000,10 @@ Renames file or directory named <code>oldname</code> to <code>newname</code>.
 If this function fails, it returns <b>nil</b>,
 plus a string describing the error.
 
+<div class='teliva'>
+<em>This function is sandboxed. It may fail if the computer owner's
+permissions disallow it.</em>
+</div>
 
 
 
@@ -4105,6 +4113,11 @@ consisting of modules <code>socket</code>, <code>http</code>, <code>url</code>,
 
 <li><a href='https://github.com/brunoos/luasec/wiki'>LuaSec</a>,
 consisting of modules <code>https</code> and <code>ssl</code>.
+
+<div class='teliva'>
+<em>Networking primitives are sandboxed, and may fail if the computer owner's
+permissions disallow it.</em>
+</div>
 
 </div>
 

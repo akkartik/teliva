@@ -391,7 +391,7 @@ function spawn_main()
   assert(false, "Teliva ran out of stuff to do. Possible causes:\n"..
                 "- main() returned. Apps shouldn't let this happen.\n"..
                 "- App is reading past the end of a file (after recv() returned nil)\n"..
-                "- Some channel is blocked forever.\n"..
+                "- Some channel is blocked forever.\n")
   curses.nodelay(true)
   curses.getch()
 end

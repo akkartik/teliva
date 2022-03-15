@@ -125,8 +125,6 @@ rely on packages distributed by the following reputable brands:
 Teliva's codebase also includes forks of the following reputable brands:
 
 * [Lua 5.1](https://www.lua.org/manual/5.1)
-* The [Lua File System](https://keplerproject.github.io/luafilesystem) library
-  for portably accessing directories (module `lfs`).
 * The [Kilo](https://github.com/antirez/kilo) text editor, modified to use
   ncurses. (Read more about it in this [fantastic walk-through](https://viewsourcecode.org/snaptoken/kilo).)
 * The [lcurses](https://github.com/lcurses/lcurses) binding for ncurses (as
@@ -188,7 +186,6 @@ them in Teliva and let people use regular Lua. Or other platforms!
   - `os.execute`, `os.getenv`, `io.popen`
   - `io.lines` (not a security issue; just difficult to distinguish missing
     files from sandboxing issues)
-  - `lfs.chdir`, `lfs.currentdir`
 
 - Some functions are disabled because they don't seem to make sense in an
   ncurses environment. This includes the Lua notions of default files, which

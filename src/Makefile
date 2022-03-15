@@ -27,7 +27,7 @@ LUA_A=	liblua.a
 CORE_O=	lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \
 	lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o ltm.o  \
 	lundump.o lvm.o lzio.o \
-	realpath.o lfs.o kilo.o tlv.o teliva.o
+	realpath.o kilo.o tlv.o teliva.o
 LIB_O=	lauxlib.o lbaselib.o liolib.o lmathlib.o loslib.o \
 	ltablib.o lstrlib.o linit.o
 
@@ -167,7 +167,6 @@ lzio.o: lzio.c lua.h luaconf.h llimits.h lmem.h lstate.h lobject.h ltm.h \
 print.o: print.c ldebug.h lstate.h lua.h luaconf.h lobject.h llimits.h \
   ltm.h lzio.h lmem.h lopcodes.h lundump.h
 realpath.o: realpath.c
-lfs.o: lfs.c lfs.h lua.h lauxlib.h lualib.h
 kilo.o: kilo.c lua.h teliva.h
 teliva.o: teliva.c lua.h lauxlib.h lualib.h teliva.h tlv.h
 

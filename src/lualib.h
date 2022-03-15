@@ -33,9 +33,6 @@ LUALIB_API int (luaopen_string) (lua_State *L);
 #define LUA_MATHLIBNAME	"math"
 LUALIB_API int (luaopen_math) (lua_State *L);
 
-#define LUA_LFSLIBNAME	"lfs"
-LUALIB_API int (luaopen_lfs) (lua_State *L);
-
 #define LUA_CURSESLIBNAME	"curses"
 LUALIB_API int (luaopen_curses) (lua_State *L);
 

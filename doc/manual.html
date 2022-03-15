@@ -3602,7 +3602,8 @@ idiomatic Teliva uses some slightly different primitives.
 <p>
 This function opens a file exclusively for reading, and returns a
 <code>channel</code> (NOT a file as in Lua) or <b>nil</b> on error.
-<code>recv()</code> from the channel to read a line at a time from the file.
+<a href='#pdf-channel:recv'><code>recv</code></a> from the channel to read a
+line at a time from the file.
 
 <p>
 (The <code>fs</code> parameter is currently unused. It will be used to pass in
@@ -3612,11 +3613,11 @@ fake file systems for tests.)
 <hr><h3><a name="pdf-character_by_character"><code>character_by_character(chanin, chanout)</code></a></h3>
 
 <p>
-This function converts a channel that can <code>recv()</code> a line at a time
-from a file into a channel that can <code>recv()</code> a character at a time.
-Don't try to mix by-line reads with by-character reads. Once a channel is
-passed into <code>character_by_character</code>, calling code should stop trying
-to use it.
+This function converts a channel that can <a href='#pdf-channel:recv'><code>recv</code></a>
+a line at a time from a file into a channel that can <a href='#pdf-channel:recv'><code>recv</code></a>
+a character at a time. Don't try to mix by-line reads with by-character reads.
+Once a channel is passed into <code>character_by_character</code>, calling
+code should stop trying to use it.
 
 
 <p>
@@ -3625,9 +3626,9 @@ to use it.
 <p>
 This function opens a file exclusively for writing, and returns a
 <code>channel</code> (NOT a file as in Lua) or <b>nil</b> on error.
-<code>send()</code> to the channel will write to the file. <code>close()</code> on the
-channel will persist the changes and make them externally visible. All writes
-are hidden until <code>close()</code>.
+<a href='#pdf-channel:send'><code>send</code></a> to the channel to write to
+the file. <code>close</code> on the channel will persist the changes and make
+them externally visible. All writes are hidden until <code>close</code>.
 
 <p>
 (The <code>fs</code> parameter is currently unused. It will be used to pass in

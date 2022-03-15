@@ -137,13 +137,16 @@ Teliva's codebase also includes forks of the following reputable brands:
 * The [luasec](https://github.com/brunoos/luasec) library for HTTPS support
   (modules `https` and `ssl`).
 * The [json.lua](https://github.com/rxi/json.lua) library for
-  serializing/deserializing to JSON (module `json`).
+  serializing/deserializing to JSON (modules `json` and `jsonf`).
 
 I only add to this list with great deliberation. Since it includes indirect
 suppliers (suppliers of suppliers), I have an incentive to only include
 suppliers who also have shallow supply chains. Minimizing the size of the
 supply chain should result in more reliable software that requires less
 frequent upgrades.
+
+(Look in [the manual](https://akkartik.github.io/teliva/doc/manual.html) for
+more details of what's available.)
 
 ## Why Lua?
 

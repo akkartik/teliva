@@ -36,13 +36,26 @@ static int os_pushresult (lua_State *L, int i, const char *filename) {
 }
 
 
+static char oslib_errbuf[1024] = {0};
 static int os_remove (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
+  if (starts_with(filename, "teliva_tmp_")) {
+    /* continue */
+  }
+  else if (starts_with(filename, "teliva_")) {
+    snprintf(oslib_errbuf, 1024, "app tried to remove file '%s'; that's never allowed for filenames starting with 'teliva_'", filename);
+    Previous_message = oslib_errbuf;
+    return os_pushresult(L, 0, filename);
+  }
+  else if (!file_operation_permitted(filename, "w")) {
+    snprintf(oslib_errbuf, 1024, "app tried to remove file '%s'; give it write permissions (ctrl-p) if that is expected", filename);
+    Previous_message = oslib_errbuf;
+    return os_pushresult(L, 0, filename);
+  }
   return os_pushresult(L, remove(filename) == 0, filename);
 }
 
 
-static char oslib_errbuf[1024] = {0};
 static int os_rename (lua_State *L) {
   const char *fromname = luaL_checkstring(L, 1);
   const char *toname = luaL_checkstring(L, 2);
@@ -52,12 +65,12 @@ static int os_rename (lua_State *L) {
     /* continue */
   }
   else if (starts_with(fromname, "teliva_")) {
-    snprintf(oslib_errbuf, 1024, "app tried to open file '%s'; that's never allowed for filenames starting with 'teliva_'", fromname);
+    snprintf(oslib_errbuf, 1024, "app tried to rename file '%s'; that's never allowed for filenames starting with 'teliva_'", fromname);
     Previous_message = oslib_errbuf;
     return os_pushresult(L, 0, fromname);
   }
   else if (!file_operation_permitted(fromname, "r")) {
-    snprintf(oslib_errbuf, 1024, "app tried to open file '%s' for reading; adjust its permissions (ctrl-p) if that is expected", fromname);
+    snprintf(oslib_errbuf, 1024, "app tried to rename file '%s'; give it read permissions (ctrl-p) if that is expected", fromname);
     Previous_message = oslib_errbuf;
     return os_pushresult(L, 0, fromname);
   }
@@ -65,12 +78,12 @@ static int os_rename (lua_State *L) {
     /* continue */
   }
   else if (starts_with(toname, "teliva_")) {
-    snprintf(oslib_errbuf, 1024, "app tried to open file '%s'; that's never allowed for filenames starting with 'teliva_'", toname);
+    snprintf(oslib_errbuf, 1024, "app tried to rename to file '%s'; that's never allowed for filenames starting with 'teliva_'", toname);
     Previous_message = oslib_errbuf;
     return os_pushresult(L, 0, toname);
   }
   else if (!file_operation_permitted(toname, "w")) {
-    snprintf(oslib_errbuf, 1024, "app tried to open file '%s' for writing; adjust its permissions (ctrl-p) if that is expected", toname);
+    snprintf(oslib_errbuf, 1024, "app tried to rename to file '%s'; give it write permissions (ctrl-p) if that is expected", toname);
     Previous_message = oslib_errbuf;
     return os_pushresult(L, 0, toname);
   }

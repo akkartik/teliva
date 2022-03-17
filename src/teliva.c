@@ -320,7 +320,7 @@ void append_string_to_array(lua_State* L, int array_index, const char* s) {
   lua_rawseti(L, array_index, new_index);
 }
 
-extern void save_caller_as(lua_State* L, const char* name, const char* caller_name);
+static void save_caller_as(lua_State* L, const char* name, const char* caller_name);
 void save_caller(lua_State* L, const char* name, int call_graph_depth) {
   lua_Debug ar;
   lua_getstack(L, 1, &ar);
@@ -328,7 +328,7 @@ void save_caller(lua_State* L, const char* name, int call_graph_depth) {
   if (ar.name) save_caller_as(L, name, ar.name);
 }
 
-void save_caller_as(lua_State* L, const char* name, const char* caller_name) {
+static void save_caller_as(lua_State* L, const char* name, const char* caller_name) {
   // push table of caller tables
   luaL_newmetatable(L, "__teliva_caller");
   int ct = lua_gettop(L);

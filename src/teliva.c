@@ -369,6 +369,8 @@ void record_metadata_about_function_call (lua_State *L, CallInfo *ci) {
     const char* caller_name = name_of_global(L, ci, 1);
     if (caller_name)
       save_caller(L, function_name, caller_name);
+    else if (call_graph_depth == 3)
+      save_caller(L, function_name, "main");
   }
 }
 

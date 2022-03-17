@@ -307,7 +307,7 @@ static const char* name_of_global(lua_State* L, const CallInfo* ci, int frame) {
   // push table of function names
   luaL_newmetatable(L, "__teliva_global_name");
   int gt = lua_gettop(L);
-  lua_pushinteger(L, func);
+  lua_pushinteger(L, (long int)func);
   lua_rawget(L, gt);
   if (!lua_isnil(L, -1))
     result = lua_tostring(L, -1);  // safe because global names are long-lived and never GC'd
@@ -325,8 +325,8 @@ static void precompute_names_of_globals(lua_State* L) {
   int table = lua_gettop(L);
   for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
     const char* key = lua_tostring(L, -2);
-    const char* value = lua_topointer(L, -1);
-    lua_pushinteger(L, value);
+    const void* value = lua_topointer(L, -1);
+    lua_pushinteger(L, (long int)value);
     lua_pushstring(L, key);
     lua_rawset(L, gt);
   }

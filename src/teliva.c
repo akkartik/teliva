@@ -298,31 +298,6 @@ void assign_call_graph_depth_to_name(lua_State* L, int depth, const char* name) 
   lua_pop(L, 1);  // table
 }
 
-int array_contains_string(lua_State* L, int array_index, const char* s) {
-  int oldtop = lua_gettop(L);
-  assert(lua_istable(L, array_index));
-  int array_size = luaL_getn(L, array_index);
-  int result = false;
-  for (int i = 1; i <= array_size; ++i) {
-    lua_rawgeti(L, array_index, i);
-    assert(lua_isstring(L, -1));
-    const char* curr = lua_tostring(L, -1);
-    result = result || (strcmp(curr, s) == 0);
-    lua_pop(L, 1);  // current element
-    if (result) break;
-  }
-  assert(oldtop == lua_gettop(L));
-  return result;
-}
-
-void append_string_to_array(lua_State* L, int array_index, const char* s) {
-  assert(lua_istable(L, array_index));
-  int array_size = luaL_getn(L, array_index);
-  int new_index = array_size+1;
-  lua_pushstring(L, s);
-  lua_rawseti(L, array_index, new_index);
-}
-
 static void save_caller_as(lua_State* L, const char* name, const char* caller_name) {
   // push table of caller tables
   luaL_newmetatable(L, "__teliva_caller");

@@ -309,31 +309,30 @@ static const char* name_of_global(lua_State* L, const CallInfo* ci, int frame) {
   int gt = lua_gettop(L);
   lua_pushinteger(L, func);
   lua_rawget(L, gt);
-  if (lua_isnil(L, -1)) {
-    // set value if it doesn't exist yet
-    lua_Debug f;
-    lua_getstack(L, frame, &f);
-    lua_getinfo(L, "n", &f);
-    lua_pushinteger(L, func);
-    if (f.name) {
-      result = strdup(f.name);
-      lua_pushstring(L, result);
-    }
-    else {
-      lua_pushinteger(L, 0);
-    }
-    lua_rawset(L, gt);
-  }
-  else if (lua_isnumber(L, -1)) {
-    // return null
-  }
-  else {
-    result = lua_tostring(L, -1);
-  }
+  if (!lua_isnil(L, -1))
+    result = lua_tostring(L, -1);  // safe because global names are long-lived and never GC'd
   lua_pop(L, 1);  // value
-  lua_pop(L, 1);  // table of function names
+  lua_pop(L, 1);  // table of global names
   assert(lua_gettop(L) == oldtop);
   return result;
+}
+
+static void precompute_names_of_globals(lua_State* L) {
+  int oldtop = lua_gettop(L);
+  luaL_newmetatable(L, "__teliva_global_name");
+  int gt = lua_gettop(L);
+  lua_pushvalue(L, LUA_GLOBALSINDEX);
+  int table = lua_gettop(L);
+  for (lua_pushnil(L); lua_next(L, table) != 0; lua_pop(L, 1)) {
+    const char* key = lua_tostring(L, -2);
+    const char* value = lua_topointer(L, -1);
+    lua_pushinteger(L, value);
+    lua_pushstring(L, key);
+    lua_rawset(L, gt);
+  }
+  lua_pop(L, 1);  // table of globals
+  lua_pop(L, 1);  // table of global names
+  assert(lua_gettop(L) == oldtop);
 }
 
 static void save_caller(lua_State* L, const char* name, const char* caller_name) {
@@ -1802,6 +1801,7 @@ int load_image(lua_State* L, char** argv, int n) {
 //?   exit(1);
   status = load_definitions(L);
   if (status != 0) return 0;
+  precompute_names_of_globals(L);
   /* run tests */
   status = run_tests(L);
   if (status != 0) return report_in_developer_mode(L, status);

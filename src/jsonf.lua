@@ -67,7 +67,7 @@ local literal_map = {
 
 local function skip_spaces(infile)
   while true do
-    local c = infile:recv()
+    local c = infile.read(1)
     if c == nil then break end
     if space_chars[c] == nil then return c end
   end
@@ -79,7 +79,7 @@ local function next_chars(infile, set, firstc)
   local res = {firstc}
   local nextc
   while true do
-    nextc = infile:recv()
+    nextc = infile.read(1)
     if nextc == nil then break end
     if set[nextc] then break end
     table.insert(res, nextc)
@@ -121,27 +121,27 @@ local function parse_string(infile, firstc)
   local res = {}
 
   while true do
-    local chr = infile:recv()
+    local chr = infile.read(1)
     if chr == nil then break end
     local x = chr:byte()
 
     if x < 32 then
       error("control character in string")
     elseif chr == '\\' then
-      local c = infile:recv()
+      local c = infile.read(1)
       if c == nil then break end
       if c == "u" then
         local hex = ''
-        c = infile:recv()
+        c = infile.read(1)
         if c == nil then break end
         hex = hex..c
-        c = infile:recv()
+        c = infile.read(1)
         if c == nil then break end
         hex = hex..c
-        c = infile:recv()
+        c = infile.read(1)
         if c == nil then break end
         hex = hex..c
-        c = infile:recv()
+        c = infile.read(1)
         if c == nil then break end
         hex = hex..c
         if not hex:match('^%x%x%x%x') then
@@ -155,7 +155,7 @@ local function parse_string(infile, firstc)
         table.insert(res, escape_char_map_inv[c])
       end
     elseif chr == '"' then
-      return table.concat(res), infile:recv()
+      return table.concat(res), infile.read(1)
     else
       table.insert(res, chr)
     end
@@ -170,7 +170,7 @@ local function parse_number(infile, firstc)
   local res = {firstc}
   local nextc
   while true do
-    nextc = infile:recv()
+    nextc = infile.read(1)
     if nextc == nil then break end
     if delim_chars[nextc] then break end
     table.insert(res, nextc)
@@ -295,14 +295,6 @@ end
 
 
 function jsonf.decode(infile)
-  return decode2(character_by_character(infile))
-end
-
-
-function decode2(infile)
-  if not ischannel(infile) then
-    error("expected channel, got " .. type(f))
-  end
   local firstc = skip_spaces(infile)
   local res, nextc = parse(infile, firstc)
   if nextc then

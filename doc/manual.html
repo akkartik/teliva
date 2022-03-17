@@ -3600,35 +3600,26 @@ idiomatic Teliva uses some slightly different primitives.
 <hr><h3><a name="pdf-start_reading"><code>start_reading (fs, filename)</code></a></h3>
 
 <p>
-This function opens a file exclusively for reading, and returns a
-<code>channel</code> (NOT a file as in Lua) or <b>nil</b> on error.
-<a href='#pdf-channel:recv'><code>recv</code></a> from the channel to read a
-line at a time from the file.
+This function opens a file exclusively for reading, and returns an object (NOT
+a file handle as in Lua) or <b>nil</b> on error. If the returned object is
+stored in variable <code>f</code>, <code>f.read(format)</code> will read from
+the file. Legal values for <code>format</code> are identical to
+<a href='#pdf-file:read'><code>file:read(format)</code></a>.
 
 <p>
 (The <code>fs</code> parameter is currently unused. It will be used to pass in
 fake file systems for tests.)
-
-<p>
-<hr><h3><a name="pdf-character_by_character"><code>character_by_character(chanin, chanout)</code></a></h3>
-
-<p>
-This function converts a channel that can <a href='#pdf-channel:recv'><code>recv</code></a>
-a line at a time from a file into a channel that can <a href='#pdf-channel:recv'><code>recv</code></a>
-a character at a time. Don't try to mix by-line reads with by-character reads.
-Once a channel is passed into <code>character_by_character</code>, calling
-code should stop trying to use it.
 
 
 <p>
 <hr><h3><a name="pdf-start_writing"><code>start_writing(fs, filename)</code></a></h3>
 
 <p>
-This function opens a file exclusively for writing, and returns a
-<code>channel</code> (NOT a file as in Lua) or <b>nil</b> on error.
-<a href='#pdf-channel:send'><code>send</code></a> to the channel to write to
-the file. <code>close</code> on the channel will persist the changes and make
-them externally visible. All writes are hidden until <code>close</code>.
+This function opens a file exclusively for writing, and returns an object (NOT
+a file handle as in Lua) or <b>nil</b> on error. If the result is stored in
+variable <code>f</code>, <code>f.write(x)</code> will write <code>x</code> to
+the file. <code>f.close()</code> will persist the changes and make them
+externally visible. All changes will be hidden until <code>f.close()</code>.
 
 <p>
 (The <code>fs</code> parameter is currently unused. It will be used to pass in
@@ -4408,17 +4399,19 @@ Returns a value representing the JSON string <code>str</code>.
 
 
 <p>
-<hr><h3><a name="pdf-jsonf.decode"><code>jsonf.decode (chan)</code></a></h3>
+<hr><h3><a name="pdf-jsonf.decode"><code>jsonf.decode (f)</code></a></h3>
 
 
 <p>
-Returns a value representing the JSON string read from channel
-<code>chan</code>.
+Reads a value encoded in JSON from a file and returns it.
+<code>f</code> is the type of file object returned by
+<a href='#pdf-start_reading'><code>start_reading</code></a> (i.e. supporting
+<code>f.read(format)</code>).
 
+For example, suppose file <code>foo</code> contains '[1,2,3,{"x":10}]'. Then:
 <pre>
-     local channel = task.Channel:new()
-     channel:send('[1,2,3,{"x":10}]')
-     jsonf.decode(channel)                -- Returns { 1, 2, 3, { x = 10 } }
+     local infile = start_reading(nil, 'foo')
+     jsonf.decode(infile)                 -- Returns { 1, 2, 3, { x = 10 } }
 </pre><p>
 
 

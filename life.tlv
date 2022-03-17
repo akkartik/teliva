@@ -522,7 +522,7 @@
     >  if infile == nil then return end
     >  local line_index = lines  -- quarter of the way down in pixels
     >  while true do
-    >    local line = infile:recv()
+    >    local line = infile.read()
     >    if line == nil then break end
     >    if line:sub(1,1) ~= '!' then  -- comment; plaintext files can't have whitespace before comments
     >      local col_index = cols

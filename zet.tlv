@@ -3732,8 +3732,8 @@
     >switch to new file API for writing
   write_zettels:
     >function write_zettels(outfile)
-    >  outfile:send(json.encode(zettels))
-    >  outfile:close()
+    >  outfile.write(json.encode(zettels))
+    >  outfile.close()
     >end
 - __teliva_timestamp:
     >Thu Mar 10 04:21:28 2022

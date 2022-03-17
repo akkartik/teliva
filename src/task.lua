@@ -384,25 +384,6 @@ _M.RECV      = RECV
 _M.SEND      = SEND
 _M.NOP       = NOP
 
--- Specific to Teliva
-function spawn_main()
-  task.spawn(call_main)
-  task.scheduler()
-  assert(false, "Teliva ran out of stuff to do. Possible causes:\n"..
-                "- main() returned. Apps shouldn't let this happen.\n"..
-                "- App is reading past the end of a file (after recv() returned nil)\n"..
-                "- Some channel is blocked forever.\n")
-  curses.nodelay(true)
-  curses.getch()
-end
-
--- This function exists only to make the call to 'main' visible to Teliva.
--- Teliva can't yet recognize the caller of indirect calls, as happens with
--- task.spawn.
-function call_main()
-  main()
-end
-
 ----------------------------------------------------------------------------
 ----------------------------------------------------------------------------
 -- Tests

@@ -2123,7 +2123,16 @@ When you run it, it produces the following output:
      main    false   cannot resume dead coroutine
 </pre>
 
-
+<div class='teliva'>
+Coroutines are powerful, but require some experience to use tastefully. Try to
+use them judiciously. If you find yourself juggling lots of coroutines and
+trying to decide which one to try to resume, you should probably be using
+<a href='#5.13'>tasks and channels</a> instead. On the other hand, tasks have
+some cognitive overheads. You have to explicitly manage them with
+<a href='#pdf-task.scheduler'><code>task.scheduler</code></a>, and errors can
+sometimes be hard to track down. For simple generators that emit elements
+on demand, a coroutine is likely the best solution.
+</div>
 
 
 <h1>3 - <a name="3">C API</a></h1>
@@ -4423,17 +4432,17 @@ For example, suppose file <code>foo</code> contains '[1,2,3,{"x":10}]'. Then:
 
 Teliva includes the well-known
 <a href='https://github.com/majek/lua-channels#readme'>lua-channels</a>
-library in module <code>task</code>. It also transparently starts up
-<a href='#pdf-task.scheduler'><code>task.scheduler</code></a> for all apps.
-See sieve.tlv for a basic example.
+library in module <code>task</code>. See sieve.tlv for a basic example.
 
 <p>
 <hr><h3><a name="pdf-task.spawn"><code>task.spawn (fun, [...])</code></a></h3>
 
 
 <p>
-Run <code>fun</code> as a coroutine with given parameters. You should use this
-instead of <a href="#pdf-coroutine.create"><code>coroutine.create</code></a>.
+Run <code>fun</code> as a coroutine with given parameters. Spawn tasks instead of
+just calling <a href="#pdf-coroutine.create"><code>coroutine.create</code></a>
+when you can't statically predict how your coroutines will transfer control to
+each other.
 
 
 <p>
@@ -4441,8 +4450,9 @@ instead of <a href="#pdf-coroutine.create"><code>coroutine.create</code></a>.
 
 
 <p>
-Starts running any spawned tasks. You shouldn't need to ever call this from
-Teliva. The scheduler is always started for you.
+Starts running any spawned tasks. Execution transfers to spawned tasks;
+this function only returns when there are no tasks left to run or when all
+tasks are blocked (deadlock).
 
 
 <p>

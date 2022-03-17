@@ -484,7 +484,7 @@ restart:
   y += 2;
   mvprintw(y, 0, "functions: ");
   y++;
-  for (int depth = /*ignore callers of main*/3; ; ++depth) {
+  for (int depth = /*main*/2; ; ++depth) {
     mvaddstr(y, 0, "                ");
     bool drew_anything = false;
     index_within_level = 0;

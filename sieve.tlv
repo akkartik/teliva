@@ -25,14 +25,17 @@
   Window:
     >Window = curses.stdscr()
 - __teliva_timestamp: original
-  doc:blurb:
-    >To show a brief description of the app on the 'big picture' screen, put the text in a special buffer called 'doc:blurb'.
-    >
-    >You can also override the default big picture screen entirely by creating a buffer called 'doc:main'.
-- __teliva_timestamp:
-    >Sat Feb 26 21:50:11 2022
   main:
     >function main()
+    >  task.spawn(main_task)
+    >  task.scheduler()
+    >  Window:refresh()
+    >  Window:getch()
+    >end
+- __teliva_timestamp: original
+  main_task:
+    >function main_task()
+    >  Window:clear()
     >  local c = task.Channel:new()
     >  task.spawn(counter, c)
     >  for i=1,10 do
@@ -64,8 +67,8 @@
     >end
 - __teliva_timestamp:
     >Sat Feb 26 21:55:46 2022
-  main:
-    >function main()
+  main_task:
+    >function main_task()
     >  local primes = task.Channel:new()
     >  task.spawn(sieve, primes)
     >  for i=1,10 do
@@ -104,8 +107,8 @@
     >Sat Feb 26 22:09:47 2022
   __teliva_note:
     >infinite primes
-  main:
-    >function main()
+  main_task:
+    >function main_task()
     >  local primes = task.Channel:new()
     >  task.spawn(sieve, primes)
     >  while true do
@@ -120,8 +123,8 @@
     >clear screen when it fills up; pause on keypress
     >
     >In Teliva getch() implicitly refreshes the screen.
-  main:
-    >function main()
+  main_task:
+    >function main_task()
     >  Window:nodelay(true)
     >  Window:clear()
     >  local primes = task.Channel:new()
@@ -139,7 +142,6 @@
     >  end
     >  print('key pressed; done')
     >  Window:nodelay(false)
-    >  Window:getch()
     >end
 - __teliva_timestamp:
     >Sat Feb 26 22:27:25 2022

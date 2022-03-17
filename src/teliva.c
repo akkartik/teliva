@@ -298,7 +298,46 @@ void save_call_graph_depth(lua_State* L, int depth, const char* name) {
   lua_pop(L, 1);  // table
 }
 
+/* Don't rely on this for security. It's visible to apps and so can be mutated
+ * by them. */
+static const char* name_of_global(lua_State* L, const CallInfo* ci, int frame) {
+  const char* result = NULL;
+  Closure* func = ci_func(ci-frame);
+  int oldtop = lua_gettop(L);
+  // push table of function names
+  luaL_newmetatable(L, "__teliva_global_name");
+  int gt = lua_gettop(L);
+  lua_pushinteger(L, func);
+  lua_rawget(L, gt);
+  if (lua_isnil(L, -1)) {
+    // set value if it doesn't exist yet
+    lua_Debug f;
+    lua_getstack(L, frame, &f);
+    lua_getinfo(L, "n", &f);
+    lua_pushinteger(L, func);
+    if (f.name) {
+      result = strdup(f.name);
+      lua_pushstring(L, result);
+    }
+    else {
+      lua_pushinteger(L, 0);
+    }
+    lua_rawset(L, gt);
+  }
+  else if (lua_isnumber(L, -1)) {
+    // return null
+  }
+  else {
+    result = lua_tostring(L, -1);
+  }
+  lua_pop(L, 1);  // value
+  lua_pop(L, 1);  // table of function names
+  assert(lua_gettop(L) == oldtop);
+  return result;
+}
+
 static void save_caller(lua_State* L, const char* name, const char* caller_name) {
+  int oldtop = lua_gettop(L);
   // push table of caller tables
   luaL_newmetatable(L, "__teliva_caller");
   int ct = lua_gettop(L);
@@ -317,22 +356,19 @@ static void save_caller(lua_State* L, const char* name, const char* caller_name)
   // clean up
   lua_pop(L, 1);  // caller table
   lua_pop(L, 1);  // table of caller tables
+  assert(lua_gettop(L) == oldtop);
 }
 
 void record_metadata_about_function_call (lua_State *L, CallInfo *ci) {
-  lua_Debug f;
-  lua_getstack(L, 0, &f);
-  lua_getinfo(L, "n", &f);
+  const char* function_name = name_of_global(L, ci, 0);
   long int call_graph_depth = ci - L->base_ci;
   /* note to self: the function pointer is at ci_func(ci) */
-  if (f.name) {
-    save_call_graph_depth(L, call_graph_depth, f.name);
+  if (function_name) {
+    save_call_graph_depth(L, call_graph_depth, function_name);
     if (call_graph_depth <= 1) return;
-    lua_Debug caller_f;
-    lua_getstack(L, 1, &caller_f);
-    lua_getinfo(L, "n", &caller_f);
-    if (caller_f.name)
-      save_caller(L, f.name, caller_f.name);
+    const char* caller_name = name_of_global(L, ci, 1);
+    if (caller_name)
+      save_caller(L, function_name, caller_name);
   }
 }
 

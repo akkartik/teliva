@@ -276,7 +276,7 @@ void draw_highlighted_definition_name(const char* definition_name) {
   addstr("  ");
 }
 
-void assign_call_graph_depth_to_name(lua_State* L, int depth, const char* name) {
+void save_call_graph_depth(lua_State* L, int depth, const char* name) {
   /* Maintain a global table mapping from function name to call-stack depth
    * at first call to it.
    *
@@ -298,7 +298,7 @@ void assign_call_graph_depth_to_name(lua_State* L, int depth, const char* name) 
   lua_pop(L, 1);  // table
 }
 
-static void save_caller_as(lua_State* L, const char* name, const char* caller_name) {
+static void save_caller(lua_State* L, const char* name, const char* caller_name) {
   // push table of caller tables
   luaL_newmetatable(L, "__teliva_caller");
   int ct = lua_gettop(L);
@@ -323,16 +323,16 @@ void record_metadata_about_function_call (lua_State *L, CallInfo *ci) {
   lua_Debug f;
   lua_getstack(L, 0, &f);
   lua_getinfo(L, "n", &f);
-  long int call_depth = ci - L->base_ci;
+  long int call_graph_depth = ci - L->base_ci;
   /* note to self: the function pointer is at ci_func(ci) */
   if (f.name) {
-    assign_call_graph_depth_to_name(L, call_depth, f.name);
-    if (call_depth <= 1) return;
+    save_call_graph_depth(L, call_graph_depth, f.name);
+    if (call_graph_depth <= 1) return;
     lua_Debug caller_f;
     lua_getstack(L, 1, &caller_f);
     lua_getinfo(L, "n", &caller_f);
     if (caller_f.name)
-      save_caller_as(L, f.name, caller_f.name);
+      save_caller(L, f.name, caller_f.name);
   }
 }
 
@@ -1243,7 +1243,7 @@ static int run_tests(lua_State* L) {
   return 1;
 }
 
-static void clear_call_graph(lua_State* L) {
+static void clear_call_graph_depth(lua_State* L) {
   int oldtop = lua_gettop(L);
   luaL_newmetatable(L, "__teliva_call_graph_depth");
   int cgt = lua_gettop(L);
@@ -1764,10 +1764,11 @@ int load_image(lua_State* L, char** argv, int n) {
 //?   exit(1);
   status = load_definitions(L);
   if (status != 0) return 0;
+  /* run tests */
   status = run_tests(L);
   if (status != 0) return report_in_developer_mode(L, status);
-  /* clear callgraph stats from running tests */
-  clear_call_graph(L);
+  /* clear stats from running tests */
+  clear_call_graph_depth(L);
   clear_caller(L);
   /* initialize permissions */
   load_permissions_from_user_configuration(L);

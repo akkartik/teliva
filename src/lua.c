@@ -249,7 +249,7 @@ static int pmain (lua_State *L) {
   if (s->status != 0) return 0;
 
   /* call main() */
-  assign_call_graph_depth_to_name(L, /*depth*/2, "main");  /* manually seed debug info */
+  save_call_graph_depth(L, /*depth*/2, "main");  /* manually seed debug info */
   lua_getglobal(L, "main");
   s->status = docall(L, 0, 1);
   if (s->status != 0) return report_in_developer_mode(L, s->status);

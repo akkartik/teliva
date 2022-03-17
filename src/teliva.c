@@ -13,6 +13,9 @@
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
+
+#undef getstr
+#include "lstate.h"
 #include "teliva.h"
 #include "tlv.h"
 
@@ -341,11 +344,21 @@ static void save_caller_as(lua_State* L, const char* name, const char* caller_na
   lua_pop(L, 1);  // table of caller tables
 }
 
-void save_caller(lua_State* L, const char* name, int call_graph_depth) {
-  lua_Debug ar;
-  lua_getstack(L, 1, &ar);
-  lua_getinfo(L, "n", &ar);
-  if (ar.name) save_caller_as(L, name, ar.name);
+void record_metadata_about_function_call (lua_State *L, CallInfo *ci) {
+  lua_Debug f;
+  lua_getstack(L, 0, &f);
+  lua_getinfo(L, "n", &f);
+  long int call_depth = ci - L->base_ci;
+  /* note to self: the function pointer is at ci_func(ci) */
+  if (f.name) {
+    assign_call_graph_depth_to_name(L, call_depth, f.name);
+    if (call_depth <= 1) return;
+    lua_Debug caller_f;
+    lua_getstack(L, 1, &caller_f);
+    lua_getinfo(L, "n", &caller_f);
+    if (caller_f.name)
+      save_caller_as(L, f.name, caller_f.name);
+  }
 }
 
 static void clear_caller(lua_State* L) {
@@ -496,7 +509,7 @@ restart:
   y += 2;
   mvprintw(y, 0, "functions: ");
   y++;
-  for (int depth = /*ignore call_main*/2; ; ++depth) {
+  for (int depth = /*ignore callers of main*/3; ; ++depth) {
     mvaddstr(y, 0, "                ");
     bool drew_anything = false;
     index_within_level = 0;

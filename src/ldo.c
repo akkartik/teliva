@@ -29,7 +29,6 @@
 #include "lundump.h"
 #include "lvm.h"
 #include "lzio.h"
-#include "teliva.h"
 
 
 
@@ -256,37 +255,7 @@ static StkId tryfuncTM (lua_State *L, StkId func) {
 }
 
 
-/* based on getfuncname */
-extern Instruction symbexec (const Proto *pt, int lastpc, int reg);
-extern int luaL_newmetatable (lua_State *L, const char *tname);
-void record_metadata_about_function_call (lua_State *L, CallInfo *ci) {
-  if (!isLua(ci))
-    return;
-  if (ci->tailcalls > 0)
-    return;
-  if (!isLua(ci - 1))
-    return;
-  ci--;  /* calling function */
-  if (ci == L->ci)
-    ci->savedpc = L->savedpc;
-  int pc = cast(int, ci->savedpc - ci_func(ci)->l.p->code) - 1;
-  lua_assert(pc != -1);  // TODO: lua_assert not triggering
-  Instruction i = ci_func(ci)->l.p->code[pc];
-  if (GET_OPCODE(i) != OP_CALL && GET_OPCODE(i) != OP_TAILCALL &&
-      GET_OPCODE(i) != OP_TFORLOOP)
-    return;
-  Proto *p = ci_func(ci)->l.p;
-  i = symbexec(p, pc, GETARG_A(i));  /* previous instruction that writes to call's RA */
-  if (GET_OPCODE(i) != OP_GETGLOBAL)
-    return;
-  int g = GETARG_Bx(i);  /* global index */
-  lua_assert(ttisstring(&p->k[g]));
-  int call_graph_depth = ci - L->base_ci;
-  const char* function_name = svalue(&p->k[g]);
-  assign_call_graph_depth_to_name(L, call_graph_depth, function_name);
-  save_caller(L, function_name, call_graph_depth);
-}
-
+extern void record_metadata_about_function_call (lua_State *L, CallInfo *ci);
 
 #define inc_ci(L) \
   ((L->ci == L->end_ci) ? growCI(L) : \

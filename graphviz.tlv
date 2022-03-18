@@ -501,11 +501,13 @@
 - __teliva_timestamp: original
   read_dot_file:
     >function read_dot_file(filename)
-    >  local infile = start_reading(nil, filename)
-    >  local chars = graphviz_buffered_reader(infile)
-    >  local tokens = graphviz_tokenizer(chars)
     >  local graph = {}
-    >  parse_graph(tokens, graph)
+    >  local infile = start_reading(nil, filename)
+    >  if infile then
+    >    local chars = graphviz_buffered_reader(infile)
+    >    local tokens = graphviz_tokenizer(chars)
+    >    parse_graph(tokens, graph)
+    >  end
     >  return graph
     >end
 - __teliva_timestamp: original

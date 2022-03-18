@@ -134,6 +134,8 @@
     >    end
     >    result = result..'}'
     >    return result
+    >  elseif type(x) == 'string' then
+    >    return '"'..x..'"'
     >  end
     >  return tostring(x)
     >end
@@ -272,10 +274,17 @@
     >    self.scr.attrs = curses.A_NORMAL
     >  end
     >  h.getch = function(self)
-    >    return table.remove(h.kbd, 1)
+    >    local c = table.remove(h.kbd, 1)
+    >    if c == nil then return c end
+    >    return string.byte(c)  -- for verisimilitude with ncurses
     >  end
     >  h.addch = function(self, c)
     >    local scr = self.scr
+    >    if c == '\n' then
+    >      scr.cursy = scr.cursy+1
+    >      scr.cursx = 0
+    >      return
+    >    end
     >    if scr.cursy <= scr.h then
     >      scr[scr.cursy][scr.cursx] = {data=c, attrs=scr.attrs}
     >      scr.cursx = scr.cursx+1
@@ -303,6 +312,9 @@
     >  h.clear = function(self)
     >    clear_scr(self.scr)
     >  end
+    >  h.refresh = function(self)
+    >    -- nothing
+    >  end
     >  return h
     >end
 - __teliva_timestamp: original
@@ -325,6 +337,8 @@
 - __teliva_timestamp: original
   clear_scr:
     >function clear_scr(props)
+    >  props.cursy = 1
+    >  props.cursx = 1
     >  for y=1,props.h do
     >    props[y] = {}
     >    for x=1,props.w do
@@ -361,9 +375,9 @@
     >  }
     >  local y = 1
     >  while true do
-    >    local c = w:getch()
-    >    if c == nil then break end
-    >    w:mvaddstr(y, 1, lines[c])
+    >    local b = w:getch()
+    >    if b == nil then break end
+    >    w:mvaddstr(y, 1, lines[string.char(b)])
     >    y = y+1
     >  end
     >  check_screen(w, '345  '..

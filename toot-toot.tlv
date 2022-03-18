@@ -119,6 +119,8 @@
     >    end
     >    result = result..'}'
     >    return result
+    >  elseif type(x) == 'string' then
+    >    return '"'..x..'"'
     >  end
     >  return tostring(x)
     >end

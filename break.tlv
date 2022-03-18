@@ -497,8 +497,270 @@
     >    update(Window)
     >  end
     >end
+- __teliva_timestamp:
+    >Thu Mar 17 21:21:29 2022
+  program:
+    >program = {lines = nil, cursor = nil}
+    >-- lines: [line]
+    >-- cursor: int, index into lines
+    >-- line: {[word], cursor}
+    >-- word: {string, cursor}
+- __teliva_timestamp:
+    >Thu Mar 17 21:27:38 2022
+  render:
+    >function render(window)
+    >  local key = window:getch()
+    >  for row, line in ipair(program.lines) do
+    >    for col, word in ipair(line.words) do
+    >      window:addstr(word)
+    >      window:addstr(' ')
+    >    end
+    >    window:addstr('\n')
+    >  end
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 21:28:39 2022
+  render:
+    >function render(window)
+    >  local key = window:getch()
+    >  for row, line in ipairs(program.lines) do
+    >    for col, word in pairs(line.words) do
+    >      window:addstr(word)
+    >      window:addstr(' ')
+    >    end
+    >    window:addstr('\n')
+    >  end
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 21:31:33 2022
+  Program:
+    >Program = {
+    >  cursor_y = 1,
+    >  lines = {
+    >    {
+    >      cursor_x = 1,
+    >      words = {
+    >        {
+    >          cursor = 0,
+    >          data = '',
+    >        },
+    >      },
+    >    },
+    >  },
+    >}
+    >
+    >
+    >
+    >
+    >
+- __teliva_timestamp:
+    >Thu Mar 17 21:32:05 2022
+  render:
+    >function render(window)
+    >  window:clear()
+    >  for row, line in ipairs(program.lines) do
+    >    for col, word in pairs(line.words) do
+    >      window:addstr(word)
+    >      window:addstr(' ')
+    >    end
+    >    window:addstr('\n')
+    >  end
+    >  window:refresh()
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 21:32:22 2022
+  render:
+    >function render(window)
+    >  window:clear()
+    >  for row, line in ipairs(program.lines) do
+    >    for col, word in pairs(line.words) do
+    >      window:addstr(word.data)
+    >      window:addstr(' ')
+    >    end
+    >    window:addstr('\n')
+    >  end
+    >  window:refresh()
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 21:33:00 2022
+  update:
+    >function update(window)
+    >  local key = window:getch()
+    >  if key == ' ' then
+    >    print('space')
+    >    window:getch()
+    >  end
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 21:33:17 2022
+  update:
+    >function update(window)
+    >  local key = window:getch()
+    >  if key == string.byte(' ') then
+    >    print('space')
+    >    window:getch()
+    >  end
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 21:33:31 2022
+  update:
+    >function update(window)
+    >  local key = string.char(window:getch())
+    >  if key == ' ' then
+    >    print('space')
+    >    window:getch()
+    >  end
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 21:36:14 2022
+  __teliva_note:
+    >very initial skeleton
+    >- just render, no eval
+    >- no stack rendering
+    >- no cursor (just appends)
+  update:
+    >function update(window)
+    >  local key = string.char(window:getch())
+    >  local nwords = #program.lines[1].words
+    >  if key == ' ' then
+    >    program.lines[1].words[nwords+1] = {data='', cursor=0}
+    >  else
+    >    program.lines[1].words[nwords].data = program.lines[1].words[nwords].data .. key
+    >  end
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 21:39:24 2022
+  main:
+    >function main()
+    >  init_colors()
+    >
+    >  while true do
+    >    render(Window)
+    >    update(Window)
+    >  end
+    >end
+    >
+    >function test_basic_render()
+    >  
+- __teliva_timestamp:
+    >Thu Mar 17 21:43:05 2022
+  main:
+    >function main()
+    >  init_colors()
+    >
+    >  while true do
+    >    render(Window, Program)
+    >    update(Window, Program)
+    >  end
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 21:43:11 2022
+  render:
+    >function render(window, program)
+    >  window:clear()
+    >  for row, line in ipairs(program.lines) do
+    >    for col, word in pairs(line.words) do
+    >      window:addstr(word.data)
+    >      window:addstr(' ')
+    >    end
+    >    window:addstr('\n')
+    >  end
+    >  window:refresh()
+    >end
+    >
+    >function test_render()
+    >  local w = window{
+    >    kbd=kbd(''),
+    >    scr=scr{h=3, w=5},
+    >  }
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 21:43:20 2022
+  update:
+    >function update(window, program, key)
+    >  local nwords = #program.lines[1].words
+    >  if key == ' ' then
+    >    program.lines[1].words[nwords+1] = {data='', cursor=0}
+    >  else
+    >    program.lines[1].words[nwords].data = program.lines[1].words[nwords].data .. key
+    >  end
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 21:58:10 2022
+  Program:
+    >Program = empty_program()
+- __teliva_timestamp:
+    >Thu Mar 17 21:58:10 2022
+  empty_program:
+    >function empty_program()
+    >  return {
+    >    cursor_y = 1,
+    >    lines = {
+    >      {
+    >        cursor_x = 1,
+    >        words = {
+    >          {
+    >            cursor = 0,
+    >            data = '',
+    >          },
+    >        },
+    >      },
+    >    },
+    >  }
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 22:36:24 2022
+  render:
+    >function render(window, program)
+    >  window:clear()
+    >  for row, line in ipairs(program.lines) do
+    >    for col, word in pairs(line.words) do
+    >      window:addstr(word.data)
+    >      window:addstr(' ')
+    >    end
+    >    window:addstr('\n')
+    >  end
+    >  window:refresh()
+    >end
+- __teliva_timestamp:
+    >Thu Mar 17 22:41:01 2022
+  __teliva_note:
+    >a passing test
+  main:
+    >function main()
+    >  init_colors()
+    >
+    >  while true do
+    >    render(Window, Program)
+    >    local key = string.char(Window:getch())  -- nodelay can't be set
+    >    update(Window, Program, key)
+    >  end
+    >end
+    >
+    >function test_incomplete()
+    >  local w = window{
+    >    kbd=kbd('ab c'),
+    >    scr=scr{h=3, w=5},
+    >  }
+    >  local prog = empty_program()
+    >  while true do
+    >    render(w, prog)
+    >    local key = w:getch()
+    >    if key == nil then break end
+    >    update(w, prog, string.char(key))
+    >  end
+    >  check_screen(w, 'ab c '..
+    >                  '     '..
+    >                  '     ',
+    >               'test_main_incomplete')
+    >end
 - __teliva_timestamp: original
   doc:blurb:
-    >To show a brief description of the app on the 'big picture' screen, put the text in a special buffer called 'doc:blurb'.
+    >A concatenative programming language with a live-updating debug UI.
+    >by Kartik Agaram and Sumeet Agarwal
     >
-    >You can also override the default big picture screen entirely by creating a buffer called 'doc:main'.
+    >Highly incomplete.
+    >
+    >Previous prototypes:
+    >  - https://archive.org/details/akkartik-2min-2020-12-06
+    >  - https://merveilles.town/@akkartik/105759816342173743

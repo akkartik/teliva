@@ -60,6 +60,10 @@
     >  return s:sub(1,pos-1)..s:sub(pos+1)
     >end
     >
+    >function string.pos(s, sub)
+    >  return string.find(s, sub, 1, true)  -- plain=true to disable regular expressions
+    >end
+    >
     >-- TODO: backport utf-8 support from Lua 5.3
 - __teliva_timestamp: original
   debugy:

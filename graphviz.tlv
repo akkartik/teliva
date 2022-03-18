@@ -60,6 +60,10 @@
     >  return s:sub(1,pos-1)..s:sub(pos+1)
     >end
     >
+    >function string.pos(s, sub)
+    >  return string.find(s, sub, 1, true)  -- plain=true to disable regular expressions
+    >end
+    >
     >-- TODO: backport utf-8 support from Lua 5.3
 - __teliva_timestamp: original
   debugy:
@@ -548,17 +552,17 @@
     >      self:skip_whitespace_and_comments()
     >      local c = self.chars.peek
     >      if c == nil then return nil end
-    >      if string.find('/*;,', c) then
+    >      if string.pos('/*;,', c) then
     >        -- should be skipped as comments
     >        error('unexpected character '..c)
-    >      elseif string.find('[]{}():=', c) then
+    >      elseif string.pos('[]{}():=', c) then
     >        -- single-char tokens
     >        return self.chars:read()
     >      elseif c == '"' then
     >        return self:string()
     >      elseif c == '<' then
     >        error('html strings are not implemented yet')
-    >      elseif string.find('-.0123456789', c) then
+    >      elseif string.pos('-.0123456789', c) then
     >        return self:numeral()
     >      elseif string.match(c, '[%a_]') then
     >        return self:identifier()
@@ -571,7 +575,7 @@
     >          break  -- end of chars
     >        elseif string.match(c, '%s') then
     >          self.chars:read()
-    >        elseif string.match(',;', c) then
+    >        elseif string.pos(',;', c) then
     >          self.chars:read()
     >        elseif c == '#' then
     >          self.chars:read()  -- skip
@@ -623,7 +627,7 @@
     >        local c = self.chars.peek
     >        if c == nil then
     >          return result
-    >        elseif string.find('-.0123456789', c) then
+    >        elseif string.pos('-.0123456789', c) then
     >          result = result..self.chars:read()
     >        else
     >          break

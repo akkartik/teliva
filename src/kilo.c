@@ -1098,7 +1098,7 @@ static void editorGo(lua_State* L) {
                 editorOpen("teliva_editor_buffer");
                 attrset(A_NORMAL);
                 clear();
-                draw_callers_of_current_definition(L);
+                draw_current_definition_name_and_callers(L);
             }
             return;
         } else if (c == CTRL_U) {
@@ -1252,7 +1252,7 @@ int edit(lua_State* L, char* filename, char* definition_name) {
     editorOpen(filename);
     attrset(A_NORMAL);
     clear();
-    draw_callers_of_current_definition(L);
+    draw_current_definition_name_and_callers(L);
     while(!Quit) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;
@@ -1377,7 +1377,7 @@ int editFrom(lua_State* L, char* filename, char* definition_name, int rowoff, in
     editorOpen(filename);
     attrset(A_NORMAL);
     clear();
-    draw_callers_of_current_definition(L);
+    draw_current_definition_name_and_callers(L);
     while(!Quit) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;
@@ -1420,7 +1420,7 @@ int resumeEdit(lua_State* L) {
     Back_to_big_picture = 0;
     attrset(A_NORMAL);
     clear();
-    draw_callers_of_current_definition(L);
+    draw_current_definition_name_and_callers(L);
     while(!Quit) {
         /* update on resize */
         E.startcol = LINE_NUMBER_SPACE;

@@ -699,8 +699,10 @@ int editor_view_in_progress(lua_State* L) {
 
 char Current_definition[CURRENT_DEFINITION_LEN+1] = {0};
 
-void draw_callers_of_current_definition(lua_State* L) {
+void draw_current_definition_name_and_callers(lua_State* L) {
   int oldtop = lua_gettop(L);
+  mvaddstr(0, 0, "");
+  draw_definition_name(Current_definition);
   luaL_newmetatable(L, "__teliva_caller");
   int ct = lua_gettop(L);
   lua_getfield(L, ct, Current_definition);
@@ -711,7 +713,7 @@ void draw_callers_of_current_definition(lua_State* L) {
   }
   int ctc = lua_gettop(L);
   attron(COLOR_PAIR(COLOR_PAIR_FADE));
-  mvaddstr(0, 0, "callers: ");
+  addstr("callers: ");
   attroff(COLOR_PAIR(COLOR_PAIR_FADE));
   for (lua_pushnil(L); lua_next(L, ctc) != 0; lua_pop(L, 1)) {
     const char* caller_name = lua_tostring(L, -2);

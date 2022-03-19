@@ -755,3 +755,86 @@
     >  end
     >  assert(tokens:read() == '}')
     >end
+- __teliva_timestamp:
+    >Fri Mar 18 17:21:16 2022
+  Focus:
+    >-- The focus is a set of nodes we're constantly running
+    >-- certain queries against.
+    >Focus = {}
+- __teliva_timestamp:
+    >Fri Mar 18 17:21:40 2022
+  Graph:
+    >-- The set of edges parsed from the given .dot file.
+    >Graph = {}
+- __teliva_timestamp:
+    >Fri Mar 18 17:29:25 2022
+  render_focus:
+    >function render_focus(window)
+    >  window:attrset(curses.A_BOLD)
+    >  window:mvaddstr(5, 1, 'focus: ')
+    >  window:attrset(curses.A_NORMAL)
+    >  for _, node in ipairs(Focus) do
+    >    window:addstr(node)
+    >    window:addstr(' ')
+    >  end
+    >
+    >  window:mvaddstr(8, 0, '')
+    >  local lines, cols = window:getmaxyx()
+    >  for col=1,cols do
+    >    window:addstr('_')
+    >  end
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 17:30:11 2022
+  render_queries_on_focus:
+    >function render_queries_on_focus(window)
+    >  window:attrset(curses.A_BOLD)
+    >  window:mvaddstr(10, 1, '')
+    >  -- TODO
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 17:30:39 2022
+  render:
+    >function render(window)
+    >  window:clear()
+    >  render_basic_stats(window)
+    >  render_focus(window)
+    >  render_queries_on_focus(window)
+    >  window:refresh()
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 17:35:20 2022
+  sources:
+    >function sources(Graph)
+    >  local is_target = {}
+    >  for source, targets in pairs(Graph) do
+    >    for _, target in ipairs(targets) do
+    >      is_target[target] = true
+    >    end
+    >  end
+    >  local result = {}
+    >  for source, _ in pairs(Graph) do
+    >    if not is_target[source] then
+    >      result[#result+1] = source
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 17:35:57 2022
+  render_basic_stats:
+    >function render_basic_stats(window)
+    >  window:attrset(curses.A_BOLD)
+    >  window:mvaddstr(1, 1, 'sources: ')
+    >  window:attrset(curses.A_NORMAL)
+    >  local sources = sources(Graph)
+    >  for _, node in ipairs(sources) do
+    >    window:addstr(node)
+    >    window:addstr(' ')
+    >  end
+    >  window:mvaddstr(3, 0, '')
+    >  local lines, cols = window:getmaxyx()
+    >  for col=1,cols do
+    >    window:addstr('_')
+    >  end
+    >end

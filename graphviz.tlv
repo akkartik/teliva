@@ -738,10 +738,9 @@
     >        -- edge_stmt
     >        local tok3 = tokens:read()
     >        if graph[tok1] == nil then
-    >          graph[tok1] = {tok3}
-    >        else
-    >          append(graph[tok1], {tok3})
+    >          graph[tok1] = {}
     >        end
+    >        graph[tok1][tok3] = true
     >      elseif tok2 == '--' then
     >        error('unexpected token "--" in digraph; edges should be directed using "->"')
     >      elseif tok2 == '=' then
@@ -808,7 +807,7 @@
     >function sources(Graph)
     >  local is_target = {}
     >  for source, targets in pairs(Graph) do
-    >    for _, target in ipairs(targets) do
+    >    for target, _ in pairs(targets) do
     >      is_target[target] = true
     >    end
     >  end

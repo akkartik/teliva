@@ -165,8 +165,19 @@
     >end
 - __teliva_timestamp: original
   filter:
+    >function filter(h, f)
+    >  result = {}
+    >  for k, v in pairs(h) do
+    >    if f(k, v) then
+    >      result[k] = v
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  ifilter:
     >-- only for arrays
-    >function filter(l, f)
+    >function ifilter(l, f)
     >  result = {}
     >  for _, x in ipairs(l) do
     >    if f(x) then

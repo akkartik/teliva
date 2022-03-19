@@ -81,21 +81,6 @@
     >  window:mvaddstr(oldy, oldx, '')
     >end
 - __teliva_timestamp: original
-  check_eq:
-    >function check_eq(x, expected, msg)
-    >  if x == expected then
-    >    Window:addch('.')
-    >  else
-    >    print('F - '..msg)
-    >    print('  expected '..tostring(expected)..' but got '..x)
-    >    teliva_num_test_failures = teliva_num_test_failures + 1
-    >    -- overlay first test failure on editors
-    >    if teliva_first_failure == nil then
-    >      teliva_first_failure = msg
-    >    end
-    >  end
-    >end
-- __teliva_timestamp: original
   map:
     >-- only for arrays
     >function map(l, f)
@@ -117,8 +102,19 @@
     >end
 - __teliva_timestamp: original
   filter:
+    >function filter(h, f)
+    >  result = {}
+    >  for k, v in pairs(h) do
+    >    if f(k, v) then
+    >      result[k] = v
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  ifilter:
     >-- only for arrays
-    >function filter(l, f)
+    >function ifilter(l, f)
     >  result = {}
     >  for _, x in ipairs(l) do
     >    if f(x) then

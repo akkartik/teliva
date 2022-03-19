@@ -165,8 +165,19 @@
     >end
 - __teliva_timestamp: original
   filter:
+    >function filter(h, f)
+    >  result = {}
+    >  for k, v in pairs(h) do
+    >    if f(k, v) then
+    >      result[k] = v
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  ifilter:
     >-- only for arrays
-    >function filter(l, f)
+    >function ifilter(l, f)
     >  result = {}
     >  for _, x in ipairs(l) do
     >    if f(x) then
@@ -865,5 +876,127 @@
     >    local chars = graphviz_buffered_reader(infile)
     >    local tokens = graphviz_tokenizer(chars)
     >    parse_graph(tokens, graph)
+    >  end
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 18:59:24 2022
+  num_nodes:
+    >function num_nodes(Graph)
+    >  local result = 0
+    >  for k, v in pairs(Graph) do
+    >    result = result+1
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 19:00:19 2022
+  render_basic_stats:
+    >function render_basic_stats(window)
+    >  window:attrset(curses.A_BOLD)
+    >  window:mvaddstr(1, 1, 'sources: ')
+    >  window:attrset(curses.A_NORMAL)
+    >  local sources = sources(Graph)
+    >  for _, node in ipairs(sources) do
+    >    window:addstr(node)
+    >    window:addstr(' ')
+    >  end
+    >  window:attrset(curses.A_BOLD)
+    >  window:addstr('size: ')
+    >  window:attrset(curses.A_NORMAL)
+    >  window:addstr(tostring(num_nodes(Graph)))
+    >  window:addstr(' nodes')
+    >  window:mvaddstr(3, 0, '')
+    >  local lines, cols = window:getmaxyx()
+    >  for col=1,cols do
+    >    window:addstr('_')
+    >  end
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 19:01:49 2022
+  main:
+    >function main()
+    >  if #arg == 0 then
+    >    Window:clear()
+    >    print('restart this app with the name of a .dot file')
+    >    Window:refresh()
+    >    while true do Window:getch(); end
+    >  end
+    >  for _, filename in ipairs(arg) do
+    >    read_dot_file(filename, Graph)
+    >  end
+    >  Focus = sources(Graph)
+    >
+    >  while true do
+    >    render(Window)
+    >    update(Window)
+    >  end
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 19:09:56 2022
+  reachable:
+    >function reachable(graph, node)
+    >  local reached = {}
+    >  local todo = {node}
+    >  while #todo > 0 do
+    >    local curr = table.remove(todo)
+    >    if reached[curr] == nil then
+    >      reached[curr] = true
+    >      local targets = graph[curr]
+    >      if targets then
+    >        for target, _ in pairs(graph[curr]) do
+    >          table.insert(todo, target)
+    >        end
+    >      end
+    >    end
+    >  end
+    >  return reached
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 20:27:16 2022
+  bold:
+    >function bold(window, text)
+    >  window:attrset(curses.A_BOLD)
+    >  window:addstr(text)
+    >  window:attrset(curses.A_NORMAL)
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 20:30:39 2022
+  render_queries_on_focus:
+    >function render_queries_on_focus(window)
+    >  local deps = {}
+    >  local needed_by = {}
+    >  for _, node in ipairs(Focus) do
+    >    deps[node] = reachable(Graph, node)
+    >    for dep, _ in pairs(deps[node]) do
+    >      if needed_by[dep] == nil then
+    >        needed_by[dep] = {}
+    >      end
+    >      append(needed_by[dep], {node})
+    >    end
+    >  end
+    >  window:mvaddstr(10, 0, '')
+    >  bold(window, 'universal deps shared by everything in focus: ')
+    >  render_list(window, filter(needed_by, function(node, deps) return #deps == #Focus end))
+    >  for _, node in ipairs(Focus) do
+    >    local y, x = window:getyx()
+    >    window:mvaddstr(y+2, 0, '- '..node)
+    >    bold(window, ' #deps: ')
+    >    window:addstr(num_nodes(deps[node]))
+    >    bold(window, ' overlapping but not universal: ')
+    >    render_list(window, filter(deps[node], function(k, v) return #needed_by[k] > 1 and #needed_by[k] < #Focus end))
+    >    bold(window, ' unique: ')
+    >    render_list(window, filter(deps[node], function(k, v) return #needed_by[k] == 1 end))
+    >  end
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 20:32:18 2022
+  render_list:
+    >function render_list(window, h)
+    >  window:addstr('(')
+    >  window:addstr(num_nodes(h))
+    >  window:addstr(') ')
+    >  for node, _ in pairs(h) do
+    >    window:addstr(node)
+    >    window:addstr(' ')
     >  end
     >end

@@ -564,10 +564,18 @@
     >        return self:string()
     >      elseif c == '<' then
     >        error('html strings are not implemented yet')
-    >      elseif string.pos('-.0123456789', c) then
+    >      elseif c == '-' then
+    >        if self.chars.peek2 == '-' or self.chars.peek2 == '>' then
+    >          return self:edgeop()
+    >        else
+    >          return self:numeral()
+    >        end
+    >      elseif string.pos('.0123456789', c) then
     >        return self:numeral()
     >      elseif string.match(c, '[%a_]') then
     >        return self:identifier()
+    >      else
+    >        error('unexpected character '..str(c))
     >      end
     >    end,
     >    skip_whitespace_and_comments = function(self)
@@ -654,6 +662,9 @@
     >      end
     >      return result
     >    end,
+    >    edgeop = function(self)
+    >      return self.chars:read()..self.chars:read()
+    >    end,
     >  }
     >end
     >
@@ -672,4 +683,75 @@
     >  check_tokenizer('a123 124',      'a123',      'tokenizer: identifier')
     >  check_tokenizer('"abc def" 124', '"abc def"', 'tokenizer: string')
     >  check_tokenizer('',              nil,         'tokenizer: eof')
+    >end
+- __teliva_timestamp: original
+  parse_graph:
+    >-- https://graphviz.org/doc/info/lang.html
+    >function parse_graph(tokens, graph)
+    >  local t = tokens:read()
+    >  if t == 'strict' then
+    >    t = tokens:read()
+    >  end
+    >  if t == 'graph' then
+    >    error('undirected graphs not supported just yet')
+    >  elseif t == 'digraph' then
+    >    return parse_directed_graph(tokens, graph)
+    >  else
+    >    error('parse_graph: unexpected token '..t)
+    >  end
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 16:52:39 2022
+  skip_attr_list:
+    >function skip_attr_list(tokens)
+    >  while true do
+    >    local tok = tokens:read()
+    >    if tok == nil then
+    >      error('unterminated attr list; looked for "]" in vain')
+    >    end
+    >    if tok == ']' then break end
+    >  end
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 17:01:49 2022
+  parse_directed_graph:
+    >function parse_directed_graph(tokens, graph)
+    >  tokens:read()  -- skip name
+    >  assert(tokens:read() == '{')
+    >  while true do
+    >    if tokens:peek() == nil then
+    >      error('file not terminated with "}"')
+    >    end
+    >    if tokens:peek() == '}' then break end
+    >    local tok1 = tokens:read()
+    >    if tok1 == '[' then
+    >      skip_attr_list(tokens)
+    >    else
+    >      local tok2 = tokens:read()
+    >      if tok2 == '[' then
+    >        -- node_stmt
+    >        skip_attr_list(tokens)
+    >        -- otherwise ignore node declarations;
+    >        -- we'll assume the graph is fully connected
+    >        -- and we can focus on just edges
+    >      elseif tok2 == '->' then
+    >        -- edge_stmt
+    >        local tok3 = tokens:read()
+    >        if graph[tok1] == nil then
+    >          graph[tok1] = {tok3}
+    >        else
+    >          append(graph[tok1], {tok3})
+    >        end
+    >      elseif tok2 == '--' then
+    >        error('unexpected token "--" in digraph; edges should be directed using "->"')
+    >      elseif tok2 == '=' then
+    >        -- id '=' id
+    >        -- skip
+    >        tokens:read()
+    >      else
+    >        error('unexpected token '..tok2)
+    >      end
+    >    end
+    >  end
+    >  assert(tokens:read() == '}')
     >end

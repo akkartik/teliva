@@ -81,6 +81,74 @@
     >  window:mvaddstr(oldy, oldx, '')
     >end
 - __teliva_timestamp: original
+  check:
+    >function check(x, msg)
+    >  if x then
+    >    Window:addch('.')
+    >  else
+    >    print('F - '..msg)
+    >    print('  '..str(x)..' is false/nil')
+    >    teliva_num_test_failures = teliva_num_test_failures + 1
+    >    -- overlay first test failure on editors
+    >    if teliva_first_failure == nil then
+    >      teliva_first_failure = msg
+    >    end
+    >  end
+    >end
+- __teliva_timestamp: original
+  check_eq:
+    >function check_eq(x, expected, msg)
+    >  if eq(x, expected) then
+    >    Window:addch('.')
+    >  else
+    >    print('F - '..msg)
+    >    print('  expected '..str(expected)..' but got '..str(x))
+    >    teliva_num_test_failures = teliva_num_test_failures + 1
+    >    -- overlay first test failure on editors
+    >    if teliva_first_failure == nil then
+    >      teliva_first_failure = msg
+    >    end
+    >  end
+    >end
+- __teliva_timestamp: original
+  eq:
+    >function eq(a, b)
+    >  if type(a) ~= type(b) then return false end
+    >  if type(a) == 'table' then
+    >    if #a ~= #b then return false end
+    >    for k, v in pairs(a) do
+    >      if b[k] ~= v then
+    >        return false
+    >      end
+    >    end
+    >    for k, v in pairs(b) do
+    >      if a[k] ~= v then
+    >        return false
+    >      end
+    >    end
+    >    return true
+    >  end
+    >  return a == b
+    >end
+- __teliva_timestamp: original
+  str:
+    >-- smarter tostring
+    >-- slow; used only for debugging
+    >function str(x)
+    >  if type(x) == 'table' then
+    >    local result = ''
+    >    result = result..#x..'{'
+    >    for k, v in pairs(x) do
+    >      result = result..str(k)..'='..str(v)..', '
+    >    end
+    >    result = result..'}'
+    >    return result
+    >  elseif type(x) == 'string' then
+    >    return '"'..x..'"'
+    >  end
+    >  return tostring(x)
+    >end
+- __teliva_timestamp: original
   map:
     >-- only for arrays
     >function map(l, f)
@@ -146,6 +214,114 @@
     >  end
     >  return result
     >end
+- __teliva_timestamp: original
+  sort_letters:
+    >function sort_letters(s)
+    >  tmp = {}
+    >  for i=1,#s do
+    >    table.insert(tmp, s[i])
+    >  end
+    >  table.sort(tmp)
+    >  local result = ''
+    >  for _, c in pairs(tmp) do
+    >    result = result..c
+    >  end
+    >  return result
+    >end
+    >
+    >function test_sort_letters(s)
+    >  check_eq(sort_letters(''), '', 'test_sort_letters: empty')
+    >  check_eq(sort_letters('ba'), 'ab', 'test_sort_letters: non-empty')
+    >  check_eq(sort_letters('abba'), 'aabb', 'test_sort_letters: duplicates')
+    >end
+- __teliva_timestamp: original
+  count_letters:
+    >function count_letters(s)
+    >  local result = {}
+    >  for i=1,s:len() do
+    >    local c = s[i]
+    >    if result[c] == nil then
+    >      result[c] = 1
+    >    else
+    >      result[c] = result[c] + 1
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  append:
+    >-- concatenate list 'elems' into 'l', modifying 'l' in the process
+    >function append(l, elems)
+    >  for i=1,#elems do
+    >    table.insert(l, elems[i])
+    >  end
+    >end
+- __teliva_timestamp: original
+  all_but:
+    >function all_but(x, idx)
+    >  if type(x) == 'table' then
+    >    local result = {}
+    >    for i, elem in ipairs(x) do
+    >      if i ~= idx then
+    >        table.insert(result,elem)
+    >      end
+    >    end
+    >    return result
+    >  elseif type(x) == 'string' then
+    >    if idx < 1 then return x:sub(1) end
+    >    return x:sub(1, idx-1) .. x:sub(idx+1)
+    >  else
+    >    error('all_but: unsupported type '..type(x))
+    >  end
+    >end
+    >
+    >function test_all_but()
+    >  check_eq(all_but('', 0), '', 'all_but: empty')
+    >  check_eq(all_but('abc', 0), 'abc', 'all_but: invalid low index')
+    >  check_eq(all_but('abc', 4), 'abc', 'all_but: invalid high index')
+    >  check_eq(all_but('abc', 1), 'bc', 'all_but: first index')
+    >  check_eq(all_but('abc', 3), 'ab', 'all_but: final index')
+    >  check_eq(all_but('abc', 2), 'ac', 'all_but: middle index')
+    >end
+- __teliva_timestamp: original
+  set:
+    >function set(l)
+    >  local result = {}
+    >  for i, elem in ipairs(l) do
+    >    result[elem] = true
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  set_eq:
+    >function set_eq(l1, l2)
+    >  return eq(set(l1), set(l2))
+    >end
+    >
+    >function test_set_eq()
+    >  check(set_eq({1}, {1}), 'set_eq: identical')
+    >  check(not set_eq({1, 2}, {1, 3}), 'set_eq: different')
+    >  check(set_eq({1, 2}, {2, 1}), 'set_eq: order')
+    >  check(set_eq({1, 2, 2}, {2, 1}), 'set_eq: duplicates')
+    >end
+- __teliva_timestamp: original
+  clear:
+    >function clear(lines)
+    >  while #lines > 0 do
+    >    table.remove(lines)
+    >  end
+    >end
+- __teliva_timestamp: original
+  zap:
+    >function zap(target, src)
+    >  clear(target)
+    >  append(target, src)
+    >end
+- __teliva_timestamp: original
+  menu:
+    >-- To show app-specific hotkeys in the menu bar, add hotkey/command
+    >-- arrays of strings to the menu array.
+    >menu = {}
 - __teliva_timestamp: original
   Window:
     >Window = curses.stdscr()

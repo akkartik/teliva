@@ -120,8 +120,13 @@
     >      if b[k] ~= v then
     >        return false
     >      end
-    >      return true
     >    end
+    >    for k, v in pairs(b) do
+    >      if a[k] ~= v then
+    >        return false
+    >      end
+    >    end
+    >    return true
     >  end
     >  return a == b
     >end
@@ -250,6 +255,67 @@
     >  for i=1,#elems do
     >    table.insert(l, elems[i])
     >  end
+    >end
+- __teliva_timestamp: original
+  all_but:
+    >function all_but(x, idx)
+    >  if type(x) == 'table' then
+    >    local result = {}
+    >    for i, elem in ipairs(x) do
+    >      if i ~= idx then
+    >        table.insert(result,elem)
+    >      end
+    >    end
+    >    return result
+    >  elseif type(x) == 'string' then
+    >    if idx < 1 then return x:sub(1) end
+    >    return x:sub(1, idx-1) .. x:sub(idx+1)
+    >  else
+    >    error('all_but: unsupported type '..type(x))
+    >  end
+    >end
+    >
+    >function test_all_but()
+    >  check_eq(all_but('', 0), '', 'all_but: empty')
+    >  check_eq(all_but('abc', 0), 'abc', 'all_but: invalid low index')
+    >  check_eq(all_but('abc', 4), 'abc', 'all_but: invalid high index')
+    >  check_eq(all_but('abc', 1), 'bc', 'all_but: first index')
+    >  check_eq(all_but('abc', 3), 'ab', 'all_but: final index')
+    >  check_eq(all_but('abc', 2), 'ac', 'all_but: middle index')
+    >end
+- __teliva_timestamp: original
+  set:
+    >function set(l)
+    >  local result = {}
+    >  for i, elem in ipairs(l) do
+    >    result[elem] = true
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  set_eq:
+    >function set_eq(l1, l2)
+    >  return eq(set(l1), set(l2))
+    >end
+    >
+    >function test_set_eq()
+    >  check(set_eq({1}, {1}), 'set_eq: identical')
+    >  check(not set_eq({1, 2}, {1, 3}), 'set_eq: different')
+    >  check(set_eq({1, 2}, {2, 1}), 'set_eq: order')
+    >  check(set_eq({1, 2, 2}, {2, 1}), 'set_eq: duplicates')
+    >end
+- __teliva_timestamp: original
+  clear:
+    >function clear(lines)
+    >  while #lines > 0 do
+    >    table.remove(lines)
+    >  end
+    >end
+- __teliva_timestamp: original
+  zap:
+    >function zap(target, src)
+    >  clear(target)
+    >  append(target, src)
     >end
 - __teliva_timestamp: original
   menu:

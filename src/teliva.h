@@ -165,7 +165,7 @@ extern void save_editor_state(int rowoff, int coloff, int cy, int cx);
 int editor_view_in_progress(lua_State* L);
 
 extern void save_call_graph_depth(lua_State* L, int depth, const char* name);
-extern void draw_callers_of_current_definition(lua_State* L);
+extern void draw_current_definition_name_and_callers(lua_State* L);
 
 extern void append_to_audit_log(lua_State* L, const char* buffer);
 

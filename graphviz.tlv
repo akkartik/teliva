@@ -838,3 +838,33 @@
     >    window:addstr('_')
     >  end
     >end
+- __teliva_timestamp:
+    >Fri Mar 18 17:51:18 2022
+  main:
+    >function main()
+    >  if #arg == 0 then
+    >    Window:clear()
+    >    print('restart this app with the name of a .dot file')
+    >    Window:refresh()
+    >    while true do Window:getch(); end
+    >  end
+    >  for _, filename in ipairs(arg) do
+    >    read_dot_file(filename, Graph)
+    >  end
+    >
+    >  while true do
+    >    render(Window)
+    >    update(Window)
+    >  end
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 17:51:32 2022
+  read_dot_file:
+    >function read_dot_file(filename, graph)
+    >  local infile = start_reading(nil, filename)
+    >  if infile then
+    >    local chars = graphviz_buffered_reader(infile)
+    >    local tokens = graphviz_tokenizer(chars)
+    >    parse_graph(tokens, graph)
+    >  end
+    >end

@@ -115,13 +115,17 @@
     >function eq(a, b)
     >  if type(a) ~= type(b) then return false end
     >  if type(a) == 'table' then
-    >    if #a ~= #b then return false end
     >    for k, v in pairs(a) do
     >      if b[k] ~= v then
     >        return false
     >      end
-    >      return true
     >    end
+    >    for k, v in pairs(b) do
+    >      if a[k] ~= v then
+    >        return false
+    >      end
+    >    end
+    >    return true
     >  end
     >  return a == b
     >end
@@ -880,10 +884,27 @@
     >end
 - __teliva_timestamp:
     >Fri Mar 18 18:59:24 2022
+  count:
+    >function count(h)
+    >  local result = 0
+    >  for k, v in pairs(h) do
+    >    result = result+1
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 18:59:24 2022
   num_nodes:
     >function num_nodes(Graph)
-    >  local result = 0
+    >  local nodes = {}
     >  for k, v in pairs(Graph) do
+    >    nodes[k] = true
+    >    for k, v in pairs(v) do
+    >      nodes[k] = true
+    >    end
+    >  end
+    >  local result = 0
+    >  for k, v in pairs(nodes) do
     >    result = result+1
     >  end
     >  return result
@@ -963,6 +984,12 @@
     >Fri Mar 18 20:30:39 2022
   render_queries_on_focus:
     >function render_queries_on_focus(window)
+    >  render_reachable_sets(window)
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 20:30:39 2022
+  render_reachable_sets:
+    >function render_reachable_sets(window)
     >  local deps = {}
     >  local needed_by = {}
     >  for _, node in ipairs(Focus) do
@@ -974,29 +1001,87 @@
     >      append(needed_by[dep], {node})
     >    end
     >  end
-    >  window:mvaddstr(10, 0, '')
-    >  bold(window, 'universal deps shared by everything in focus: ')
-    >  render_set(window, filter(needed_by, function(node, deps) return #deps == #Focus end))
-    >  for _, node in ipairs(Focus) do
-    >    local y, x = window:getyx()
-    >    window:mvaddstr(y+2, 0, '- '..node)
-    >    bold(window, ' #deps: ')
-    >    window:addstr(num_nodes(deps[node]))
-    >    bold(window, ' overlapping but not universal: ')
-    >    render_set(window, filter(deps[node], function(k, v) return #needed_by[k] > 1 and #needed_by[k] < #Focus end))
-    >    bold(window, ' unique: ')
-    >    render_set(window, filter(deps[node], function(k, v) return #needed_by[k] == 1 end))
+    >  for k, v in ipairs(needed_by) do
+    >    table.sort(v)
     >  end
+    >  window:mvaddstr(10, 0, '')
+    >  local sets = {Focus}  -- queue
+    >  local done = {}
+    >  while #sets > 0 do
+    >    local from_nodes = table.remove(sets, 1)
+    >    if #from_nodes == 0 then break end
+    >    table.sort(from_nodes)
+    >    local key = table.concat(from_nodes)
+    >    if done[key] == nil then
+    >      done[key] = true
+    >      local y, x = window:getyx()
+    >      window:mvaddstr(y+2, 0, '')
+    >      window:attrset(curses.A_BOLD)
+    >      render_list(window, from_nodes)
+    >      window:attrset(curses.A_NORMAL)
+    >      window:addstr(' -> ')
+    >      render_set(window, filter(needed_by, function(node, users) return set_eq(users, from_nodes) end))
+    >      for i, elem in ipairs(from_nodes) do
+    >        table.insert(sets, all_but(from_nodes, i))
+    >      end
+    >    end
+    >  end
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 20:32:18 2022
+  render_list:
+    >function render_list(window, l)
+    >  window:addstr('{')
+    >  for i, node in ipairs(l) do
+    >    if i > 1 then window:addstr(' ') end
+    >    window:addstr(node)
+    >  end
+    >  window:addstr('}')
     >end
 - __teliva_timestamp:
     >Fri Mar 18 20:32:18 2022
   render_set:
     >function render_set(window, h)
     >  window:addstr('(')
-    >  window:addstr(num_nodes(h))
+    >  window:addstr(count(h))
     >  window:addstr(') ')
     >  for node, _ in pairs(h) do
     >    window:addstr(node)
     >    window:addstr(' ')
     >  end
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 20:32:18 2022
+  all_but:
+    >function all_but(l, idx)
+    >  local result = {}
+    >  for i, elem in ipairs(l) do
+    >    if i ~= idx then
+    >      table.insert(result,elem)
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 20:32:18 2022
+  set:
+    >function set(l)
+    >  local result = {}
+    >  for i, elem in ipairs(l) do
+    >    result[elem] = true
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp:
+    >Fri Mar 18 20:32:18 2022
+  set_eq:
+    >function set_eq(l1, l2)
+    >  return eq(set(l1), set(l2))
+    >end
+    >
+    >function test_set_eq()
+    >  check(set_eq({1}, {1}), 'set_eq: identical')
+    >  check(not set_eq({1, 2}, {1, 3}), 'set_eq: different')
+    >  check(set_eq({1, 2}, {2, 1}), 'set_eq: order')
+    >  check(set_eq({1, 2, 2}, {2, 1}), 'set_eq: duplicates')
     >end

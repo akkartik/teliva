@@ -249,11 +249,58 @@
     >  return result
     >end
 - __teliva_timestamp: original
+  union:
+    >function union(a, b)
+    >  for k, v in pairs(b) do
+    >    a[k] = v
+    >  end
+    >  return a
+    >end
+- __teliva_timestamp: original
+  subtract:
+    >-- set subtraction
+    >function subtract(a, b)
+    >  for k, v in pairs(b) do
+    >    a[k] = nil
+    >  end
+    >  return a
+    >end
+- __teliva_timestamp: original
+  all:
+    >-- universal quantifier on sets
+    >function all(s, f)
+    >  for k, v in pairs(s) do
+    >    if not f(k, v) then
+    >      return false
+    >    end
+    >  end
+    >  return true
+    >end
+- __teliva_timestamp: original
+  to_array:
+    >-- turn a set into an array
+    >-- drops values
+    >function to_array(h)
+    >  local result = {}
+    >  for k, _ in pairs(h) do
+    >    table.insert(result, k)
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
   append:
     >-- concatenate list 'elems' into 'l', modifying 'l' in the process
     >function append(l, elems)
     >  for i=1,#elems do
     >    table.insert(l, elems[i])
+    >  end
+    >end
+- __teliva_timestamp: original
+  prepend:
+    >-- concatenate list 'elems' into the start of 'l', modifying 'l' in the process
+    >function prepend(l, elems)
+    >  for i=1,#elems do
+    >    table.insert(l, i, elems[i])
     >  end
     >end
 - __teliva_timestamp: original
@@ -520,6 +567,8 @@
 - __teliva_timestamp: original
   main:
     >function main()
+    >  Window:clear()
+    >  Window:refresh()
     >  init_colors()
     >  local lines = {}
     >  local url = ''

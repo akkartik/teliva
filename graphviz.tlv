@@ -249,11 +249,58 @@
     >  return result
     >end
 - __teliva_timestamp: original
+  union:
+    >function union(a, b)
+    >  for k, v in pairs(b) do
+    >    a[k] = v
+    >  end
+    >  return a
+    >end
+- __teliva_timestamp: original
+  subtract:
+    >-- set subtraction
+    >function subtract(a, b)
+    >  for k, v in pairs(b) do
+    >    a[k] = nil
+    >  end
+    >  return a
+    >end
+- __teliva_timestamp: original
+  all:
+    >-- universal quantifier on sets
+    >function all(s, f)
+    >  for k, v in pairs(s) do
+    >    if not f(k, v) then
+    >      return false
+    >    end
+    >  end
+    >  return true
+    >end
+- __teliva_timestamp: original
+  to_array:
+    >-- turn a set into an array
+    >-- drops values
+    >function to_array(h)
+    >  local result = {}
+    >  for k, _ in pairs(h) do
+    >    table.insert(result, k)
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
   append:
     >-- concatenate list 'elems' into 'l', modifying 'l' in the process
     >function append(l, elems)
     >  for i=1,#elems do
     >    table.insert(l, elems[i])
+    >  end
+    >end
+- __teliva_timestamp: original
+  prepend:
+    >-- concatenate list 'elems' into the start of 'l', modifying 'l' in the process
+    >function prepend(l, elems)
+    >  for i=1,#elems do
+    >    table.insert(l, i, elems[i])
     >  end
     >end
 - __teliva_timestamp: original
@@ -1110,5 +1157,154 @@
     >  for node, _ in pairs(h) do
     >    window:addstr(node)
     >    window:addstr(' ')
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Mar 19 09:19:10 2022
+  main:
+    >function main()
+    >  if #arg == 0 then
+    >    Window:clear()
+    >    print('restart this app with the name of a .dot file')
+    >    Window:refresh()
+    >    while true do Window:getch(); end
+    >  end
+    >  for _, filename in ipairs(arg) do
+    >    read_dot_file(filename, Graph)
+    >  end
+    >  Focus = sources(Graph)
+    >  Nodes = toposort(Graph)
+    >
+    >  while true do
+    >    render(Window)
+    >    update(Window)
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Mar 19 09:32:33 2022
+  nodes:
+    >function nodes(graph)
+    >  local result = {}
+    >  for n, deps in pairs(graph) do
+    >    result[n] = true
+    >    for n, _ in pairs(deps) do
+    >      result[n] = true
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp:
+    >Sat Mar 19 16:27:32 2022
+  toposort:
+    >-- stable sort of nodes in a graph
+    >-- nodes always occur before all their dependencies
+    >-- disconnected nodes are in alphabetical order
+    >function toposort(graph)
+    >  -- non-map variables are arrays
+    >  -- result = leaves in graph
+    >  -- candidates = non-leaves
+    >  local result = {}
+    >  local resultMap = {}
+    >  local candidatesMap = nodes(graph)
+    >  local leavesMap = filter(candidatesMap, function(k, v) return graph[k] == nil end)
+    >  local leaves = to_array(leavesMap)
+    >  table.sort(leaves)
+    >  union(resultMap, leavesMap)
+    >  prepend(result, leaves)
+    >  subtract(candidatesMap, leavesMap)
+    >
+    >  function in_result(x, _) return resultMap[x] end
+    >  function all_deps_in_result(k, _) return all(graph[k], in_result) end
+    >  while true do
+    >    local oldcount = count(candidatesMap)
+    >    if oldcount == 0 then break end
+    >    local inducteesMap = filter(candidatesMap, all_deps_in_result)
+    >    local inductees = to_array(inducteesMap)
+    >    table.sort(inductees)
+    >    union(resultMap, inducteesMap)
+    >    prepend(result, inductees)
+    >    subtract(candidatesMap, inducteesMap)
+    >    if oldcount == count(candidatesMap) then
+    >      error('toposort: graph is not connected')
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp:
+    >Sat Mar 19 16:32:24 2022
+  render_focus:
+    >function render_focus(window)
+    >  local y, _ = window:getyx()
+    >  window:mvaddstr(y+1, 0, '')
+    >  bold(window, 'focus: ')
+    >  for _, node in ipairs(Focus) do
+    >    window:addstr(node)
+    >    window:addstr(' ')
+    >  end
+    >  y, _ = window:getyx()
+    >  window:mvaddstr(y+1, 0, '')
+    >  local lines, cols = window:getmaxyx()
+    >  for col=1,cols do
+    >    window:addstr('_')
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Mar 19 16:33:19 2022
+  render_basic_stats:
+    >function render_basic_stats(window)
+    >  bold(window, tostring(#Nodes)..' nodes: ')
+    >  for i, node in ipairs(Nodes) do
+    >    window:attrset(curses.A_REVERSE)
+    >    window:addstr(i)
+    >    window:attrset(curses.A_NORMAL)
+    >    window:addstr(' ')
+    >    window:addstr(node)
+    >    window:addstr(' ')
+    >  end
+    >  local y, x = window:getyx()
+    >  window:mvaddstr(y+1, 0, '')
+    >  local lines, cols = window:getmaxyx()
+    >  for col=1,cols do
+    >    window:addstr('_')
+    >  end
+    >end
+- __teliva_timestamp:
+    >Sat Mar 19 16:35:34 2022
+  render_reachable_sets:
+    >function render_reachable_sets(window)
+    >  local deps = {}
+    >  local needed_by = {}
+    >  for _, node in ipairs(Focus) do
+    >    deps[node] = reachable(Graph, node)
+    >    for dep, _ in pairs(deps[node]) do
+    >      if needed_by[dep] == nil then
+    >        needed_by[dep] = {}
+    >      end
+    >      append(needed_by[dep], {node})
+    >    end
+    >  end
+    >  for k, v in ipairs(needed_by) do
+    >    table.sort(v)
+    >  end
+    >  local sets = {Focus}  -- queue
+    >  local done = {}
+    >  while #sets > 0 do
+    >    local from_nodes = table.remove(sets, 1)
+    >    if #from_nodes == 0 then break end
+    >    table.sort(from_nodes)
+    >    local key = table.concat(from_nodes)
+    >    if done[key] == nil then
+    >      done[key] = true
+    >      local y, x = window:getyx()
+    >      window:mvaddstr(y+2, 0, '')
+    >      window:attrset(curses.A_BOLD)
+    >      render_list(window, from_nodes)
+    >      window:attrset(curses.A_NORMAL)
+    >      window:addstr(' -> ')
+    >      render_set(window, filter(needed_by, function(node, users) return set_eq(users, from_nodes) end))
+    >      for i, elem in ipairs(from_nodes) do
+    >        table.insert(sets, all_but(from_nodes, i))
+    >      end
+    >    end
     >  end
     >end

@@ -976,22 +976,22 @@
     >  end
     >  window:mvaddstr(10, 0, '')
     >  bold(window, 'universal deps shared by everything in focus: ')
-    >  render_list(window, filter(needed_by, function(node, deps) return #deps == #Focus end))
+    >  render_set(window, filter(needed_by, function(node, deps) return #deps == #Focus end))
     >  for _, node in ipairs(Focus) do
     >    local y, x = window:getyx()
     >    window:mvaddstr(y+2, 0, '- '..node)
     >    bold(window, ' #deps: ')
     >    window:addstr(num_nodes(deps[node]))
     >    bold(window, ' overlapping but not universal: ')
-    >    render_list(window, filter(deps[node], function(k, v) return #needed_by[k] > 1 and #needed_by[k] < #Focus end))
+    >    render_set(window, filter(deps[node], function(k, v) return #needed_by[k] > 1 and #needed_by[k] < #Focus end))
     >    bold(window, ' unique: ')
-    >    render_list(window, filter(deps[node], function(k, v) return #needed_by[k] == 1 end))
+    >    render_set(window, filter(deps[node], function(k, v) return #needed_by[k] == 1 end))
     >  end
     >end
 - __teliva_timestamp:
     >Fri Mar 18 20:32:18 2022
-  render_list:
-    >function render_list(window, h)
+  render_set:
+    >function render_set(window, h)
     >  window:addstr('(')
     >  window:addstr(num_nodes(h))
     >  window:addstr(') ')

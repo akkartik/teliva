@@ -207,7 +207,7 @@
     >-- concatenate list 'elems' into 'l', modifying 'l' in the process
     >function append(l, elems)
     >  for i=1,#elems do
-    >    l[#l+1] = elems[i]
+    >    table.insert(l, elems[i])
     >  end
     >end
 - __teliva_timestamp: original
@@ -336,7 +336,7 @@
     >  if #l == 0 then return {prefix} end
     >  local result = {}
     >  for _, elem in ipairs(l) do
-    >    result[#result+1] = prefix..elem
+    >    table.insert(result, prefix..elem)
     >  end
     >  return result
     >end

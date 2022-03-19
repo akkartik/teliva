@@ -237,7 +237,7 @@
     >-- concatenate list 'elems' into 'l', modifying 'l' in the process
     >function append(l, elems)
     >  for i=1,#elems do
-    >    l[#l+1] = elems[i]
+    >    table.insert(l, elems[i])
     >  end
     >end
 - __teliva_timestamp: original
@@ -814,7 +814,7 @@
     >  local result = {}
     >  for source, _ in pairs(Graph) do
     >    if not is_target[source] then
-    >      result[#result+1] = source
+    >      table.insert(result, source)
     >    end
     >  end
     >  return result

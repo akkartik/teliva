@@ -237,7 +237,7 @@
     >-- concatenate list 'elems' into 'l', modifying 'l' in the process
     >function append(l, elems)
     >  for i=1,#elems do
-    >    l[#l+1] = elems[i]
+    >    table.insert(l, elems[i])
     >  end
     >end
 - __teliva_timestamp: original
@@ -625,11 +625,11 @@
   update:
     >function update(window)
     >  local key = string.char(window:getch())
-    >  local nwords = #program.lines[1].words
     >  if key == ' ' then
-    >    program.lines[1].words[nwords+1] = {data='', cursor=0}
+    >    table.insert(program.lines[1].words, {data='', cursor=0})
     >  else
-    >    program.lines[1].words[nwords].data = program.lines[1].words[nwords].data .. key
+    >    local words = program.lines[1].words
+    >    words[#words].data = words[#words].data .. key
     >  end
     >end
 - __teliva_timestamp:
@@ -682,11 +682,11 @@
     >Thu Mar 17 21:43:20 2022
   update:
     >function update(window, program, key)
-    >  local nwords = #program.lines[1].words
     >  if key == ' ' then
-    >    program.lines[1].words[nwords+1] = {data='', cursor=0}
+    >    table.insert(program.lines[1].words, {data='', cursor=0})
     >  else
-    >    program.lines[1].words[nwords].data = program.lines[1].words[nwords].data .. key
+    >    local words = program.lines[1].words
+    >    words[#words].data = words[#words].data .. key
     >  end
     >end
 - __teliva_timestamp:

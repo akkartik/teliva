@@ -581,6 +581,17 @@
     >  end
     >end
 - __teliva_timestamp: original
+  sep:
+    >-- horizontal separator
+    >function sep(window)
+    >  local y, _ = window:getyx()
+    >  window:mvaddstr(y+1, 0, '')
+    >  local _, cols = window:getmaxyx()
+    >  for col=1,cols do
+    >    window:addstr('_')
+    >  end
+    >end
+- __teliva_timestamp: original
   render:
     >function render(window)
     >  window:clear()

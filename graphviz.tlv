@@ -581,6 +581,17 @@
     >  end
     >end
 - __teliva_timestamp: original
+  sep:
+    >-- horizontal separator
+    >function sep(window)
+    >  local y, _ = window:getyx()
+    >  window:mvaddstr(y+1, 0, '')
+    >  local _, cols = window:getmaxyx()
+    >  for col=1,cols do
+    >    window:addstr('_')
+    >  end
+    >end
+- __teliva_timestamp: original
   render:
     >function render(window)
     >  window:clear()
@@ -1241,12 +1252,7 @@
     >    window:addstr(node)
     >    window:addstr(' ')
     >  end
-    >  y, _ = window:getyx()
-    >  window:mvaddstr(y+1, 0, '')
-    >  local lines, cols = window:getmaxyx()
-    >  for col=1,cols do
-    >    window:addstr('_')
-    >  end
+    >  sep(window)
     >end
 - __teliva_timestamp:
     >Sat Mar 19 16:33:19 2022
@@ -1261,12 +1267,7 @@
     >    window:addstr(node)
     >    window:addstr(' ')
     >  end
-    >  local y, x = window:getyx()
-    >  window:mvaddstr(y+1, 0, '')
-    >  local lines, cols = window:getmaxyx()
-    >  for col=1,cols do
-    >    window:addstr('_')
-    >  end
+    >  sep(window)
     >end
 - __teliva_timestamp:
     >Sat Mar 19 16:35:34 2022
@@ -1307,4 +1308,60 @@
     >      end
     >    end
     >  end
+    >end
+- __teliva_timestamp:
+    >Sat Mar 19 21:05:05 2022
+  toposort:
+    >-- stable sort of nodes in a graph
+    >-- nodes always occur before all their dependencies
+    >-- disconnected nodes are in alphabetical order
+    >function toposort(graph)
+    >  -- non-map variables are arrays
+    >  -- result = leaves in graph
+    >  -- candidates = non-leaves
+    >  local inResultMap = {}
+    >  local candidatesMap = nodes(graph)
+    >  local leavesMap = filter(candidatesMap, function(k, v) return graph[k] == nil end)
+    >  local leaves = to_array(leavesMap)
+    >  table.sort(leaves)
+    >  union(inResultMap, leavesMap)
+    >  local result = {leaves}
+    >  subtract(candidatesMap, leavesMap)
+    >
+    >  function in_result(x, _) return inResultMap[x] end
+    >  function all_deps_in_result(k, _) return all(graph[k], in_result) end
+    >  while true do
+    >    local oldcount = count(candidatesMap)
+    >    if oldcount == 0 then break end
+    >    local inducteesMap = filter(candidatesMap, all_deps_in_result)
+    >    local inductees = to_array(inducteesMap)
+    >    table.sort(inductees)
+    >    union(inResultMap, inducteesMap)
+    >    table.insert(result, 1, inductees)
+    >    subtract(candidatesMap, inducteesMap)
+    >    if oldcount == count(candidatesMap) then
+    >      error('toposort: graph is not connected')
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp:
+    >Sat Mar 19 21:05:57 2022
+  render_basic_stats:
+    >function render_basic_stats(window)
+    >  bold(window, tostring(#Nodes)..' nodes:')
+    >  local i = 1
+    >  for _, stratum in ipairs(Nodes) do
+    >    window:addstr('\n  ')
+    >    for _, node in ipairs(stratum) do
+    >      window:attrset(curses.A_REVERSE)
+    >      window:addstr(i)
+    >      window:attrset(curses.A_NORMAL)
+    >      window:addstr(' ')
+    >      window:addstr(node)
+    >      window:addstr(' ')
+    >      i = i+1
+    >    end
+    >  end
+    >  sep(window)
     >end

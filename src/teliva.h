@@ -189,5 +189,6 @@ extern void render_previous_error(void);
 
 /* Misc */
 extern int starts_with(const char* s, const char* prefix);
+extern int contains(const char* s, const char* sub);
 
 #endif

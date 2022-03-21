@@ -139,7 +139,11 @@ static int io_open (lua_State *L) {
   /* other filenames starting with teliva_ are never ok (reserved for the
    * framework, should not be accessed by apps directly */
   else if (starts_with(filename, "teliva_")) {
-    snprintf(iolib_errbuf, 1024, "app tried to open file '%s'; that's never allowed for filenames starting with 'teliva_'", filename);
+    snprintf(iolib_errbuf, 1024, "app tried to open file '%s'; relative paths are never allowed", filename);
+    Previous_message = iolib_errbuf;
+  }
+  else if (contains(filename, "./")) {
+    snprintf(iolib_errbuf, 1024, "app tried to open file '%s'; relative paths are never allowed", filename);
     Previous_message = iolib_errbuf;
   }
   else if (file_operation_permitted(filename, mode)) {

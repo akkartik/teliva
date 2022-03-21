@@ -47,6 +47,11 @@ static int os_remove (lua_State *L) {
     Previous_message = oslib_errbuf;
     return os_pushresult(L, 0, filename);
   }
+  else if (contains(filename, "./")) {
+    snprintf(oslib_errbuf, 1024, "app tried to remove file '%s'; relative paths are never allowed", filename);
+    Previous_message = oslib_errbuf;
+    return os_pushresult(L, 0, filename);
+  }
   else if (!file_operation_permitted(filename, "w")) {
     snprintf(oslib_errbuf, 1024, "app tried to remove file '%s'; give it write permissions (ctrl-p) if that is expected", filename);
     Previous_message = oslib_errbuf;
@@ -69,6 +74,11 @@ static int os_rename (lua_State *L) {
     Previous_message = oslib_errbuf;
     return os_pushresult(L, 0, fromname);
   }
+  else if (contains(fromname, "./")) {
+    snprintf(oslib_errbuf, 1024, "app tried to rename file '%s'; relative paths are never allowed", fromname);
+    Previous_message = oslib_errbuf;
+    return os_pushresult(L, 0, fromname);
+  }
   else if (!file_operation_permitted(fromname, "r")) {
     snprintf(oslib_errbuf, 1024, "app tried to rename file '%s'; give it read permissions (ctrl-p) if that is expected", fromname);
     Previous_message = oslib_errbuf;
@@ -79,6 +89,11 @@ static int os_rename (lua_State *L) {
   }
   else if (starts_with(toname, "teliva_")) {
     snprintf(oslib_errbuf, 1024, "app tried to rename to file '%s'; that's never allowed for filenames starting with 'teliva_'", toname);
+    Previous_message = oslib_errbuf;
+    return os_pushresult(L, 0, toname);
+  }
+  else if (contains(fromname, "./")) {
+    snprintf(oslib_errbuf, 1024, "app tried to rename to file '%s'; relative paths are never allowed", toname);
     Previous_message = oslib_errbuf;
     return os_pushresult(L, 0, toname);
   }

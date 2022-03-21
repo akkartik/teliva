@@ -23,6 +23,10 @@ int starts_with(const char* s, const char* prefix) {
   return strncmp(s, prefix, strlen(prefix)) == 0;
 }
 
+int contains(const char* s, const char* sub) {
+  return strstr(s, sub) != NULL;
+}
+
 /*** Standard UI elements */
 
 int menu_column = 0;

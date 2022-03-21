@@ -155,8 +155,6 @@ extern char* Previous_message;
 extern int load_image(lua_State* L, char** argv, int n);
 extern void developer_mode(lua_State* L);
 extern void permissions_mode(lua_State* L);
-extern int file_operation_permitted(const char* filename, const char* mode);
-extern int net_operations_permitted;
 
 extern void load_editor_buffer_to_current_definition_in_image(lua_State* L);
 extern int load_editor_buffer_to_current_definition_in_image_and_reload(lua_State* L);
@@ -186,6 +184,11 @@ extern const char* Previous_error;
 extern int report_in_developer_mode(lua_State* L, int status);
 
 extern void render_previous_error(void);
+
+/* Permissions checking */
+
+extern int file_operation_permitted(const char* filename, const char* mode);
+extern int net_operations_permitted;
 
 /* Misc */
 extern int starts_with(const char* s, const char* prefix);

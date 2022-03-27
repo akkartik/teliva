@@ -236,6 +236,7 @@
     >end
 - __teliva_timestamp: original
   count_letters:
+    >-- TODO: handle unicode
     >function count_letters(s)
     >  local result = {}
     >  for i=1,s:len() do
@@ -244,6 +245,21 @@
     >      result[c] = 1
     >    else
     >      result[c] = result[c] + 1
+    >    end
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  count:
+    >-- turn an array of elements into a map from elements to their frequency
+    >-- analogous to count_letters for non-strings
+    >function count(a)
+    >  local result = {}
+    >  for i, v in ipairs(a) do
+    >    if result[v] == nil then
+    >      result[v] = 1
+    >    else
+    >      result[v] = result[v] + 1
     >    end
     >  end
     >  return result
@@ -488,8 +504,8 @@
     >function count_anagrams(s)
     >  local result = factorial(s:len())
     >  local letter_counts = count_letters(s)
-    >  for k, v in pairs(letter_counts) do
-    >    result = result / factorial(v)
+    >  for l, cnt in pairs(letter_counts) do
+    >    result = result / factorial(cnt)
     >  end
     >  return result
     >end

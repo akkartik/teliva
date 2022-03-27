@@ -149,6 +149,29 @@
     >  return tostring(x)
     >end
 - __teliva_timestamp: original
+  find_index:
+    >function find_index(arr, x)
+    >  for n, y in ipairs(arr) do
+    >    if x == y then
+    >      return n
+    >    end
+    >  end
+    >end
+- __teliva_timestamp: original
+  trim:
+    >function trim(s)
+    >  return s:gsub('^%s*', ''):gsub('%s*$', '')
+    >end
+- __teliva_timestamp: original
+  split:
+    >function split(s, d)
+    >  result = {}
+    >  for match in (s..d):gmatch("(.-)"..d) do
+    >    table.insert(result, match);
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
   map:
     >-- only for arrays
     >function map(l, f)
@@ -188,29 +211,6 @@
     >    if f(x) then
     >      table.insert(result, x)
     >    end
-    >  end
-    >  return result
-    >end
-- __teliva_timestamp: original
-  find_index:
-    >function find_index(arr, x)
-    >  for n, y in ipairs(arr) do
-    >    if x == y then
-    >      return n
-    >    end
-    >  end
-    >end
-- __teliva_timestamp: original
-  trim:
-    >function trim(s)
-    >  return s:gsub('^%s*', ''):gsub('%s*$', '')
-    >end
-- __teliva_timestamp: original
-  split:
-    >function split(s, d)
-    >  result = {}
-    >  for match in (s..d):gmatch("(.-)"..d) do
-    >    table.insert(result, match);
     >  end
     >  return result
     >end

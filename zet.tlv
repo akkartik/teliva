@@ -381,6 +381,56 @@
     >  append(target, src)
     >end
 - __teliva_timestamp: original
+  mfactorial:
+    >-- memoized version of factorial
+    >-- doesn't memoize recursive calls, but may be good enough
+    >mfactorial = memo1(factorial)
+- __teliva_timestamp: original
+  factorial:
+    >function factorial(n)
+    >  local result = 1
+    >  for i=1,n do
+    >    result = result*i
+    >  end
+    >  return result
+    >end
+- __teliva_timestamp: original
+  memo1:
+    >-- a higher-order function that takes a function of a single arg
+    >-- (that never returns nil)
+    >-- and returns a memoized version of it
+    >function memo1(f)
+    >  local memo = {}
+    >  return function(x)
+    >    if memo[x] == nil then
+    >      memo[x] = f(x)
+    >    end
+    >    return memo[x]
+    >  end
+    >end
+    >
+    >-- mfactorial doesn't seem noticeably faster
+    >function test_memo1()
+    >  for i=0,30 do
+    >    check_eq(mfactorial(i), factorial(i), 'memo1 over factorial: '..str(i))
+    >  end
+    >end
+- __teliva_timestamp: original
+  num_permutations:
+    >-- number of permutations of n distinct objects, taken r at a time
+    >function num_permutations(n, r)
+    >  return factorial(n)/factorial(n-r)
+    >end
+    >
+    >-- mfactorial doesn't seem noticeably faster
+    >function test_memo1()
+    >  for i=0,30 do
+    >    for j=0,i do
+    >      check_eq(num_permutations(i, j), mfactorial(i)/mfactorial(i-j), 'num_permutations memoizes: '..str(i)..'P'..str(j))
+    >    end
+    >  end
+    >end
+- __teliva_timestamp: original
   menu:
     >-- To show app-specific hotkeys in the menu bar, add hotkey/command
     >-- arrays of strings to the menu array.

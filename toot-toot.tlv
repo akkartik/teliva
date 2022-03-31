@@ -969,3 +969,65 @@
     >  {'^w', 'write to "toot"'},
     >  {'^f|^b', 'scroll'},
     >}
+- __teliva_timestamp:
+    >Thu Mar 31 08:42:19 2022
+  update:
+    >function update(window)
+    >  local key = window:getch()
+    >  local h, w = window:getmaxyx()
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 6 then  -- ctrl-f
+    >    first_toot = first_toot+1
+    >  elseif key == 2 then  -- ctrl-b
+    >    if first_toot > 1 then
+    >      first_toot = first_toot-1
+    >    end
+    >  elseif key == 23 then  -- ctrl-w
+    >    local out = io.open(next_toot(), 'w')
+    >    if out ~= nil then
+    >      out:write(prose, '\n')
+    >      out:close()
+    >    end
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >end
+- __teliva_timestamp:
+    >Thu Mar 31 08:44:19 2022
+  next_toot:
+    >-- pick the first filename starting with 'toot' that doesn't exist yet
+    >function next_toot()
+    >  if not file_exists('toot') then return 'toot' end
+    >  local idx = 1
+    >  while true do
+    >    local curr = 'toot'..str(idx)
+    >    if not file_exists(curr) then
+    >      return curr
+    >    end
+    >    idx = idx+1
+    >  end
+    >end
+- __teliva_timestamp:
+    >Thu Mar 31 08:46:27 2022
+  file_exists:
+    >function file_exists(filename)
+    >  local f = io.open(filename, 'r')
+    >  return f ~= nil
+    >end

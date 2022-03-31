@@ -918,3 +918,54 @@
     >Typing '===' on its own lines, surrounded by empty lines, partitions prose and gives all segments independent character counts. Good for threads (tweetstorms).
     >
     >Scrolling support is rudimentary. Keys to scroll are independent of cursor movement, so cursor can move off the screen and confusingly 'get lost'.
+- __teliva_timestamp:
+    >Wed Mar 30 21:33:17 2022
+  update:
+    >function update(window)
+    >  local key = window:getch()
+    >  local h, w = window:getmaxyx()
+    >  if key == curses.KEY_LEFT then
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >    end
+    >  elseif key == curses.KEY_RIGHT then
+    >    if cursor <= #prose then
+    >      cursor = cursor+1
+    >    end
+    >  elseif key == curses.KEY_DOWN then
+    >    cursor = cursor_down(prose, cursor, w)
+    >  elseif key == curses.KEY_UP then
+    >    cursor = cursor_up(prose, cursor, w)
+    >  elseif key == curses.KEY_BACKSPACE or key == 8 or key == 127 then  -- ctrl-h, ctrl-?, delete
+    >    if cursor > 1 then
+    >      cursor = cursor-1
+    >      prose = prose:remove(cursor)
+    >    end
+    >  elseif key == 6 then  -- ctrl-f
+    >    first_toot = first_toot+1
+    >  elseif key == 2 then  -- ctrl-b
+    >    if first_toot > 1 then
+    >      first_toot = first_toot-1
+    >    end
+    >  elseif key == 23 then  -- ctrl-w
+    >    local out = io.open('toot', 'w')
+    >    if out ~= nil then
+    >      out:write(prose, '\n')
+    >      out:close()
+    >    end
+    >  elseif key == 10 or (key >= 32 and key < 127) then
+    >    prose = prose:insert(string.char(key), cursor-1)
+    >    cursor = cursor+1
+    >  end
+    >end
+- __teliva_timestamp:
+    >Wed Mar 30 21:33:44 2022
+  __teliva_note:
+    >Get rid of the ctrl-k shortcut. Makes it too easy to lose data. To clear the page just quit and restart.
+  menu:
+    >-- To show app-specific hotkeys in the menu bar, add hotkey/command
+    >-- arrays of strings to the menu array.
+    >menu = {
+    >  {'^w', 'write to "toot"'},
+    >  {'^f|^b', 'scroll'},
+    >}

@@ -34,6 +34,13 @@ int any_equal(char* const* arr, const char* s) {
   return 0;
 }
 
+int any_starts_with(char* const* arr, const char* s) {
+  for (int i = 0; arr[i]; ++i)
+    if (starts_with(s, arr[i]))
+      return 1;
+  return 0;
+}
+
 /*** Standard UI elements */
 
 int menu_column = 0;
@@ -1323,8 +1330,15 @@ static int isarg(lua_State* trustedL) {
   return 1;
 }
 
+static int inarg(lua_State* trustedL) {
+  const char* arg = luaL_checkstring(trustedL, -1);
+  lua_pushboolean(trustedL, any_starts_with(Argv, arg));
+  return 1;
+}
+
 static const luaL_Reg trusted_base_funcs[] = {
   {"isarg", isarg},
+  {"inarg", inarg},
 };
 
 void initialize_trustedL() {
@@ -1625,7 +1639,8 @@ void print_file_permission_suggestions(int row) {
   mvaddstr(row++, 0, "--  * restrict to files with a fixed prefix: return string.find(filename, 'foo') == 1");
   mvaddstr(row++, 0, "--  * restrict to files with a fixed extension: return filename:sub(-4) == '.txt'");
   mvaddstr(row++, 0, "--  * restrict to files under some directory: return string.find(filename, 'foo/') == 1");
-  mvaddstr(row++, 0, "--  * restrict access only to commandline args: return inargs(filename)");
+  mvaddstr(row++, 0, "--  * restrict access only to files specified on commandline: return isarg(filename)");
+  mvaddstr(row++, 0, "--  * restrict access only to paths under directories specified on commandline: return inargs(filename)");
   mvaddstr(row++, 0, "--");
   mvaddstr(row++, 0, "-- Each of these has benefits and drawbacks.");
 }

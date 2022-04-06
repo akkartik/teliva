@@ -27,6 +27,13 @@ int contains(const char* s, const char* sub) {
   return strstr(s, sub) != NULL;
 }
 
+int any_equal(char* const* arr, const char* s) {
+  for (int i = 0; arr[i]; ++i)
+    if (strcmp(arr[i], s) == 0)
+      return 1;
+  return 0;
+}
+
 /*** Standard UI elements */
 
 int menu_column = 0;
@@ -1310,10 +1317,21 @@ static void clear_call_graph_depth(lua_State* L) {
 /* Perform privilege calculations in a whole other isolated context. */
 lua_State* trustedL = NULL;
 
+static int isarg(lua_State* trustedL) {
+  const char* arg = luaL_checkstring(trustedL, -1);
+  lua_pushboolean(trustedL, any_equal(Argv, arg));
+  return 1;
+}
+
+static const luaL_Reg trusted_base_funcs[] = {
+  {"isarg", isarg},
+};
+
 void initialize_trustedL() {
   trustedL = luaL_newstate();
   lua_gc(trustedL, LUA_GCSTOP, 0);  /* stop collector during initialization */
   luaL_openlibs(trustedL);
+  luaL_register(trustedL, "_G", trusted_base_funcs);
   /* TODO: Should we include ncurses? How to debug policies? */
   lua_gc(trustedL, LUA_GCRESTART, 0);
 }
@@ -1607,6 +1625,7 @@ void print_file_permission_suggestions(int row) {
   mvaddstr(row++, 0, "--  * restrict to files with a fixed prefix: return string.find(filename, 'foo') == 1");
   mvaddstr(row++, 0, "--  * restrict to files with a fixed extension: return filename:sub(-4) == '.txt'");
   mvaddstr(row++, 0, "--  * restrict to files under some directory: return string.find(filename, 'foo/') == 1");
+  mvaddstr(row++, 0, "--  * restrict access only to commandline args: return inargs(filename)");
   mvaddstr(row++, 0, "--");
   mvaddstr(row++, 0, "-- Each of these has benefits and drawbacks.");
 }

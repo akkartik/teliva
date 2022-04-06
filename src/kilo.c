@@ -1338,6 +1338,7 @@ void editNonCode(char* filename) {
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
+void print_file_permission_suggestions(int row);
 void editFilePermissions(char* filename) {
     Quit = 0;
     Back_to_big_picture = 0;
@@ -1354,7 +1355,11 @@ void editFilePermissions(char* filename) {
         int y, x;
         getyx(stdscr, y, x);
         mvaddstr(0, 0, "function file_operation_permitted(filename, is_write)");
-        mvaddstr(MIN(E.startrow + E.numrows, E.endrow), 0, "end");
+        int past_end_row = MIN(E.startrow + E.numrows, E.endrow);
+        mvaddstr(past_end_row, 0, "end");
+        attrset(COLOR_PAIR(COLOR_PAIR_LUA_COMMENT));
+        print_file_permission_suggestions(past_end_row+2);
+        attrset(A_NORMAL);
         mvaddstr(y, x, "");
         int c = getch();
         editorProcessKeypress2(c);

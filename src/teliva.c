@@ -1563,6 +1563,17 @@ static void edit_file_operations_predicate_body() {
   }
 }
 
+void print_file_permission_suggestions(int row) {
+  mvaddstr(row++, 0, "-- Some ideas:");
+  mvaddstr(row++, 0, "--  * restrict access to a single file: return filename == 'foo'");
+  mvaddstr(row++, 0, "--  * restrict to reading only: return is_write == false");
+  mvaddstr(row++, 0, "--  * restrict to files with a fixed prefix: return string.find(filename, 'foo') == 1");
+  mvaddstr(row++, 0, "--  * restrict to files with a fixed extension: return filename:sub(-4) == '.txt'");
+  mvaddstr(row++, 0, "--  * restrict to files under some directory: return string.find(filename, 'foo/') == 1");
+  mvaddstr(row++, 0, "--");
+  mvaddstr(row++, 0, "-- Each of these has benefits and drawbacks.");
+}
+
 static void permissions_view() {
   while (true) {
     render_permissions_screen();

@@ -66,6 +66,7 @@ static const char* trim(const char* in) {
   return result;
 }
 
+int ask_for_permission_on_every_file_operation = 0;
 const char* default_file_operations_predicate_body = "return false\n";
 const char* file_operations_predicate_body;
 int net_operations_permitted = false;
@@ -126,7 +127,9 @@ const char* character_name(char c) {
 
 static void render_permissions(lua_State* L) {
   int file_colors = COLOR_PAIR_SAFE;
-  if (file_operations_predicate_body && strcmp("return false", trim(file_operations_predicate_body)) != 0)
+  if (ask_for_permission_on_every_file_operation)
+    file_colors = COLOR_PAIR_WARN;
+  else if (file_operations_predicate_body && strcmp("return false", trim(file_operations_predicate_body)) != 0)
     file_colors = COLOR_PAIR_WARN;
   int net_colors = net_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
   if (file_colors == COLOR_PAIR_WARN && net_colors == COLOR_PAIR_WARN) {
@@ -1358,7 +1361,13 @@ static void permissions_menu() {
   attrset(A_NORMAL);
   menu_column = 2;
   draw_menu_item("^x", "go back");
-  draw_menu_item("^f", "edit file permissions");
+  if (!ask_for_permission_on_every_file_operation) {
+    draw_menu_item("^f", "edit file permissions");
+    draw_menu_item("^a", "ask for permission on every file operation");
+  }
+  else {
+    draw_menu_item("^a", "stop asking for permission on every file operation");
+  }
   draw_menu_item("^n", "toggle network permissions");
   attrset(A_NORMAL);
 }
@@ -1424,13 +1433,23 @@ static void render_permissions_screen() {
   mvaddstr(2, 5, "🚧 Be very careful granting permissions 🚧");
   attrset(A_NORMAL);
 
-  mvaddstr(7, 5, "File operations");
-  mvaddstr(7, 30, "function file_operation_permitted(filename, is_write)");
-  int y = render_wrapped_text(8, 32, COLS-5, file_operations_predicate_body);
-  mvaddstr(y, 30, "end");
-  y++;
-  mvaddstr(y, 30, "");
-  characterize_file_operations_predicate();
+  int y = 7;
+  mvaddstr(y, 5, "File operations");
+  if (!ask_for_permission_on_every_file_operation) {
+    mvaddstr(y, 30, "function file_operation_permitted(filename, is_write)");
+    y = render_wrapped_text(y+1, 32, COLS-5, file_operations_predicate_body);
+    mvaddstr(y, 30, "end");
+    y++;
+    mvaddstr(y, 30, "");
+    characterize_file_operations_predicate();
+  }
+  else {
+    attron(COLOR_PAIR(COLOR_PAIR_WARN));
+    attron(A_REVERSE);
+    mvaddstr(y, 30, " always ask                    ");
+    attroff(A_REVERSE);
+    attroff(COLOR_PAIR(COLOR_PAIR_WARN));
+  }
   y += 2;
 
   int net_colors = net_operations_permitted ? COLOR_PAIR_WARN : COLOR_PAIR_SAFE;
@@ -1455,35 +1474,53 @@ static void render_permissions_screen() {
   attroff(COLOR_PAIR(net_colors));
   mvaddstr(y, 30, "(No nuance available for network operations.)");
 
-  int file_operations_safe = strcmp("return false", trim(file_operations_predicate_body)) == 0;
-  int net_operations_safe = (net_operations_permitted == 0);
-  int file_operations_unsafe = strcmp("return true", trim(file_operations_predicate_body)) == 0;
-  int net_operations_unsafe = (net_operations_permitted != 0);
-  if (file_operations_safe && net_operations_safe) {
-    attron(COLOR_PAIR(COLOR_PAIR_SAFE));
-    mvaddstr(5, 5, "This app can't access private data or communicate with other computers.");
-    attroff(COLOR_PAIR(COLOR_PAIR_SAFE));
-  }
-  else if (file_operations_safe || net_operations_safe) {
-    attron(COLOR_PAIR(COLOR_PAIR_WARN));
-    if (net_operations_safe) {
-      mvaddstr(5, 5, "This app can access private data, but they can't leave this computer.");
+  if (!ask_for_permission_on_every_file_operation) {
+    int file_operations_safe = strcmp("return false", trim(file_operations_predicate_body)) == 0;
+    int net_operations_safe = (net_operations_permitted == 0);
+    int file_operations_unsafe = strcmp("return true", trim(file_operations_predicate_body)) == 0;
+    int net_operations_unsafe = (net_operations_permitted != 0);
+    if (file_operations_safe && net_operations_safe) {
+      attron(COLOR_PAIR(COLOR_PAIR_SAFE));
+      mvaddstr(5, 5, "This app can't access private data or communicate with other computers.");
+      attroff(COLOR_PAIR(COLOR_PAIR_SAFE));
+    }
+    else if (file_operations_safe || net_operations_safe) {
+      attron(COLOR_PAIR(COLOR_PAIR_WARN));
+      if (net_operations_safe) {
+        mvaddstr(5, 5, "This app can access private data, but they can't leave this computer.");
+      }
+      else {
+        mvaddstr(5, 5, "This app can communicate with other computers, but can't access private data.");
+      }
+      attroff(COLOR_PAIR(COLOR_PAIR_WARN));
+    }
+    else if (file_operations_unsafe && net_operations_unsafe) {
+      attron(COLOR_PAIR(COLOR_PAIR_RISK));
+      // idea: include pentagram emoji. But it isn't widely supported yet on Linux.
+      mvaddstr(5, 5, "😈 ⚠️  Teliva can't protect you if this app does something sketchy. Consider restricting permissions. ⚠️  😈");
+      attroff(COLOR_PAIR(COLOR_PAIR_RISK));
     }
     else {
-      mvaddstr(5, 5, "This app can communicate with other computers, but can't access private data.");
+      attron(COLOR_PAIR(COLOR_PAIR_RISK));
+      mvaddstr(5, 5, "🦮 🙈 Teliva can't tell how much it's protecting you. Consider simplifying permissions.");
+      attroff(COLOR_PAIR(COLOR_PAIR_RISK));
     }
-    attroff(COLOR_PAIR(COLOR_PAIR_WARN));
-  }
-  else if (file_operations_unsafe && net_operations_unsafe) {
-    attron(COLOR_PAIR(COLOR_PAIR_RISK));
-    // idea: include pentagram emoji. But it isn't widely supported yet on Linux.
-    mvaddstr(5, 5, "😈 ⚠️  Teliva can't protect you if this app does something sketchy. Consider restricting permissions. ⚠️  😈");
-    attroff(COLOR_PAIR(COLOR_PAIR_RISK));
   }
   else {
-    attron(COLOR_PAIR(COLOR_PAIR_RISK));
-    mvaddstr(5, 5, "🦮 🙈 Teliva can't tell how much it's protecting you. Consider simplifying permissions.");
-    attroff(COLOR_PAIR(COLOR_PAIR_RISK));
+    // ask_for_permission_on_every_file_operation is true
+    if (net_operations_permitted == 0) {
+      attron(COLOR_PAIR(COLOR_PAIR_WARN));
+      mvaddstr(5, 5, "You're manually managing file permissions, but they can't leave this computer.");
+      attroff(COLOR_PAIR(COLOR_PAIR_WARN));
+    }
+    else {
+      attron(COLOR_PAIR(COLOR_PAIR_WARN));
+      mvaddstr(5, 5, "You're manually managing file permissions, and the app can access the network. Watch out for fatigue.");
+      attroff(COLOR_PAIR(COLOR_PAIR_WARN));
+//?       attron(COLOR_PAIR(COLOR_PAIR_RISK));
+//?       mvaddstr(5, 5, "😈 ⚠️  Manually managing file permissions on a networked app is a losing enterprise. ⚠️  😈");
+//?       attroff(COLOR_PAIR(COLOR_PAIR_RISK));
+    }
   }
 
   permissions_menu();
@@ -1582,7 +1619,11 @@ static void permissions_view() {
       case CTRL_X:
         return;
       case CTRL_F:
-        edit_file_operations_predicate_body();
+        if (!ask_for_permission_on_every_file_operation)
+          edit_file_operations_predicate_body();
+        break;
+      case CTRL_A:
+        ask_for_permission_on_every_file_operation = !ask_for_permission_on_every_file_operation;
         break;
       case CTRL_N:
         net_operations_permitted = !net_operations_permitted;
@@ -1618,6 +1659,9 @@ static void save_permissions_to_user_configuration(lua_State* L) {
       if (!lua_isnil(L, -1))
         emit_multiline_string(out, lua_tostring(L, -1));
       lua_pop(L, 1);  /* file_operations_predicate_body */
+      lua_getfield(L, -2, "ask_for_permission_on_every_file_operation");
+      fprintf(out, "  ask_for_permission_on_every_file_operation: %s\n", lua_tostring(L, -1));
+      lua_pop(L, 1);  /* ask_for_permission_on_every_file_operation */
       lua_getfield(L, -2, "net_operations_permitted");
       fprintf(out, "  net_operations_permitted: %s\n", lua_tostring(L, -1));
       lua_pop(L, 1);  /* net_operations_permitted */
@@ -1629,6 +1673,7 @@ static void save_permissions_to_user_configuration(lua_State* L) {
   fprintf(out, "  file_operations_predicate_body:\n");
   assert(file_operations_predicate_body);
   emit_multiline_string(out, file_operations_predicate_body);
+  fprintf(out, "  ask_for_permission_on_every_file_operation: %d\n", ask_for_permission_on_every_file_operation);
   fprintf(out, "  net_operations_permitted: %d\n", net_operations_permitted);
   fclose(out);
   if (in) fclose(in);
@@ -1666,6 +1711,9 @@ static void load_permissions_from_user_configuration(lua_State* L) {
         file_operations_predicate_body = file_operations_predicate_body_buffer;
       }
       lua_pop(L, 1);  /* file_operations_predicate_body */
+      lua_getfield(L, -2, "ask_for_permission_on_every_file_operation");
+      ask_for_permission_on_every_file_operation = lua_tointeger(L, -1);
+      lua_pop(L, 1);  /* ask_for_permission_on_every_file_operation */
       lua_getfield(L, -2, "net_operations_permitted");
       net_operations_permitted = lua_tointeger(L, -1);
       lua_pop(L, 1);  /* net_operations_permitted */

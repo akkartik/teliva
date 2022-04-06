@@ -187,6 +187,7 @@ extern void render_previous_error(void);
 
 /* Permissions checking */
 
+extern int ask_for_permission_on_every_file_operation;
 extern int file_operation_permitted(const char* filename, const char* mode);
 extern int net_operations_permitted;
 

@@ -1367,7 +1367,28 @@ static const char* user_configuration_filename() {
   return config_filename;
 }
 
-int file_operation_permitted(const char* filename, const char* mode) {
+static int file_operation_permitted_manually(const char* filename, const char* mode) {
+  int old_y, old_x;
+  getyx(stdscr, old_y, old_x);
+  attr_t old_attrs;
+  short old_pair;
+  attr_get(&old_attrs, &old_pair, NULL);
+  attrset(A_NORMAL);
+  mvaddstr(LINES-1, 0, "");
+  clrtoeol();
+  attrset(A_REVERSE);
+  if (strncmp(mode, "r", /*strlen("r") + 1 for NULL*/ 2) == 0)
+    mvprintw(LINES-1, 0, "open file \"%s\" for reading? ", filename);
+  else
+    mvprintw(LINES-1, 0, "open file \"%s\" for reading and writing? ", filename);
+  attrset(A_NORMAL);
+  int response = getch();
+  attr_set(old_attrs, old_pair, NULL);
+  mvaddstr(old_y, old_x, "");
+  return response == 'y';
+}
+
+static int file_operation_permitted_automatically(const char* filename, const char* mode) {
   int oldtop = lua_gettop(trustedL);
   lua_getglobal(trustedL, "file_operation_permitted");
   lua_pushstring(trustedL, filename);
@@ -1384,6 +1405,13 @@ int file_operation_permitted(const char* filename, const char* mode) {
   int should_allow = lua_toboolean(trustedL, -1);
   lua_settop(trustedL, oldtop);
   return should_allow;
+}
+
+int file_operation_permitted(const char* filename, const char* mode) {
+  if (ask_for_permission_on_every_file_operation)
+    return file_operation_permitted_manually(filename, mode);
+  else
+    return file_operation_permitted_automatically(filename, mode);
 }
 
 static void permissions_menu() {

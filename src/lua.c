@@ -239,7 +239,7 @@ static int pmain (lua_State *L) {
   if (status != 0) return 0;
   status = dorequire(L, "src/task.lua", "task");
   if (status != 0) return 0;
-  status = dorequire(L, "src/file.lua", "file");
+  status = dofile(L, "src/file.lua");
   if (status != 0) return 0;
   lua_gc(L, LUA_GCRESTART, 0);
 

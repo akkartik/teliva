@@ -17,6 +17,74 @@
 # If these constraints are violated, Teliva may unceremoniously crash. Please
 # report bugs at http://akkartik.name/contact
 - __teliva_timestamp: original
+  check:
+    >function check(x, msg)
+    >  if x then
+    >    Window:addch('.')
+    >  else
+    >    print('F - '..msg)
+    >    print('  '..str(x)..' is false/nil')
+    >    teliva_num_test_failures = teliva_num_test_failures + 1
+    >    -- overlay first test failure on editors
+    >    if teliva_first_failure == nil then
+    >      teliva_first_failure = msg
+    >    end
+    >  end
+    >end
+- __teliva_timestamp: original
+  check_eq:
+    >function check_eq(x, expected, msg)
+    >  if eq(x, expected) then
+    >    Window:addch('.')
+    >  else
+    >    print('F - '..msg)
+    >    print('  expected '..str(expected)..' but got '..str(x))
+    >    teliva_num_test_failures = teliva_num_test_failures + 1
+    >    -- overlay first test failure on editors
+    >    if teliva_first_failure == nil then
+    >      teliva_first_failure = msg
+    >    end
+    >  end
+    >end
+- __teliva_timestamp: original
+  eq:
+    >function eq(a, b)
+    >  if type(a) ~= type(b) then return false end
+    >  if type(a) == 'table' then
+    >    if #a ~= #b then return false end
+    >    for k, v in pairs(a) do
+    >      if b[k] ~= v then
+    >        return false
+    >      end
+    >    end
+    >    for k, v in pairs(b) do
+    >      if a[k] ~= v then
+    >        return false
+    >      end
+    >    end
+    >    return true
+    >  end
+    >  return a == b
+    >end
+- __teliva_timestamp: original
+  str:
+    >-- smarter tostring
+    >-- slow; used only for debugging
+    >function str(x)
+    >  if type(x) == 'table' then
+    >    local result = ''
+    >    result = result..#x..'{'
+    >    for k, v in pairs(x) do
+    >      result = result..str(k)..'='..str(v)..', '
+    >    end
+    >    result = result..'}'
+    >    return result
+    >  elseif type(x) == 'string' then
+    >    return '"'..x..'"'
+    >  end
+    >  return tostring(x)
+    >end
+- __teliva_timestamp: original
   Window:
     >Window = curses.stdscr()
     >-- animation-based app

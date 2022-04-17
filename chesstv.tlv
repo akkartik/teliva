@@ -354,6 +354,6 @@
 - __teliva_timestamp:
     >Thu Feb 17 20:00:23 2022
   doc:blurb:
-    >A demo of Teliva's support for networking: watch the current live chess game from LiChessTV.
+    >A demo of Teliva's support for networking: watch the current live chess game from Lichess TV.
     >
     >Compare with https://lichess.org/tv on a browser.

@@ -1579,3 +1579,99 @@
     >  end
     >  window:nodelay(false)
     >end
+- __teliva_timestamp:
+    >Sat Apr 23 00:45:54 2022
+  __teliva_note:
+    >ignore non-compliant "comments" containing tabs
+    >https://merveilles.town/@akkartik/108179923032818671
+  parse_items:
+    >function parse_items(feed, lines)
+    >  if Items[feed] == nil then Items[feed] = {} end
+    >  for line in lines:gmatch('[^\n]+') do
+    >    local t, status = line:match('([0-9][^%s]+)\t(.*)')
+    >    if t and status then
+    >      table.insert(Items[feed], {feed=feed, time=t, parsed_time=parse_time(t), status=status})
+    >    end
+    >  end
+    >  table.sort(Items[feed], compare_parsed_time)
+    >end
+- __teliva_timestamp:
+    >Sat Apr 23 00:52:39 2022
+  render_feed_status:
+    >function render_feed_status(window, feed_status)
+    >  window:clear()
+    >  for _, fs in ipairs(feed_status) do
+    >    if fs.status then
+    >      if fs.status == 2 then
+    >        window:attrset(curses.color_pair(10))
+    >        window:addstr(fs.feed..'\n')
+    >        window:attrset(curses.A_NORMAL)
+    >      else
+    >        window:attrset(curses.color_pair(9))
+    >        window:addstr(fs.feed..'\n')
+    >        window:attrset(curses.A_NORMAL)
+    >      end
+    >    else
+    >      window:addstr(fs.feed..'\n')
+    >    end
+    >  end
+    >  window:refresh()
+    >end
+- __teliva_timestamp:
+    >Sat Apr 23 00:56:34 2022
+  __teliva_note:
+    >handle errors in requests
+  reload_feeds:
+    >function reload_feeds(window)
+    >  window:nodelay(true)
+    >  local feed_status = {}
+    >  for _, feed in ipairs(Feeds) do
+    >    table.insert(feed_status, {feed=feed})
+    >  end
+    >  render_feed_status(window, feed_status)
+    >  for _, fs in ipairs(feed_status) do
+    >    local response, status, headers = http.request(fs.feed)
+    >    if response == nil then
+    >      fs.status = 4  -- treat any network issue like a 404
+    >    else
+    >      fs.status = status/100
+    >      if fs.status == 2 then
+    >        parse_items(fs.feed, response)
+    >      end
+    >      render_feed_status(window, feed_status)
+    >    end
+    >    if window:getch() then break end
+    >  end
+    >  window:nodelay(false)
+    >end
+- __teliva_timestamp:
+    >Sat Apr 23 01:06:55 2022
+  __teliva_note:
+    >handle more time formats
+  parse_time:
+    >function parse_time(t)
+    >  local int = tonumber
+    >  -- hackily strip out fractions of seconds
+    >  local year, month, day, hour, min, sec, tz_op, tz_hour, tz_min = t:match("^(%d%d%d%d)%-(%d%d)%-(%d%d)[Tt](%d%d%.?%d*):(%d%d):(%d%d)%.?[0-9]*([+-])(%d%d):(%d%d)")
+    >  if year == nil then
+    >    year, month, day, hour, min, sec = t:match("^(%d%d%d%d)%-(%d%d)%-(%d%d)[Tt](%d%d%.?%d*):(%d%d):(%d%d)%.?[0-9]*[Zz]")
+    >  end
+    >  if year == nil then
+    >    return 0
+    >  end
+    >  -- convert to UTC
+    >  if tz_op == '+' then
+    >    hour = int(hour) - int(tz_hour)
+    >    min = int(min) - int(tz_min)
+    >  elseif tz_op == '-' then
+    >    hour = int(hour) + int(tz_hour)
+    >    min = int(min) + int(tz_min)
+    >  end
+    >  return os.time{ year=int(year), month=int(month), day=int(day), hour=hour, min=min, sec=int(sec) }
+    >end
+    >
+    >function test_parse_time()
+    >  parse_time('2019-07-31T14:19+01:00')  -- invalid per https://www.ietf.org/rfc/rfc3339.txt, but seen in the while; just ignore
+    >  parse_time('2019-09-16T01:13:07-07:00')
+    >  parse_time('2019-09-16T01:13:07Z')
+    >end

@@ -3,8 +3,8 @@ body {
 	background-color: #FFFFFF ;
 	font-family: Helvetica, Arial, sans-serif ;
 	text-align: justify ;
-	margin-right: 30px ;
-	margin-left: 30px ;
+	margin: auto ;
+	width: 50em ;
 }
 
 h1, h2, h3, h4 {

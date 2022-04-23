@@ -2181,13 +2181,18 @@ each library provides all its functions as fields of a global table
 or as methods of its objects.
 
 
-<h2>5.1 - <a name="5.1">Basic Functions</a></h2>
+<h2>5.1 - <a name="5.1">Basic Primitives</a></h2>
 
 <p>
 The basic library provides some core functions to Lua.
 If you do not include this library in your application,
 you should check carefully whether you need to provide 
 implementations for some of its facilities.
+
+
+<p>
+<hr><h3><a name="pdf-arg"><code>arg</code></a></h3>
+A global variable containing any commandline arguments.
 
 
 <p>
@@ -2277,7 +2282,7 @@ to the message.
 
 <p>
 <hr><h3><a name="pdf-_G"><code>_G</code></a></h3>
-A global variable (not a function) that
+A global variable that
 holds the global environment (that is, <code>_G._G = _G</code>).
 Lua itself does not use this variable;
 changing its value does not affect any environment,

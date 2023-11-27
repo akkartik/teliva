@@ -25,7 +25,7 @@ make linux  # replace with 'macosx', etc. depending on your OS
 src/teliva hanoi.tlv
 ```
 
-<img alt='screenshot of Teliva running the Towers of Hanoi' src='doc/hanoi.png'>
+![screenshot of Teliva running the Towers of Hanoi](doc/hanoi.png)
 
 No matter what app you run, you are always guaranteed access to a single
 obvious, consistent way (currently the hotkey `ctrl-u`) to inspect its
@@ -35,7 +35,7 @@ When you look under the hood of an app, the first thing you see is a
 _big-picture view_ which shows the app's major data structures and a top-down
 view of the app's code.
 
-<img alt='screenshot of big-picture view for the Towers of Hanoi' src='doc/hanoi-big-picture.png'>
+![screenshot of big-picture view for the Towers of Hanoi](doc/hanoi-big-picture.png)
 
 Select a definition, make a change, hit `ctrl-x`, and the app will run with
 your updates. ([video](https://archive.org/details/akkartik-2021-11-14))

@@ -94,6 +94,7 @@ function temporary_filename_in_same_volume(filename)
       -- file doesn't exist yet; create a placeholder and return it
       local handle = io.open(temporary_filename, 'w')
       if handle == nil then
+        -- HERE: if an app doesn't have permissions, attempts to write to disk eventually get here
         error("this is unexpected; I can't create temporary files..")
       end
       handle:close()
